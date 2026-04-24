@@ -1,0 +1,10 @@
+{
+  "name": "everythingai-client-agent",
+  "version": "0.1.0",
+  "description": "Local client agent for scanning folders and syncing metadata to the EverythingAI server.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  }
+}
