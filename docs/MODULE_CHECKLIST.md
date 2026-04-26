@@ -4,73 +4,74 @@
 
 ### File System Layer
 
-- [ ] File scanner
-- [ ] File watcher
-- [ ] Change detection
-- [ ] File hash tracking
+- [x] File scanner
+- [x] File watcher
+- [x] Change detection
+- [x] File hash tracking
 
 ### Metadata Layer
 
-- [ ] Metadata database
-- [ ] File indexing status
-- [ ] Path tracking
+- [x] Metadata database
+- [x] File indexing status
+- [x] Path tracking
 
 ### Content Layer
 
-- [ ] Text extraction
+- [x] Text extraction
 - [ ] OCR support
-- [ ] File type handling
+- [x] File type handling
 
 ### Search Layer
 
-- [ ] Keyword search
-- [ ] Filename search
-- [ ] Path search
+- [x] Keyword search
+- [x] Filename search
+- [x] Path search
 
 ### AI Layer
 
-- [ ] Embedding generation
-- [ ] Semantic search
-- [ ] Chat interface
-- [ ] Summarization
-- [ ] Classification
+- [x] Embedding generation
+- [x] Semantic search
+- [x] Chat interface
+- [x] Summarization
+- [x] Classification
 
 ### Knowledge Layer
 
-- [ ] Entity extraction
-- [ ] Knowledge pages
-- [ ] Relationship mapping
+- [x] Entity extraction
+- [x] Knowledge pages
+- [x] Relationship mapping
 
 ### Organization Layer
 
-- [ ] Tag suggestion
-- [ ] Folder suggestion
-- [ ] Rename suggestion
-- [ ] Duplicate detection
+- [x] Tag suggestion
+- [x] Folder suggestion
+- [x] Rename suggestion
+- [x] Duplicate detection
 
 ### Execution Layer
 
-- [ ] Preview actions
-- [ ] Approval system
-- [ ] Move files
-- [ ] Rename files
+- [x] Preview actions
+- [x] Approval system
+- [x] Move files
+- [x] Rename files
 - [ ] Delete handling
-- [ ] Undo system
-- [ ] Audit log
+- [x] Undo system
+- [x] Audit log
 
 ### UI Layer
 
-- [ ] Search UI
-- [ ] Chat UI
-- [ ] File preview
-- [ ] Action preview
-- [ ] Settings
+- [x] Search UI
+- [x] Chat UI
+- [x] File preview
+- [x] Action preview
+- [x] Settings
+- [x] System overview dashboard
 
 ## Integration modules
 
-- [ ] AnythingLLM integration
-- [ ] Ollama integration
-- [ ] External APIs
+- [x] AnythingLLM integration
+- [x] Ollama integration
+- [x] External APIs
 
 ## Future modules
 

@@ -405,7 +405,8 @@ Alternative if choosing Python first:
 
 ## Open decisions
 
-- Whether to implement the first backend in Node.js TypeScript or Python FastAPI.
+- First metadata indexer decision: implement inside the existing `services/api` Node.js package using JavaScript modules and SQLite, rather than adding a competing `apps/api` scaffold immediately.
+- Whether to migrate the first backend from JavaScript to TypeScript as the codebase grows.
 - Whether AnythingLLM is forked immediately or integrated after the metadata indexer works.
 - Whether Organizor2 should be imported as code, copied module-by-module, or used only as reference.
 - Whether the first UI should be desktop-first or API/CLI-first.
@@ -413,3 +414,27 @@ Alternative if choosing Python first:
 ## Recommended decision
 
 Start API/CLI-first with a small local SQLite metadata indexer. Once indexing works, add document extraction and search. Only then integrate UI and AnythingLLM.
+
+## Current implementation status
+
+- Phase 1 metadata indexing is implemented in `services/api` with SQLite persistence and CLI/API entrypoints.
+- Phase 2 document extraction is implemented for TXT, MD, CSV, PDF, DOCX, and XLSX with per-file extraction status and errors.
+- Phase 3 keyword search is implemented with SQLite FTS over filenames, paths, extensions, and extracted text.
+- Phase 4 local chat is implemented as retrieval plus an opt-in Ollama-compatible provider. If `OLLAMA_MODEL` is not configured, the API returns a prompt-ready fallback with sources. No cloud provider or AnythingLLM integration runs yet.
+- Phase 5 organization suggestions are implemented as preview-only records for tags, category, rename, and move suggestions. The suggestion engine uses Organizor2-inspired content/type rules adapted into the API. No file actions are executed at suggestion time.
+- Phase 6 safe action previews are implemented as non-executing preview records with approval required, conflict detection, and path traversal checks for rename/move proposals.
+- Phase 7 safe execution and undo are implemented for approved tag, category, rename, and move actions. Rename/move update the SQLite index and write audit records. Delete actions are not implemented.
+- Phase 8 has a minimal local web app served by `services/api` for indexing, extraction, search, Ollama chat, suggestions, previews, approved execution, and a SQLite-backed system overview panel.
+- Integration bridge: AnythingLLM sync is implemented as an optional document-upload bridge for extracted EverythingAI knowledge. It is configured by environment variables and does not replace the local SQLite source of truth.
+- Additional platform services are implemented for duplicate detection, file watching/change detection, deterministic summaries/classification/entities, local deterministic token embeddings, and semantic-style related search over extracted text.
+- Operational visibility is implemented through `/api/status`, `/api/action-executions`, `/api/audit-log`, and `/api/labels`.
+- Knowledge layer basics are implemented through file previews and an entity/classification knowledge index generated from file insights.
+
+The current implementation is local-first. Source file mutation is limited to approved rename/move actions after a safe preview; all other indexing, extraction, search, chat, labels, previews, and audit records are stored in app-owned SQLite data.
+
+## Current validation status
+
+- Automated tests pass with `npm test` (`15/15` as of the latest validation).
+- Dependency audit passes with `npm audit --omit=dev`.
+- Local Ollama is verified with model `qwen3.5:2b`.
+- End-to-end clean app smoke test passed: serve UI, index fixture folder, extract text, search indexed content, answer through Ollama with source reference, generate organization suggestion, preview move, and execute approved folder organization.

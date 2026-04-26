@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EverythingAI Local App</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">EverythingAI local-first file brain</p>
+          <h1>Scan, search, chat, and safely organize local files.</h1>
+          <p class="lede">This app indexes local metadata/content in SQLite, answers through Ollama when configured, and only executes organization actions after preview and approval.</p>
+        </div>
+        <div class="status-card">
+          <span>Provider</span>
+          <strong id="providerStatus">Ollama-ready when configured</strong>
+        </div>
+      </section>
+
+      <section class="panel grid">
+        <label>
+          API token
+          <input id="token" type="password" value="replace-with-your-local-development-token" />
+        </label>
+        <label>
+          Folder path
+          <input id="folderPath" placeholder="C:\path\to\folder" />
+        </label>
+        <button id="indexBtn">Index Folder</button>
+        <button id="extractBtn">Extract Text</button>
+        <button id="embeddingsBtn">Embeddings</button>
+        <button id="watchBtn">Watch Folder</button>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <h2>System Overview</h2>
+            <p class="muted">Current local index state from SQLite.</p>
+          </div>
+          <button id="statusBtn" class="secondary">Refresh Status</button>
+        </div>
+        <div id="statusGrid" class="metrics"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Settings</h2>
+        <p class="muted">Settings are stored in this browser only. Server providers are configured through environment variables.</p>
+        <div class="row">
+          <button id="saveSettingsBtn">Save Local Settings</button>
+          <button id="clearSettingsBtn">Clear Local Settings</button>
+          <span id="settingsStatus" class="muted"></span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Search and Chat</h2>
+        <div class="row">
+          <input id="query" placeholder="Search or ask about files..." />
+          <button id="searchBtn">Search</button>
+          <button id="semanticBtn">Semantic</button>
+          <button id="chatBtn">Ask AI</button>
+        </div>
+        <pre id="answer"></pre>
+      </section>
+
+      <section class="panel">
+        <h2>Insights and Duplicates</h2>
+        <div class="row">
+          <button id="insightsBtn">Generate Insights</button>
+          <button id="duplicatesBtn">Find Duplicates</button>
+          <button id="knowledgeBtn">Knowledge</button>
+          <span></span>
+        </div>
+        <div id="insights" class="cards"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Files</h2>
+        <button id="refreshBtn">Refresh Files</button>
+        <div id="files" class="cards"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Suggestions and Safe Actions</h2>
+        <p class="muted">Select a file, create suggestions, preview an action, then explicitly approve execution.</p>
+        <div id="suggestions" class="cards"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Log</h2>
+        <div class="row">
+          <button id="labelsBtn">Labels</button>
+          <button id="executionsBtn">Executions</button>
+          <button id="auditBtn">Audit</button>
+        </div>
+        <pre id="log"></pre>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
