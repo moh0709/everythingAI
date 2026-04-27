@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -47,11 +46,6 @@ app.use(express.json({ limit: '25mb' }));
 app.use(morgan('dev'));
 app.use(express.static(publicDir));
 
-const memoryStore = {
-  devices: new Map(),
-  files: new Map(),
-};
-
 function requireApiToken(req, res, next) {
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -66,6 +60,20 @@ function requireApiToken(req, res, next) {
   next();
 }
 
+function requireBodyString(req, res, fieldName) {
+  const value = req.body?.[fieldName];
+  if (typeof value !== 'string' || !value.trim()) {
+    res.status(400).json({ error: `${fieldName} is required` });
+    return null;
+  }
+  return value.trim();
+}
+
+function parseLimit(value, fallback) {
+  const parsed = Number.parseInt(value || fallback.toString(), 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -74,82 +82,10 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.post('/api/devices/register', requireApiToken, (req, res) => {
-  const { hostname, platform, agentVersion } = req.body;
-
-  if (!hostname) {
-    return res.status(400).json({ error: 'hostname is required' });
-  }
-
-  const deviceId = nanoid();
-  const device = {
-    id: deviceId,
-    hostname,
-    platform: platform || 'unknown',
-    agentVersion: agentVersion || '0.1.0',
-    registeredAt: new Date().toISOString(),
-    lastSeenAt: new Date().toISOString(),
-  };
-
-  memoryStore.devices.set(deviceId, device);
-
-  res.status(201).json({ device });
-});
-
-app.get('/api/devices', requireApiToken, (_req, res) => {
-  res.json({ devices: Array.from(memoryStore.devices.values()) });
-});
-
-app.post('/api/files/ingest', requireApiToken, (req, res) => {
-  const { deviceId, files } = req.body;
-
-  if (!deviceId) {
-    return res.status(400).json({ error: 'deviceId is required' });
-  }
-
-  if (!Array.isArray(files)) {
-    return res.status(400).json({ error: 'files must be an array' });
-  }
-
-  const device = memoryStore.devices.get(deviceId);
-  if (!device) {
-    return res.status(404).json({ error: 'device not found' });
-  }
-
-  const now = new Date().toISOString();
-  device.lastSeenAt = now;
-
-  let ingested = 0;
-
-  for (const file of files) {
-    if (!file.fullPath || !file.filename) continue;
-
-    const fileId = file.hash ? `${deviceId}:${file.hash}` : `${deviceId}:${file.fullPath}`;
-
-    memoryStore.files.set(fileId, {
-      id: fileId,
-      deviceId,
-      filename: file.filename,
-      fullPath: file.fullPath,
-      extension: file.extension || '',
-      size: file.size || 0,
-      createdAt: file.createdAt || null,
-      modifiedAt: file.modifiedAt || null,
-      hash: file.hash || null,
-      indexedAt: now,
-      status: 'metadata_indexed',
-    });
-
-    ingested += 1;
-  }
-
-  res.status(201).json({ ingested });
-});
-
 app.get('/api/files', requireApiToken, (req, res) => {
   const db = openDatabase();
   const files = listIndexedFiles(db, {
-    limit: Number.parseInt(req.query.limit || '100', 10),
+    limit: parseLimit(req.query.limit, 100),
     status: req.query.status?.toString(),
     query: req.query.q?.toString(),
   });
@@ -191,11 +127,8 @@ app.get('/api/files/:fileId/preview', requireApiToken, (req, res) => {
 
 app.post('/api/index', requireApiToken, async (req, res, next) => {
   try {
-    const { folderPath } = req.body;
-
-    if (!folderPath) {
-      return res.status(400).json({ error: 'folderPath is required' });
-    }
+    const folderPath = requireBodyString(req, res, 'folderPath');
+    if (!folderPath) return;
 
     const db = openDatabase();
     const insertRecord = db.transaction((record) => upsertIndexedFile(db, record));
@@ -214,8 +147,8 @@ app.post('/api/extract', requireApiToken, async (req, res, next) => {
   try {
     const db = openDatabase();
     const result = await extractIndexedFiles(db, {
-      fileId: req.body.fileId,
-      limit: Number.parseInt(req.body.limit || '1000', 10),
+      fileId: req.body?.fileId,
+      limit: parseLimit(req.body?.limit, 1000),
     });
     db.close();
 
@@ -235,7 +168,7 @@ app.get('/api/search', requireApiToken, (req, res) => {
   const db = openDatabase();
   const results = searchFiles(db, {
     query,
-    limit: Number.parseInt(req.query.limit || '20', 10),
+    limit: parseLimit(req.query.limit, 20),
   });
   db.close();
 
@@ -252,7 +185,7 @@ app.get('/api/semantic-search', requireApiToken, (req, res) => {
   const db = openDatabase();
   const results = semanticSearchFiles(db, {
     query,
-    limit: Number.parseInt(req.query.limit || '10', 10),
+    limit: parseLimit(req.query.limit, 10),
   });
   db.close();
 
@@ -262,8 +195,8 @@ app.get('/api/semantic-search', requireApiToken, (req, res) => {
 app.post('/api/embeddings', requireApiToken, (req, res) => {
   const db = openDatabase();
   const result = generateEmbeddings(db, {
-    fileId: req.body.fileId,
-    limit: Number.parseInt(req.body.limit || '1000', 10),
+    fileId: req.body?.fileId,
+    limit: parseLimit(req.body?.limit, 1000),
   });
   db.close();
 
@@ -272,16 +205,13 @@ app.post('/api/embeddings', requireApiToken, (req, res) => {
 
 app.post('/api/chat', requireApiToken, async (req, res, next) => {
   try {
-    const { question, limit } = req.body;
-
-    if (!question) {
-      return res.status(400).json({ error: 'question is required' });
-    }
+    const question = requireBodyString(req, res, 'question');
+    if (!question) return;
 
     const db = openDatabase();
     const result = await answerFromLocalFiles(db, {
       question,
-      limit: Number.parseInt(limit || '5', 10),
+      limit: parseLimit(req.body?.limit, 5),
     });
     db.close();
 
@@ -295,13 +225,13 @@ app.post('/api/insights', requireApiToken, async (req, res, next) => {
   try {
     const db = openDatabase();
     const result = await generateFileInsights(db, {
-      fileId: req.body.fileId,
-      limit: Number.parseInt(req.body.limit || '25', 10),
-      useOllama: req.body.useOllama === true,
+      fileId: req.body?.fileId,
+      limit: parseLimit(req.body?.limit, 25),
+      useOllama: req.body?.useOllama === true,
     });
     const insights = listFileInsights(db, {
-      fileId: req.body.fileId,
-      limit: Number.parseInt(req.body.limit || '25', 10),
+      fileId: req.body?.fileId,
+      limit: parseLimit(req.body?.limit, 25),
     });
     db.close();
 
@@ -322,7 +252,7 @@ app.get('/api/duplicates', requireApiToken, (_req, res) => {
 app.get('/api/knowledge', requireApiToken, (req, res) => {
   const db = openDatabase();
   const result = buildKnowledgeIndex(db, {
-    limit: Number.parseInt(req.query.limit || '500', 10),
+    limit: parseLimit(req.query.limit, 500),
   });
   db.close();
 
@@ -331,14 +261,11 @@ app.get('/api/knowledge', requireApiToken, (req, res) => {
 
 app.post('/api/watch', requireApiToken, async (req, res, next) => {
   try {
-    const { folderPath, extract } = req.body;
-
-    if (!folderPath) {
-      return res.status(400).json({ error: 'folderPath is required' });
-    }
+    const folderPath = requireBodyString(req, res, 'folderPath');
+    if (!folderPath) return;
 
     const db = openDatabase();
-    const result = await startFolderWatcher(db, { rootPath: folderPath, extract: extract !== false });
+    const result = await startFolderWatcher(db, { rootPath: folderPath, extract: req.body?.extract !== false });
 
     res.status(201).json(result);
   } catch (error) {
@@ -348,11 +275,8 @@ app.post('/api/watch', requireApiToken, async (req, res, next) => {
 
 app.post('/api/unwatch', requireApiToken, (req, res, next) => {
   try {
-    const { folderPath } = req.body;
-
-    if (!folderPath) {
-      return res.status(400).json({ error: 'folderPath is required' });
-    }
+    const folderPath = requireBodyString(req, res, 'folderPath');
+    if (!folderPath) return;
 
     const db = openDatabase();
     const result = stopFolderWatcher(db, { rootPath: folderPath });
@@ -366,11 +290,8 @@ app.post('/api/unwatch', requireApiToken, (req, res, next) => {
 
 app.post('/api/suggestions', requireApiToken, (req, res, next) => {
   try {
-    const { fileId } = req.body;
-
-    if (!fileId) {
-      return res.status(400).json({ error: 'fileId is required' });
-    }
+    const fileId = requireBodyString(req, res, 'fileId');
+    if (!fileId) return;
 
     const db = openDatabase();
     const suggestions = generatePreviewSuggestions(db, { fileId });
@@ -384,11 +305,8 @@ app.post('/api/suggestions', requireApiToken, (req, res, next) => {
 
 app.post('/api/action-previews', requireApiToken, async (req, res, next) => {
   try {
-    const { suggestionId } = req.body;
-
-    if (!suggestionId) {
-      return res.status(400).json({ error: 'suggestionId is required' });
-    }
+    const suggestionId = requireBodyString(req, res, 'suggestionId');
+    if (!suggestionId) return;
 
     const db = openDatabase();
     const preview = await createActionPreview(db, { suggestionId });
@@ -402,16 +320,13 @@ app.post('/api/action-previews', requireApiToken, async (req, res, next) => {
 
 app.post('/api/action-executions', requireApiToken, async (req, res, next) => {
   try {
-    const { previewId, approve } = req.body;
-
-    if (!previewId) {
-      return res.status(400).json({ error: 'previewId is required' });
-    }
+    const previewId = requireBodyString(req, res, 'previewId');
+    if (!previewId) return;
 
     const db = openDatabase();
     const execution = await executeActionPreview(db, {
       previewId,
-      approve: approve === true,
+      approve: req.body?.approve === true,
     });
     db.close();
 
@@ -426,7 +341,7 @@ app.post('/api/action-executions/:executionId/undo', requireApiToken, async (req
     const db = openDatabase();
     const execution = await undoActionExecution(db, {
       executionId: req.params.executionId,
-      approve: req.body.approve === true,
+      approve: req.body?.approve === true,
     });
     db.close();
 
@@ -440,7 +355,7 @@ app.get('/api/action-executions', requireApiToken, (req, res) => {
   const db = openDatabase();
   const executions = listActionExecutions(db, {
     fileId: req.query.fileId?.toString(),
-    limit: Number.parseInt(req.query.limit || '100', 10),
+    limit: parseLimit(req.query.limit, 100),
   });
   db.close();
 
@@ -452,7 +367,7 @@ app.get('/api/audit-log', requireApiToken, (req, res) => {
   const events = listAuditLog(db, {
     entityType: req.query.entityType?.toString(),
     entityId: req.query.entityId?.toString(),
-    limit: Number.parseInt(req.query.limit || '100', 10),
+    limit: parseLimit(req.query.limit, 100),
   });
   db.close();
 
@@ -463,7 +378,7 @@ app.get('/api/labels', requireApiToken, (req, res) => {
   const db = openDatabase();
   const labels = listFileLabels(db, {
     fileId: req.query.fileId?.toString(),
-    limit: Number.parseInt(req.query.limit || '100', 10),
+    limit: parseLimit(req.query.limit, 100),
   });
   db.close();
 
@@ -474,8 +389,8 @@ app.post('/api/integrations/anythingllm/sync', requireApiToken, async (req, res,
   try {
     const db = openDatabase();
     const result = await syncExtractedFilesToAnythingLlm(db, {
-      fileId: req.body.fileId,
-      limit: Number.parseInt(req.body.limit || '25', 10),
+      fileId: req.body?.fileId,
+      limit: parseLimit(req.body?.limit, 25),
     });
     db.close();
 
