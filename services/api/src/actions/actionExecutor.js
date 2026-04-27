@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   getActionExecutionById,
   getActionPreviewById,
+  getIndexedFileById,
   insertActionExecution,
   insertAuditLog,
   markActionExecutionUndone,
@@ -29,6 +30,33 @@ function relativeAfterAction(originalRelativePath, targetPath, sourcePath) {
   }
 
   return path.join(originalDir, relativeFromSourceDir);
+}
+
+function deriveOriginalRelativePath(currentFile, restoredAbsolutePath) {
+  if (!currentFile?.absolute_path || !currentFile?.relative_path) {
+    return path.basename(restoredAbsolutePath);
+  }
+
+  const currentAbsolutePath = path.resolve(currentFile.absolute_path);
+  const currentRelativePath = path.normalize(currentFile.relative_path);
+  const lowerAbsolutePath = currentAbsolutePath.toLowerCase();
+  const lowerRelativePath = currentRelativePath.toLowerCase();
+
+  if (!lowerAbsolutePath.endsWith(lowerRelativePath)) {
+    return path.basename(restoredAbsolutePath);
+  }
+
+  const rootPath = currentAbsolutePath
+    .slice(0, currentAbsolutePath.length - currentRelativePath.length)
+    .replace(/[\\/]+$/, '');
+
+  const restoredRelativePath = path.relative(rootPath, restoredAbsolutePath);
+
+  if (!restoredRelativePath || restoredRelativePath.startsWith('..') || path.isAbsolute(restoredRelativePath)) {
+    return path.basename(restoredAbsolutePath);
+  }
+
+  return restoredRelativePath;
 }
 
 function audit(db, { eventType, entityType, entityId, payload }) {
@@ -149,6 +177,9 @@ export async function undoActionExecution(db, { executionId, approve = false } =
       throw new Error('Undo target path already exists.');
     }
 
+    const currentFile = getIndexedFileById(db, execution.file_id);
+    const restoredRelativePath = deriveOriginalRelativePath(currentFile, execution.undo_target_path);
+
     await fs.mkdir(path.dirname(execution.undo_target_path), { recursive: true });
     await fs.rename(execution.undo_source_path, execution.undo_target_path);
 
@@ -156,7 +187,7 @@ export async function undoActionExecution(db, { executionId, approve = false } =
       fileId: execution.file_id,
       filename: path.basename(execution.undo_target_path),
       absolutePath: execution.undo_target_path,
-      relativePath: path.basename(execution.undo_target_path),
+      relativePath: restoredRelativePath,
     });
   }
 
