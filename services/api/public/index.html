@@ -4,102 +4,261 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>EverythingAI Local App</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=auto-feedback-1" />
   </head>
   <body>
-    <main class="shell">
-      <section class="hero">
-        <div>
-          <p class="eyebrow">EverythingAI local-first file brain</p>
-          <h1>Scan, search, chat, and safely organize local files.</h1>
-          <p class="lede">This app indexes local metadata/content in SQLite, answers through Ollama when configured, and only executes organization actions after preview and approval.</p>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">EO</span>
+          <strong>EverythingAI Organizor</strong>
         </div>
-        <div class="status-card">
+        <nav class="nav-list" aria-label="Primary">
+          <button class="nav-item active" data-view-target="dashboardView">Dashboard</button>
+          <button class="nav-item" data-view-target="filesView">Library</button>
+          <button class="nav-item" data-view-target="planView">Organize Plan</button>
+          <button class="nav-item" data-view-target="organizeView">Safe Actions</button>
+          <button class="nav-item" data-view-target="knowledgeView">Knowledge</button>
+          <button class="nav-item" data-view-target="chatView">Ask</button>
+          <button class="nav-item" data-view-target="settingsView">Settings</button>
+        </nav>
+        <div class="sidebar-status">
           <span>Provider</span>
-          <strong id="providerStatus">Ollama-ready when configured</strong>
+          <strong id="providerStatus">ollama: model not set</strong>
+          <button id="providerSettingsBtn" class="secondary compact">Settings</button>
         </div>
-      </section>
+      </aside>
 
-      <section class="panel grid">
-        <label>
-          API token
-          <input id="token" type="password" value="replace-with-your-local-development-token" />
-        </label>
-        <label>
-          Folder path
-          <input id="folderPath" placeholder="C:\path\to\folder" />
-        </label>
-        <button id="indexBtn">Index Folder</button>
-        <button id="extractBtn">Extract Text</button>
-        <button id="embeddingsBtn">Embeddings</button>
-        <button id="watchBtn">Watch Folder</button>
-      </section>
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Organizor2 planning layer inside EverythingAI</p>
+            <h1>AI File Intelligence Center</h1>
+            <p class="topbar-copy">Analyze local files, generate organization plans, preview changes, and execute safely through EverythingAI.</p>
+          </div>
+          <div class="topbar-actions">
+            <div class="global-search">
+              <input id="query" placeholder="Search files, knowledge, labels, actions..." />
+              <button id="unifiedSearchBtn">Search Everything</button>
+              <button id="chatBtn" class="secondary">Ask AI</button>
+            </div>
+            <div class="activity-banner">
+              <strong id="activityStatus">Ready</strong>
+              <span id="activityDetails">Auto indexing prepares search, knowledge, and organization plans.</span>
+            </div>
+            <span class="live-pill">Live local mode</span>
+            <button id="statusBtn" class="secondary">Refresh</button>
+          </div>
+        </header>
 
-      <section class="panel">
+        <section id="dashboardView" class="view active">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Source Intake</h2>
+                <p class="muted">Pick a folder once. The app automatically loads files into SQLite, extracts text, creates embeddings, saves knowledge, and prepares organization suggestions.</p>
+              </div>
+            </div>
+            <div class="folder-grid">
+              <label>
+                API token
+                <input id="token" type="password" value="replace-with-your-local-development-token" />
+              </label>
+              <label>
+                Folder path
+                <input id="folderPath" placeholder="C:\path\to\folder" />
+              </label>
+              <button id="openFolderBtn" class="secondary">Open Folder</button>
+              <button id="indexBtn">Auto Index</button>
+              <button id="extractBtn" class="secondary">Extract Text</button>
+              <button id="embeddingsBtn" class="secondary">Embeddings</button>
+              <button id="watchBtn">Auto Watch</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>System Overview</h2>
+                <p class="muted">Current local index, extraction, embeddings, suggestions, safe actions, and sync state.</p>
+              </div>
+            </div>
+            <div id="statusGrid" class="metrics"></div>
+          </section>
+
+          <section class="dashboard-grid">
+            <div class="panel">
+              <h2>Organizor Layer</h2>
+              <p class="muted">Generate a folder plan from indexed files. Knowledge and suggestions are created automatically during indexing.</p>
+              <div class="quick-actions">
+                <button data-view-target="planView" class="gradient-action">Start Planning</button>
+                <button id="suggestVisibleBtn" class="secondary">Analyze Library</button>
+              </div>
+            </div>
+            <div class="panel">
+              <h2>AnythingLLM Bridge</h2>
+              <p class="muted">Sync extracted documents or ask indexed sources through the same global search bar.</p>
+              <div class="quick-actions">
+                <button id="anythingLlmSyncBtn" class="secondary">Sync AnythingLLM</button>
+                <button data-view-target="chatView">Ask Sources</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="filesView" class="view">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Library</h2>
+                <p class="muted">Indexed files waiting for Organizor review.</p>
+              </div>
+              <button id="refreshBtn" class="secondary">Refresh Files</button>
+            </div>
+            <div id="files" class="cards"></div>
+          </section>
+        </section>
+
+        <section id="planView" class="view">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Planning</h2>
+                <p class="muted">Organizor2-inspired plan view. Suggestions are grouped by target folder and action type before preview.</p>
+              </div>
+              <div class="button-row">
+                <button id="refreshPlanBtn">Refresh Plan</button>
+                <button id="suggestPlanBtn" class="gradient-action">Generate From Library</button>
+              </div>
+            </div>
+            <div class="plan-layout">
+              <div>
+                <h3>Proposed Structure</h3>
+                <div id="planTree" class="plan-tree"></div>
+              </div>
+              <div>
+                <h3>Plan Actions</h3>
+                <div id="planActions" class="cards"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="organizeView" class="view">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Safe Actions</h2>
+                <p class="muted">Preview generated suggestions, then explicitly approve any rename, move, tag, or category action.</p>
+              </div>
+              <div class="button-row">
+                <button id="insightsBtn">Generate Insights</button>
+                <button id="labelsBtn" class="secondary">Labels</button>
+                <button id="executionsBtn" class="secondary">Executions</button>
+                <button id="auditBtn" class="secondary">Audit</button>
+              </div>
+            </div>
+            <div id="suggestions" class="cards"></div>
+          </section>
+          <section class="panel">
+            <h2>Action Log</h2>
+            <pre id="log"></pre>
+          </section>
+        </section>
+
+        <section id="chatView" class="view">
+          <section class="chat-layout">
+            <div class="panel">
+              <div class="section-heading">
+                <div>
+                  <h2>Ask Sources</h2>
+                  <p class="muted">Use AnythingLLM/Ollama-style retrieval after files have been indexed and extracted.</p>
+                </div>
+              </div>
+              <div class="search-row">
+                <button id="searchBtn">Search Everything</button>
+                <button id="semanticBtn" class="secondary">Semantic Files</button>
+              </div>
+              <pre id="answer"></pre>
+            </div>
+            <aside class="panel">
+              <h2>Source Context</h2>
+              <p class="muted">Search results open in Library. File previews appear in this chat answer area.</p>
+            </aside>
+          </section>
+        </section>
+
+        <section id="knowledgeView" class="view">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Knowledge</h2>
+                <p class="muted">Generated summaries, classifications, entities, duplicate groups, and source maps.</p>
+              </div>
+              <div class="button-row">
+                <button id="knowledgeBtn">Build Knowledge</button>
+                <button id="knowledgeRefreshBtn">Knowledge</button>
+                <button id="duplicatesRefreshBtn" class="secondary">Find Duplicates</button>
+              </div>
+            </div>
+            <div id="insights" class="cards"></div>
+          </section>
+        </section>
+
+        <section id="settingsView" class="view">
+          <section class="panel">
+            <h2>Local Settings</h2>
+            <p class="muted">Folder and token settings are stored in this browser. Provider settings apply to the running local API server.</p>
+            <div class="button-row">
+              <button id="saveSettingsBtn">Save Local Settings</button>
+              <button id="clearSettingsBtn" class="secondary">Clear Local Settings</button>
+              <span id="settingsStatus" class="muted"></span>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="providerSettingsDialog">
+      <form method="dialog" class="settings-dialog">
         <div class="section-heading">
           <div>
-            <h2>System Overview</h2>
-            <p class="muted">Current local index state from SQLite.</p>
+            <h2>Provider Settings</h2>
+            <p class="muted">Provider changes apply to local chat requests on this running API server.</p>
           </div>
-          <button id="statusBtn" class="secondary">Refresh Status</button>
+          <button id="closeProviderSettingsBtn" class="secondary" value="cancel">Close</button>
         </div>
-        <div id="statusGrid" class="metrics"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Settings</h2>
-        <p class="muted">Settings are stored in this browser only. Server providers are configured through environment variables.</p>
-        <div class="row">
-          <button id="saveSettingsBtn">Save Local Settings</button>
-          <button id="clearSettingsBtn">Clear Local Settings</button>
-          <span id="settingsStatus" class="muted"></span>
+        <label>
+          Chat provider
+          <select id="providerSelect">
+            <option value="ollama">Ollama</option>
+          </select>
+        </label>
+        <label>
+          Ollama base URL
+          <input id="ollamaBaseUrl" placeholder="http://127.0.0.1:11434" />
+        </label>
+        <label>
+          Ollama model
+          <input id="ollamaModel" placeholder="qwen3.5:2b" />
+        </label>
+        <div class="settings-grid">
+          <label>
+            Timeout ms
+            <input id="ollamaTimeoutMs" type="number" min="1000" step="1000" />
+          </label>
+          <label>
+            Max tokens
+            <input id="ollamaNumPredict" type="number" min="1" step="1" />
+          </label>
         </div>
-      </section>
-
-      <section class="panel">
-        <h2>Search and Chat</h2>
-        <div class="row">
-          <input id="query" placeholder="Search or ask about files..." />
-          <button id="searchBtn">Search</button>
-          <button id="semanticBtn">Semantic</button>
-          <button id="chatBtn">Ask AI</button>
+        <div class="button-row">
+          <button id="saveProviderSettingsBtn" type="button">Save Provider</button>
+          <span id="providerSettingsStatus" class="muted"></span>
         </div>
-        <pre id="answer"></pre>
-      </section>
+      </form>
+    </dialog>
 
-      <section class="panel">
-        <h2>Insights and Duplicates</h2>
-        <div class="row">
-          <button id="insightsBtn">Generate Insights</button>
-          <button id="duplicatesBtn">Find Duplicates</button>
-          <button id="knowledgeBtn">Knowledge</button>
-          <span></span>
-        </div>
-        <div id="insights" class="cards"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Files</h2>
-        <button id="refreshBtn">Refresh Files</button>
-        <div id="files" class="cards"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Suggestions and Safe Actions</h2>
-        <p class="muted">Select a file, create suggestions, preview an action, then explicitly approve execution.</p>
-        <div id="suggestions" class="cards"></div>
-      </section>
-
-      <section class="panel">
-        <h2>Log</h2>
-        <div class="row">
-          <button id="labelsBtn">Labels</button>
-          <button id="executionsBtn">Executions</button>
-          <button id="auditBtn">Audit</button>
-        </div>
-        <pre id="log"></pre>
-      </section>
-    </main>
-    <script src="/app.js" type="module"></script>
+    <script src="/app.js?v=auto-feedback-1" type="module"></script>
   </body>
 </html>

@@ -12,6 +12,7 @@ import {
   listActionExecutions,
   listAuditLog,
   listFileLabels,
+  listOrganizationSuggestions,
   getSystemStatus,
 } from '../src/db/client.js';
 import { scanFolder } from '../src/indexer/fileScanner.js';
@@ -30,6 +31,12 @@ import { findDuplicateFiles } from '../src/duplicates/duplicateService.js';
 import { startFolderWatcher, stopFolderWatcher } from '../src/watcher/watchService.js';
 import { buildKnowledgeIndex } from '../src/knowledge/knowledgeService.js';
 import { generateEmbeddings, searchEmbeddings } from '../src/embeddings/embeddingService.js';
+import { selectFolder } from '../src/utils/folderPicker.js';
+import {
+  getProviderSettings,
+  resetProviderSettings,
+  updateProviderSettings,
+} from '../src/settings/providerSettings.js';
 
 async function writeMinimalXlsx(filePath) {
   const zip = new JSZip();
@@ -232,6 +239,58 @@ test('calls an Ollama-compatible provider when configured', async () => {
   assert.match(calls[0].options.body, /supplier contract/);
 });
 
+test('defaults provider settings to Ollama and updates model options', () => {
+  const defaults = resetProviderSettings({
+    OLLAMA_BASE_URL: '',
+    OLLAMA_MODEL: '',
+    OLLAMA_TIMEOUT_MS: '',
+    OLLAMA_NUM_PREDICT: '',
+  });
+
+  assert.equal(defaults.provider, 'ollama');
+  assert.equal(defaults.ollama.baseUrl, 'http://127.0.0.1:11434');
+  assert.equal(defaults.ollama.timeoutMs, 120000);
+  assert.equal(defaults.ollama.numPredict, 192);
+
+  const updated = updateProviderSettings({
+    provider: 'unknown',
+    ollama: {
+      baseUrl: ' http://localhost:11434/ ',
+      model: ' llama3.2 ',
+      timeoutMs: '60000',
+      numPredict: '256',
+    },
+  });
+
+  assert.equal(updated.provider, 'ollama');
+  assert.equal(updated.ollama.baseUrl, 'http://localhost:11434/');
+  assert.equal(updated.ollama.model, 'llama3.2');
+  assert.equal(updated.ollama.timeoutMs, 60000);
+  assert.equal(updated.ollama.numPredict, 256);
+  assert.deepEqual(getProviderSettings(), updated);
+
+  resetProviderSettings();
+});
+
+test('parses selected Windows folder path from the native folder picker', async (t) => {
+  if (process.platform !== 'win32') {
+    t.skip('Windows-only folder picker');
+    return;
+  }
+
+  const result = await selectFolder({
+    execFileImpl: async (_command, _args, options) => {
+      assert.equal(options.windowsHide, false);
+      return { stdout: 'C:\\Users\\Example\\Documents\r\n' };
+    },
+  });
+
+  assert.deepEqual(result, {
+    cancelled: false,
+    folderPath: 'C:\\Users\\Example\\Documents',
+  });
+});
+
 test('creates safe action previews without executing file actions', async () => {
   const root = await createFixture();
   const db = openDatabase(tempDbPath());
@@ -271,6 +330,7 @@ test('uses Organizor2-inspired content rules for organization suggestions', asyn
 
   const notes = fileByName(db, 'Alpha Notes.md');
   const suggestions = generatePreviewSuggestions(db, { fileId: notes.id });
+  const storedSuggestions = listOrganizationSuggestions(db, { fileId: notes.id, limit: 20 });
 
   assert.equal(suggestions.some((suggestion) => (
     suggestion.action_type === 'category' && suggestion.suggested_value === 'legal'
@@ -281,6 +341,8 @@ test('uses Organizor2-inspired content rules for organization suggestions', asyn
   assert.equal(suggestions.some((suggestion) => (
     suggestion.action_type === 'tag' && suggestion.suggested_value === 'contract'
   )), true);
+  assert.equal(storedSuggestions.some((suggestion) => suggestion.filename === 'Alpha Notes.md'), true);
+  assert.equal(storedSuggestions.some((suggestion) => suggestion.absolute_path === notes.absolute_path), true);
 
   db.close();
 });
@@ -434,11 +496,16 @@ test('starts a watcher and indexes changed files', async () => {
   await new Promise((resolve) => setTimeout(resolve, 500));
 
   const files = listIndexedFiles(db, { limit: 100 });
+  const status = getSystemStatus(db);
   const stopped = stopFolderWatcher(db, { rootPath: root });
 
   assert.equal(watcher.status, 'active');
   assert.equal(files.some((file) => file.filename === 'initial.txt'), true);
   assert.equal(files.some((file) => file.filename === 'later.txt'), true);
+  assert.equal(status.extracted_files >= 2, true);
+  assert.equal(status.embedded_files >= 2, true);
+  assert.equal(status.insight_files >= 2, true);
+  assert.equal(status.suggestions > 0, true);
   assert.equal(stopped.status, 'stopped');
 
   db.close();
@@ -484,6 +551,34 @@ test('reports system status counts for the local dashboard', async () => {
   assert.equal(status.insight_files >= 4, true);
   assert.equal(status.suggestions > 0, true);
   assert.equal(Boolean(status.last_indexed_at), true);
+
+  db.close();
+});
+
+test('automatic local pipeline prepares searchable knowledge and organization suggestions', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const extraction = await extractIndexedFiles(db, { logger: { error: () => {} } });
+  const embeddings = generateEmbeddings(db, { limit: 100 });
+  const insights = await generateFileInsights(db, { limit: 100 });
+  const files = listIndexedFiles(db, { limit: 100 });
+  let suggestionCount = 0;
+
+  for (const file of files) {
+    suggestionCount += generatePreviewSuggestions(db, { fileId: file.id }).length;
+  }
+
+  const knowledge = buildKnowledgeIndex(db);
+  const storedSuggestions = listOrganizationSuggestions(db, { limit: 100 });
+
+  assert.equal(extraction.extracted > 0, true);
+  assert.equal(embeddings.generated > 0, true);
+  assert.equal(insights.generated > 0, true);
+  assert.equal(knowledge.classification_count > 0, true);
+  assert.equal(suggestionCount > 0, true);
+  assert.equal(storedSuggestions.length >= suggestionCount, true);
 
   db.close();
 });

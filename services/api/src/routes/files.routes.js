@@ -8,7 +8,9 @@ import {
 } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { extractIndexedFiles } from '../extractors/extractionRunner.js';
+import { runLocalAutomationPipeline } from '../automation/localPipeline.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
+import { selectFolder } from '../utils/folderPicker.js';
 
 export function createFilesRouter() {
   const router = Router();
@@ -52,9 +54,29 @@ export function createFilesRouter() {
       const result = await scanFolder(folderPath, {
         onRecord: (record) => insertRecord(record),
       });
+      const automation = {
+        enabled: req.body?.auto !== false,
+      };
+
+      if (automation.enabled) {
+        Object.assign(automation, await runLocalAutomationPipeline(db, {
+          limit: parseLimit(req.body?.limit, 1000),
+          logger: console,
+          useOllama: req.body?.useOllama === true,
+        }));
+      }
+
       db.close();
 
-      res.status(201).json(result);
+      res.status(201).json({ ...result, automation });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/select-folder', async (_req, res, next) => {
+    try {
+      res.json(await selectFolder());
     } catch (error) {
       next(error);
     }

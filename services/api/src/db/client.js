@@ -344,10 +344,16 @@ export function listOrganizationSuggestions(db, { fileId, limit = 50 } = {}) {
   const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
 
   return db.prepare(`
-    SELECT *
-    FROM organization_suggestions
+    SELECT
+      s.*,
+      f.filename,
+      f.absolute_path,
+      f.relative_path,
+      f.extension
+    FROM organization_suggestions s
+    JOIN indexed_files f ON f.id = s.file_id
     ${where}
-    ORDER BY created_at DESC
+    ORDER BY s.created_at DESC
     LIMIT @limit
   `).all(params);
 }

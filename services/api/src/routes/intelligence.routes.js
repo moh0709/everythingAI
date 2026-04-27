@@ -46,5 +46,25 @@ export function createIntelligenceRouter() {
     res.json(result);
   });
 
+  router.post('/knowledge/build', async (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const limit = parseLimit(req.body?.limit, 500);
+      const insightResult = await generateFileInsights(db, {
+        limit,
+        useOllama: req.body?.useOllama === true,
+      });
+      const knowledge = buildKnowledgeIndex(db, { limit });
+      db.close();
+
+      res.json({
+        generated: insightResult.generated,
+        knowledge,
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 }

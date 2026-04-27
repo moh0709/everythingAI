@@ -8,8 +8,10 @@ export function notFoundHandler(req, res) {
 export function errorHandler(error, _req, res, _next) {
   console.error(error);
 
-  res.status(500).json({
-    error: 'Internal Server Error',
+  const status = error.status || 500;
+
+  res.status(status).json({
+    error: status === 500 ? 'Internal Server Error' : error.name || 'Request Error',
     message: error.message,
   });
 }

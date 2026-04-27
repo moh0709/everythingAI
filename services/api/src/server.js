@@ -27,7 +27,13 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json({ limit: '25mb' }));
 app.use(morgan('dev'));
-app.use(express.static(publicDir));
+app.use(express.static(publicDir, {
+  setHeaders(res) {
+    if (process.env.NODE_ENV !== 'production') {
+      res.setHeader('Cache-Control', 'no-store');
+    }
+  },
+}));
 
 app.get('/health', (_req, res) => {
   res.json({

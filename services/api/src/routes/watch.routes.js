@@ -12,7 +12,11 @@ export function createWatchRouter() {
       if (!folderPath) return;
 
       const db = openDatabase();
-      const result = await startFolderWatcher(db, { rootPath: folderPath, extract: req.body?.extract !== false });
+      const result = await startFolderWatcher(db, {
+        rootPath: folderPath,
+        extract: req.body?.extract !== false,
+        auto: req.body?.auto !== false,
+      });
 
       res.status(201).json(result);
     } catch (error) {

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { getIndexedFileById, insertOrganizationSuggestion } from '../db/client.js';
+import { getIndexedFileById, insertOrganizationSuggestion, listOrganizationSuggestions } from '../db/client.js';
 import { analyzeFileForOrganization } from '../integrations/organizor/organizationRules.js';
 
 function createSuggestionId(fileId, actionType, suggestedValue) {
@@ -89,15 +89,25 @@ export function generatePreviewSuggestions(db, { fileId }) {
     });
   }
 
-  const saved = suggestions.map((suggestion) => ({
+  const existing = listOrganizationSuggestions(db, { fileId: file.id, limit: 500 });
+  const existingKeys = new Set(existing.map((suggestion) => (
+    `${suggestion.action_type}:${suggestion.suggested_value}`
+  )));
+  const saved = suggestions.filter((suggestion) => (
+    !existingKeys.has(`${suggestion.action_type}:${suggestion.suggested_value}`)
+  )).map((suggestion) => ({
     id: createSuggestionId(file.id, suggestion.action_type, suggestion.suggested_value),
     ...suggestion,
   }));
+
+  if (!saved.length) {
+    return existing;
+  }
 
   const insert = db.transaction((records) => {
     for (const record of records) insertOrganizationSuggestion(db, record);
   });
   insert(saved);
 
-  return saved;
+  return [...saved, ...existing];
 }

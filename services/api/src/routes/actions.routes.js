@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   openDatabase,
+  listOrganizationSuggestions,
   listActionExecutions,
   listAuditLog,
   listFileLabels,
@@ -26,6 +27,17 @@ export function createActionsRouter() {
     } catch (error) {
       next(error);
     }
+  });
+
+  router.get('/suggestions', (req, res) => {
+    const db = openDatabase();
+    const suggestions = listOrganizationSuggestions(db, {
+      fileId: req.query.fileId?.toString(),
+      limit: parseLimit(req.query.limit, 100),
+    });
+    db.close();
+
+    res.json({ suggestions });
   });
 
   router.post('/action-previews', async (req, res, next) => {
