@@ -12,6 +12,7 @@
   --purple: #7c3aed;
   --green: #16a34a;
   --amber: #d97706;
+  --red: #dc2626;
   --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
@@ -78,6 +79,19 @@ button.gradient-action:hover {
 button:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+button:disabled::after {
+  content: "";
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-left: 0.5rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  vertical-align: -0.1rem;
+  animation: spin 0.8s linear infinite;
 }
 
 input,
@@ -251,22 +265,28 @@ pre {
   width: min(720px, 48vw);
 }
 
-.activity-banner {
+.activity-banner,
+.error-panel {
   display: grid;
   gap: 0.15rem;
   width: min(720px, 48vw);
-  border: 1px solid #bfdbfe;
   border-radius: 12px;
-  background: #eff6ff;
   padding: 0.65rem 0.8rem;
+}
+
+.activity-banner {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
   color: #1e3a8a;
 }
 
-.activity-banner strong {
+.activity-banner strong,
+.error-panel strong {
   font-size: 0.86rem;
 }
 
-.activity-banner span {
+.activity-banner span,
+.error-panel span {
   color: #475569;
   font-size: 0.82rem;
 }
@@ -276,15 +296,37 @@ pre {
   background: #eef2ff;
 }
 
+.activity-banner[data-tone="working"] strong::before {
+  content: "";
+  display: inline-block;
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-right: 0.45rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  vertical-align: -0.1rem;
+  animation: spin 0.8s linear infinite;
+}
+
 .activity-banner[data-tone="success"] {
   border-color: #bbf7d0;
   background: #f0fdf4;
 }
 
-.activity-banner[data-tone="error"] {
-  border-color: #fecaca;
+.activity-banner[data-tone="error"],
+.error-panel {
+  border: 1px solid #fecaca;
   background: #fef2f2;
   color: #991b1b;
+}
+
+.error-panel span {
+  color: #7f1d1d;
+}
+
+.error-panel[hidden] {
+  display: none;
 }
 
 .live-pill {
@@ -501,6 +543,12 @@ dialog::backdrop {
   gap: 0.75rem;
 }
 
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 1100px) {
   .sidebar {
     position: static;
@@ -534,7 +582,9 @@ dialog::backdrop {
   .topbar,
   .section-heading,
   .topbar-actions,
-  .global-search {
+  .global-search,
+  .activity-banner,
+  .error-panel {
     display: grid;
     width: 100%;
   }
