@@ -6,12 +6,43 @@ import { upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
 import { runLocalAutomationPipeline } from '../automation/localPipeline.js';
 
 const activeWatchers = new Map();
+const DEFAULT_DEBOUNCE_MS = Number.parseInt(process.env.EVERYTHINGAI_WATCH_DEBOUNCE_MS || '', 10) || 1000;
 
 function watchId(rootPath) {
   return crypto.createHash('sha256').update(path.resolve(rootPath).toLowerCase()).digest('hex');
 }
 
-export async function startFolderWatcher(db, { rootPath, extract = true, auto = true, logger = console } = {}) {
+async function runWatchCycle(db, {
+  id,
+  absoluteRoot,
+  insert,
+  extract,
+  auto,
+  logger,
+}) {
+  await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
+
+  if (auto) {
+    await runLocalAutomationPipeline(db, { extract, logger });
+  }
+
+  upsertWatchRoot(db, {
+    id,
+    root_path: absoluteRoot,
+    status: 'active',
+    last_event_at: new Date().toISOString(),
+    error_message: null,
+    created_at: new Date().toISOString(),
+  });
+}
+
+export async function startFolderWatcher(db, {
+  rootPath,
+  extract = true,
+  auto = true,
+  debounceMs = DEFAULT_DEBOUNCE_MS,
+  logger = console,
+} = {}) {
   if (!rootPath) throw new Error('rootPath is required');
 
   const absoluteRoot = path.resolve(rootPath);
@@ -22,25 +53,22 @@ export async function startFolderWatcher(db, { rootPath, extract = true, auto = 
   }
 
   const insert = db.transaction((record) => upsertIndexedFile(db, record));
-  await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
-  if (auto) {
-    await runLocalAutomationPipeline(db, { extract, logger });
-  }
+  let timer = null;
+  let running = false;
+  let pending = false;
 
-  const watcher = fs.watch(absoluteRoot, { recursive: true }, async () => {
+  async function runQueuedCycle() {
+    if (running) {
+      pending = true;
+      return;
+    }
+
+    running = true;
     try {
-      await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
-      if (auto) {
-        await runLocalAutomationPipeline(db, { extract, logger });
-      }
-      upsertWatchRoot(db, {
-        id,
-        root_path: absoluteRoot,
-        status: 'active',
-        last_event_at: new Date().toISOString(),
-        error_message: null,
-        created_at: new Date().toISOString(),
-      });
+      do {
+        pending = false;
+        await runWatchCycle(db, { id, absoluteRoot, insert, extract, auto, logger });
+      } while (pending);
     } catch (error) {
       logger.error(`Watcher failed for ${absoluteRoot}: ${error.message}`);
       upsertWatchRoot(db, {
@@ -51,10 +79,32 @@ export async function startFolderWatcher(db, { rootPath, extract = true, auto = 
         error_message: error.message,
         created_at: new Date().toISOString(),
       });
+    } finally {
+      running = false;
     }
+  }
+
+  function scheduleCycle() {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      timer = null;
+      runQueuedCycle();
+    }, debounceMs);
+  }
+
+  await runQueuedCycle();
+
+  const watcher = fs.watch(absoluteRoot, { recursive: true }, () => {
+    scheduleCycle();
   });
 
-  activeWatchers.set(id, watcher);
+  activeWatchers.set(id, {
+    close() {
+      if (timer) clearTimeout(timer);
+      watcher.close();
+    },
+  });
+
   upsertWatchRoot(db, {
     id,
     root_path: absoluteRoot,
@@ -64,7 +114,7 @@ export async function startFolderWatcher(db, { rootPath, extract = true, auto = 
     created_at: new Date().toISOString(),
   });
 
-  return { id, rootPath: absoluteRoot, status: 'active', already_running: false };
+  return { id, rootPath: absoluteRoot, status: 'active', already_running: false, debounceMs };
 }
 
 export function stopFolderWatcher(db, { rootPath }) {
