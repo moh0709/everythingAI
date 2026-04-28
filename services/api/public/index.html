@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>EverythingAI Local App</title>
-    <link rel="stylesheet" href="/styles.css?v=auto-feedback-1" />
+    <link rel="stylesheet" href="/styles.css?v=mvp-finalization-1" />
   </head>
   <body>
     <div class="app-shell">
@@ -45,6 +45,11 @@
             <div class="activity-banner">
               <strong id="activityStatus">Ready</strong>
               <span id="activityDetails">Auto indexing prepares search, knowledge, and organization plans.</span>
+            </div>
+            <div id="errorPanel" class="error-panel" hidden>
+              <strong>Action failed</strong>
+              <span id="errorMessage"></span>
+              <button id="dismissErrorBtn" class="secondary compact">Dismiss</button>
             </div>
             <span class="live-pill">Live local mode</span>
             <button id="statusBtn" class="secondary">Refresh</button>
@@ -198,7 +203,7 @@
               <div class="button-row">
                 <button id="knowledgeBtn">Build Knowledge</button>
                 <button id="knowledgeRefreshBtn">Knowledge</button>
-                <button id="duplicatesRefreshBtn" class="secondary">Find Duplicates</button>
+                <button id="duplicatesBtn" class="secondary">Find Duplicates</button>
               </div>
             </div>
             <div id="insights" class="cards"></div>
@@ -259,6 +264,6 @@
       </form>
     </dialog>
 
-    <script src="/app.js?v=auto-feedback-1" type="module"></script>
+    <script src="/app.js?v=mvp-finalization-1" type="module"></script>
   </body>
 </html>
