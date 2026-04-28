@@ -169,3 +169,9 @@ CREATE TABLE IF NOT EXISTS file_embeddings (
 
 CREATE INDEX IF NOT EXISTS idx_file_embeddings_model
   ON file_embeddings(embedding_model);
+
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY,
+  value_json TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
