@@ -4,7 +4,9 @@ import crypto from 'node:crypto';
 import mime from 'mime-types';
 import { hashFile } from './hash.js';
 
-const EXCLUDED_NAMES = new Set([
+const DEFAULT_MAX_FILE_SIZE_BYTES = Number.parseInt(process.env.EVERYTHINGAI_MAX_FILE_SIZE_BYTES || '', 10) || 250 * 1024 * 1024;
+
+const DEFAULT_EXCLUDED_NAMES = [
   '$recycle.bin',
   'system volume information',
   'pagefile.sys',
@@ -17,7 +19,7 @@ const EXCLUDED_NAMES = new Set([
   'appdata',
   'node_modules',
   '.git',
-]);
+];
 
 function toIsoDate(date) {
   return date instanceof Date && !Number.isNaN(date.valueOf()) ? date.toISOString() : null;
@@ -31,8 +33,42 @@ function createFileId(filePath) {
   return crypto.createHash('sha256').update(normalizeForId(filePath)).digest('hex');
 }
 
-function isExcludedName(name) {
-  return EXCLUDED_NAMES.has(name.toLowerCase());
+function parseCsvSet(value) {
+  return new Set((value || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean));
+}
+
+function normalizeExtension(extension) {
+  if (!extension) return '';
+  return extension.startsWith('.') ? extension.toLowerCase() : `.${extension.toLowerCase()}`;
+}
+
+function createScannerConfig(options = {}) {
+  const excludedNames = new Set([
+    ...DEFAULT_EXCLUDED_NAMES,
+    ...(options.excludeNames || []),
+    ...parseCsvSet(process.env.EVERYTHINGAI_EXCLUDE_NAMES),
+  ].map((name) => name.toLowerCase()));
+
+  const excludedExtensions = new Set([
+    ...(options.excludeExtensions || []),
+    ...parseCsvSet(process.env.EVERYTHINGAI_EXCLUDE_EXTENSIONS),
+  ].map(normalizeExtension));
+
+  return {
+    excludedNames,
+    excludedExtensions,
+    maxFileSizeBytes: Number.isFinite(options.maxFileSizeBytes) && options.maxFileSizeBytes > 0
+      ? options.maxFileSizeBytes
+      : DEFAULT_MAX_FILE_SIZE_BYTES,
+    shouldSkipUnchanged: options.shouldSkipUnchanged,
+  };
+}
+
+function isExcludedName(name, config) {
+  return config.excludedNames.has(name.toLowerCase());
 }
 
 function isPathInside(childPath, parentPath) {
@@ -40,9 +76,28 @@ function isPathInside(childPath, parentPath) {
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
-export async function scanFolder(rootPath, { onRecord, logger = console } = {}) {
+function shouldSkipExtension(filename, config) {
+  const extension = path.extname(filename).toLowerCase();
+  return extension && config.excludedExtensions.has(extension);
+}
+
+export async function scanFolder(rootPath, {
+  onRecord,
+  logger = console,
+  maxFileSizeBytes,
+  excludeNames,
+  excludeExtensions,
+  shouldSkipUnchanged,
+  onProgress,
+} = {}) {
   const absoluteRoot = path.resolve(rootPath);
   const rootStats = await fs.stat(absoluteRoot);
+  const config = createScannerConfig({
+    maxFileSizeBytes,
+    excludeNames,
+    excludeExtensions,
+    shouldSkipUnchanged,
+  });
 
   if (!rootStats.isDirectory()) {
     throw new Error(`Path is not a directory: ${absoluteRoot}`);
@@ -53,13 +108,27 @@ export async function scanFolder(rootPath, { onRecord, logger = console } = {}) 
     indexed: 0,
     failed: 0,
     skipped: 0,
+    skipped_unchanged: 0,
+    skipped_large: 0,
+    skipped_excluded: 0,
   };
+
+  const skippedReasons = [];
+
+  function skip(reason, itemPath) {
+    counters.skipped += 1;
+    if (reason === 'unchanged') counters.skipped_unchanged += 1;
+    if (reason === 'large_file') counters.skipped_large += 1;
+    if (reason === 'excluded') counters.skipped_excluded += 1;
+    if (skippedReasons.length < 100) skippedReasons.push({ reason, path: itemPath });
+  }
 
   async function emit(record) {
     counters.scanned += 1;
     if (record.index_status === 'indexed') counters.indexed += 1;
     if (record.index_status === 'failed') counters.failed += 1;
     if (onRecord) await onRecord(record);
+    if (onProgress && counters.scanned % 50 === 0) onProgress({ ...counters });
   }
 
   async function scanDirectory(directoryPath) {
@@ -76,18 +145,18 @@ export async function scanFolder(rootPath, { onRecord, logger = console } = {}) 
     for (const entry of entries) {
       const entryPath = path.join(directoryPath, entry.name);
 
-      if (isExcludedName(entry.name)) {
-        counters.skipped += 1;
+      if (isExcludedName(entry.name, config)) {
+        skip('excluded', entryPath);
         continue;
       }
 
       if (!isPathInside(entryPath, absoluteRoot)) {
-        counters.skipped += 1;
+        skip('outside_root', entryPath);
         continue;
       }
 
       if (entry.isSymbolicLink()) {
-        counters.skipped += 1;
+        skip('symlink', entryPath);
         continue;
       }
 
@@ -97,7 +166,12 @@ export async function scanFolder(rootPath, { onRecord, logger = console } = {}) 
       }
 
       if (!entry.isFile()) {
-        counters.skipped += 1;
+        skip('not_file', entryPath);
+        continue;
+      }
+
+      if (shouldSkipExtension(entry.name, config)) {
+        skip('excluded', entryPath);
         continue;
       }
 
@@ -114,6 +188,18 @@ export async function scanFolder(rootPath, { onRecord, logger = console } = {}) 
 
     try {
       const stats = await fs.stat(absolutePath);
+      const modifiedAt = toIsoDate(stats.mtime);
+
+      if (stats.size > config.maxFileSizeBytes) {
+        skip('large_file', absolutePath);
+        return;
+      }
+
+      if (config.shouldSkipUnchanged?.({ absolutePath, sizeBytes: stats.size, modifiedAt })) {
+        skip('unchanged', absolutePath);
+        return;
+      }
+
       const contentHash = await hashFile(absolutePath);
 
       await emit({
@@ -125,7 +211,7 @@ export async function scanFolder(rootPath, { onRecord, logger = console } = {}) 
         mime_type: mime.lookup(filename) || 'application/octet-stream',
         size_bytes: stats.size,
         created_at: toIsoDate(stats.birthtime),
-        modified_at: toIsoDate(stats.mtime),
+        modified_at: modifiedAt,
         content_hash: contentHash,
         index_status: 'indexed',
         last_indexed_at: indexedAt,
@@ -155,6 +241,8 @@ export async function scanFolder(rootPath, { onRecord, logger = console } = {}) 
   await scanDirectory(absoluteRoot);
   return {
     rootPath: absoluteRoot,
+    maxFileSizeBytes: config.maxFileSizeBytes,
     ...counters,
+    skippedReasons,
   };
 }
