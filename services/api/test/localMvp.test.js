@@ -491,9 +491,9 @@ test('starts a watcher and indexes changed files', async () => {
   const db = openDatabase(tempDbPath());
   await fs.writeFile(path.join(root, 'initial.txt'), 'initial content');
 
-  const watcher = await startFolderWatcher(db, { rootPath: root, extract: true, logger: { error: () => {} } });
+  const watcher = await startFolderWatcher(db, { rootPath: root, extract: true, debounceMs: 200, logger: { error: () => {} } });
   await fs.writeFile(path.join(root, 'later.txt'), 'later watched content');
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 1500));
 
   const files = listIndexedFiles(db, { limit: 100 });
   const status = getSystemStatus(db);
