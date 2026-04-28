@@ -6,6 +6,12 @@ EverythingAI is the project foundation for **EverythingApp**: a local-first AI-p
 
 **EverythingApp is a local AI-powered file brain that indexes full drives, understands file and document contents, remembers filenames and paths, answers questions with source references, generates Wikipedia-style knowledge pages, and safely suggests or performs file organization such as tagging, renaming, and moving files.**
 
+## Current focus
+
+The current objective is to finalize and optimize the **local MVP** in `services/api` before moving to the full production platform architecture.
+
+The local MVP should become stable, safe, boring, and reliable before adding more advanced production-platform features.
+
 ## Strategic direction
 
 The recommended strategy is to evaluate and potentially fork **AnythingLLM** as the base product, then expand it with the missing filesystem intelligence layer.
@@ -47,7 +53,10 @@ See the `/docs` folder:
 - [`SECURITY_AND_FILE_SAFETY.md`](docs/SECURITY_AND_FILE_SAFETY.md)
 - [`MVP_SCOPE.md`](docs/MVP_SCOPE.md)
 - [`ROADMAP.md`](docs/ROADMAP.md)
-- [`DECISIONS.md`](docs/DECISIONS.md)
+- [`LOCAL_MVP_VS_CENTRAL_PLATFORM.md`](docs/LOCAL_MVP_VS_CENTRAL_PLATFORM.md)
+- [`MVP_FINALIZATION_PLAN.md`](docs/MVP_FINALIZATION_PLAN.md)
+- [`KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md)
+- [`WINDOWS_LOCAL_SMOKE_TEST.md`](docs/WINDOWS_LOCAL_SMOKE_TEST.md)
 
 ## Initial stack recommendation
 
@@ -68,9 +77,11 @@ File actions: custom safe executor with preview, approval, audit log, and undo
 
 This repository contains the product and technical documentation foundation plus the local API-first file brain MVP.
 
+The production platform architecture is still the long-term target. The current runnable implementation is a local MVP using SQLite.
+
 ## Local file brain MVP
 
-The runnable MVP lives in `services/api`. It scans a local folder, reads file metadata, computes SHA-256 content hashes, extracts document text, searches metadata/content with SQLite FTS, answers through local Ollama, and safely organizes files after preview and approval.
+The runnable MVP lives in `services/api`. It scans a local folder, reads file metadata, computes SHA-256 content hashes, extracts document text, searches metadata/content with SQLite FTS, answers through local Ollama when configured, generates insights, finds duplicates, watches folders, and safely organizes files after preview and approval.
 
 File move/rename execution is available only through an explicit approved action preview. Delete actions are not implemented.
 
@@ -102,6 +113,24 @@ replace-with-your-local-development-token
 
 The UI includes local browser settings for saving the API token and preferred folder path. Provider settings such as Ollama and AnythingLLM remain server environment variables.
 
+### Local MVP optimization environment variables
+
+```text
+EVERYTHINGAI_MAX_FILE_SIZE_BYTES=262144000
+EVERYTHINGAI_EXCLUDE_NAMES=node_modules,.git,dist,build
+EVERYTHINGAI_EXCLUDE_EXTENSIONS=.exe,.dll,.iso,.zip
+EVERYTHINGAI_WATCH_DEBOUNCE_MS=1000
+```
+
+Recommended for first local tests:
+
+```powershell
+$env:EVERYTHINGAI_MAX_FILE_SIZE_BYTES="262144000"
+$env:EVERYTHINGAI_EXCLUDE_NAMES="node_modules,.git,dist,build"
+$env:EVERYTHINGAI_EXCLUDE_EXTENSIONS=".exe,.dll,.iso,.zip"
+$env:EVERYTHINGAI_WATCH_DEBOUNCE_MS="1000"
+```
+
 ### Index a folder
 
 ```bash
@@ -115,6 +144,8 @@ To choose a database path:
 ```bash
 npm run index -- "C:\path\to\test-folder" -- --db "C:\path\to\everythingai.sqlite"
 ```
+
+The scanner skips symlinks, known system/dependency folders, excluded names/extensions, and files above the configured maximum file size. The scan result includes counters and skipped reasons.
 
 ### List indexed records
 
@@ -149,6 +180,8 @@ For one file:
 ```bash
 npm run extract -- -- --file-id "<file-id>"
 ```
+
+Extraction skips already-extracted unchanged files by default.
 
 ### Search indexed files
 
@@ -214,6 +247,12 @@ npm run watch -- "C:\path\to\folder"
 
 The watcher performs an initial scan/extract and re-indexes when files change while the process is running.
 
+Watcher events are debounced and queued to avoid overlapping rescans. Configure the debounce delay with:
+
+```text
+EVERYTHINGAI_WATCH_DEBOUNCE_MS=1000
+```
+
 ### Generate preview-only organization suggestions
 
 ```bash
@@ -242,6 +281,8 @@ Supported execution actions:
 - app-level category
 - rename file
 - move file into the previewed folder
+
+Execution validates that the target stays inside the allowed directory boundary, source and target differ, the source exists, and the target does not already exist. Failed execution attempts are audited.
 
 Undo supported filesystem actions:
 
@@ -305,7 +346,7 @@ The sync exports extracted text with source path metadata. It does not replace E
 
 ### Safety behavior
 
-The indexer skips symlink traversal and known unsafe/system/dependency paths such as Windows system folders, recycle-bin folders, `.git`, and `node_modules`. Per-file errors are logged and stored without stopping the scan. File execution requires a safe preview plus explicit approval. Delete actions are not implemented.
+The indexer skips symlink traversal and known unsafe/system/dependency paths such as Windows system folders, recycle-bin folders, `.git`, and `node_modules`. Per-file errors are logged and stored without stopping the scan. File execution requires a safe preview plus explicit approval. Failed execution attempts are audited. Delete actions are not implemented.
 
 ### Validation
 
@@ -316,8 +357,10 @@ npm audit --omit=dev
 
 ## Next architectural decision
 
-The next step is to decide whether to:
+After the local MVP is finalized and tested, the next major phase is deciding when to move from local MVP to production platform:
 
-1. Fork AnythingLLM directly into this repo or a separate upstream fork.
-2. Keep this repo as the product/specification repository.
-3. Build a proof-of-concept filesystem indexer before modifying AnythingLLM.
+1. PostgreSQL + pgvector migration.
+2. Real embedding provider support.
+3. Installed client agent split.
+4. Central browser/server architecture.
+5. Multi-user tenant/workspace model.
