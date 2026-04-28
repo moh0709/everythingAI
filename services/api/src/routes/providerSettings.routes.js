@@ -1,23 +1,15 @@
 import { Router } from 'express';
 import { openDatabase, getAppSetting, setAppSetting } from '../db/client.js';
 import { getDefaultAiProviderSettings, listDefaultModels, mergeAiProviderSettings } from '../settings/aiProviderSettings.js';
+import { fetchProviderModels } from '../settings/providerModelFetchers.js';
 
 const SETTINGS_KEY = 'ai_provider_settings';
-
-async function fetchOllamaModels(endpoint) {
-  try {
-    const response = await fetch(`${endpoint.replace(/\/$/, '')}/api/tags`);
-    if (!response.ok) return null;
-    const payload = await response.json();
-    return (payload.models || []).map((model) => ({ id: model.name, name: model.name }));
-  } catch {
-    return null;
-  }
-}
+const REMOTE_PROVIDERS = ['openrouter', 'cerebras', 'mistral', 'google'];
+const ALL_PROVIDERS = ['ollama', 'openrouter', 'cerebras', 'mistral', 'google'];
 
 function publicSettings(settings) {
   const copy = JSON.parse(JSON.stringify(settings));
-  for (const provider of ['openrouter', 'cerebras', 'mistral', 'google']) {
+  for (const provider of REMOTE_PROVIDERS) {
     if (copy[provider]?.apiKey) copy[provider].apiKey = '__saved__';
   }
   return copy;
@@ -25,19 +17,32 @@ function publicSettings(settings) {
 
 function preserveSavedKeys(existing, incoming) {
   const next = mergeAiProviderSettings(incoming);
-  for (const provider of ['openrouter', 'cerebras', 'mistral', 'google']) {
+  for (const provider of REMOTE_PROVIDERS) {
     if (next[provider]?.apiKey === '__saved__') next[provider].apiKey = existing[provider]?.apiKey || '';
   }
   return next;
+}
+
+function loadSettings() {
+  const db = openDatabase();
+  const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
+  db.close();
+  return settings;
+}
+
+async function modelsFor(provider, settings, defaults) {
+  const liveModels = await fetchProviderModels(provider, settings);
+  return {
+    models: liveModels?.length ? liveModels : defaults[provider],
+    live: Boolean(liveModels?.length),
+  };
 }
 
 export function createProviderSettingsRouter() {
   const router = Router();
 
   router.get('/provider-settings', (_req, res) => {
-    const db = openDatabase();
-    const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
-    db.close();
+    const settings = loadSettings();
     res.json({ settings: publicSettings(settings) });
   });
 
@@ -51,25 +56,37 @@ export function createProviderSettingsRouter() {
   });
 
   router.get('/provider-settings/models', async (_req, res) => {
-    const db = openDatabase();
-    const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
-    db.close();
+    const settings = loadSettings();
     const defaults = listDefaultModels();
-    const ollamaModels = await fetchOllamaModels(settings.ollama.endpoint);
-    res.json({ models: { ...defaults, ollama: ollamaModels?.length ? ollamaModels : defaults.ollama }, remoteProvidersEnabled: settings.remoteProvidersEnabled });
+    const entries = await Promise.all(ALL_PROVIDERS.map(async (provider) => {
+      const result = await modelsFor(provider, settings, defaults);
+      return [provider, result.models];
+    }));
+    res.json({ models: Object.fromEntries(entries), remoteProvidersEnabled: settings.remoteProvidersEnabled });
+  });
+
+  router.get('/provider-settings/models/:provider', async (req, res) => {
+    const provider = req.params.provider;
+    const defaults = listDefaultModels();
+    if (!defaults[provider]) return res.status(404).json({ error: 'Unknown provider' });
+    const settings = loadSettings();
+    const result = await modelsFor(provider, settings, defaults);
+    res.json({ provider, models: result.models, live: result.live });
   });
 
   router.post('/provider-settings/test', async (req, res) => {
-    const db = openDatabase();
-    const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
-    db.close();
+    const settings = loadSettings();
+    const defaults = listDefaultModels();
     const provider = req.body?.provider || settings.activeProvider;
-    if (provider === 'ollama') {
-      const models = await fetchOllamaModels(settings.ollama.endpoint);
-      return res.json({ provider, connected: Array.isArray(models), message: Array.isArray(models) ? 'Ollama connection successful.' : 'Ollama is not reachable.' });
-    }
-    if (!settings.remoteProvidersEnabled) return res.json({ provider, connected: false, message: 'Remote providers are disabled by policy.' });
-    return res.json({ provider, connected: false, message: 'Remote provider test proxy is not implemented in local MVP.' });
+    if (!defaults[provider]) return res.status(404).json({ provider, connected: false, message: 'Unknown provider.' });
+    if (provider !== 'ollama' && !settings.remoteProvidersEnabled) return res.json({ provider, connected: false, message: 'Remote providers are disabled by policy.' });
+    const result = await modelsFor(provider, settings, defaults);
+    res.json({
+      provider,
+      connected: result.live,
+      modelCount: result.models.length,
+      message: result.live ? `${provider} connection successful. ${result.models.length} model(s) available.` : `${provider} is not reachable or credentials are missing. Showing fallback models.`,
+    });
   });
 
   return router;
