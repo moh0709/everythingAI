@@ -9,25 +9,29 @@ const DEFAULT_SETTINGS = {
     timeoutMs: Number.parseInt(process.env.OLLAMA_TIMEOUT_MS || '120000', 10),
   },
   openrouter: {
-    apiKey: '',
+    endpoint: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1',
+    apiKey: process.env.OPENROUTER_API_KEY || '',
     model: 'anthropic/claude-3.5-sonnet',
     temperature: 0.2,
     maxTokens: 4096,
   },
   cerebras: {
-    apiKey: '',
+    endpoint: process.env.CEREBRAS_BASE_URL || 'https://api.cerebras.ai/v1',
+    apiKey: process.env.CEREBRAS_API_KEY || '',
     model: 'llama3.1-8b',
     temperature: 0.2,
     maxTokens: 4096,
   },
   mistral: {
-    apiKey: '',
+    endpoint: process.env.MISTRAL_BASE_URL || 'https://api.mistral.ai/v1',
+    apiKey: process.env.MISTRAL_API_KEY || '',
     model: 'mistral-large-latest',
     temperature: 0.2,
     maxTokens: 4096,
   },
   google: {
-    apiKey: '',
+    endpoint: process.env.GOOGLE_AI_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta',
+    apiKey: process.env.GOOGLE_AI_API_KEY || '',
     model: 'gemini-1.5-flash',
     temperature: 0.2,
     maxTokens: 4096,
@@ -78,6 +82,7 @@ export function listDefaultModels() {
     cerebras: [
       { id: 'llama3.1-8b', name: 'Llama 3.1 8B' },
       { id: 'llama3.1-70b', name: 'Llama 3.1 70B' },
+      { id: 'qwen-3-32b', name: 'Qwen 3 32B' },
     ],
     mistral: [
       { id: 'mistral-large-latest', name: 'Mistral Large' },
