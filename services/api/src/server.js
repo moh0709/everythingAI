@@ -14,6 +14,7 @@ import { createWatchRouter } from './routes/watch.routes.js';
 import { createActionsRouter } from './routes/actions.routes.js';
 import { createIntegrationsRouter } from './routes/integrations.routes.js';
 import { createSystemRouter } from './routes/system.routes.js';
+import { createSourcePathsRouter } from './routes/sourcePaths.routes.js';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api', requireApiToken, createFilesRouter());
+app.use('/api', requireApiToken, createSourcePathsRouter());
 app.use('/api', requireApiToken, createSearchRouter());
 app.use('/api', requireApiToken, createIntelligenceRouter());
 app.use('/api', requireApiToken, createWatchRouter());
