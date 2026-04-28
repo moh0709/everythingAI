@@ -13,6 +13,8 @@ import {
 } from '../db/client.js';
 import { disableActionPreviewExecution } from '../previews/actionPreviewService.js';
 
+const SUPPORTED_ACTION_TYPES = new Set(['tag', 'category', 'rename', 'move']);
+
 function createId(prefix) {
   return crypto
     .createHash('sha256')
@@ -70,6 +72,36 @@ function audit(db, { eventType, entityType, entityId, payload }) {
   });
 }
 
+function failExecution(db, { preview, error, executionId = createId('execution') }) {
+  const failedExecution = {
+    id: executionId,
+    preview_id: preview?.id || null,
+    file_id: preview?.file_id || null,
+    action_type: preview?.action_type || 'unknown',
+    status: 'failed',
+    source_path: preview?.source_path || null,
+    target_path: preview?.target_path || null,
+    undo_source_path: null,
+    undo_target_path: null,
+    error_message: error.message,
+    executed_at: new Date().toISOString(),
+    undone_at: null,
+  };
+
+  if (preview && SUPPORTED_ACTION_TYPES.has(preview.action_type)) {
+    insertActionExecution(db, failedExecution);
+  }
+
+  audit(db, {
+    eventType: 'action.failed',
+    entityType: 'action_execution',
+    entityId: failedExecution.id,
+    payload: failedExecution,
+  });
+
+  return failedExecution;
+}
+
 async function pathExists(filePath) {
   try {
     await fs.access(filePath);
@@ -79,10 +111,31 @@ async function pathExists(filePath) {
   }
 }
 
-async function executeFilesystemAction(db, preview) {
+function assertSafeFilesystemPreview(preview) {
+  if (!preview.source_path) {
+    throw new Error('Preview has no source path.');
+  }
+
   if (!preview.target_path) {
     throw new Error('Preview has no target path.');
   }
+
+  const sourcePath = path.resolve(preview.source_path);
+  const targetPath = path.resolve(preview.target_path);
+  const sourceDir = path.dirname(sourcePath);
+  const relativeTarget = path.relative(sourceDir, targetPath);
+
+  if (!relativeTarget || relativeTarget.startsWith('..') || path.isAbsolute(relativeTarget)) {
+    throw new Error('Target path escapes the allowed source directory boundary.');
+  }
+
+  if (sourcePath === targetPath) {
+    throw new Error('Source and target paths are identical.');
+  }
+}
+
+async function executeFilesystemAction(db, preview) {
+  assertSafeFilesystemPreview(preview);
 
   if (!(await pathExists(preview.source_path))) {
     throw new Error('Source file no longer exists.');
@@ -114,43 +167,54 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
     throw new Error(`Action preview not found: ${previewId}`);
   }
 
-  if (preview.preview_status !== 'ready' || preview.can_execute !== 1) {
-    throw new Error(`Action preview is not executable: ${preview.blocked_reason || preview.preview_status}`);
+  const executionId = createId('execution');
+
+  try {
+    if (!SUPPORTED_ACTION_TYPES.has(preview.action_type)) {
+      throw new Error(`Unsupported action type: ${preview.action_type}`);
+    }
+
+    if (preview.preview_status !== 'ready' || preview.can_execute !== 1) {
+      throw new Error(`Action preview is not executable: ${preview.blocked_reason || preview.preview_status}`);
+    }
+
+    const execution = {
+      id: executionId,
+      preview_id: preview.id,
+      file_id: preview.file_id,
+      action_type: preview.action_type,
+      status: 'executed',
+      source_path: preview.source_path,
+      target_path: preview.target_path,
+      undo_source_path: preview.target_path,
+      undo_target_path: preview.source_path,
+      error_message: null,
+      executed_at: new Date().toISOString(),
+      undone_at: null,
+    };
+
+    if (preview.action_type === 'rename' || preview.action_type === 'move') {
+      await executeFilesystemAction(db, preview);
+    } else if (preview.action_type === 'tag') {
+      upsertFileLabel(db, { fileId: preview.file_id, tag: preview.suggested_value });
+    } else if (preview.action_type === 'category') {
+      upsertFileLabel(db, { fileId: preview.file_id, category: preview.suggested_value });
+    }
+
+    insertActionExecution(db, execution);
+    disableActionPreviewExecution(db, preview.id);
+    audit(db, {
+      eventType: 'action.executed',
+      entityType: 'action_execution',
+      entityId: execution.id,
+      payload: execution,
+    });
+
+    return execution;
+  } catch (error) {
+    const failedExecution = failExecution(db, { preview, error, executionId });
+    throw Object.assign(error, { execution: failedExecution });
   }
-
-  const execution = {
-    id: createId('execution'),
-    preview_id: preview.id,
-    file_id: preview.file_id,
-    action_type: preview.action_type,
-    status: 'executed',
-    source_path: preview.source_path,
-    target_path: preview.target_path,
-    undo_source_path: preview.target_path,
-    undo_target_path: preview.source_path,
-    error_message: null,
-    executed_at: new Date().toISOString(),
-    undone_at: null,
-  };
-
-  if (preview.action_type === 'rename' || preview.action_type === 'move') {
-    await executeFilesystemAction(db, preview);
-  } else if (preview.action_type === 'tag') {
-    upsertFileLabel(db, { fileId: preview.file_id, tag: preview.suggested_value });
-  } else if (preview.action_type === 'category') {
-    upsertFileLabel(db, { fileId: preview.file_id, category: preview.suggested_value });
-  }
-
-  insertActionExecution(db, execution);
-  disableActionPreviewExecution(db, preview.id);
-  audit(db, {
-    eventType: 'action.executed',
-    entityType: 'action_execution',
-    entityId: execution.id,
-    payload: execution,
-  });
-
-  return execution;
 }
 
 export async function undoActionExecution(db, { executionId, approve = false } = {}) {
