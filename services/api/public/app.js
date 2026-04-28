@@ -3,6 +3,7 @@ const state = {
   suggestions: [],
   planSuggestions: [],
   unifiedResults: null,
+  busyCount: 0,
 };
 
 const els = {
@@ -21,6 +22,8 @@ const els = {
   providerStatus: document.querySelector('#providerStatus'),
   activityStatus: document.querySelector('#activityStatus'),
   activityDetails: document.querySelector('#activityDetails'),
+  errorPanel: document.querySelector('#errorPanel'),
+  errorMessage: document.querySelector('#errorMessage'),
   providerSettingsDialog: document.querySelector('#providerSettingsDialog'),
   providerSettingsStatus: document.querySelector('#providerSettingsStatus'),
   providerSelect: document.querySelector('#providerSelect'),
@@ -45,6 +48,45 @@ function setActivity(status, details = '', tone = 'ready') {
   els.activityStatus.textContent = status;
   els.activityDetails.textContent = details;
   els.activityStatus.closest('.activity-banner').dataset.tone = tone;
+}
+
+function showError(error) {
+  const message = error?.message || String(error);
+  els.errorMessage.textContent = message;
+  els.errorPanel.hidden = false;
+  setActivity('Failed', message, 'error');
+  log({ error: message, execution: error?.execution || null });
+}
+
+function clearError() {
+  els.errorPanel.hidden = true;
+  els.errorMessage.textContent = '';
+}
+
+async function withUiState({ button, working = 'Working', details = 'Operation in progress...' }, task) {
+  const previousLabel = button?.textContent;
+  state.busyCount += 1;
+  clearError();
+  setActivity(working, details, 'working');
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Working...';
+  }
+
+  try {
+    const result = await task();
+    return result;
+  } catch (error) {
+    showError(error);
+    throw error;
+  } finally {
+    state.busyCount -= 1;
+    if (button) {
+      button.disabled = false;
+      button.textContent = previousLabel;
+    }
+  }
 }
 
 function loadSettings() {
@@ -78,7 +120,9 @@ async function api(path, { method = 'GET', body } = {}) {
   const payload = await response.json();
 
   if (!response.ok) {
-    throw new Error(payload.message || payload.error || `Request failed: ${response.status}`);
+    const error = new Error(payload.message || payload.error || `Request failed: ${response.status}`);
+    if (payload.execution) error.execution = payload.execution;
+    throw error;
   }
 
   return payload;
@@ -272,12 +316,12 @@ async function refreshDashboard() {
   ]);
 }
 
-async function runAutoIndex(folderPath) {
-  const indexButton = document.querySelector('#indexBtn');
-  indexButton.disabled = true;
-  setActivity('Working', 'Indexing files, extracting text, creating embeddings, saving knowledge, and preparing organization suggestions...', 'working');
-
-  try {
+async function runAutoIndex(folderPath, button = document.querySelector('#indexBtn')) {
+  return withUiState({
+    button,
+    working: 'Working',
+    details: 'Indexing files, extracting text, creating embeddings, saving knowledge, and preparing organization suggestions...',
+  }, async () => {
     const result = await api('/api/index', {
       method: 'POST',
       body: { folderPath, auto: true },
@@ -291,29 +335,21 @@ async function runAutoIndex(folderPath) {
     );
     log(result);
     return result;
-  } catch (error) {
-    setActivity('Failed', error.message, 'error');
-    throw error;
-  } finally {
-    indexButton.disabled = false;
-  }
+  });
 }
 
-document.querySelector('#indexBtn').addEventListener('click', async () => {
-  await runAutoIndex(els.folderPath.value);
+document.querySelector('#indexBtn').addEventListener('click', async (event) => {
+  await runAutoIndex(els.folderPath.value, event.currentTarget);
 });
 
-async function buildKnowledge() {
-  const buttons = [
-    document.querySelector('#knowledgeBtn'),
-    document.querySelector('#knowledgeRefreshBtn'),
-  ];
-  buttons.forEach((button) => { button.disabled = true; });
-  setActivity('Working', 'Building knowledge from extracted files and saved insights...', 'working');
-
-  try {
+async function buildKnowledge(button) {
+  return withUiState({
+    button,
+    working: 'Working',
+    details: 'Building knowledge from extracted files and saved insights...',
+  }, async () => {
     const buildPayload = await api('/api/knowledge/build', {
-    method: 'POST',
+      method: 'POST',
       body: { limit: 500 },
     });
     const payload = buildPayload.knowledge;
@@ -339,12 +375,7 @@ async function buildKnowledge() {
     setActivity('Ready', `Knowledge built: ${payload.classification_count} categories and ${payload.entity_count} entities.`, 'success');
     await refreshStatus();
     showView('knowledgeView');
-  } catch (error) {
-    setActivity('Failed', error.message, 'error');
-    throw error;
-  } finally {
-    buttons.forEach((button) => { button.disabled = false; });
-  }
+  });
 }
 
 document.querySelector('#saveSettingsBtn').addEventListener('click', saveSettings);
@@ -354,31 +385,48 @@ document.querySelector('#clearSettingsBtn').addEventListener('click', () => {
   els.settingsStatus.textContent = 'Cleared';
 });
 
-document.querySelector('#extractBtn').addEventListener('click', async () => {
-  setActivity('Working', 'Extracting readable document text...', 'working');
-  log(await api('/api/extract', { method: 'POST', body: {} }));
-  await refreshStatus();
-  setActivity('Ready', 'Text extraction complete.', 'success');
-});
+document.querySelector('#dismissErrorBtn').addEventListener('click', clearError);
 
-document.querySelector('#embeddingsBtn').addEventListener('click', async () => {
-  setActivity('Working', 'Generating semantic search embeddings...', 'working');
-  log(await api('/api/embeddings', { method: 'POST', body: { limit: 1000 } }));
-  await refreshStatus();
-  setActivity('Ready', 'Embeddings are ready for semantic search.', 'success');
-});
-
-document.querySelector('#watchBtn').addEventListener('click', async () => {
-  await runAutoIndex(els.folderPath.value);
-  setActivity('Working', 'Starting folder watcher. Future changes will update search, knowledge, embeddings, and plans automatically.', 'working');
-  const result = await api('/api/watch', {
-    method: 'POST',
-    body: { folderPath: els.folderPath.value, extract: true, auto: true },
+document.querySelector('#extractBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Extracting readable document text...',
+  }, async () => {
+    log(await api('/api/extract', { method: 'POST', body: {} }));
+    await refreshStatus();
+    setActivity('Ready', 'Text extraction complete.', 'success');
   });
-  log(result);
-  await refreshDashboard();
-  await refreshPlan();
-  setActivity('Ready', 'Folder is being watched. New and changed files will be automatically processed.', 'success');
+});
+
+document.querySelector('#embeddingsBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Generating semantic search embeddings...',
+  }, async () => {
+    log(await api('/api/embeddings', { method: 'POST', body: { limit: 1000 } }));
+    await refreshStatus();
+    setActivity('Ready', 'Embeddings are ready for semantic search.', 'success');
+  });
+});
+
+document.querySelector('#watchBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Starting watcher and preparing the selected folder...',
+  }, async () => {
+    await runAutoIndex(els.folderPath.value);
+    const result = await api('/api/watch', {
+      method: 'POST',
+      body: { folderPath: els.folderPath.value, extract: true, auto: true },
+    });
+    log(result);
+    await refreshDashboard();
+    await refreshPlan();
+    setActivity('Ready', 'Folder is being watched. New and changed files will be automatically processed.', 'success');
+  });
 });
 
 document.querySelector('#providerSettingsBtn').addEventListener('click', async () => {
@@ -387,36 +435,43 @@ document.querySelector('#providerSettingsBtn').addEventListener('click', async (
   els.providerSettingsDialog.showModal();
 });
 
-document.querySelector('#saveProviderSettingsBtn').addEventListener('click', async () => {
-  const payload = await api('/api/provider-settings', {
-    method: 'PUT',
-    body: {
-      provider: els.providerSelect.value,
-      ollama: {
-        baseUrl: els.ollamaBaseUrl.value,
-        model: els.ollamaModel.value,
-        timeoutMs: els.ollamaTimeoutMs.value,
-        numPredict: els.ollamaNumPredict.value,
+document.querySelector('#saveProviderSettingsBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Saving provider settings...',
+  }, async () => {
+    const payload = await api('/api/provider-settings', {
+      method: 'PUT',
+      body: {
+        provider: els.providerSelect.value,
+        ollama: {
+          baseUrl: els.ollamaBaseUrl.value,
+          model: els.ollamaModel.value,
+          timeoutMs: els.ollamaTimeoutMs.value,
+          numPredict: els.ollamaNumPredict.value,
+        },
       },
-    },
-  });
+    });
 
-  renderProviderSettings(payload.settings);
-  els.providerSettingsStatus.textContent = 'Saved';
-  await refreshStatus();
+    renderProviderSettings(payload.settings);
+    els.providerSettingsStatus.textContent = 'Saved';
+    await refreshStatus();
+    setActivity('Ready', 'Provider settings saved.', 'success');
+  });
 });
 
 document.querySelector('#openFolderBtn').addEventListener('click', async (event) => {
-  const button = event.currentTarget;
-  button.disabled = true;
-  setActivity('Waiting', 'Choose a folder to add. The app will process it automatically after selection.', 'working');
-  log('Opening folder picker...');
-
-  try {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Waiting',
+    details: 'Choose a folder to add. The app will process it automatically after selection.',
+  }, async () => {
     const result = await api('/api/select-folder', { method: 'POST', body: {} });
 
     if (result.cancelled) {
       log('Folder selection cancelled.');
+      setActivity('Ready', 'Folder selection cancelled.', 'ready');
       return;
     }
 
@@ -424,18 +479,23 @@ document.querySelector('#openFolderBtn').addEventListener('click', async (event)
     saveSettings();
     log(`Selected folder: ${result.folderPath}`);
     await runAutoIndex(result.folderPath);
-  } finally {
-    button.disabled = false;
-  }
+  });
 });
 
 document.querySelector('#statusBtn').addEventListener('click', refreshStatus);
 
 document.querySelector('#refreshBtn').addEventListener('click', refreshFiles);
 
-document.querySelector('#refreshPlanBtn').addEventListener('click', async () => {
-  const suggestions = await refreshPlan();
-  log(`Loaded ${suggestions.length} plan suggestion(s).`);
+document.querySelector('#refreshPlanBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Refreshing organization plan...',
+  }, async () => {
+    const suggestions = await refreshPlan();
+    log(`Loaded ${suggestions.length} plan suggestion(s).`);
+    setActivity('Ready', 'Organization plan refreshed.', 'success');
+  });
 });
 
 els.viewButtons.forEach((button) => {
@@ -448,96 +508,141 @@ document.querySelector('#searchBtn').addEventListener('click', async () => {
   document.querySelector('#unifiedSearchBtn').click();
 });
 
-document.querySelector('#semanticBtn').addEventListener('click', async () => {
-  const payload = await api(`/api/semantic-search?q=${encodeURIComponent(els.query.value)}&limit=20`);
-  renderFiles(payload.results);
-  log(`Semantic search returned ${payload.results.length} result(s).`);
-  showView('filesView');
-});
-
-document.querySelector('#unifiedSearchBtn').addEventListener('click', async () => {
-  const query = els.query.value.trim();
-  if (!query) {
-    setActivity('Waiting', 'Enter a query to search files, knowledge, labels, suggestions, and actions.', 'working');
-    log('Enter a search query first.');
-    return;
-  }
-
-  setActivity('Working', `Searching everything for "${query}"...`, 'working');
-  const payload = await api(`/api/unified-search?q=${encodeURIComponent(query)}&limit=20`);
-  renderUnifiedResults(payload);
-  setActivity('Ready', `Search complete: ${Object.values(payload.totals).reduce((sum, count) => sum + count, 0)} total match(es).`, 'success');
-  showView('knowledgeView');
-});
-
-document.querySelector('#chatBtn').addEventListener('click', async () => {
-  const payload = await api('/api/chat', {
-    method: 'POST',
-    body: { question: els.query.value, limit: 5 },
+document.querySelector('#semanticBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Running semantic-style search...',
+  }, async () => {
+    const payload = await api(`/api/semantic-search?q=${encodeURIComponent(els.query.value)}&limit=20`);
+    renderFiles(payload.results);
+    log(`Semantic search returned ${payload.results.length} result(s).`);
+    setActivity('Ready', `Semantic search returned ${payload.results.length} result(s).`, 'success');
+    showView('filesView');
   });
-  els.providerStatus.textContent = `${payload.provider}: ${payload.provider_status}`;
-  els.answer.textContent = payload.answer;
-  log({ sources: payload.sources });
 });
 
-document.querySelector('#anythingLlmSyncBtn').addEventListener('click', async () => {
-  const payload = await api('/api/integrations/anythingllm/sync', {
-    method: 'POST',
-    body: { limit: 25 },
+document.querySelector('#unifiedSearchBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Searching files, knowledge, labels, suggestions, and actions...',
+  }, async () => {
+    const query = els.query.value.trim();
+    if (!query) {
+      setActivity('Waiting', 'Enter a query to search files, knowledge, labels, suggestions, and actions.', 'working');
+      log('Enter a search query first.');
+      return;
+    }
+
+    const payload = await api(`/api/unified-search?q=${encodeURIComponent(query)}&limit=20`);
+    renderUnifiedResults(payload);
+    setActivity('Ready', `Search complete: ${Object.values(payload.totals).reduce((sum, count) => sum + count, 0)} total match(es).`, 'success');
+    showView('knowledgeView');
   });
-  log(payload);
 });
 
-async function suggestVisibleFiles() {
-  if (!state.files.length) {
-    log('No visible files to organize. Index or refresh files first.');
-    return;
-  }
-
-  const created = [];
-  for (const file of state.files) {
-    const payload = await api('/api/suggestions', {
+document.querySelector('#chatBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Asking indexed sources...',
+  }, async () => {
+    const payload = await api('/api/chat', {
       method: 'POST',
-      body: { fileId: file.id },
+      body: { question: els.query.value, limit: 5 },
     });
-    created.push(...payload.suggestions);
-  }
+    els.providerStatus.textContent = `${payload.provider}: ${payload.provider_status}`;
+    els.answer.textContent = payload.answer;
+    log({ sources: payload.sources });
+    setActivity('Ready', `Answer prepared from ${payload.sources?.length || 0} source(s).`, 'success');
+    showView('chatView');
+  });
+});
 
-  const suggestions = await refreshPlan();
-  renderSuggestions(suggestions);
-  log({ generated_suggestions: created.length, files: state.files.length });
-  showView('planView');
+document.querySelector('#anythingLlmSyncBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Syncing extracted files to AnythingLLM...',
+  }, async () => {
+    const payload = await api('/api/integrations/anythingllm/sync', {
+      method: 'POST',
+      body: { limit: 25 },
+    });
+    log(payload);
+    setActivity('Ready', `AnythingLLM sync finished. Uploaded: ${payload.uploaded || 0}.`, 'success');
+  });
+});
+
+async function suggestVisibleFiles(button) {
+  return withUiState({
+    button,
+    working: 'Working',
+    details: 'Generating organization suggestions for visible files...',
+  }, async () => {
+    if (!state.files.length) {
+      log('No visible files to organize. Index or refresh files first.');
+      setActivity('Ready', 'No visible files to organize.', 'ready');
+      return;
+    }
+
+    const created = [];
+    for (const file of state.files) {
+      const payload = await api('/api/suggestions', {
+        method: 'POST',
+        body: { fileId: file.id },
+      });
+      created.push(...payload.suggestions);
+    }
+
+    const suggestions = await refreshPlan();
+    renderSuggestions(suggestions);
+    log({ generated_suggestions: created.length, files: state.files.length });
+    setActivity('Ready', `Generated ${created.length} suggestion(s).`, 'success');
+    showView('planView');
+  });
 }
 
-document.querySelector('#suggestVisibleBtn').addEventListener('click', suggestVisibleFiles);
+document.querySelector('#suggestVisibleBtn').addEventListener('click', async (event) => suggestVisibleFiles(event.currentTarget));
 
-document.querySelector('#suggestPlanBtn').addEventListener('click', suggestVisibleFiles);
+document.querySelector('#suggestPlanBtn').addEventListener('click', async (event) => suggestVisibleFiles(event.currentTarget));
 
-document.querySelector('#insightsBtn').addEventListener('click', async () => {
-  const payload = await api('/api/insights', {
-    method: 'POST',
-    body: { limit: 25, useOllama: false },
+document.querySelector('#insightsBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Generating file insights...',
+  }, async () => {
+    const payload = await api('/api/insights', {
+      method: 'POST',
+      body: { limit: 25, useOllama: false },
+    });
+    renderInsights(payload.insights);
+    log({ generated: payload.generated });
+    await refreshStatus();
+    setActivity('Ready', `Generated ${payload.generated || 0} insight(s).`, 'success');
   });
-  renderInsights(payload.insights);
-  log({ generated: payload.generated });
-  await refreshStatus();
 });
 
-document.querySelector('#duplicatesBtn').addEventListener('click', async () => {
-  const payload = await api('/api/duplicates');
-  els.insights.innerHTML = payload.groups.map((group) => `
-    <article class="card">
-      <h3>Duplicate group: ${group.file_count} files</h3>
-      <p class="muted">Hash: ${group.content_hash}</p>
-      <pre>${group.files.map((file) => file.absolute_path).join('\n')}</pre>
-    </article>
-  `).join('') || '<p class="muted">No duplicates found.</p>';
-  log(payload);
-  showView('knowledgeView');
-});
-
-document.querySelector('#duplicatesRefreshBtn').addEventListener('click', async () => {
-  document.querySelector('#duplicatesBtn').click();
+document.querySelector('#duplicatesBtn').addEventListener('click', async (event) => {
+  await withUiState({
+    button: event.currentTarget,
+    working: 'Working',
+    details: 'Finding duplicate files...',
+  }, async () => {
+    const payload = await api('/api/duplicates');
+    els.insights.innerHTML = payload.groups.map((group) => `
+      <article class="card">
+        <h3>Duplicate group: ${group.file_count} files</h3>
+        <p class="muted">Hash: ${group.content_hash}</p>
+        <pre>${group.files.map((file) => file.absolute_path).join('\n')}</pre>
+      </article>
+    `).join('') || '<p class="muted">No duplicates found.</p>';
+    log(payload);
+    setActivity('Ready', `Duplicate scan complete: ${payload.duplicate_groups || 0} group(s).`, 'success');
+    showView('knowledgeView');
+  });
 });
 
 document.querySelector('#labelsBtn').addEventListener('click', async () => {
@@ -552,63 +657,101 @@ document.querySelector('#auditBtn').addEventListener('click', async () => {
   log(await api('/api/audit-log?limit=100'));
 });
 
-document.querySelector('#knowledgeBtn').addEventListener('click', async () => {
-  await buildKnowledge();
+document.querySelector('#knowledgeBtn').addEventListener('click', async (event) => {
+  await buildKnowledge(event.currentTarget);
 });
 
-document.querySelector('#knowledgeRefreshBtn').addEventListener('click', async () => {
-  await buildKnowledge();
+document.querySelector('#knowledgeRefreshBtn').addEventListener('click', async (event) => {
+  await buildKnowledge(event.currentTarget);
 });
 
 els.files.addEventListener('click', async (event) => {
   const previewFileId = event.target.dataset.previewFile;
   if (previewFileId) {
-    const payload = await api(`/api/files/${previewFileId}/preview`);
-    els.answer.textContent = [
-      payload.file.filename,
-      payload.file.absolute_path,
-      '',
-      payload.insight?.summary || 'No insight yet.',
-      '',
-      payload.previewText || 'No extracted preview text available.',
-    ].join('\n');
-    log(payload.file);
+    await withUiState({
+      button: event.target,
+      working: 'Working',
+      details: 'Loading file preview...',
+    }, async () => {
+      const payload = await api(`/api/files/${previewFileId}/preview`);
+      els.answer.textContent = [
+        payload.file.filename,
+        payload.file.absolute_path,
+        '',
+        payload.insight?.summary || 'No insight yet.',
+        '',
+        payload.previewText || 'No extracted preview text available.',
+      ].join('\n');
+      log(payload.file);
+      setActivity('Ready', `Preview loaded for ${payload.file.filename}.`, 'success');
+      showView('chatView');
+    });
     return;
   }
 
   const fileId = event.target.dataset.suggest;
   if (!fileId) return;
 
-  const payload = await api('/api/suggestions', {
-    method: 'POST',
-    body: { fileId },
+  await withUiState({
+    button: event.target,
+    working: 'Working',
+    details: 'Generating organization suggestions...',
+  }, async () => {
+    const payload = await api('/api/suggestions', {
+      method: 'POST',
+      body: { fileId },
+    });
+    renderSuggestions(payload.suggestions);
+    await refreshPlan();
+    log(payload);
+    setActivity('Ready', `Generated ${payload.suggestions.length} suggestion(s).`, 'success');
+    showView('organizeView');
   });
-  renderSuggestions(payload.suggestions);
-  await refreshPlan();
-  log(payload);
-  showView('organizeView');
 });
 
 async function handlePreviewClick(event) {
   const suggestionId = event.target.dataset.preview;
   if (!suggestionId) return;
 
-  const previewPayload = await api('/api/action-previews', {
-    method: 'POST',
-    body: { suggestionId },
-  });
-  log(previewPayload);
+  await withUiState({
+    button: event.target,
+    working: 'Working',
+    details: 'Creating safe action preview...',
+  }, async () => {
+    const previewPayload = await api('/api/action-previews', {
+      method: 'POST',
+      body: { suggestionId },
+    });
+    log(previewPayload);
 
-  if (previewPayload.preview.preview_status !== 'ready') return;
-  const approved = window.confirm(`Execute ${previewPayload.preview.action_type}? This is approved and audited.`);
-  if (!approved) return;
+    if (previewPayload.preview.preview_status !== 'ready') {
+      setActivity('Ready', `Preview blocked: ${previewPayload.preview.blocked_reason || 'not executable'}.`, 'ready');
+      return;
+    }
 
-  const executionPayload = await api('/api/action-executions', {
-    method: 'POST',
-    body: { previewId: previewPayload.preview.id, approve: true },
+    const approved = window.confirm([
+      `Execute ${previewPayload.preview.action_type}?`,
+      '',
+      `Source: ${previewPayload.preview.source_path || previewPayload.preview.current_value || 'app metadata'}`,
+      `Target: ${previewPayload.preview.target_path || previewPayload.preview.suggested_value}`,
+      '',
+      'This action is audited and can only run because you approved it.',
+    ].join('\n'));
+
+    if (!approved) {
+      setActivity('Ready', 'Action preview created but execution was cancelled.', 'ready');
+      return;
+    }
+
+    const executionPayload = await api('/api/action-executions', {
+      method: 'POST',
+      body: { previewId: previewPayload.preview.id, approve: true },
+    });
+    log(executionPayload);
+    await refreshDashboard();
+    await refreshPlan();
+    setActivity('Ready', `Action executed: ${executionPayload.execution.action_type}.`, 'success');
   });
-  log(executionPayload);
-  await refreshDashboard();
 }
 
 els.suggestions.addEventListener('click', handlePreviewClick);
@@ -618,4 +761,4 @@ loadSettings();
 refreshProviderSettings()
   .then(refreshDashboard)
   .then(refreshPlan)
-  .catch((error) => log(error.message));
+  .catch((error) => showError(error));
