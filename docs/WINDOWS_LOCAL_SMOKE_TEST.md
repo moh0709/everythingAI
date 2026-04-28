@@ -25,7 +25,25 @@ cd C:\AI\everythingAI\services\api
 npm install
 ```
 
-## 2. Create safe test folder
+## 2. Set local MVP safety/optimization variables
+
+```powershell
+$env:EVERYTHINGAI_MAX_FILE_SIZE_BYTES="262144000"
+$env:EVERYTHINGAI_EXCLUDE_NAMES="node_modules,.git,dist,build"
+$env:EVERYTHINGAI_EXCLUDE_EXTENSIONS=".exe,.dll,.iso,.zip"
+$env:EVERYTHINGAI_WATCH_DEBOUNCE_MS="1000"
+```
+
+Optional Ollama setup:
+
+```powershell
+$env:OLLAMA_BASE_URL="http://127.0.0.1:11434"
+$env:OLLAMA_MODEL="qwen3.5:2b"
+$env:OLLAMA_TIMEOUT_MS="120000"
+$env:OLLAMA_NUM_PREDICT="192"
+```
+
+## 3. Create safe test folder
 
 Do not test on the full C: drive first.
 
@@ -36,7 +54,7 @@ Set-Content C:\AI\everythingAI-test-files\contract-test.md "# Contract\nSupplier
 Set-Content C:\AI\everythingAI-test-files\notes-test.csv "name,value`nalpha,42"
 ```
 
-## 3. Run tests
+## 4. Run tests
 
 ```powershell
 npm test
@@ -48,7 +66,9 @@ Expected:
 All tests pass.
 ```
 
-## 4. Start local API/UI
+If tests fail, copy the full output before continuing.
+
+## 5. Start local API/UI
 
 ```powershell
 npm start
@@ -66,7 +86,7 @@ Default local token:
 replace-with-your-local-development-token
 ```
 
-## 5. Index test folder from CLI
+## 6. Index test folder from CLI
 
 In another PowerShell window:
 
@@ -80,9 +100,10 @@ Expected:
 ```text
 indexed > 0
 failed = 0
+skipped reasons are visible if files/folders are excluded
 ```
 
-## 6. Extract text
+## 7. Extract text
 
 ```powershell
 npm run extract
@@ -92,9 +113,10 @@ Expected:
 
 ```text
 extracted > 0
+skipped_unchanged may appear on later repeated runs
 ```
 
-## 7. Search
+## 8. Search
 
 ```powershell
 npm run search -- "supplier"
@@ -106,7 +128,7 @@ Expected:
 contract-test.md or invoice-test.txt appears in results.
 ```
 
-## 8. Generate embeddings and semantic search
+## 9. Generate embeddings and semantic search
 
 ```powershell
 npm run embeddings
@@ -119,7 +141,9 @@ Expected:
 Relevant files appear with score above 0.
 ```
 
-## 9. Generate insights
+Note: current MVP embeddings are deterministic local token embeddings, not neural embeddings yet.
+
+## 10. Generate insights
 
 ```powershell
 npm run insights -- --limit 10
@@ -131,7 +155,7 @@ Expected:
 Files get classification and summary.
 ```
 
-## 10. Organization preview flow
+## 11. Organization preview flow
 
 List files:
 
@@ -157,7 +181,7 @@ Expected:
 Preview is created. It may be ready or blocked depending on conflict checks.
 ```
 
-## 11. Execute only after approval
+## 12. Execute only after approval
 
 Only run this inside the safe test folder.
 
@@ -171,7 +195,17 @@ Expected:
 Action executes only when --approve is present.
 ```
 
-## 12. Undo approved action
+Execution validates:
+
+- safe preview exists
+- source path exists
+- target path does not exist
+- source and target are different
+- target does not escape the allowed directory boundary
+
+Failed execution attempts are audited.
+
+## 13. Undo approved action
 
 ```powershell
 npm run undo -- "<execution-id>" --approve
@@ -183,7 +217,34 @@ Expected:
 Moved/renamed file is restored and audit log contains action.undone.
 ```
 
-## 13. Check dashboard
+## 14. Test watcher carefully
+
+Use only the safe test folder:
+
+```powershell
+npm run watch -- "C:\AI\everythingAI-test-files"
+```
+
+In another PowerShell window:
+
+```powershell
+Set-Content C:\AI\everythingAI-test-files\watch-test.txt "Watcher test supplier document"
+```
+
+Expected:
+
+```text
+File is indexed after debounce delay.
+The watcher does not start overlapping rescans.
+```
+
+Stop the watcher with:
+
+```text
+Ctrl+C
+```
+
+## 15. Check dashboard
 
 In browser:
 
@@ -198,8 +259,9 @@ Verify:
 - File preview works.
 - Suggestions can be created.
 - Actions require confirmation.
+- Errors are visible in the log area.
 
-## 14. Check audit log
+## 16. Check audit log
 
 ```powershell
 curl -H "Authorization: Bearer replace-with-your-local-development-token" http://127.0.0.1:4100/api/audit-log
@@ -208,7 +270,19 @@ curl -H "Authorization: Bearer replace-with-your-local-development-token" http:/
 Expected:
 
 ```text
-Executed and undone actions are listed after running action tests.
+Executed, failed, and undone actions are listed after running action tests.
+```
+
+## 17. Check validation and dependency audit
+
+```powershell
+npm audit --omit=dev
+```
+
+Expected:
+
+```text
+No critical production dependency issues.
 ```
 
 ## Safety reminders
@@ -218,3 +292,4 @@ Executed and undone actions are listed after running action tests.
 - Do not scan production folders until smoke test passes.
 - Delete actions are not implemented and should stay disabled.
 - Move/rename actions must only run after preview and explicit approval.
+- Use the safe test folder until all tests pass.
