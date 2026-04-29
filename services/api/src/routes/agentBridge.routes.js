@@ -3,10 +3,13 @@ import { openDatabase, getAppSetting, setAppSetting } from '../db/client.js';
 import { getDefaultAiProviderSettings, mergeAiProviderSettings } from '../settings/aiProviderSettings.js';
 import {
   bridgeSecurityNotice,
+  chatWithAgent,
   detectAgentIntegration,
   getBridgeStatus,
   runAgentProbe,
 } from '../agents/localAgentBridge.js';
+import { searchFiles } from '../search/searchService.js';
+import { parseLimit } from '../utils/request.js';
 
 const SETTINGS_KEY = 'ai_provider_settings';
 
@@ -30,6 +33,14 @@ function saveAgentSettings(agentIntegrations) {
   setAppSetting(db, SETTINGS_KEY, next);
   db.close();
   return next.agentIntegrations;
+}
+
+function loadContext(query, limit) {
+  if (!query || !query.toString().trim()) return [];
+  const db = openDatabase();
+  const results = searchFiles(db, { query, limit });
+  db.close();
+  return results;
 }
 
 export function createAgentBridgeRouter() {
@@ -87,6 +98,25 @@ export function createAgentBridgeRouter() {
       const action = req.body?.action || 'version';
       if (!agentId) return res.status(400).json({ error: 'agentId is required' });
       const result = await runAgentProbe(agentId, action, settings);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/agent-bridge/chat', async (req, res, next) => {
+    try {
+      const settings = loadSettings();
+      const agentId = req.body?.agentId || req.body?.integration;
+      const message = req.body?.message;
+      if (!agentId) return res.status(400).json({ error: 'agentId is required' });
+      if (!message || !message.toString().trim()) return res.status(400).json({ error: 'message is required' });
+
+      const context = Array.isArray(req.body?.context)
+        ? req.body.context
+        : loadContext(req.body?.contextQuery || req.body?.q, parseLimit(req.body?.limit, 5));
+
+      const result = await chatWithAgent(agentId, { message, context }, settings);
       res.json(result);
     } catch (error) {
       next(error);
