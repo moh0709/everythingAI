@@ -1,5 +1,5 @@
 import { listExtractedFiles, upsertFileInsight } from '../db/client.js';
-import { createLocalChatAnswer } from '../ai/localProvider.js';
+import { createConfiguredChatAnswer } from '../ai/providerRuntime.js';
 
 const CLASSIFICATION_RULES = [
   { classification: 'legal', patterns: ['contract', 'agreement', 'terms', 'signed'] },
@@ -16,7 +16,7 @@ function classifyText(text) {
 
 function extractEntities(text) {
   const peopleOrOrgs = Array.from(new Set(text.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [])).slice(0, 12);
-  const dates = Array.from(new Set(text.match(/\b\d{4}-\d{2}-\d{2}\b|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b/gi) || [])).slice(0, 12);
+  const dates = Array.from(new Set(text.match(/\b\d{4}-\d{2}-\d{2}\b|\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b/gi) || [])).slice(0, 12);
   return { names: peopleOrOrgs, dates };
 }
 
@@ -27,7 +27,7 @@ function deterministicSummary(file) {
   return sentence.length > 280 ? `${sentence.slice(0, 277)}...` : sentence;
 }
 
-export async function generateFileInsights(db, { fileId, limit = 25, useOllama = false } = {}) {
+export async function generateFileInsights(db, { fileId, limit = 25, useOllama = false, useProvider = false, provider } = {}) {
   const files = listExtractedFiles(db, { fileId, limit });
   const results = [];
 
@@ -36,21 +36,22 @@ export async function generateFileInsights(db, { fileId, limit = 25, useOllama =
     const classification = classifyText(text);
     const entities = extractEntities(text);
     let summary = deterministicSummary(file);
-    let provider = 'deterministic';
+    let insightProvider = 'deterministic';
     let status = 'generated';
     let errorMessage = null;
 
-    if (useOllama) {
-      const response = await createLocalChatAnswer({
+    if (useOllama || useProvider || provider) {
+      const response = await createConfiguredChatAnswer({
         question: `Summarize this file in one concise paragraph and mention its likely category: ${file.filename}`,
         sources: [{
           filename: file.filename,
           absolute_path: file.absolute_path,
           snippet: file.extracted_text.slice(0, 1800),
         }],
+        overrideProvider: provider,
       });
 
-      provider = response.provider;
+      insightProvider = response.provider;
       if (response.provider_status === 'ok') {
         summary = response.answer;
       } else {
@@ -63,7 +64,7 @@ export async function generateFileInsights(db, { fileId, limit = 25, useOllama =
       summary,
       classification,
       entities_json: JSON.stringify(entities),
-      provider,
+      provider: insightProvider,
       status,
       error_message: errorMessage,
       generated_at: new Date().toISOString(),
