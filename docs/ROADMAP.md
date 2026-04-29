@@ -1,115 +1,358 @@
 # ROADMAP
 
-## Phase 1 - Foundation
+## Current roadmap position
 
-- Define product vision
-- Define architecture
-- Define modules
-- Define MVP
+EverythingAI is currently in the **local MVP hardening phase**.
 
-Status: Complete for local MVP.
+The project has moved beyond concept/prototype planning. The current implementation now contains a local backend engine, an Organizor-style React UI, backend-persisted source paths, automatic knowledge consumption, safe organization previews/execution, AI provider settings, and live provider model discovery.
+
+This roadmap reflects the known work completed in the repository and in the current implementation session up to this update.
+
+The project is **not production ready yet**. The next milestone is to complete local MVP hardening, verify builds/tests, and then move toward production-platform architecture.
 
 ---
 
-## Phase 2 - Core MVP Build
+## Phase 1 — Product direction and architecture
 
 ### Goal
 
-Build a working local system that indexes files and supports AI search and chat.
+Define what EverythingAI is, what it should do, and how the system should be structured.
 
-### Tasks
+### Status
 
-- File scanner
-- Metadata storage
-- Document parsing
-- Embedding pipeline
-- Basic search
-- Integrate AnythingLLM
+```text
+Complete
+```
 
-Status: Mostly complete for local MVP. Metadata indexing, document parsing, keyword search, local deterministic token embeddings, semantic-style related search, duplicate detection, file watching, and an optional AnythingLLM document sync bridge are implemented. Neural embeddings remain a future quality upgrade.
+### Finished
+
+- [x] Define EverythingAI / EverythingApp product vision.
+- [x] Define EverythingAI as a local-first AI file brain.
+- [x] Select Organizor-style UI as the main product experience.
+- [x] Keep product name as EverythingAI.
+- [x] Downgrade old static UI to technical/debug role.
+- [x] Define Source Paths as the central scope model.
+- [x] Define automatic knowledge consumption from scoped folders.
+- [x] Define safe execution principle: AI suggests, user approves.
+- [x] Define local MVP before central production platform.
+
+### Product principle
+
+```text
+User manages scope.
+EverythingAI consumes knowledge.
+User approves actions.
+```
 
 ---
 
-## Phase 3 - AI Layer Integration
+## Phase 2 — Backend core engine
 
 ### Goal
 
-Enable AI understanding of files.
+Build a working local backend that indexes folders, stores file intelligence, extracts content, searches knowledge, watches folders, and safely organizes files.
 
-### Tasks
+### Status
 
-- Connect Ollama
-- Enable chat with files
-- Add source references
-- Add summarization
+```text
+Mostly implemented — needs local verification and hardening
+```
 
-Status: Ollama chat with source references is implemented using `qwen3.5:2b` in local validation. Deterministic summaries/classification/entities are implemented, with optional Ollama summaries available.
+### Finished
+
+- [x] SQLite local database.
+- [x] File metadata indexing.
+- [x] SHA-256 content hashing.
+- [x] Document text extraction.
+- [x] SQLite FTS keyword search.
+- [x] Deterministic vector-style semantic search foundation.
+- [x] File embeddings table.
+- [x] File insights table.
+- [x] Organization suggestions table.
+- [x] Action previews table.
+- [x] Action executions table.
+- [x] Audit log table.
+- [x] Watch roots / source paths table.
+- [x] App settings table.
+- [x] Source Paths API.
+- [x] Provider settings API.
+- [x] Folder watcher foundation.
+- [x] Safe action preview flow.
+- [x] Approved rename/move execution.
+- [x] Undo foundation.
+- [x] AnythingLLM sync backend endpoint.
+
+### Still to finalize
+
+- [ ] Run backend tests locally.
+- [ ] Verify source path add/pause/resume/remove after backend restart.
+- [ ] Verify watcher behavior for backend-persisted source paths.
+- [ ] Add cleanup behavior when removing source paths from scope.
+- [ ] Improve failed file and failed extraction reporting.
+- [ ] Add regression tests for failed execution and nested undo.
+- [ ] Add real background job queue later for production.
 
 ---
 
-## Phase 4 - Organization Engine
+## Phase 3 — EverythingAI React UI
 
 ### Goal
 
-Add AI-driven file organization suggestions.
+Use the Organizor-style UI as the main user-facing app while keeping the EverythingAI name and backend.
 
-### Tasks
+### Status
 
-- Tag suggestions
-- Rename suggestions
-- Folder suggestions
-- Confidence scoring
-- Preview UI
+```text
+Implemented as active enhanced UI — needs build verification and cleanup
+```
 
-Status: Implemented for local MVP with safe previews.
+### Finished
+
+- [x] Create `apps/everything-ai-ui` React/Vite app.
+- [x] Keep product name as EverythingAI.
+- [x] Add Organizor-style Dashboard.
+- [x] Add Explorer.
+- [x] Add Planning.
+- [x] Add Analytics.
+- [x] Add Settings.
+- [x] Add Source Paths section.
+- [x] Load backend-persisted source paths.
+- [x] Add source path add/re-scan/pause/resume/remove controls.
+- [x] Add AI provider settings UI.
+- [x] Add provider cards.
+- [x] Add model selector.
+- [x] Add model refresh.
+- [x] Add provider test connection.
+- [x] Add planning rules UI.
+- [x] Add real Explorer filters.
+- [x] Replace static tags with dynamic file tags.
+- [x] Wire content preview to `GET /api/files/:fileId/preview`.
+- [x] Replace static AI Confidence with calculated average suggestion confidence.
+- [x] Replace static destination folder with editable planning label.
+- [x] Add dry-run preview queue.
+- [x] Wire execute approved previews.
+- [x] Activate enhanced UI through `AppEnhanced.tsx`.
+- [x] Add styling for real filter panel, visible/total file count, and scrollable preview text.
+
+### Still to finalize
+
+- [ ] Run `npm install` and `npm run build` in `apps/everything-ai-ui`.
+- [ ] Fix TypeScript/build errors if any.
+- [ ] Rename `AppEnhanced.tsx` to `App.tsx` after build is stable.
+- [ ] Remove or archive old/deprecated `App.tsx`.
+- [ ] Improve UI layout after real local testing.
+- [ ] Add clearer loading/progress indicators for long scans.
 
 ---
 
-## Phase 5 - Safe Execution Layer
+## Phase 4 — AI provider system
 
 ### Goal
 
-Enable safe file operations.
+Allow EverythingAI to use configurable local and remote AI providers for chat, insights, planning, and future reasoning.
 
-### Tasks
+### Status
 
-- Approval flow
-- File move
-- File rename
-- Undo system
-- Audit log
+```text
+Settings and live model discovery implemented — execution integration still incomplete
+```
 
-Status: Implemented for approved rename/move plus undo and audit. Delete handling is intentionally not implemented.
+### Finished
+
+- [x] Backend-persisted provider settings.
+- [x] Local Ollama settings.
+- [x] OpenRouter settings.
+- [x] Cerebras settings.
+- [x] Mistral settings.
+- [x] Google AI settings.
+- [x] Remote provider enable/disable policy.
+- [x] API key masking/preservation logic.
+- [x] Static fallback model lists.
+- [x] Live Ollama model discovery.
+- [x] Live OpenRouter model discovery.
+- [x] Live Cerebras model discovery.
+- [x] Live Mistral model discovery.
+- [x] Live Google AI model discovery.
+- [x] Provider model refresh endpoint.
+- [x] Provider connection test endpoint.
+
+### Still to finalize
+
+- [ ] Selected provider must control `/api/chat`.
+- [ ] Selected provider must control `/api/insights`.
+- [ ] Selected provider must control planning/suggestion generation.
+- [ ] Add server-side provider execution adapters for chat/completions.
+- [ ] Improve provider-specific error messages.
+- [ ] Improve API key UX: saved / replace / clear.
+- [ ] Decide how embeddings provider selection should work.
 
 ---
 
-## Phase 6 - Knowledge Layer
+## Phase 5 — Planning and organization workflow
 
 ### Goal
 
-Transform files into structured knowledge.
+Let AI generate a safe organization plan, allow the user to review it, dry-run it, and approve execution.
 
-### Tasks
+### Status
 
-- Entity extraction
-- Knowledge pages
-- Relationships
+```text
+Functional MVP foundation — backend rules need enforcement
+```
 
-Status: Basic knowledge layer is implemented through insight-derived entities, classifications, file preview, related file references, and a local system overview dashboard. Rich generated wiki pages remain future enhancement.
+### Finished
+
+- [x] Organization suggestions.
+- [x] Confidence scoring.
+- [x] Selectable suggestions.
+- [x] Dry-run action previews.
+- [x] Preview ready/blocked states.
+- [x] Individual action preview execution.
+- [x] Execute Plan button wired to executable previews.
+- [x] Confirmation before execution.
+- [x] Audit trail foundation.
+- [x] Editable destination/planning label replaces static `/Documents/Organized` placeholder.
+
+### Still to finalize
+
+- [ ] Backend must enforce confidence threshold.
+- [ ] Backend must enforce allow/disable rename.
+- [ ] Backend must enforce allow/disable move.
+- [ ] Backend must enforce allow/disable tag.
+- [ ] Backend must enforce allow/disable category.
+- [ ] Backend must enforce dry-run-only mode.
+- [ ] Backend must enforce require-approval mode.
+- [ ] Add better grouped folder-structure planning view.
+- [ ] Add better bulk select controls.
+- [ ] Add Undo UI.
+- [ ] Add clearer blocked-action explanations.
 
 ---
 
-## Phase 7 - Advanced Features
+## Phase 6 — Knowledge layer
 
-- Duplicate detection
-- Automation rules
-- Performance optimization
-- Multi-user support
+### Goal
 
-Status: Duplicate detection is implemented. Automation rules, performance optimization, and multi-user support remain future work.
+Turn indexed files and extracted content into a searchable and explainable knowledge base.
+
+### Status
+
+```text
+Backend foundation exists — dedicated UI still missing
+```
+
+### Finished
+
+- [x] Extracted text stored.
+- [x] File insights stored.
+- [x] Summaries generated.
+- [x] Classifications generated.
+- [x] Basic entity extraction.
+- [x] File preview endpoint.
+- [x] Explorer content preview wired to backend preview endpoint.
+- [x] Dynamic file tags use extension, index status, extraction status, insight classification, and file size.
+- [x] Related/searchable file references foundation.
+
+### Still to finalize
+
+- [ ] Add dedicated Knowledge page in React UI.
+- [ ] Show summaries.
+- [ ] Show classifications.
+- [ ] Show extracted entities.
+- [ ] Show duplicate groups.
+- [ ] Show source map.
+- [ ] Show knowledge build status.
+- [ ] Add Ask EverythingAI / knowledge chat page.
+- [ ] Connect selected AI provider to knowledge chat.
 
 ---
 
-## Long-term vision
+## Phase 7 — Integrations
 
-EverythingApp becomes a full local AI operating system for knowledge and files.
+### Goal
+
+Connect EverythingAI to external knowledge systems and future enterprise data sources.
+
+### Status
+
+```text
+Backend foundation started — UI missing
+```
+
+### Finished
+
+- [x] AnythingLLM sync backend endpoint.
+- [x] AnythingLLM extracted-document upload bridge.
+
+### Still to finalize
+
+- [ ] Add AnythingLLM sync UI.
+- [ ] Show sync status.
+- [ ] Configure workspace slug in UI.
+- [ ] Show sync errors.
+- [ ] Add cloud storage connector strategy.
+- [ ] Add future SharePoint / OneDrive / Google Drive connector strategy.
+
+---
+
+## Phase 8 — Production platform readiness
+
+### Goal
+
+Move from local MVP into a real production-ready platform with users, workspaces, devices, central database, and client agents.
+
+### Status
+
+```text
+Not started — future production phase
+```
+
+### Required later
+
+- [ ] Authentication.
+- [ ] Users.
+- [ ] Workspace / tenant model.
+- [ ] Device/client identity.
+- [ ] Installed client agent architecture.
+- [ ] Central server architecture.
+- [ ] PostgreSQL migration.
+- [ ] pgvector or dedicated vector database.
+- [ ] Background job queue.
+- [ ] Secure credential storage.
+- [ ] Enterprise permission model.
+- [ ] File access control model.
+- [ ] Production logging and monitoring.
+- [ ] CI/build pipeline.
+- [ ] Backup and migration strategy.
+- [ ] Deployment strategy.
+
+---
+
+## Current production-readiness assessment
+
+```text
+Concept:                 Complete
+Architecture:            Complete for local MVP
+Backend MVP foundation:  70–80%
+React UI MVP foundation: 65–75%
+AI provider UI:          75–85%
+AI provider execution:   25–35%
+Planning workflow:       60–70%
+Knowledge UI:            20–30%
+Production readiness:    20–30%
+```
+
+## Immediate next priorities
+
+1. Run backend tests.
+2. Run frontend build.
+3. Fix build/runtime errors.
+4. Connect selected AI provider to real chat/insights/planning execution.
+5. Enforce planning rules in backend suggestion logic.
+6. Add Undo UI.
+7. Add Knowledge page.
+8. Add AnythingLLM sync UI.
+
+## One-sentence status
+
+EverythingAI is now a serious local MVP foundation with backend-persisted source paths, automatic knowledge consumption, Organizor-style UI, provider settings, live model discovery, and safe planning workflow — but it still needs provider execution integration, backend planning-rule enforcement, knowledge UI, undo/sync UI, testing, and production hardening before it is fully production ready.
