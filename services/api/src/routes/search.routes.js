@@ -11,7 +11,6 @@ import { semanticSearchFiles } from '../search/semanticSearch.js';
 import { generateEmbeddings } from '../embeddings/embeddingService.js';
 import { answerFromLocalFiles } from '../ai/chatPipeline.js';
 import { requireBodyString, requireQueryString, parseLimit } from '../utils/request.js';
-import { getProviderSettings } from '../settings/providerSettings.js';
 
 export function createSearchRouter() {
   const router = Router();
@@ -123,7 +122,7 @@ export function createSearchRouter() {
       const result = await answerFromLocalFiles(db, {
         question,
         limit: parseLimit(req.body?.limit, 5),
-        providerOptions: getProviderSettings().ollama,
+        provider: req.body?.provider,
       });
       db.close();
 
