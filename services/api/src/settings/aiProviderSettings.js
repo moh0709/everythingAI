@@ -6,6 +6,19 @@ const providerBlock = ({ endpoint, apiKey = '', model, temperature = 0.2, maxTok
   maxTokens,
 });
 
+const agentBlock = ({ command, authStrategy, mode = 'local-cli', chatMode = 'stdin', chatArgs = [], enabled = false, chatEnabled = false }) => ({
+  enabled,
+  mode,
+  command,
+  authStrategy,
+  chatEnabled,
+  chatMode,
+  chatArgs,
+  allowWorkspaceContext: false,
+  maxInputChars: 12000,
+  timeoutMs: 120000,
+});
+
 const DEFAULT_SETTINGS = {
   remoteProvidersEnabled: false,
   activeProvider: 'ollama',
@@ -51,13 +64,13 @@ const DEFAULT_SETTINGS = {
     dryRunOnly: false,
   },
   agentIntegrations: {
-    codex: { enabled: false, mode: 'local-cli', command: 'codex', authStrategy: 'codex-app' },
-    kiloCode: { enabled: false, mode: 'local-cli', command: 'kilo', authStrategy: 'external-app' },
-    openCode: { enabled: false, mode: 'local-cli', command: 'opencode', authStrategy: 'external-app' },
-    claudeCode: { enabled: false, mode: 'local-cli', command: 'claude', authStrategy: 'external-app' },
-    aider: { enabled: false, mode: 'local-cli', command: 'aider', authStrategy: 'local-config' },
-    continue: { enabled: false, mode: 'config-bridge', command: 'continue', authStrategy: 'local-config' },
-    cline: { enabled: false, mode: 'config-bridge', command: 'cline', authStrategy: 'local-config' },
+    codex: agentBlock({ command: 'codex', authStrategy: 'codex-app', chatArgs: ['exec', '-'] }),
+    kiloCode: agentBlock({ command: 'kilo', authStrategy: 'external-app', chatArgs: ['chat', '--stdin'] }),
+    openCode: agentBlock({ command: 'opencode', authStrategy: 'external-app', chatArgs: ['run', '-'] }),
+    claudeCode: agentBlock({ command: 'claude', authStrategy: 'external-app', chatArgs: ['-p'] }),
+    aider: agentBlock({ command: 'aider', authStrategy: 'local-config', chatArgs: ['--message'] }),
+    continue: agentBlock({ command: 'continue', authStrategy: 'local-config', mode: 'config-bridge', chatMode: 'disabled' }),
+    cline: agentBlock({ command: 'cline', authStrategy: 'local-config', mode: 'config-bridge', chatMode: 'disabled' }),
   },
 };
 
@@ -78,7 +91,10 @@ export function mergeAiProviderSettings(settings = {}) {
     merged[provider] = { ...defaults[provider], ...(settings[provider] || {}) };
   }
   merged.planning = { ...defaults.planning, ...(settings.planning || {}) };
-  merged.agentIntegrations = { ...defaults.agentIntegrations, ...(settings.agentIntegrations || {}) };
+  merged.agentIntegrations = Object.fromEntries(Object.entries(defaults.agentIntegrations).map(([key, value]) => [
+    key,
+    { ...value, ...((settings.agentIntegrations || {})[key] || {}) },
+  ]));
   return merged;
 }
 
