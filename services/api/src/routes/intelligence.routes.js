@@ -15,6 +15,8 @@ export function createIntelligenceRouter() {
         fileId: req.body?.fileId,
         limit: parseLimit(req.body?.limit, 25),
         useOllama: req.body?.useOllama === true,
+        useProvider: req.body?.useProvider === true,
+        provider: req.body?.provider,
       });
       const insights = listFileInsights(db, {
         fileId: req.body?.fileId,
@@ -53,6 +55,8 @@ export function createIntelligenceRouter() {
       const insightResult = await generateFileInsights(db, {
         limit,
         useOllama: req.body?.useOllama === true,
+        useProvider: req.body?.useProvider === true,
+        provider: req.body?.provider,
       });
       const knowledge = buildKnowledgeIndex(db, { limit });
       db.close();
