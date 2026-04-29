@@ -4,7 +4,7 @@
 
 EverythingAI is currently in the **local MVP hardening phase**.
 
-The project has moved beyond concept/prototype planning. The current implementation now contains a local backend engine, an Organizor-style React UI, backend-persisted source paths, automatic knowledge consumption, safe organization previews/execution, AI provider settings, and live provider model discovery.
+The project has moved beyond concept/prototype planning. The current implementation now contains a local backend engine, an Organizor-style React UI, backend-persisted source paths, automatic knowledge consumption, safe organization previews/execution, AI provider settings, live provider model discovery, and initial configured-provider execution for chat and insights.
 
 This roadmap reflects the known work completed in the repository and in the current implementation session up to this update.
 
@@ -154,7 +154,7 @@ Allow EverythingAI to use configurable local and remote AI providers for chat, i
 ### Status
 
 ```text
-Settings and live model discovery implemented — execution integration still incomplete
+Provider settings, live model discovery, and initial execution integration implemented — planning execution still incomplete
 ```
 
 ### Finished
@@ -175,16 +175,17 @@ Settings and live model discovery implemented — execution integration still in
 - [x] Live Google AI model discovery.
 - [x] Provider model refresh endpoint.
 - [x] Provider connection test endpoint.
+- [x] Server-side configured provider runtime for chat/completions.
+- [x] Selected provider can control `/api/chat`.
+- [x] Selected provider can control `/api/insights` when provider execution is requested.
 
 ### Still to finalize
 
-- [ ] Selected provider must control `/api/chat`.
-- [ ] Selected provider must control `/api/insights`.
 - [ ] Selected provider must control planning/suggestion generation.
-- [ ] Add server-side provider execution adapters for chat/completions.
-- [ ] Improve provider-specific error messages.
+- [ ] Add deeper provider-specific error messages and UI feedback.
 - [ ] Improve API key UX: saved / replace / clear.
 - [ ] Decide how embeddings provider selection should work.
+- [ ] Add tests for Ollama/OpenRouter/Cerebras/Mistral/Google execution fallbacks.
 
 ---
 
@@ -252,6 +253,7 @@ Backend foundation exists — dedicated UI still missing
 - [x] Explorer content preview wired to backend preview endpoint.
 - [x] Dynamic file tags use extension, index status, extraction status, insight classification, and file size.
 - [x] Related/searchable file references foundation.
+- [x] Selected AI provider can be used for knowledge chat through `/api/chat`.
 
 ### Still to finalize
 
@@ -263,7 +265,6 @@ Backend foundation exists — dedicated UI still missing
 - [ ] Show source map.
 - [ ] Show knowledge build status.
 - [ ] Add Ask EverythingAI / knowledge chat page.
-- [ ] Connect selected AI provider to knowledge chat.
 
 ---
 
@@ -336,7 +337,7 @@ Architecture:            Complete for local MVP
 Backend MVP foundation:  70–80%
 React UI MVP foundation: 65–75%
 AI provider UI:          75–85%
-AI provider execution:   25–35%
+AI provider execution:   45–55%
 Planning workflow:       60–70%
 Knowledge UI:            20–30%
 Production readiness:    20–30%
@@ -347,7 +348,7 @@ Production readiness:    20–30%
 1. Run backend tests.
 2. Run frontend build.
 3. Fix build/runtime errors.
-4. Connect selected AI provider to real chat/insights/planning execution.
+4. Connect selected AI provider to planning/suggestion generation.
 5. Enforce planning rules in backend suggestion logic.
 6. Add Undo UI.
 7. Add Knowledge page.
@@ -355,4 +356,4 @@ Production readiness:    20–30%
 
 ## One-sentence status
 
-EverythingAI is now a serious local MVP foundation with backend-persisted source paths, automatic knowledge consumption, Organizor-style UI, provider settings, live model discovery, and safe planning workflow — but it still needs provider execution integration, backend planning-rule enforcement, knowledge UI, undo/sync UI, testing, and production hardening before it is fully production ready.
+EverythingAI is now a serious local MVP foundation with backend-persisted source paths, automatic knowledge consumption, Organizor-style UI, provider settings, live model discovery, configured provider execution for chat/insights, and safe planning workflow — but it still needs backend planning-rule enforcement, provider-driven planning generation, knowledge UI, undo/sync UI, testing, and production hardening before it is fully production ready.
