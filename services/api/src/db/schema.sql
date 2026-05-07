@@ -49,8 +49,28 @@ CREATE VIRTUAL TABLE IF NOT EXISTS file_search_fts USING fts5(
   extracted_text
 );
 
+CREATE TABLE IF NOT EXISTS planning_sessions (
+  id TEXT PRIMARY KEY,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'running', 'ready', 'failed', 'archived')),
+  mode TEXT NOT NULL CHECK (mode IN ('deterministic', 'provider', 'hybrid')),
+  source_json TEXT NOT NULL,
+  settings_json TEXT NOT NULL,
+  summary_json TEXT NOT NULL,
+  error_message TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  completed_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_planning_sessions_status
+  ON planning_sessions(status);
+
+CREATE INDEX IF NOT EXISTS idx_planning_sessions_created_at
+  ON planning_sessions(created_at);
+
 CREATE TABLE IF NOT EXISTS organization_suggestions (
   id TEXT PRIMARY KEY,
+  planning_session_id TEXT,
   file_id TEXT NOT NULL,
   action_type TEXT NOT NULL CHECK (action_type IN ('tag', 'category', 'rename', 'move')),
   current_value TEXT,
@@ -60,11 +80,15 @@ CREATE TABLE IF NOT EXISTS organization_suggestions (
   risk_level TEXT NOT NULL CHECK (risk_level IN ('low', 'medium', 'high')),
   requires_approval INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL,
+  FOREIGN KEY (planning_session_id) REFERENCES planning_sessions(id) ON DELETE SET NULL,
   FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_organization_suggestions_file_id
   ON organization_suggestions(file_id);
+
+CREATE INDEX IF NOT EXISTS idx_organization_suggestions_planning_session_id
+  ON organization_suggestions(planning_session_id);
 
 CREATE TABLE IF NOT EXISTS action_previews (
   id TEXT PRIMARY KEY,
