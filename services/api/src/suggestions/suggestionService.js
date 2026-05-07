@@ -3,10 +3,10 @@ import path from 'node:path';
 import { getIndexedFileById, insertOrganizationSuggestion, listOrganizationSuggestions } from '../db/client.js';
 import { analyzeFileForOrganization } from '../integrations/organizor/organizationRules.js';
 
-function createSuggestionId(fileId, actionType, suggestedValue) {
+function createSuggestionId(fileId, actionType, suggestedValue, planningSessionId = null) {
   return crypto
     .createHash('sha256')
-    .update(`${fileId}:${actionType}:${suggestedValue}:${Date.now()}:${Math.random()}`)
+    .update(`${planningSessionId || 'legacy'}:${fileId}:${actionType}:${suggestedValue}:${Date.now()}:${Math.random()}`)
     .digest('hex');
 }
 
@@ -28,7 +28,11 @@ function semanticFilenameSuggestion(file, analysis) {
   return `${base}${extension}`;
 }
 
-export function generatePreviewSuggestions(db, { fileId }) {
+function buildExistingKey(suggestion) {
+  return `${suggestion.action_type}:${suggestion.suggested_value}`;
+}
+
+export function generatePreviewSuggestions(db, { fileId, planningSessionId = null } = {}) {
   const file = getIndexedFileById(db, fileId);
 
   if (!file) {
@@ -41,6 +45,7 @@ export function generatePreviewSuggestions(db, { fileId }) {
   const safeName = semanticFilenameSuggestion(file, analysis);
   const suggestions = [
     {
+      planning_session_id: planningSessionId,
       file_id: file.id,
       action_type: 'category',
       current_value: null,
@@ -52,6 +57,7 @@ export function generatePreviewSuggestions(db, { fileId }) {
       created_at: now,
     },
     ...analysis.tags.map((tag) => ({
+      planning_session_id: planningSessionId,
       file_id: file.id,
       action_type: 'tag',
       current_value: null,
@@ -63,6 +69,7 @@ export function generatePreviewSuggestions(db, { fileId }) {
       created_at: now,
     })),
     {
+      planning_session_id: planningSessionId,
       file_id: file.id,
       action_type: 'move',
       current_value: path.dirname(file.absolute_path),
@@ -77,6 +84,7 @@ export function generatePreviewSuggestions(db, { fileId }) {
 
   if (safeName && safeName !== file.filename) {
     suggestions.push({
+      planning_session_id: planningSessionId,
       file_id: file.id,
       action_type: 'rename',
       current_value: file.filename,
@@ -89,14 +97,19 @@ export function generatePreviewSuggestions(db, { fileId }) {
     });
   }
 
-  const existing = listOrganizationSuggestions(db, { fileId: file.id, limit: 500 });
-  const existingKeys = new Set(existing.map((suggestion) => (
-    `${suggestion.action_type}:${suggestion.suggested_value}`
-  )));
+  const existing = listOrganizationSuggestions(db, {
+    fileId: file.id,
+    planningSessionId: planningSessionId || undefined,
+    limit: 500,
+  }).filter((suggestion) => {
+    if (planningSessionId) return suggestion.planning_session_id === planningSessionId;
+    return suggestion.planning_session_id === null;
+  });
+  const existingKeys = new Set(existing.map(buildExistingKey));
   const saved = suggestions.filter((suggestion) => (
-    !existingKeys.has(`${suggestion.action_type}:${suggestion.suggested_value}`)
+    !existingKeys.has(buildExistingKey(suggestion))
   )).map((suggestion) => ({
-    id: createSuggestionId(file.id, suggestion.action_type, suggestion.suggested_value),
+    id: createSuggestionId(file.id, suggestion.action_type, suggestion.suggested_value, planningSessionId),
     ...suggestion,
   }));
 
