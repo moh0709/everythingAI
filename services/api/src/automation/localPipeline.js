@@ -5,12 +5,11 @@ import { generateFileInsights } from '../insights/insightService.js';
 import { buildKnowledgeIndex } from '../knowledge/knowledgeService.js';
 import { generatePreviewSuggestions } from '../suggestions/suggestionService.js';
 
-export async function runLocalAutomationPipeline(db, {
+export async function runKnowledgeIngestionPipeline(db, {
   limit = 1000,
   extract = true,
   embeddings = true,
   insights = true,
-  suggestions = true,
   useOllama = false,
   logger = console,
 } = {}) {
@@ -18,7 +17,6 @@ export async function runLocalAutomationPipeline(db, {
     extraction: null,
     embeddings: null,
     insights: null,
-    suggestions: 0,
     knowledge: null,
   };
 
@@ -35,11 +33,45 @@ export async function runLocalAutomationPipeline(db, {
     result.knowledge = buildKnowledgeIndex(db, { limit });
   }
 
+  return result;
+}
+
+export function runPlanningPipeline(db, {
+  limit = 1000,
+} = {}) {
+  let suggestions = 0;
+  const files = listIndexedFiles(db, { limit });
+
+  for (const file of files) {
+    suggestions += generatePreviewSuggestions(db, { fileId: file.id }).length;
+  }
+
+  return { suggestions };
+}
+
+export async function runLocalAutomationPipeline(db, {
+  limit = 1000,
+  extract = true,
+  embeddings = true,
+  insights = true,
+  suggestions = true,
+  useOllama = false,
+  logger = console,
+} = {}) {
+  const result = {
+    ...(await runKnowledgeIngestionPipeline(db, {
+      limit,
+      extract,
+      embeddings,
+      insights,
+      useOllama,
+      logger,
+    })),
+    suggestions: 0,
+  };
+
   if (suggestions) {
-    const files = listIndexedFiles(db, { limit });
-    for (const file of files) {
-      result.suggestions += generatePreviewSuggestions(db, { fileId: file.id }).length;
-    }
+    result.suggestions = runPlanningPipeline(db, { limit }).suggestions;
   }
 
   return result;
