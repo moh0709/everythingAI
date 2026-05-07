@@ -8,7 +8,7 @@ import {
 } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { extractIndexedFiles } from '../extractors/extractionRunner.js';
-import { runLocalAutomationPipeline } from '../automation/localPipeline.js';
+import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 import { selectFolder } from '../utils/folderPicker.js';
 
@@ -59,7 +59,7 @@ export function createFilesRouter() {
       };
 
       if (automation.enabled) {
-        Object.assign(automation, await runLocalAutomationPipeline(db, {
+        Object.assign(automation, await runKnowledgeIngestionPipeline(db, {
           limit: parseLimit(req.body?.limit, 1000),
           logger: console,
           useOllama: req.body?.useOllama === true,
