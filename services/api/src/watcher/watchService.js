@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
-import { runLocalAutomationPipeline } from '../automation/localPipeline.js';
+import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
 
 const activeWatchers = new Map();
 const DEFAULT_DEBOUNCE_MS = Number.parseInt(process.env.EVERYTHINGAI_WATCH_DEBOUNCE_MS || '', 10) || 1000;
@@ -23,7 +23,7 @@ async function runWatchCycle(db, {
   await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
 
   if (auto) {
-    await runLocalAutomationPipeline(db, { extract, logger });
+    await runKnowledgeIngestionPipeline(db, { extract, logger });
   }
 
   upsertWatchRoot(db, {
