@@ -123,8 +123,29 @@ CREATE TABLE IF NOT EXISTS file_labels (
   FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS execution_batches (
+  id TEXT PRIMARY KEY,
+  planning_session_id TEXT,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'approved', 'running', 'completed', 'completed_with_errors', 'failed', 'undone')),
+  summary_json TEXT NOT NULL,
+  error_message TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  approved_at TEXT,
+  started_at TEXT,
+  completed_at TEXT,
+  FOREIGN KEY (planning_session_id) REFERENCES planning_sessions(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_execution_batches_status
+  ON execution_batches(status);
+
+CREATE INDEX IF NOT EXISTS idx_execution_batches_planning_session_id
+  ON execution_batches(planning_session_id);
+
 CREATE TABLE IF NOT EXISTS action_executions (
   id TEXT PRIMARY KEY,
+  execution_batch_id TEXT,
   preview_id TEXT NOT NULL,
   file_id TEXT NOT NULL,
   action_type TEXT NOT NULL CHECK (action_type IN ('tag', 'category', 'rename', 'move')),
@@ -136,9 +157,13 @@ CREATE TABLE IF NOT EXISTS action_executions (
   error_message TEXT,
   executed_at TEXT NOT NULL,
   undone_at TEXT,
+  FOREIGN KEY (execution_batch_id) REFERENCES execution_batches(id) ON DELETE SET NULL,
   FOREIGN KEY (preview_id) REFERENCES action_previews(id) ON DELETE CASCADE,
   FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_action_executions_execution_batch_id
+  ON action_executions(execution_batch_id);
 
 CREATE INDEX IF NOT EXISTS idx_action_executions_preview_id
   ON action_executions(preview_id);
