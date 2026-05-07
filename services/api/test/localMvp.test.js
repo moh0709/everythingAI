@@ -32,6 +32,7 @@ import { startFolderWatcher, stopFolderWatcher } from '../src/watcher/watchServi
 import { buildKnowledgeIndex } from '../src/knowledge/knowledgeService.js';
 import { generateEmbeddings, searchEmbeddings } from '../src/embeddings/embeddingService.js';
 import { selectFolder } from '../src/utils/folderPicker.js';
+import { runKnowledgeIngestionPipeline, runPlanningPipeline } from '../src/automation/localPipeline.js';
 import {
   getProviderSettings,
   resetProviderSettings,
@@ -144,6 +145,8 @@ test('extracts supported readable files and records failures without aborting', 
 
   assert.equal(result.extracted, 4);
   assert.equal(result.failed, 2);
+  assert.equal(result.failedItems.length, 2);
+  assert.equal(result.diagnostics.failedItems.length, 2);
   assert.match(notes.extracted_text, /Supplier contract alpha/);
   assert.match(workbook.extracted_text, /gamma/);
   assert.equal(brokenPdf.extraction_status, 'failed');
@@ -486,7 +489,7 @@ test('detects duplicate files by content hash', async () => {
   db.close();
 });
 
-test('starts a watcher and indexes changed files', async () => {
+test('starts a watcher and indexes changed files without automatic planning suggestions', async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'everythingai-watch-'));
   const db = openDatabase(tempDbPath());
   await fs.writeFile(path.join(root, 'initial.txt'), 'initial content');
@@ -497,6 +500,7 @@ test('starts a watcher and indexes changed files', async () => {
 
   const files = listIndexedFiles(db, { limit: 100 });
   const status = getSystemStatus(db);
+  const storedSuggestions = listOrganizationSuggestions(db, { limit: 100 });
   const stopped = stopFolderWatcher(db, { rootPath: root });
 
   assert.equal(watcher.status, 'active');
@@ -505,7 +509,8 @@ test('starts a watcher and indexes changed files', async () => {
   assert.equal(status.extracted_files >= 2, true);
   assert.equal(status.embedded_files >= 2, true);
   assert.equal(status.insight_files >= 2, true);
-  assert.equal(status.suggestions > 0, true);
+  assert.equal(status.suggestions, 0);
+  assert.equal(storedSuggestions.length, 0);
   assert.equal(stopped.status, 'stopped');
 
   db.close();
@@ -555,30 +560,30 @@ test('reports system status counts for the local dashboard', async () => {
   db.close();
 });
 
-test('automatic local pipeline prepares searchable knowledge and organization suggestions', async () => {
+test('knowledge ingestion pipeline prepares searchable knowledge without organization suggestions', async () => {
   const root = await createFixture();
   const db = openDatabase(tempDbPath());
 
   await indexFixture(root, db);
-  const extraction = await extractIndexedFiles(db, { logger: { error: () => {} } });
-  const embeddings = generateEmbeddings(db, { limit: 100 });
-  const insights = await generateFileInsights(db, { limit: 100 });
-  const files = listIndexedFiles(db, { limit: 100 });
-  let suggestionCount = 0;
-
-  for (const file of files) {
-    suggestionCount += generatePreviewSuggestions(db, { fileId: file.id }).length;
-  }
-
+  const knowledgePipeline = await runKnowledgeIngestionPipeline(db, {
+    limit: 100,
+    logger: { error: () => {} },
+  });
   const knowledge = buildKnowledgeIndex(db);
-  const storedSuggestions = listOrganizationSuggestions(db, { limit: 100 });
+  const storedSuggestionsBeforePlanning = listOrganizationSuggestions(db, { limit: 100 });
+  const planning = runPlanningPipeline(db, { limit: 100 });
+  const storedSuggestionsAfterPlanning = listOrganizationSuggestions(db, { limit: 100 });
 
-  assert.equal(extraction.extracted > 0, true);
-  assert.equal(embeddings.generated > 0, true);
-  assert.equal(insights.generated > 0, true);
+  assert.equal(knowledgePipeline.mode, 'knowledge_ingestion');
+  assert.equal(knowledgePipeline.extraction.extracted > 0, true);
+  assert.equal(knowledgePipeline.embeddings.generated > 0, true);
+  assert.equal(knowledgePipeline.insights.generated > 0, true);
+  assert.equal(knowledgePipeline.summary.extracted > 0, true);
   assert.equal(knowledge.classification_count > 0, true);
-  assert.equal(suggestionCount > 0, true);
-  assert.equal(storedSuggestions.length >= suggestionCount, true);
+  assert.equal(storedSuggestionsBeforePlanning.length, 0);
+  assert.equal(planning.mode, 'planning');
+  assert.equal(planning.suggestions > 0, true);
+  assert.equal(storedSuggestionsAfterPlanning.length >= planning.suggestions, true);
 
   db.close();
 });
