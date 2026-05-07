@@ -3,7 +3,7 @@ import path from 'node:path';
 import { Router } from 'express';
 import { openDatabase, upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
-import { runLocalAutomationPipeline } from '../automation/localPipeline.js';
+import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
 import { startFolderWatcher, stopFolderWatcher } from '../watcher/watchService.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 
@@ -73,7 +73,7 @@ export function createSourcePathsRouter() {
       } else {
         const insertRecord = db.transaction((record) => upsertIndexedFile(db, record));
         result = await scanFolder(absoluteRoot, { onRecord: (record) => insertRecord(record) });
-        automation = await runLocalAutomationPipeline(db, {
+        automation = await runKnowledgeIngestionPipeline(db, {
           limit: parseLimit(req.body?.limit, 1000),
           logger: console,
           useOllama: req.body?.useOllama === true,
