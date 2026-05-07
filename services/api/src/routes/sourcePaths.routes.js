@@ -4,6 +4,8 @@ import { Router } from 'express';
 import { openDatabase, upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
+import { runJob } from '../jobs/jobRunner.js';
+import { JOB_TYPES } from '../jobs/jobTypes.js';
 import { startFolderWatcher, stopFolderWatcher } from '../watcher/watchService.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 
@@ -61,6 +63,7 @@ export function createSourcePathsRouter() {
 
       let result;
       let automation;
+      let job = null;
 
       if (watch) {
         result = await startFolderWatcher(db, {
@@ -73,11 +76,27 @@ export function createSourcePathsRouter() {
       } else {
         const insertRecord = db.transaction((record) => upsertIndexedFile(db, record));
         result = await scanFolder(absoluteRoot, { onRecord: (record) => insertRecord(record) });
-        automation = await runKnowledgeIngestionPipeline(db, {
+
+        const jobResult = await runJob({
+          type: JOB_TYPES.KNOWLEDGE_INGESTION_PIPELINE,
+          input: {
+            source: 'POST /api/source-paths',
+            folderPath: absoluteRoot,
+            limit: parseLimit(req.body?.limit, 1000),
+          },
+          initialProgress: {
+            currentStep: 'knowledge_ingestion',
+            message: 'Running knowledge ingestion pipeline.',
+          },
+        }, async () => runKnowledgeIngestionPipeline(db, {
           limit: parseLimit(req.body?.limit, 1000),
           logger: console,
           useOllama: req.body?.useOllama === true,
-        });
+        }));
+
+        automation = jobResult.output;
+        job = jobResult.job;
+
         upsertWatchRoot(db, {
           id,
           root_path: absoluteRoot,
@@ -90,7 +109,7 @@ export function createSourcePathsRouter() {
 
       const sources = listSources(db);
       db.close();
-      res.status(201).json({ source: sources.find((source) => source.id === id), sources, result, automation });
+      res.status(201).json({ source: sources.find((source) => source.id === id), sources, result, automation, job });
     } catch (error) {
       next(error);
     }
