@@ -4,6 +4,8 @@ import path from 'node:path';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
 import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
+import { runJob } from '../jobs/jobRunner.js';
+import { JOB_TYPES } from '../jobs/jobTypes.js';
 
 const activeWatchers = new Map();
 const DEFAULT_DEBOUNCE_MS = Number.parseInt(process.env.EVERYTHINGAI_WATCH_DEBOUNCE_MS || '', 10) || 1000;
@@ -20,19 +22,40 @@ async function runWatchCycle(db, {
   auto,
   logger,
 }) {
-  await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
+  return runJob({
+    type: JOB_TYPES.WATCHER_CYCLE,
+    input: {
+      source: 'watcher',
+      watchRootId: id,
+      rootPath: absoluteRoot,
+      auto,
+      extract,
+    },
+    initialProgress: {
+      currentStep: 'watcher_cycle',
+      message: 'Running watcher scan and knowledge ingestion cycle.',
+    },
+  }, async () => {
+    const scan = await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
+    let knowledge = null;
 
-  if (auto) {
-    await runKnowledgeIngestionPipeline(db, { extract, logger });
-  }
+    if (auto) {
+      knowledge = await runKnowledgeIngestionPipeline(db, { extract, logger });
+    }
 
-  upsertWatchRoot(db, {
-    id,
-    root_path: absoluteRoot,
-    status: 'active',
-    last_event_at: new Date().toISOString(),
-    error_message: null,
-    created_at: new Date().toISOString(),
+    upsertWatchRoot(db, {
+      id,
+      root_path: absoluteRoot,
+      status: 'active',
+      last_event_at: new Date().toISOString(),
+      error_message: null,
+      created_at: new Date().toISOString(),
+    });
+
+    return {
+      scan,
+      knowledge,
+    };
   });
 }
 
@@ -56,6 +79,7 @@ export async function startFolderWatcher(db, {
   let timer = null;
   let running = false;
   let pending = false;
+  let lastJob = null;
 
   async function runQueuedCycle() {
     if (running) {
@@ -67,7 +91,8 @@ export async function startFolderWatcher(db, {
     try {
       do {
         pending = false;
-        await runWatchCycle(db, { id, absoluteRoot, insert, extract, auto, logger });
+        const jobResult = await runWatchCycle(db, { id, absoluteRoot, insert, extract, auto, logger });
+        lastJob = jobResult.job;
       } while (pending);
     } catch (error) {
       logger.error(`Watcher failed for ${absoluteRoot}: ${error.message}`);
@@ -114,7 +139,7 @@ export async function startFolderWatcher(db, {
     created_at: new Date().toISOString(),
   });
 
-  return { id, rootPath: absoluteRoot, status: 'active', already_running: false, debounceMs };
+  return { id, rootPath: absoluteRoot, status: 'active', already_running: false, debounceMs, job: lastJob };
 }
 
 export function stopFolderWatcher(db, { rootPath }) {
