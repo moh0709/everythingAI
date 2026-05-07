@@ -9,6 +9,8 @@ import {
 import { scanFolder } from '../indexer/fileScanner.js';
 import { extractIndexedFiles } from '../extractors/extractionRunner.js';
 import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
+import { runJob } from '../jobs/jobRunner.js';
+import { JOB_TYPES } from '../jobs/jobTypes.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 import { selectFolder } from '../utils/folderPicker.js';
 
@@ -57,18 +59,33 @@ export function createFilesRouter() {
       const automation = {
         enabled: req.body?.auto !== false,
       };
+      let job = null;
 
       if (automation.enabled) {
-        Object.assign(automation, await runKnowledgeIngestionPipeline(db, {
+        const jobResult = await runJob({
+          type: JOB_TYPES.KNOWLEDGE_INGESTION_PIPELINE,
+          input: {
+            source: 'POST /api/index',
+            folderPath,
+            limit: parseLimit(req.body?.limit, 1000),
+          },
+          initialProgress: {
+            currentStep: 'knowledge_ingestion',
+            message: 'Running knowledge ingestion pipeline.',
+          },
+        }, async () => runKnowledgeIngestionPipeline(db, {
           limit: parseLimit(req.body?.limit, 1000),
           logger: console,
           useOllama: req.body?.useOllama === true,
         }));
+
+        Object.assign(automation, jobResult.output);
+        job = jobResult.job;
       }
 
       db.close();
 
-      res.status(201).json({ ...result, automation });
+      res.status(201).json({ ...result, automation, job });
     } catch (error) {
       next(error);
     }
