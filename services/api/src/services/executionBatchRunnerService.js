@@ -3,6 +3,7 @@ import {
 } from './executionBatchService.js';
 import {
   getActionPreviewById,
+  insertAuditLog,
 } from '../db/client.js';
 import {
   validateActionPreview,
@@ -10,6 +11,25 @@ import {
 import {
   executeActionPreview,
 } from '../actions/actionExecutor.js';
+import crypto from 'node:crypto';
+
+function createId(prefix) {
+  return crypto
+    .createHash('sha256')
+    .update(`${prefix}:${Date.now()}:${Math.random()}`)
+    .digest('hex');
+}
+
+function audit(db, { eventType, entityId, payload }) {
+  insertAuditLog(db, {
+    id: createId('audit'),
+    event_type: eventType,
+    entity_type: 'execution_batch',
+    entity_id: entityId,
+    payload_json: JSON.stringify(payload),
+    created_at: new Date().toISOString(),
+  });
+}
 
 export async function executeExecutionBatch(db, {
   batchId,
@@ -28,6 +48,15 @@ export async function executeExecutionBatch(db, {
   if (batch.status !== 'approved') {
     throw new Error(`Execution batch cannot execute from status: ${batch.status}`);
   }
+
+  audit(db, {
+    eventType: 'execution_batch.started',
+    entityId: batch.id,
+    payload: {
+      batch_id: batch.id,
+      execution_count: batch.executions.length,
+    },
+  });
 
   const results = [];
 
@@ -77,9 +106,21 @@ export async function executeExecutionBatch(db, {
     }
   }
 
-  return {
+  const summary = {
     batch_id: batch.id,
     status: 'completed',
+    executed_count: results.filter((r) => r.status === 'executed').length,
+    blocked_count: results.filter((r) => r.status === 'blocked').length,
+    failed_count: results.filter((r) => r.status === 'failed').length,
+    skipped_count: results.filter((r) => r.status === 'skipped').length,
     results,
   };
+
+  audit(db, {
+    eventType: 'execution_batch.completed',
+    entityId: batch.id,
+    payload: summary,
+  });
+
+  return summary;
 }
