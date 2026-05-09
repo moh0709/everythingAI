@@ -8,11 +8,30 @@ import {
   updateExecutionBatch,
 } from '../db/repositories/executionRepository.js';
 
+const ALLOWED_TRANSITIONS = {
+  pending_approval: ['approved'],
+  approved: ['running'],
+  running: ['completed', 'failed'],
+  completed: ['rolled_back'],
+  failed: ['rolled_back'],
+  rolled_back: [],
+};
+
 function createId(prefix) {
   return crypto
     .createHash('sha256')
     .update(`${prefix}:${Date.now()}:${Math.random()}`)
     .digest('hex');
+}
+
+function assertTransitionAllowed(currentStatus, nextStatus) {
+  const allowed = ALLOWED_TRANSITIONS[currentStatus] || [];
+
+  if (!allowed.includes(nextStatus)) {
+    throw new Error(
+      `Invalid execution batch transition from ${currentStatus} to ${nextStatus}`,
+    );
+  }
 }
 
 export function createExecutionBatch(db, {
@@ -49,6 +68,8 @@ export function transitionExecutionBatchStatus(db, {
   if (!batch) {
     throw new Error(`Execution batch not found: ${batchId}`);
   }
+
+  assertTransitionAllowed(batch.status, status);
 
   const now = new Date().toISOString();
 
