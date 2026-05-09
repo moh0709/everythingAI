@@ -1,5 +1,6 @@
 import {
   getExecutionBatchDetails,
+  transitionExecutionBatchStatus,
 } from './executionBatchService.js';
 import {
   getActionPreviewById,
@@ -49,6 +50,11 @@ export async function executeExecutionBatch(db, {
   if (batch.status !== 'approved') {
     throw new Error(`Execution batch cannot execute from status: ${batch.status}`);
   }
+
+  transitionExecutionBatchStatus(db, {
+    batchId: batch.id,
+    status: 'running',
+  });
 
   audit(db, {
     eventType: 'execution_batch.started',
@@ -116,6 +122,11 @@ export async function executeExecutionBatch(db, {
     skipped_count: results.filter((r) => r.status === 'skipped').length,
     results,
   };
+
+  transitionExecutionBatchStatus(db, {
+    batchId: batch.id,
+    status: 'completed',
+  });
 
   audit(db, {
     eventType: 'execution_batch.completed',
@@ -190,6 +201,11 @@ export async function rollbackExecutionBatch(db, {
     skipped_count: rollbackResults.filter((r) => r.status === 'skipped').length,
     results: rollbackResults,
   };
+
+  transitionExecutionBatchStatus(db, {
+    batchId: batch.id,
+    status: 'rolled_back',
+  });
 
   audit(db, {
     eventType: 'execution_batch.rollback_completed',
