@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const IdentityEvents = require('../telemetry/identityEvents');
 
 function publishIdentityEvent({
