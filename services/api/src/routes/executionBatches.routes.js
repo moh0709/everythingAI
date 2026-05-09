@@ -16,6 +16,9 @@ import {
 import {
   getExecutionBatchMetricsById,
 } from '../services/executionMetricsService.js';
+import {
+  evaluateExecutionBatchHealthById,
+} from '../services/executionHealthService.js';
 
 const router = express.Router();
 
@@ -64,6 +67,16 @@ router.get('/:batchId/metrics', (req, res, next) => {
     const metrics = getExecutionBatchMetricsById(req.db, req.params.batchId);
 
     res.json({ metrics });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:batchId/health', (req, res, next) => {
+  try {
+    const health = evaluateExecutionBatchHealthById(req.db, req.params.batchId);
+
+    res.json({ health });
   } catch (error) {
     next(error);
   }
