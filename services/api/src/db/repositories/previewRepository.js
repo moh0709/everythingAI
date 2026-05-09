@@ -60,6 +60,17 @@ export function listActionPreviews(db, { fileId, suggestionId, limit = 50 } = {}
   `).all(params);
 }
 
+export function listExecutableActionPreviews(db, { limit = 100 } = {}) {
+  return db.prepare(`
+    SELECT *
+    FROM action_previews
+    WHERE can_execute = 1
+      AND preview_status = 'approved'
+    ORDER BY created_at DESC
+    LIMIT @limit
+  `).all({ limit });
+}
+
 export function getActionPreviewById(db, previewId) {
   return db.prepare(`
     SELECT
@@ -80,4 +91,25 @@ export function updateActionPreviewExecutability(db, { previewId, canExecute }) 
     SET can_execute = @canExecute
     WHERE id = @previewId
   `).run({ previewId, canExecute });
+}
+
+export function updateActionPreviewValidation(db, {
+  previewId,
+  canExecute,
+  blockedReason,
+  previewStatus,
+}) {
+  db.prepare(`
+    UPDATE action_previews
+    SET
+      can_execute = @canExecute,
+      blocked_reason = @blockedReason,
+      preview_status = @previewStatus
+    WHERE id = @previewId
+  `).run({
+    previewId,
+    canExecute,
+    blockedReason,
+    previewStatus,
+  });
 }
