@@ -13,6 +13,9 @@ import {
 import {
   verifyExecutionBatchById,
 } from '../services/executionVerificationService.js';
+import {
+  getExecutionBatchMetricsById,
+} from '../services/executionMetricsService.js';
 
 const router = express.Router();
 
@@ -51,6 +54,16 @@ router.get('/:batchId/verify', (req, res, next) => {
     const verification = verifyExecutionBatchById(req.db, req.params.batchId);
 
     res.json({ verification });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:batchId/metrics', (req, res, next) => {
+  try {
+    const metrics = getExecutionBatchMetricsById(req.db, req.params.batchId);
+
+    res.json({ metrics });
   } catch (error) {
     next(error);
   }
