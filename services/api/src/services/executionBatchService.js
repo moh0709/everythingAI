@@ -3,6 +3,7 @@ import {
   assignExecutionToBatch,
   getExecutionBatchById,
   insertExecutionBatch,
+  listExecutionBatches,
   listExecutionsForBatch,
   updateExecutionBatch,
 } from '../db/repositories/executionRepository.js';
@@ -70,4 +71,29 @@ export function attachExecutionToBatch(db, {
   });
 
   return listExecutionsForBatch(db, executionBatchId);
+}
+
+export function getExecutionBatchDetails(db, batchId) {
+  const batch = getExecutionBatchById(db, batchId);
+
+  if (!batch) {
+    return null;
+  }
+
+  return {
+    ...batch,
+    executions: listExecutionsForBatch(db, batchId),
+  };
+}
+
+export function listExecutionBatchSummaries(db, filters = {}) {
+  return listExecutionBatches(db, filters).map((batch) => ({
+    id: batch.id,
+    planning_session_id: batch.planning_session_id,
+    status: batch.status,
+    summary: batch.summary,
+    created_at: batch.created_at,
+    approved_at: batch.approved_at,
+    completed_at: batch.completed_at,
+  }));
 }
