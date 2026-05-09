@@ -10,6 +10,9 @@ import {
   executeExecutionBatch,
   rollbackExecutionBatch,
 } from '../services/executionBatchRunnerService.js';
+import {
+  verifyExecutionBatchById,
+} from '../services/executionVerificationService.js';
 
 const router = express.Router();
 
@@ -40,6 +43,16 @@ router.get('/:batchId', (req, res, next) => {
     return res.json({ batch });
   } catch (error) {
     return next(error);
+  }
+});
+
+router.get('/:batchId/verify', (req, res, next) => {
+  try {
+    const verification = verifyExecutionBatchById(req.db, req.params.batchId);
+
+    res.json({ verification });
+  } catch (error) {
+    next(error);
   }
 });
 
