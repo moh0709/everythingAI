@@ -12,6 +12,10 @@ import {
   upsertFileLabel,
 } from '../db/client.js';
 import { disableActionPreviewExecution } from '../previews/actionPreviewService.js';
+import {
+  invalidateActionPreview,
+  validateActionPreview,
+} from '../services/previewValidationService.js';
 
 const SUPPORTED_ACTION_TYPES = new Set(['tag', 'category', 'rename', 'move']);
 
@@ -138,10 +142,12 @@ async function executeFilesystemAction(db, preview) {
   assertSafeFilesystemPreview(preview);
 
   if (!(await pathExists(preview.source_path))) {
+    invalidateActionPreview(db, preview.id, 'source_missing');
     throw new Error('Source file no longer exists.');
   }
 
   if (await pathExists(preview.target_path)) {
+    invalidateActionPreview(db, preview.id, 'target_exists');
     throw new Error('Target path already exists.');
   }
 
@@ -167,6 +173,12 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
     throw new Error(`Action preview not found: ${previewId}`);
   }
 
+  const validation = validateActionPreview(preview);
+
+  if (!validation.valid) {
+    throw new Error(`Action preview failed validation: ${validation.reason}`);
+  }
+
   const executionId = createId('execution');
 
   try {
@@ -174,7 +186,7 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
       throw new Error(`Unsupported action type: ${preview.action_type}`);
     }
 
-    if (preview.preview_status !== 'ready' || preview.can_execute !== 1) {
+    if (preview.preview_status !== 'ready' && preview.preview_status !== 'approved') {
       throw new Error(`Action preview is not executable: ${preview.blocked_reason || preview.preview_status}`);
     }
 
