@@ -19,6 +19,7 @@ import { createProviderSettingsRouter } from './routes/providerSettings.routes.j
 import { createAgentBridgeRouter } from './routes/agentBridge.routes.js';
 import { createJobsRouter } from './routes/jobs.routes.js';
 import { createPlanningRouter } from './routes/planning.routes.js';
+import executionBatchesRouter from './routes/executionBatches.routes.js';
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use('/api', requireApiToken, createProviderSettingsRouter());
 app.use('/api', requireApiToken, createAgentBridgeRouter());
 app.use('/api', requireApiToken, createJobsRouter());
 app.use('/api', requireApiToken, createPlanningRouter());
+app.use('/api/execution-batches', requireApiToken, executionBatchesRouter);
 app.use('/api', requireApiToken, createSearchRouter());
 app.use('/api', requireApiToken, createIntelligenceRouter());
 app.use('/api', requireApiToken, createWatchRouter());
