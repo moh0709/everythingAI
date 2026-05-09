@@ -3,6 +3,9 @@ import {
   transitionExecutionBatchStatus,
 } from './executionBatchService.js';
 import {
+  verifyExecutionBatchIntegrity,
+} from './executionVerificationService.js';
+import {
   getActionPreviewById,
   insertAuditLog,
 } from '../db/client.js';
@@ -55,6 +58,16 @@ function assertExecutionBatchSafe(batch) {
   }
 }
 
+function assertExecutionBatchIntegrity(batch) {
+  const verification = verifyExecutionBatchIntegrity(batch);
+
+  if (!verification.valid) {
+    throw new Error(
+      `Execution batch integrity verification failed: ${verification.issues.join(', ')}`,
+    );
+  }
+}
+
 export async function executeExecutionBatch(db, {
   batchId,
   approve = false,
@@ -73,6 +86,7 @@ export async function executeExecutionBatch(db, {
     throw new Error(`Execution batch cannot execute from status: ${batch.status}`);
   }
 
+  assertExecutionBatchIntegrity(batch);
   assertExecutionBatchSafe(batch);
 
   transitionExecutionBatchStatus(db, {
@@ -179,6 +193,8 @@ export async function rollbackExecutionBatch(db, {
   if (!batch) {
     throw new Error(`Execution batch not found: ${batchId}`);
   }
+
+  assertExecutionBatchIntegrity(batch);
 
   audit(db, {
     eventType: 'execution_batch.rollback_started',
