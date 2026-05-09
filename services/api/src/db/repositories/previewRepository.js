@@ -1,0 +1,83 @@
+export function insertActionPreview(db, preview) {
+  db.prepare(`
+    INSERT INTO action_previews (
+      id,
+      suggestion_id,
+      file_id,
+      action_type,
+      source_path,
+      target_path,
+      current_value,
+      suggested_value,
+      risk_level,
+      requires_approval,
+      can_execute,
+      blocked_reason,
+      preview_status,
+      created_at
+    )
+    VALUES (
+      @id,
+      @suggestion_id,
+      @file_id,
+      @action_type,
+      @source_path,
+      @target_path,
+      @current_value,
+      @suggested_value,
+      @risk_level,
+      @requires_approval,
+      @can_execute,
+      @blocked_reason,
+      @preview_status,
+      @created_at
+    )
+  `).run(preview);
+}
+
+export function listActionPreviews(db, { fileId, suggestionId, limit = 50 } = {}) {
+  const clauses = [];
+  const params = { limit };
+
+  if (fileId) {
+    clauses.push('file_id = @fileId');
+    params.fileId = fileId;
+  }
+
+  if (suggestionId) {
+    clauses.push('suggestion_id = @suggestionId');
+    params.suggestionId = suggestionId;
+  }
+
+  const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
+
+  return db.prepare(`
+    SELECT *
+    FROM action_previews
+    ${where}
+    ORDER BY created_at DESC
+    LIMIT @limit
+  `).all(params);
+}
+
+export function getActionPreviewById(db, previewId) {
+  return db.prepare(`
+    SELECT
+      p.*,
+      f.filename,
+      f.absolute_path,
+      f.relative_path,
+      f.extension
+    FROM action_previews p
+    JOIN indexed_files f ON f.id = p.file_id
+    WHERE p.id = ?
+  `).get(previewId);
+}
+
+export function updateActionPreviewExecutability(db, { previewId, canExecute }) {
+  db.prepare(`
+    UPDATE action_previews
+    SET can_execute = @canExecute
+    WHERE id = @previewId
+  `).run({ previewId, canExecute });
+}
