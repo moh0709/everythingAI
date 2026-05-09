@@ -113,23 +113,28 @@ export async function executeExecutionBatch(db, {
     }
   }
 
+  const failedCount = results.filter((r) => r.status === 'failed').length;
+
   const summary = {
     batch_id: batch.id,
-    status: 'completed',
+    status: failedCount > 0 ? 'failed' : 'completed',
     executed_count: results.filter((r) => r.status === 'executed').length,
     blocked_count: results.filter((r) => r.status === 'blocked').length,
-    failed_count: results.filter((r) => r.status === 'failed').length,
+    failed_count: failedCount,
     skipped_count: results.filter((r) => r.status === 'skipped').length,
     results,
   };
 
   transitionExecutionBatchStatus(db, {
     batchId: batch.id,
-    status: 'completed',
+    status: summary.status,
+    errorMessage: failedCount > 0 ? 'One or more executions failed.' : null,
   });
 
   audit(db, {
-    eventType: 'execution_batch.completed',
+    eventType: failedCount > 0
+      ? 'execution_batch.failed'
+      : 'execution_batch.completed',
     entityId: batch.id,
     payload: summary,
   });
@@ -193,22 +198,29 @@ export async function rollbackExecutionBatch(db, {
     }
   }
 
+  const rollbackFailedCount = rollbackResults.filter((r) => r.status === 'failed').length;
+
   const summary = {
     batch_id: batch.id,
-    status: 'rolled_back',
+    status: rollbackFailedCount > 0 ? 'rollback_failed' : 'rolled_back',
     undone_count: rollbackResults.filter((r) => r.status === 'undone').length,
-    failed_count: rollbackResults.filter((r) => r.status === 'failed').length,
+    failed_count: rollbackFailedCount,
     skipped_count: rollbackResults.filter((r) => r.status === 'skipped').length,
     results: rollbackResults,
   };
 
   transitionExecutionBatchStatus(db, {
     batchId: batch.id,
-    status: 'rolled_back',
+    status: rollbackFailedCount > 0 ? 'failed' : 'rolled_back',
+    errorMessage: rollbackFailedCount > 0
+      ? 'One or more rollback operations failed.'
+      : null,
   });
 
   audit(db, {
-    eventType: 'execution_batch.rollback_completed',
+    eventType: rollbackFailedCount > 0
+      ? 'execution_batch.rollback_failed'
+      : 'execution_batch.rollback_completed',
     entityId: batch.id,
     payload: summary,
   });
