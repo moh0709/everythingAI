@@ -71,6 +71,20 @@ export function listExecutableActionPreviews(db, { limit = 100 } = {}) {
   `).all({ limit });
 }
 
+export function listPotentiallyStaleActionPreviews(db, { limit = 100 } = {}) {
+  return db.prepare(`
+    SELECT
+      p.*,
+      f.modified_at AS current_file_modified_at
+    FROM action_previews p
+    JOIN indexed_files f ON f.id = p.file_id
+    WHERE p.preview_status = 'approved'
+      AND f.modified_at > p.created_at
+    ORDER BY f.modified_at DESC
+    LIMIT @limit
+  `).all({ limit });
+}
+
 export function getActionPreviewById(db, previewId) {
   return db.prepare(`
     SELECT
@@ -112,4 +126,15 @@ export function updateActionPreviewValidation(db, {
     blockedReason,
     previewStatus,
   });
+}
+
+export function markActionPreviewStale(db, previewId) {
+  db.prepare(`
+    UPDATE action_previews
+    SET
+      can_execute = 0,
+      blocked_reason = 'preview_stale',
+      preview_status = 'stale'
+    WHERE id = @previewId
+  `).run({ previewId });
 }
