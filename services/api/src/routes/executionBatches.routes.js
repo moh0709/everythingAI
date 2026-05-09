@@ -8,6 +8,7 @@ import {
 } from '../services/executionBatchService.js';
 import {
   executeExecutionBatch,
+  rollbackExecutionBatch,
 } from '../services/executionBatchRunnerService.js';
 
 const router = express.Router();
@@ -80,6 +81,19 @@ router.post('/:batchId/executions', (req, res, next) => {
 router.post('/:batchId/execute', async (req, res, next) => {
   try {
     const result = await executeExecutionBatch(req.db, {
+      batchId: req.params.batchId,
+      approve: req.body?.approve === true,
+    });
+
+    res.json({ result });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/:batchId/rollback', async (req, res, next) => {
+  try {
+    const result = await rollbackExecutionBatch(req.db, {
       batchId: req.params.batchId,
       approve: req.body?.approve === true,
     });
