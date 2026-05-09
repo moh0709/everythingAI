@@ -15,6 +15,10 @@ import {
 } from '../actions/actionExecutor.js';
 import crypto from 'node:crypto';
 
+const MAX_BATCH_EXECUTIONS = 100;
+const HIGH_RISK_ACTION_TYPES = new Set(['move']);
+const HIGH_RISK_THRESHOLD = 25;
+
 function createId(prefix) {
   return crypto
     .createHash('sha256')
@@ -31,6 +35,24 @@ function audit(db, { eventType, entityId, payload }) {
     payload_json: JSON.stringify(payload),
     created_at: new Date().toISOString(),
   });
+}
+
+function assertExecutionBatchSafe(batch) {
+  if (batch.executions.length > MAX_BATCH_EXECUTIONS) {
+    throw new Error(
+      `Execution batch exceeds maximum allowed executions: ${MAX_BATCH_EXECUTIONS}`,
+    );
+  }
+
+  const highRiskCount = batch.executions.filter((execution) => (
+    HIGH_RISK_ACTION_TYPES.has(execution.action_type)
+  )).length;
+
+  if (highRiskCount > HIGH_RISK_THRESHOLD) {
+    throw new Error(
+      `Execution batch exceeds high-risk operation threshold: ${HIGH_RISK_THRESHOLD}`,
+    );
+  }
 }
 
 export async function executeExecutionBatch(db, {
@@ -50,6 +72,8 @@ export async function executeExecutionBatch(db, {
   if (batch.status !== 'approved') {
     throw new Error(`Execution batch cannot execute from status: ${batch.status}`);
   }
+
+  assertExecutionBatchSafe(batch);
 
   transitionExecutionBatchStatus(db, {
     batchId: batch.id,
