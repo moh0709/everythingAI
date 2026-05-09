@@ -39,6 +39,47 @@ export function createExecutionBatch(db, {
   return getExecutionBatchById(db, batch.id);
 }
 
+export function transitionExecutionBatchStatus(db, {
+  batchId,
+  status,
+  errorMessage = null,
+} = {}) {
+  const batch = getExecutionBatchById(db, batchId);
+
+  if (!batch) {
+    throw new Error(`Execution batch not found: ${batchId}`);
+  }
+
+  const now = new Date().toISOString();
+
+  const updatedBatch = {
+    ...batch,
+    summary_json: JSON.stringify(batch.summary || {}),
+    status,
+    error_message: errorMessage,
+    updated_at: now,
+    approved_at: batch.approved_at,
+    started_at: batch.started_at,
+    completed_at: batch.completed_at,
+  };
+
+  if (status === 'approved' && !updatedBatch.approved_at) {
+    updatedBatch.approved_at = now;
+  }
+
+  if (status === 'running' && !updatedBatch.started_at) {
+    updatedBatch.started_at = now;
+  }
+
+  if ((status === 'completed' || status === 'rolled_back' || status === 'failed') && !updatedBatch.completed_at) {
+    updatedBatch.completed_at = now;
+  }
+
+  updateExecutionBatch(db, updatedBatch);
+
+  return getExecutionBatchById(db, batchId);
+}
+
 export function approveExecutionBatch(db, batchId) {
   const batch = getExecutionBatchById(db, batchId);
 
@@ -50,15 +91,10 @@ export function approveExecutionBatch(db, batchId) {
     throw new Error(`Execution batch cannot be approved from status: ${batch.status}`);
   }
 
-  updateExecutionBatch(db, {
-    ...batch,
-    summary_json: JSON.stringify(batch.summary || {}),
+  return transitionExecutionBatchStatus(db, {
+    batchId,
     status: 'approved',
-    approved_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
   });
-
-  return getExecutionBatchById(db, batchId);
 }
 
 export function attachExecutionToBatch(db, {
