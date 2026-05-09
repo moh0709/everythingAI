@@ -3,9 +3,41 @@ import {
   approveExecutionBatch,
   attachExecutionToBatch,
   createExecutionBatch,
+  getExecutionBatchDetails,
+  listExecutionBatchSummaries,
 } from '../services/executionBatchService.js';
 
 const router = express.Router();
+
+router.get('/', (req, res, next) => {
+  try {
+    const batches = listExecutionBatchSummaries(req.db, {
+      status: req.query?.status,
+      planningSessionId: req.query?.planningSessionId,
+      limit: req.query?.limit ? Number(req.query.limit) : undefined,
+    });
+
+    res.json({ batches });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:batchId', (req, res, next) => {
+  try {
+    const batch = getExecutionBatchDetails(req.db, req.params.batchId);
+
+    if (!batch) {
+      return res.status(404).json({
+        error: 'Execution batch not found.',
+      });
+    }
+
+    return res.json({ batch });
+  } catch (error) {
+    return next(error);
+  }
+});
 
 router.post('/', (req, res, next) => {
   try {
