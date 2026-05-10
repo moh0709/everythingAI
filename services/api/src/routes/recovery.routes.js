@@ -1,91 +1,22 @@
-import crypto from 'node:crypto';
 import { Router } from 'express';
-import {
-  getIndexedFileById,
-  insertAuditLog,
-  openDatabase,
-} from '../db/client.js';
+import { openDatabase } from '../db/client.js';
 import { parseLimit, requireBodyString } from '../utils/request.js';
+import {
+  listTrashRecords,
+  moveFileToTrash,
+  restoreTrashRecord,
+} from '../recovery/trashService.js';
 
-const DEFAULT_TRASH_RETENTION_DAYS = 30;
-
-function createId(prefix) {
-  return crypto
-    .createHash('sha256')
-    .update(`${prefix}:${Date.now()}:${Math.random()}`)
-    .digest('hex');
-}
-
-function addDays(date, days) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
-function audit(db, { eventType, entityType, entityId, payload }) {
-  insertAuditLog(db, {
-    id: createId('audit'),
-    event_type: eventType,
-    entity_type: entityType,
-    entity_id: entityId,
-    payload_json: JSON.stringify(payload),
-    created_at: new Date().toISOString(),
-  });
-}
-
-function getActiveTrashRecordByFileId(db, fileId) {
-  return db.prepare(`
-    SELECT *
-    FROM trash_records
-    WHERE file_id = ?
-      AND status = 'trashed'
-    ORDER BY trashed_at DESC
-    LIMIT 1
-  `).get(fileId);
-}
-
-function getTrashRecordById(db, trashId) {
-  return db.prepare(`
-    SELECT
-      t.*,
-      f.filename,
-      f.absolute_path,
-      f.relative_path,
-      f.extension,
-      f.mime_type,
-      f.size_bytes
-    FROM trash_records t
-    JOIN indexed_files f ON f.id = t.file_id
-    WHERE t.id = ?
-  `).get(trashId);
-}
-
-function listTrashRecords(db, { status = 'trashed', limit = 100 } = {}) {
-  const clauses = [];
-  const params = { limit };
-
-  if (status) {
-    clauses.push('t.status = @status');
-    params.status = status;
+function sendServiceError(res, error) {
+  if (error.statusCode === 409 && error.trashRecord) {
+    return res.status(409).json({ error: error.message, trashRecord: error.trashRecord });
   }
 
-  const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
+  if (error.statusCode) {
+    return res.status(error.statusCode).json({ error: error.message });
+  }
 
-  return db.prepare(`
-    SELECT
-      t.*,
-      f.filename,
-      f.absolute_path,
-      f.relative_path,
-      f.extension,
-      f.mime_type,
-      f.size_bytes
-    FROM trash_records t
-    JOIN indexed_files f ON f.id = t.file_id
-    ${where}
-    ORDER BY t.trashed_at DESC
-    LIMIT @limit
-  `).all(params);
+  throw error;
 }
 
 export function createRecoveryRouter() {
@@ -112,74 +43,18 @@ export function createRecoveryRouter() {
       if (!fileId) return;
 
       const db = openDatabase();
-      const file = getIndexedFileById(db, fileId);
 
-      if (!file) {
+      try {
+        const trashRecord = moveFileToTrash(db, {
+          fileId,
+          retentionDays: req.body?.retentionDays,
+        });
         db.close();
-        return res.status(404).json({ error: 'file not found' });
-      }
-
-      const existingTrash = getActiveTrashRecordByFileId(db, fileId);
-
-      if (existingTrash) {
+        return res.status(201).json({ trashRecord });
+      } catch (error) {
         db.close();
-        return res.status(409).json({ error: 'file already in trash', trashRecord: existingTrash });
+        return sendServiceError(res, error);
       }
-
-      const now = new Date();
-      const retentionDays = Number.isInteger(req.body?.retentionDays)
-        ? req.body.retentionDays
-        : DEFAULT_TRASH_RETENTION_DAYS;
-      const trashRecord = {
-        id: createId('trash'),
-        file_id: file.id,
-        status: 'trashed',
-        original_absolute_path: file.absolute_path,
-        original_relative_path: file.relative_path,
-        retention_until: addDays(now, retentionDays).toISOString(),
-        trashed_at: now.toISOString(),
-        restored_at: null,
-        restore_reason: null,
-      };
-
-      db.prepare(`
-        INSERT INTO trash_records (
-          id,
-          file_id,
-          status,
-          original_absolute_path,
-          original_relative_path,
-          retention_until,
-          trashed_at,
-          restored_at,
-          restore_reason
-        )
-        VALUES (
-          @id,
-          @file_id,
-          @status,
-          @original_absolute_path,
-          @original_relative_path,
-          @retention_until,
-          @trashed_at,
-          @restored_at,
-          @restore_reason
-        )
-      `).run(trashRecord);
-
-      audit(db, {
-        eventType: 'file.trashed',
-        entityType: 'trash_record',
-        entityId: trashRecord.id,
-        payload: {
-          ...trashRecord,
-          retention_days: retentionDays,
-          note: 'Local MVP trash is recovery metadata only; file content is not permanently deleted.',
-        },
-      });
-
-      db.close();
-      res.status(201).json({ trashRecord });
     } catch (error) {
       next(error);
     }
@@ -192,45 +67,18 @@ export function createRecoveryRouter() {
       }
 
       const db = openDatabase();
-      const trashRecord = getTrashRecordById(db, req.params.trashId);
 
-      if (!trashRecord) {
+      try {
+        const trashRecord = restoreTrashRecord(db, {
+          trashId: req.params.trashId,
+          reason: req.body?.reason?.toString() || null,
+        });
         db.close();
-        return res.status(404).json({ error: 'trash record not found' });
-      }
-
-      if (trashRecord.status !== 'trashed') {
+        return res.json({ trashRecord });
+      } catch (error) {
         db.close();
-        return res.status(409).json({ error: `trash record cannot be restored from status: ${trashRecord.status}` });
+        return sendServiceError(res, error);
       }
-
-      const restoredAt = new Date().toISOString();
-      const restoreReason = req.body?.reason?.toString() || null;
-
-      db.prepare(`
-        UPDATE trash_records
-        SET
-          status = 'restored',
-          restored_at = @restoredAt,
-          restore_reason = @restoreReason
-        WHERE id = @trashId
-      `).run({
-        trashId: req.params.trashId,
-        restoredAt,
-        restoreReason,
-      });
-
-      const restoredRecord = getTrashRecordById(db, req.params.trashId);
-
-      audit(db, {
-        eventType: 'file.restored',
-        entityType: 'trash_record',
-        entityId: restoredRecord.id,
-        payload: restoredRecord,
-      });
-
-      db.close();
-      res.json({ trashRecord: restoredRecord });
     } catch (error) {
       next(error);
     }
