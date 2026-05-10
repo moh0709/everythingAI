@@ -3,8 +3,6 @@ import {
   openDatabase,
   listIndexedFiles,
   upsertIndexedFile,
-  listFileInsights,
-  getIndexedFileById,
 } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { extractIndexedFiles } from '../extractors/extractionRunner.js';
@@ -13,10 +11,25 @@ import { runJob } from '../jobs/jobRunner.js';
 import { JOB_TYPES } from '../jobs/jobTypes.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 import { selectFolder } from '../utils/folderPicker.js';
-import { filterActiveFiles, annotateTrashState } from '../recovery/trashVisibility.js';
+import { filterActiveFiles } from '../recovery/trashVisibility.js';
+import { createDocumentContext } from '../documents/documentContextService.js';
 
 function includeTrashed(queryValue) {
   return queryValue?.toString().toLowerCase() === 'true';
+}
+
+function sendDocumentContext(req, res) {
+  const db = openDatabase();
+  const context = createDocumentContext(db, {
+    fileId: req.params.fileId,
+  });
+  db.close();
+
+  if (!context) {
+    return res.status(404).json({ error: 'file not found' });
+  }
+
+  return res.json(context);
 }
 
 export function createFilesRouter() {
@@ -36,23 +49,9 @@ export function createFilesRouter() {
     res.json({ files });
   });
 
-  router.get('/files/:fileId/preview', (req, res) => {
-    const db = openDatabase();
-    const file = getIndexedFileById(db, req.params.fileId);
-    const annotatedFile = file ? annotateTrashState(db, [file])[0] : null;
-    const insights = listFileInsights(db, { fileId: req.params.fileId, limit: 1 });
-    db.close();
+  router.get('/files/:fileId/preview', sendDocumentContext);
 
-    if (!annotatedFile) {
-      return res.status(404).json({ error: 'file not found' });
-    }
-
-    return res.json({
-      file: annotatedFile,
-      insight: insights[0] || null,
-      previewText: (annotatedFile.extracted_text || '').slice(0, 5000),
-    });
-  });
+  router.get('/documents/:fileId/context', sendDocumentContext);
 
   router.post('/index', async (req, res, next) => {
     try {
