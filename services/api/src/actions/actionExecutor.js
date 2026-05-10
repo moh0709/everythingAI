@@ -82,9 +82,15 @@ function audit(db, { eventType, entityType, entityId, payload }) {
   });
 }
 
-function failExecution(db, { preview, error, executionId = createId('execution') }) {
+function failExecution(db, {
+  preview,
+  error,
+  executionId = createId('execution'),
+  executionBatchId = null,
+}) {
   const failedExecution = {
     id: executionId,
+    execution_batch_id: executionBatchId,
     preview_id: preview?.id || null,
     file_id: preview?.file_id || null,
     action_type: preview?.action_type || 'unknown',
@@ -119,6 +125,7 @@ function auditUndoFailure(db, { execution, error }) {
     entityId: execution.id,
     payload: {
       execution_id: execution.id,
+      execution_batch_id: execution.execution_batch_id || null,
       file_id: execution.file_id,
       action_type: execution.action_type,
       status: execution.status,
@@ -265,7 +272,11 @@ async function executeFilesystemAction(db, preview) {
   });
 }
 
-export async function executeActionPreview(db, { previewId, approve = false } = {}) {
+export async function executeActionPreview(db, {
+  previewId,
+  approve = false,
+  executionBatchId = null,
+} = {}) {
   if (!approve) {
     throw new Error('Explicit approval is required to execute an action preview.');
   }
@@ -296,6 +307,7 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
 
     const execution = {
       id: executionId,
+      execution_batch_id: executionBatchId,
       preview_id: preview.id,
       file_id: preview.file_id,
       action_type: preview.action_type,
@@ -341,7 +353,12 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
 
     return execution;
   } catch (error) {
-    const failedExecution = failExecution(db, { preview, error, executionId });
+    const failedExecution = failExecution(db, {
+      preview,
+      error,
+      executionId,
+      executionBatchId,
+    });
     throw Object.assign(error, { execution: failedExecution });
   }
 }
