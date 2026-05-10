@@ -10,6 +10,8 @@ import {
   upsertIndexedFile,
 } from '../src/db/client.js';
 import { scanFolder } from '../src/indexer/fileScanner.js';
+import { searchFiles } from '../src/search/searchService.js';
+import { annotateTrashState, filterActiveFiles } from '../src/recovery/trashVisibility.js';
 import {
   listTrashRecords,
   moveFileToTrash,
@@ -115,6 +117,47 @@ test('prevents restoring a trash record more than once', async () => {
     () => restoreTrashRecord(db, { trashId: trashRecord.id }),
     (error) => error.statusCode === 409 && /cannot be restored/.test(error.message),
   );
+
+  db.close();
+});
+
+test('hides active trash records from file list visibility by default', async () => {
+  const root = await createRecoveryFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const file = fileByName(db, 'Recovery Notes.txt');
+  moveFileToTrash(db, { fileId: file.id });
+
+  const allFiles = listIndexedFiles(db, { limit: 100 });
+  const activeFiles = filterActiveFiles(db, allFiles);
+  const visibleWithTrash = filterActiveFiles(db, allFiles, { includeTrashed: true });
+
+  assert.equal(allFiles.some((row) => row.id === file.id), true);
+  assert.equal(activeFiles.some((row) => row.id === file.id), false);
+  assert.equal(visibleWithTrash.some((row) => row.id === file.id && row.recovery_status === 'trashed'), true);
+
+  db.close();
+});
+
+test('hides active trash records from keyword search by default', async () => {
+  const root = await createRecoveryFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const file = fileByName(db, 'Recovery Notes.txt');
+
+  assert.equal(searchFiles(db, { query: 'Recovery', limit: 10 }).some((row) => row.id === file.id), true);
+
+  moveFileToTrash(db, { fileId: file.id });
+
+  const activeResults = searchFiles(db, { query: 'Recovery', limit: 10 });
+  const resultsWithTrash = searchFiles(db, { query: 'Recovery', limit: 10, includeTrashed: true });
+  const annotated = annotateTrashState(db, resultsWithTrash);
+
+  assert.equal(activeResults.some((row) => row.id === file.id), false);
+  assert.equal(resultsWithTrash.some((row) => row.id === file.id), true);
+  assert.equal(annotated.find((row) => row.id === file.id).recovery_status, 'trashed');
 
   db.close();
 });
