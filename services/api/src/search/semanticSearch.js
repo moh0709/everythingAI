@@ -1,5 +1,6 @@
 import { listExtractedFiles } from '../db/client.js';
 import { searchEmbeddings } from '../embeddings/embeddingService.js';
+import { filterActiveFileLinkedRows } from '../recovery/trashVisibility.js';
 
 function tokenize(text) {
   const stop = new Set(['the', 'and', 'for', 'with', 'from', 'that', 'this', 'into', 'your', 'you']);
@@ -30,14 +31,16 @@ function cosine(a, b) {
   return dot / (Math.sqrt(aMag) * Math.sqrt(bMag));
 }
 
-export function semanticSearchFiles(db, { query, limit = 10 } = {}) {
+export function semanticSearchFiles(db, { query, limit = 10, includeTrashed = false } = {}) {
   if (!query || !query.trim()) return [];
 
   const embeddingResults = searchEmbeddings(db, { query, limit });
-  if (embeddingResults.length > 0) return embeddingResults;
+  if (embeddingResults.length > 0) {
+    return filterActiveFileLinkedRows(db, embeddingResults, { includeTrashed });
+  }
 
   const queryVector = vectorize(query);
-  const files = listExtractedFiles(db, { limit: 1000 });
+  const files = filterActiveFileLinkedRows(db, listExtractedFiles(db, { limit: 1000 }), { includeTrashed });
 
   return files
     .map((file) => ({
@@ -46,6 +49,7 @@ export function semanticSearchFiles(db, { query, limit = 10 } = {}) {
       absolute_path: file.absolute_path,
       relative_path: file.relative_path,
       extension: file.extension,
+      recovery_status: file.recovery_status,
       score: cosine(queryVector, vectorize(`${file.filename} ${file.extracted_text}`)),
       snippet: (file.extracted_text || '').replace(/\s+/g, ' ').slice(0, 240),
     }))
