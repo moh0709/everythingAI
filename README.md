@@ -12,6 +12,39 @@ The current objective is to finalize and optimize the **local MVP** in `services
 
 The local MVP should become stable, safe, boring, and reliable before adding more advanced production-platform features.
 
+## Current local MVP status
+
+```text
+Backend local MVP: runnable through API
+Automated tests: 78 passed / 0 failed
+Manual API smoke test: passed
+```
+
+Completed backend hardening:
+
+```text
+Sprint 1: recovery/trash smoke path
+Sprint 2: search/source-reference hardening
+Sprint 3: execution recovery hardening
+Sprint 4: execution batch and plan approval workflow
+Sprint 5: smoke-test runbook and manual API smoke test started
+```
+
+The local MVP currently supports:
+
+- Local folder indexing
+- Document extraction
+- Keyword search and source references
+- Document context
+- Suggestions and action previews
+- Approval-gated action execution
+- Recovery snapshots for filesystem mutation
+- Approval-gated undo for supported filesystem actions
+- Local trash/restore behavior
+- Permanent purge blocking
+- Execution batches with approval and audit
+- Manual API smoke-test validation
+
 ## Enterprise platform direction
 
 The production target is a **Governed Enterprise Cognitive Workspace**: a trusted enterprise knowledge operating environment where files are ingested, understood, organized, searched, governed, recovered, measured, and continuously improved.
@@ -75,6 +108,13 @@ See the `/docs` folder.
 - [`MVP_FINALIZATION_PLAN.md`](docs/MVP_FINALIZATION_PLAN.md)
 - [`KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md)
 - [`WINDOWS_LOCAL_SMOKE_TEST.md`](docs/WINDOWS_LOCAL_SMOKE_TEST.md)
+- [`UNIFIED_SEARCH_VISIBILITY.md`](docs/UNIFIED_SEARCH_VISIBILITY.md)
+- [`EXECUTION_RECOVERY_SNAPSHOTS_AND_AUDIT.md`](docs/EXECUTION_RECOVERY_SNAPSHOTS_AND_AUDIT.md)
+- [`SPRINT3_EXECUTION_BATCH_DECISION.md`](docs/SPRINT3_EXECUTION_BATCH_DECISION.md)
+- [`SPRINT4_STEP01_BATCH_WORKFLOW_AUDIT_PLAN.md`](docs/SPRINT4_STEP01_BATCH_WORKFLOW_AUDIT_PLAN.md)
+- [`EXECUTION_BATCH_WORKFLOW.md`](docs/EXECUTION_BATCH_WORKFLOW.md)
+- [`MVP_SMOKE_TEST_RUNBOOK.md`](docs/MVP_SMOKE_TEST_RUNBOOK.md)
+- [`MVP_API_ROUTES.md`](docs/MVP_API_ROUTES.md)
 
 ### Enterprise workspace documentation
 
@@ -112,12 +152,6 @@ Embeddings: nomic-embed-text or BGE models
 File actions: custom safe executor with preview, approval, audit log, and undo
 ```
 
-## Current status
-
-This repository contains the product and technical documentation foundation plus the local API-first file brain MVP.
-
-The production platform architecture is still the long-term target. The current runnable implementation is a local MVP using SQLite.
-
 ## Local file brain MVP
 
 The runnable MVP lives in `services/api`. It scans a local folder, reads file metadata, computes SHA-256 content hashes, extracts document text, searches metadata/content with SQLite FTS, answers through local Ollama when configured, generates insights, finds duplicates, watches folders, and safely organizes files after preview and approval.
@@ -131,10 +165,10 @@ cd services/api
 npm install
 ```
 
-### Run the local app
+### Run the local API
 
 ```powershell
-$env:OLLAMA_MODEL="qwen3.5:2b"
+cd E:\01PROJEKTER\EverythingAI\services\api
 npm start
 ```
 
@@ -150,7 +184,25 @@ The default local development token is:
 replace-with-your-local-development-token
 ```
 
-The UI includes local browser settings for saving the API token and preferred folder path. Provider settings such as Ollama and AnythingLLM remain server environment variables.
+Use it as:
+
+```text
+Authorization: Bearer replace-with-your-local-development-token
+```
+
+### Test
+
+```powershell
+cd E:\01PROJEKTER\EverythingAI\services\api
+npm test
+```
+
+Current local MVP validation status:
+
+```text
+78 tests passing / 0 failing
+Manual API smoke test passing
+```
 
 ### Local MVP optimization environment variables
 
@@ -168,6 +220,31 @@ $env:EVERYTHINGAI_MAX_FILE_SIZE_BYTES="262144000"
 $env:EVERYTHINGAI_EXCLUDE_NAMES="node_modules,.git,dist,build"
 $env:EVERYTHINGAI_EXCLUDE_EXTENSIONS=".exe,.dll,.iso,.zip"
 $env:EVERYTHINGAI_WATCH_DEBOUNCE_MS="1000"
+```
+
+### Manual MVP smoke test
+
+Use:
+
+```text
+docs/MVP_SMOKE_TEST_RUNBOOK.md
+```
+
+The smoke test validates:
+
+```text
+health
+index
+extract
+search
+document context
+suggestions
+previews
+batch create/approve/run
+batch audit
+action execution linkage
+trash/restore
+purge denial
 ```
 
 ### Index a folder
@@ -275,19 +352,13 @@ This means the local MVP does not silently hide indexed problem records by defau
 
 ### Document context
 
-The stable document context endpoint is:
+The document context endpoint is:
 
 ```text
-GET /api/documents/:fileId/context
+GET /api/intelligence/document-context/:fileId
 ```
 
-The older preview endpoint is still supported for compatibility:
-
-```text
-GET /api/files/:fileId/preview
-```
-
-Both endpoints return the same context shape:
+It returns:
 
 ```text
 file
@@ -296,7 +367,7 @@ insight
 source_reference
 ```
 
-The `file` object includes metadata, recovery state, indexing state, extraction state, extraction errors, source path, and source reference. Context remains available for trashed files so recovery/admin views can inspect them safely. Failed or stale files clearly expose `index_status = failed` and `index_error_message`.
+The `file` object includes metadata, recovery state, indexing state, extraction state, extraction errors, source path, and source reference. Context remains available for active and recoverable file states. Failed or stale files clearly expose `index_status = failed` and `index_error_message`.
 
 Semantic-style related search:
 
@@ -397,6 +468,38 @@ Undo supported filesystem actions:
 npm run undo -- "<execution-id>" --approve
 ```
 
+### Execution batches
+
+Execution batches group selected action previews into an approval-gated run.
+
+Batch API flow:
+
+```text
+POST /api/execution-batches
+POST /api/execution-batches/:batchId/approve
+POST /api/execution-batches/:batchId/run
+GET /api/execution-batches/:batchId
+```
+
+Batch safety rules:
+
+```text
+batch creation accepts selected preview IDs
+batch approval requires approve=true
+blocked previews prevent approval
+batch run requires approve=true
+batch run uses the existing safe single-action executor
+batch run stops on first failure
+no automatic rollback in local MVP
+operator-approved undo only
+```
+
+See:
+
+```text
+docs/EXECUTION_BATCH_WORKFLOW.md
+```
+
 ### Local recovery and trash behavior
 
 The local MVP uses recovery metadata instead of permanent delete. Moving a file to trash does not permanently delete file content. It creates a `trash_records` row, records retention metadata, writes an audit event, and hides the file from normal `/api/files` and `/api/search` results.
@@ -407,7 +510,7 @@ Recovery rules:
 - Restore requires explicit approval.
 - Active trashed files are hidden from normal file list and keyword search results.
 - Use `includeTrashed=true` only for recovery/admin views that need to include trashed records.
-- File preview includes `recovery_status: "active" | "trashed"`.
+- File context includes `recovery_status: "active" | "trashed"`.
 - Restore is blocked with `restore_conflict` if the indexed file path no longer matches the original trashed path.
 - Permanent purge is blocked in the local MVP and audited as `file.purge_blocked`.
 
@@ -421,36 +524,35 @@ npm start
 
 Use `Authorization: Bearer <API_TOKEN>` for protected routes.
 
-- `POST /api/index` with `{ "folderPath": "C:\\path\\to\\folder" }`
-- `POST /api/extract` with optional `{ "fileId": "...", "limit": 1000 }`
+See the dedicated route checklist:
+
+```text
+docs/MVP_API_ROUTES.md
+```
+
+Core routes include:
+
+- `POST /api/index`
+- `POST /api/extract`
 - `GET /api/status`
-- `GET /api/files?q=invoice&limit=20`
-- `GET /api/files?q=invoice&includeTrashed=true`
-- `GET /api/search?q=supplier&limit=20`
-- `GET /api/search?q=supplier&includeTrashed=true`
-- `GET /api/semantic-search?q=supplier&limit=10`
-- `GET /api/documents/:fileId/context`
-- `POST /api/embeddings` with optional `{ "fileId": "...", "limit": 1000 }`
-- `POST /api/chat` with `{ "question": "Which files mention supplier?" }`
-- `POST /api/insights` with optional `{ "fileId": "...", "limit": 25, "useOllama": false }`
-- `GET /api/duplicates`
-- `GET /api/files/:fileId/preview`
-- `GET /api/knowledge`
-- `POST /api/watch` with `{ "folderPath": "C:\\path\\to\\folder", "extract": true }`
-- `POST /api/unwatch` with `{ "folderPath": "C:\\path\\to\\folder" }`
-- `POST /api/suggestions` with `{ "fileId": "..." }`
-- `POST /api/action-previews` with `{ "suggestionId": "..." }`
-- `POST /api/action-executions` with `{ "previewId": "...", "approve": true }`
-- `POST /api/action-executions/:executionId/undo` with `{ "approve": true }`
-- `GET /api/action-executions`
+- `GET /api/files`
+- `GET /api/search`
+- `GET /api/semantic-search`
+- `GET /api/intelligence/document-context/:fileId`
+- `POST /api/suggestions`
+- `POST /api/action-previews`
+- `POST /api/action-executions`
+- `POST /api/action-executions/:executionId/undo`
+- `POST /api/execution-batches`
+- `GET /api/execution-batches`
+- `GET /api/execution-batches/:batchId`
+- `POST /api/execution-batches/:batchId/approve`
+- `POST /api/execution-batches/:batchId/run`
 - `GET /api/audit-log`
-- `GET /api/labels`
 - `GET /api/recovery/trash`
-- `GET /api/recovery/trash?status=restored`
-- `POST /api/recovery/trash` with `{ "fileId": "...", "approve": true }`
-- `POST /api/recovery/trash/:trashId/restore` with `{ "approve": true, "reason": "..." }`
-- `POST /api/recovery/trash/:trashId/purge` returns `403` in the local MVP and audits `file.purge_blocked`
-- `POST /api/integrations/anythingllm/sync` with optional `{ "fileId": "...", "limit": 25 }`
+- `POST /api/recovery/trash`
+- `POST /api/recovery/trash/:trashId/restore`
+- `POST /api/recovery/trash/:trashId/purge`
 
 ### AnythingLLM sync
 
@@ -481,25 +583,25 @@ Delete actions are not implemented. The recovery layer supports trash metadata, 
 
 Extraction also guards against stale indexed paths. If a previously indexed path no longer exists on disk, the record is marked failed with a stale-file message and is not retried on every extraction run.
 
-### Validation
+## Known local MVP limitations
 
-```bash
-npm test
-npm audit --omit=dev
-```
-
-Current local MVP validation status:
-
-```text
-45 tests passing / 0 failing
-```
+- The UI/browser flow still needs a dedicated validation pass.
+- Batch-level automatic rollback is not implemented.
+- Batch-level undo endpoint is not implemented.
+- Planning-session-to-batch generation is not implemented.
+- Semantic search uses deterministic local token vectors, not a neural embedding model yet.
+- Production platform architecture is not implemented yet.
+- Multi-user/tenant auth is not implemented yet.
+- PostgreSQL/pgvector migration is still a later phase.
 
 ## Next architectural decision
 
-After the local MVP is finalized and tested, the next major phase is deciding when to move from local MVP to production platform:
+After the local MVP is validated, the next major phase is deciding whether to prioritize:
 
-1. PostgreSQL + pgvector migration.
-2. Real embedding provider support.
-3. Installed client agent split.
-4. Central browser/server architecture.
-5. Multi-user tenant/workspace model.
+1. UI polish and browser workflow completion.
+2. Production deployment hardening.
+3. PostgreSQL + pgvector migration.
+4. Real embedding provider support.
+5. Installed client agent split.
+6. Central browser/server architecture.
+7. Multi-user tenant/workspace model.
