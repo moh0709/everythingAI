@@ -278,6 +278,29 @@ function renderUnifiedResults(payload) {
   log({ query: payload.query, totals: payload.totals });
 }
 
+function renderDocumentContextText(documentContext) {
+  const file = documentContext.file || {};
+  const sourceReference = documentContext.source_reference || {};
+  const insight = documentContext.insight || {};
+
+  return [
+    file.filename || 'Unknown file',
+    file.absolute_path || '',
+    '',
+    `Recovery status: ${file.recovery_status || 'unknown'}`,
+    `Index status: ${file.index_status || 'unknown'}`,
+    `Extraction status: ${file.extraction_status || 'unknown'}`,
+    file.extraction_error_message ? `Extraction error: ${file.extraction_error_message}` : '',
+    '',
+    `Source reference: ${sourceReference.source_label || sourceReference.relative_path || 'not available'}`,
+    sourceReference.source_type ? `Source type: ${sourceReference.source_type}` : '',
+    '',
+    insight.summary ? `Insight: ${insight.summary}` : 'Insight: No insight yet.',
+    '',
+    documentContext.previewText || 'No extracted preview text available.',
+  ].filter((line) => line !== '').join('\n');
+}
+
 function renderProviderSettings(settings) {
   els.providerSelect.value = settings.provider || 'ollama';
   els.ollamaBaseUrl.value = settings.ollama?.baseUrl || 'http://127.0.0.1:11434';
@@ -671,19 +694,12 @@ els.files.addEventListener('click', async (event) => {
     await withUiState({
       button: event.target,
       working: 'Working',
-      details: 'Loading file preview...',
+      details: 'Loading document context...',
     }, async () => {
-      const payload = await api(`/api/files/${previewFileId}/preview`);
-      els.answer.textContent = [
-        payload.file.filename,
-        payload.file.absolute_path,
-        '',
-        payload.insight?.summary || 'No insight yet.',
-        '',
-        payload.previewText || 'No extracted preview text available.',
-      ].join('\n');
-      log(payload.file);
-      setActivity('Ready', `Preview loaded for ${payload.file.filename}.`, 'success');
+      const payload = await api(`/api/intelligence/document-context/${previewFileId}`);
+      els.answer.textContent = renderDocumentContextText(payload.document);
+      log(payload.document);
+      setActivity('Ready', `Document context loaded for ${payload.document.file.filename}.`, 'success');
       showView('chatView');
     });
     return;
