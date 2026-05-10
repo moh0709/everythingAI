@@ -220,7 +220,7 @@ For one file:
 npm run extract -- -- --file-id "<file-id>"
 ```
 
-Extraction skips already-extracted unchanged files by default.
+Extraction skips already-extracted unchanged files by default. If an indexed file no longer exists on disk, extraction marks the indexed file as `failed`, reports it under `stale_missing` / `staleMissingItems`, and skips future retry loops until the file is re-indexed from an existing path.
 
 ### Search indexed files
 
@@ -410,6 +410,8 @@ The indexer skips symlink traversal and known unsafe/system/dependency paths suc
 
 Delete actions are not implemented. The recovery layer supports trash metadata, restore, restore-conflict detection, normal list/search hiding for active trash records, and explicit permanent-purge blocking. Permanent purge is disabled in the local MVP under policy `NO_PERMANENT_PURGE_IN_LOCAL_MVP`.
 
+Extraction also guards against stale indexed paths. If a previously indexed path no longer exists on disk, the record is marked failed with a stale-file message and is not retried on every extraction run.
+
 ### Validation
 
 ```bash
@@ -420,7 +422,7 @@ npm audit --omit=dev
 Current local MVP validation status:
 
 ```text
-35 tests passing / 0 failing
+36 tests passing / 0 failing
 ```
 
 ## Next architectural decision
