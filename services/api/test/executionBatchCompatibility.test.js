@@ -10,6 +10,7 @@ import {
   openDatabase,
   upsertIndexedFile,
 } from '../src/db/client.js';
+import { insertExecutionBatch } from '../src/db/repositories/executionRepository.js';
 import { scanFolder } from '../src/indexer/fileScanner.js';
 import { generatePreviewSuggestions } from '../src/suggestions/suggestionService.js';
 import { createActionPreview } from '../src/previews/actionPreviewService.js';
@@ -35,6 +36,23 @@ async function indexFixture(root, db) {
 
 function fileByName(db, filename) {
   return listIndexedFiles(db, { limit: 100 }).find((file) => file.filename === filename);
+}
+
+function createDraftBatch(db, id) {
+  const timestamp = new Date().toISOString();
+  insertExecutionBatch(db, {
+    id,
+    planning_session_id: null,
+    status: 'draft',
+    summary_json: JSON.stringify({ preview_ids: [], total_previews: 0 }),
+    error_message: null,
+    created_at: timestamp,
+    updated_at: timestamp,
+    approved_at: null,
+    started_at: null,
+    completed_at: null,
+  });
+  return id;
 }
 
 async function preparePreview(db, { actionType = 'tag' } = {}) {
@@ -63,7 +81,7 @@ test('normal action execution keeps execution_batch_id null', async () => {
 test('successful action execution stores execution_batch_id when provided', async () => {
   const root = await createFixture();
   const db = openDatabase(tempDbPath());
-  const executionBatchId = 'batch-compat-success';
+  const executionBatchId = createDraftBatch(db, 'batch-compat-success');
 
   await indexFixture(root, db);
   const { preview } = await preparePreview(db, { actionType: 'tag' });
@@ -83,7 +101,7 @@ test('successful action execution stores execution_batch_id when provided', asyn
 test('failed action execution stores execution_batch_id when provided', async () => {
   const root = await createFixture();
   const db = openDatabase(tempDbPath());
-  const executionBatchId = 'batch-compat-failure';
+  const executionBatchId = createDraftBatch(db, 'batch-compat-failure');
 
   await indexFixture(root, db);
   const { file, preview } = await preparePreview(db, { actionType: 'move' });
