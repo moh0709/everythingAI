@@ -16,6 +16,11 @@ import {
   invalidateActionPreview,
   validateActionPreview,
 } from '../services/previewValidationService.js';
+import {
+  createRecoverySnapshot,
+  markSnapshotUsed,
+  RECOVERY_SNAPSHOT_TYPES,
+} from '../recovery/recoverySnapshotService.js';
 
 const SUPPORTED_ACTION_TYPES = new Set(['tag', 'category', 'rename', 'move']);
 
@@ -138,6 +143,25 @@ function assertSafeFilesystemPreview(preview) {
   }
 }
 
+function createPreMutationSnapshot(db, { preview, executionId }) {
+  const file = getIndexedFileById(db, preview.file_id);
+
+  return createRecoverySnapshot(db, {
+    fileId: preview.file_id,
+    previewId: preview.id,
+    executionId,
+    snapshotType: RECOVERY_SNAPSHOT_TYPES.EXECUTION_PRE_MUTATION,
+    sourcePath: preview.source_path,
+    targetPath: preview.target_path,
+    metadata: {
+      file,
+      preview,
+      execution: { id: executionId, action_type: preview.action_type },
+      reason: 'pre-mutation snapshot before filesystem action execution',
+    },
+  });
+}
+
 async function executeFilesystemAction(db, preview) {
   assertSafeFilesystemPreview(preview);
 
@@ -180,6 +204,7 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
   }
 
   const executionId = createId('execution');
+  let recoverySnapshot = null;
 
   try {
     if (!SUPPORTED_ACTION_TYPES.has(preview.action_type)) {
@@ -206,6 +231,7 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
     };
 
     if (preview.action_type === 'rename' || preview.action_type === 'move') {
+      recoverySnapshot = createPreMutationSnapshot(db, { preview, executionId });
       await executeFilesystemAction(db, preview);
     } else if (preview.action_type === 'tag') {
       upsertFileLabel(db, { fileId: preview.file_id, tag: preview.suggested_value });
@@ -214,12 +240,23 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
     }
 
     insertActionExecution(db, execution);
+
+    if (recoverySnapshot) {
+      markSnapshotUsed(db, {
+        snapshotId: recoverySnapshot.id,
+        executionId: execution.id,
+      });
+    }
+
     disableActionPreviewExecution(db, preview.id);
     audit(db, {
       eventType: 'action.executed',
       entityType: 'action_execution',
       entityId: execution.id,
-      payload: execution,
+      payload: {
+        ...execution,
+        recovery_snapshot_id: recoverySnapshot?.id || null,
+      },
     });
 
     return execution;
