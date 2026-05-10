@@ -11,6 +11,7 @@ import { semanticSearchFiles } from '../search/semanticSearch.js';
 import { generateEmbeddings } from '../embeddings/embeddingService.js';
 import { answerFromLocalFiles } from '../ai/chatPipeline.js';
 import { requireBodyString, requireQueryString, parseLimit } from '../utils/request.js';
+import { filterActiveFileLinkedRows } from '../recovery/trashVisibility.js';
 
 function includeTrashed(queryValue) {
   return queryValue?.toString().toLowerCase() === 'true';
@@ -42,6 +43,7 @@ export function createSearchRouter() {
     const results = semanticSearchFiles(db, {
       query,
       limit: parseLimit(req.query.limit, 10),
+      includeTrashed: includeTrashed(req.query.includeTrashed),
     });
     db.close();
 
@@ -58,28 +60,36 @@ export function createSearchRouter() {
     const includesQuery = (value) => (value || '').toString().toLowerCase().includes(normalized);
     const db = openDatabase();
     const files = searchFiles(db, { query, limit, includeTrashed: includeTrash });
-    const semantic = semanticSearchFiles(db, { query, limit });
-    const insights = listFileInsights(db, { limit: 500 }).filter((insight) => (
+    const semantic = semanticSearchFiles(db, { query, limit, includeTrashed: includeTrash });
+    const insights = filterActiveFileLinkedRows(db, listFileInsights(db, { limit: 500 }), {
+      includeTrashed: includeTrash,
+    }).filter((insight) => (
       includesQuery(insight.filename)
       || includesQuery(insight.absolute_path)
       || includesQuery(insight.summary)
       || includesQuery(insight.classification)
       || includesQuery(insight.entities_json)
     )).slice(0, limit);
-    const labels = listFileLabels(db, { limit: 500 }).filter((label) => (
+    const labels = filterActiveFileLinkedRows(db, listFileLabels(db, { limit: 500 }), {
+      includeTrashed: includeTrash,
+    }).filter((label) => (
       includesQuery(label.filename)
       || includesQuery(label.absolute_path)
       || includesQuery(label.category)
       || label.tags.some((tag) => includesQuery(tag))
     )).slice(0, limit);
-    const suggestions = listOrganizationSuggestions(db, { limit: 500 }).filter((suggestion) => (
+    const suggestions = filterActiveFileLinkedRows(db, listOrganizationSuggestions(db, { limit: 500 }), {
+      includeTrashed: includeTrash,
+    }).filter((suggestion) => (
       includesQuery(suggestion.filename)
       || includesQuery(suggestion.absolute_path)
       || includesQuery(suggestion.action_type)
       || includesQuery(suggestion.suggested_value)
       || includesQuery(suggestion.reason)
     )).slice(0, limit);
-    const executions = listActionExecutions(db, { limit: 500 }).filter((execution) => (
+    const executions = filterActiveFileLinkedRows(db, listActionExecutions(db, { limit: 500 }), {
+      includeTrashed: includeTrash,
+    }).filter((execution) => (
       includesQuery(execution.filename)
       || includesQuery(execution.absolute_path)
       || includesQuery(execution.action_type)
