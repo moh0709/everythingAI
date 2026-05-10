@@ -108,7 +108,7 @@ test('creates draft batch with blocked preview counts without executing anything
   assert.equal(batch.summary.blocked_previews, 1);
   const blockedPreview = batch.summary.previews.find((preview) => preview.preview_id === movePreview.id);
   assert.equal(blockedPreview.validation_valid, false);
-  assert.equal(blockedPreview.validation_reason, 'target_exists');
+  assert.equal(blockedPreview.validation_reason, 'Target file already exists.');
   assert.equal(await fs.readFile(file.absolute_path, 'utf8'), '# Batch Service\nSupplier contract batch service test');
 
   db.close();
