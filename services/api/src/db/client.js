@@ -127,6 +127,19 @@ export function upsertIndexedFile(db, fileRecord) {
   syncSearchIndexForFile(db, fileRecord.id);
 }
 
+export function markIndexedFileFailed(db, { fileId, errorMessage, lastIndexedAt = new Date().toISOString() }) {
+  db.prepare(`
+    UPDATE indexed_files
+    SET
+      index_status = 'failed',
+      error_message = @errorMessage,
+      last_indexed_at = @lastIndexedAt
+    WHERE id = @fileId
+  `).run({ fileId, errorMessage, lastIndexedAt });
+
+  syncSearchIndexForFile(db, fileId);
+}
+
 export function insertPlanningSession(db, session) {
   db.prepare(`
     INSERT INTO planning_sessions (
