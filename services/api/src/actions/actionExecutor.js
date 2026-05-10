@@ -174,15 +174,15 @@ function assertSafeUndoExecution(execution) {
 
   const undoSourcePath = path.resolve(execution.undo_source_path);
   const undoTargetPath = path.resolve(execution.undo_target_path);
-  const undoSourceDir = path.dirname(undoSourcePath);
-  const relativeTarget = path.relative(undoSourceDir, undoTargetPath);
-
-  if (!relativeTarget || relativeTarget.startsWith('..') || path.isAbsolute(relativeTarget)) {
-    throw new Error('Undo target path escapes the allowed source directory boundary.');
-  }
+  const originalSourcePath = path.resolve(execution.source_path || '');
+  const originalTargetPath = path.resolve(execution.target_path || '');
 
   if (undoSourcePath === undoTargetPath) {
     throw new Error('Undo source and target paths are identical.');
+  }
+
+  if (undoSourcePath !== originalTargetPath || undoTargetPath !== originalSourcePath) {
+    throw new Error('Undo paths do not match original execution paths.');
   }
 }
 
