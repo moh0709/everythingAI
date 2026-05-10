@@ -171,6 +171,36 @@ CREATE INDEX IF NOT EXISTS idx_action_executions_preview_id
 CREATE INDEX IF NOT EXISTS idx_action_executions_file_id
   ON action_executions(file_id);
 
+CREATE TABLE IF NOT EXISTS recovery_snapshots (
+  id TEXT PRIMARY KEY,
+  file_id TEXT NOT NULL,
+  preview_id TEXT,
+  execution_id TEXT,
+  snapshot_type TEXT NOT NULL CHECK (snapshot_type IN ('execution_pre_mutation', 'undo_pre_mutation')),
+  status TEXT NOT NULL CHECK (status IN ('created', 'used', 'failed')),
+  source_path TEXT,
+  target_path TEXT,
+  metadata_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  used_at TEXT,
+  error_message TEXT,
+  FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE,
+  FOREIGN KEY (preview_id) REFERENCES action_previews(id) ON DELETE SET NULL,
+  FOREIGN KEY (execution_id) REFERENCES action_executions(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_recovery_snapshots_file_id
+  ON recovery_snapshots(file_id);
+
+CREATE INDEX IF NOT EXISTS idx_recovery_snapshots_preview_id
+  ON recovery_snapshots(preview_id);
+
+CREATE INDEX IF NOT EXISTS idx_recovery_snapshots_execution_id
+  ON recovery_snapshots(execution_id);
+
+CREATE INDEX IF NOT EXISTS idx_recovery_snapshots_status
+  ON recovery_snapshots(status);
+
 CREATE TABLE IF NOT EXISTS trash_records (
   id TEXT PRIMARY KEY,
   file_id TEXT NOT NULL,
