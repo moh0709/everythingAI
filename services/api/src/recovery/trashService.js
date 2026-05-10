@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import path from 'node:path';
 import {
   getIndexedFileById,
   insertAuditLog,
@@ -28,6 +29,44 @@ function audit(db, { eventType, entityType, entityId, payload }) {
     payload_json: JSON.stringify(payload),
     created_at: new Date().toISOString(),
   });
+}
+
+function normalizePath(filePath) {
+  return path.resolve(filePath || '').toLowerCase();
+}
+
+function createServiceError(message, statusCode, extra = {}) {
+  return Object.assign(new Error(message), { statusCode, ...extra });
+}
+
+function assertRestoreIsSafe(db, trashRecord) {
+  if (!path.isAbsolute(trashRecord.original_absolute_path)) {
+    throw createServiceError('trash record original path is not absolute', 409, {
+      code: 'restore_conflict',
+      conflict: 'unsafe_original_path',
+      trashRecord,
+    });
+  }
+
+  const currentFile = getIndexedFileById(db, trashRecord.file_id);
+
+  if (!currentFile) {
+    throw createServiceError('indexed file for trash record no longer exists', 409, {
+      code: 'restore_conflict',
+      conflict: 'missing_indexed_file',
+      trashRecord,
+    });
+  }
+
+  if (normalizePath(currentFile.absolute_path) !== normalizePath(trashRecord.original_absolute_path)) {
+    throw createServiceError('restore conflict: indexed file path no longer matches original trash path', 409, {
+      code: 'restore_conflict',
+      conflict: 'indexed_path_changed',
+      trashRecord,
+      current_path: currentFile.absolute_path,
+      expected_path: trashRecord.original_absolute_path,
+    });
+  }
 }
 
 export function getActiveTrashRecordByFileId(db, fileId) {
@@ -93,18 +132,13 @@ export function moveFileToTrash(db, { fileId, retentionDays = DEFAULT_TRASH_RETE
   const file = getIndexedFileById(db, fileId);
 
   if (!file) {
-    const error = new Error('file not found');
-    error.statusCode = 404;
-    throw error;
+    throw createServiceError('file not found', 404);
   }
 
   const existingTrash = getActiveTrashRecordByFileId(db, fileId);
 
   if (existingTrash) {
-    const error = new Error('file already in trash');
-    error.statusCode = 409;
-    error.trashRecord = existingTrash;
-    throw error;
+    throw createServiceError('file already in trash', 409, { trashRecord: existingTrash });
   }
 
   const now = new Date();
@@ -171,16 +205,14 @@ export function restoreTrashRecord(db, { trashId, reason = null } = {}) {
   const trashRecord = getTrashRecordById(db, trashId);
 
   if (!trashRecord) {
-    const error = new Error('trash record not found');
-    error.statusCode = 404;
-    throw error;
+    throw createServiceError('trash record not found', 404);
   }
 
   if (trashRecord.status !== 'trashed') {
-    const error = new Error(`trash record cannot be restored from status: ${trashRecord.status}`);
-    error.statusCode = 409;
-    throw error;
+    throw createServiceError(`trash record cannot be restored from status: ${trashRecord.status}`, 409);
   }
+
+  assertRestoreIsSafe(db, trashRecord);
 
   db.prepare(`
     UPDATE trash_records
