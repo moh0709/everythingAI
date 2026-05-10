@@ -21,6 +21,7 @@ import {
   markSnapshotUsed,
   RECOVERY_SNAPSHOT_TYPES,
 } from '../recovery/recoverySnapshotService.js';
+import { getActiveTrashRecordByFileId } from '../recovery/trashService.js';
 
 const SUPPORTED_ACTION_TYPES = new Set(['tag', 'category', 'rename', 'move']);
 
@@ -143,6 +144,24 @@ function assertSafeFilesystemPreview(preview) {
   }
 }
 
+async function assertFilesystemExecutionPreconditions(db, preview) {
+  assertSafeFilesystemPreview(preview);
+
+  if (getActiveTrashRecordByFileId(db, preview.file_id)) {
+    throw new Error('Cannot execute action against active trashed file.');
+  }
+
+  if (!(await pathExists(preview.source_path))) {
+    invalidateActionPreview(db, preview.id, 'source_missing');
+    throw new Error('Source file no longer exists.');
+  }
+
+  if (await pathExists(preview.target_path)) {
+    invalidateActionPreview(db, preview.id, 'target_exists');
+    throw new Error('Target path already exists.');
+  }
+}
+
 function createPreMutationSnapshot(db, { preview, executionId }) {
   const file = getIndexedFileById(db, preview.file_id);
 
@@ -163,18 +182,6 @@ function createPreMutationSnapshot(db, { preview, executionId }) {
 }
 
 async function executeFilesystemAction(db, preview) {
-  assertSafeFilesystemPreview(preview);
-
-  if (!(await pathExists(preview.source_path))) {
-    invalidateActionPreview(db, preview.id, 'source_missing');
-    throw new Error('Source file no longer exists.');
-  }
-
-  if (await pathExists(preview.target_path)) {
-    invalidateActionPreview(db, preview.id, 'target_exists');
-    throw new Error('Target path already exists.');
-  }
-
   await fs.mkdir(path.dirname(preview.target_path), { recursive: true });
   await fs.rename(preview.source_path, preview.target_path);
 
@@ -231,6 +238,7 @@ export async function executeActionPreview(db, { previewId, approve = false } = 
     };
 
     if (preview.action_type === 'rename' || preview.action_type === 'move') {
+      await assertFilesystemExecutionPreconditions(db, preview);
       recoverySnapshot = createPreMutationSnapshot(db, { preview, executionId });
       await executeFilesystemAction(db, preview);
     } else if (preview.action_type === 'tag') {
