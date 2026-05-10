@@ -165,6 +165,19 @@
             </div>
             <div id="suggestions" class="cards"></div>
           </section>
+          <section class="panel batch-panel">
+            <div class="section-heading">
+              <div>
+                <h2>Batch Queue</h2>
+                <p class="muted">Create previews first, then add ready previews here for grouped approval and execution.</p>
+              </div>
+              <div class="button-row">
+                <button id="clearBatchQueueBtn" class="secondary">Clear Queue</button>
+              </div>
+            </div>
+            <div id="batchQueueStatus" class="batch-status">No previews selected.</div>
+            <div id="batchQueue" class="cards"></div>
+          </section>
           <section class="panel">
             <h2>Action Log</h2>
             <pre id="log"></pre>
@@ -265,5 +278,6 @@
     </dialog>
 
     <script src="/app.js?v=mvp-finalization-1" type="module"></script>
+    <script src="/batch-ui.js?v=sprint6-batch-queue-1" type="module"></script>
   </body>
 </html>
