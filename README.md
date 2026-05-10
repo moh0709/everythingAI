@@ -122,7 +122,7 @@ The production platform architecture is still the long-term target. The current 
 
 The runnable MVP lives in `services/api`. It scans a local folder, reads file metadata, computes SHA-256 content hashes, extracts document text, searches metadata/content with SQLite FTS, answers through local Ollama when configured, generates insights, finds duplicates, watches folders, and safely organizes files after preview and approval.
 
-File move/rename execution is available only through an explicit approved action preview. Delete actions are not implemented.
+File move/rename execution is available only through an explicit approved action preview. Delete actions are not implemented. The local MVP includes governed recovery metadata: files can be moved to a local trash state, hidden from normal list/search results, restored, and audited. Permanent purge is explicitly blocked in the MVP.
 
 ### Install
 
@@ -228,7 +228,7 @@ Extraction skips already-extracted unchanged files by default.
 npm run search -- "supplier contract"
 ```
 
-Search uses SQLite FTS over filename, path, extension, and extracted content. Results include source paths and snippets where available.
+Search uses SQLite FTS over filename, path, extension, and extracted content. Results include source paths and snippets where available. Active trash records are hidden from normal search by default.
 
 Semantic-style related search:
 
@@ -329,6 +329,20 @@ Undo supported filesystem actions:
 npm run undo -- "<execution-id>" --approve
 ```
 
+### Local recovery and trash behavior
+
+The local MVP uses recovery metadata instead of permanent delete. Moving a file to trash does not permanently delete file content. It creates a `trash_records` row, records retention metadata, writes an audit event, and hides the file from normal `/api/files` and `/api/search` results.
+
+Recovery rules:
+
+- Move to trash requires explicit approval.
+- Restore requires explicit approval.
+- Active trashed files are hidden from normal file list and keyword search results.
+- Use `includeTrashed=true` only for recovery/admin views that need to include trashed records.
+- File preview includes `recovery_status: "active" | "trashed"`.
+- Restore is blocked with `restore_conflict` if the indexed file path no longer matches the original trashed path.
+- Permanent purge is blocked in the local MVP and audited as `file.purge_blocked`.
+
 ### API endpoints
 
 Start the API:
@@ -343,7 +357,9 @@ Use `Authorization: Bearer <API_TOKEN>` for protected routes.
 - `POST /api/extract` with optional `{ "fileId": "...", "limit": 1000 }`
 - `GET /api/status`
 - `GET /api/files?q=invoice&limit=20`
+- `GET /api/files?q=invoice&includeTrashed=true`
 - `GET /api/search?q=supplier&limit=20`
+- `GET /api/search?q=supplier&includeTrashed=true`
 - `GET /api/semantic-search?q=supplier&limit=10`
 - `POST /api/embeddings` with optional `{ "fileId": "...", "limit": 1000 }`
 - `POST /api/chat` with `{ "question": "Which files mention supplier?" }`
@@ -360,6 +376,11 @@ Use `Authorization: Bearer <API_TOKEN>` for protected routes.
 - `GET /api/action-executions`
 - `GET /api/audit-log`
 - `GET /api/labels`
+- `GET /api/recovery/trash`
+- `GET /api/recovery/trash?status=restored`
+- `POST /api/recovery/trash` with `{ "fileId": "...", "approve": true }`
+- `POST /api/recovery/trash/:trashId/restore` with `{ "approve": true, "reason": "..." }`
+- `POST /api/recovery/trash/:trashId/purge` returns `403` in the local MVP and audits `file.purge_blocked`
 - `POST /api/integrations/anythingllm/sync` with optional `{ "fileId": "...", "limit": 25 }`
 
 ### AnythingLLM sync
@@ -385,13 +406,21 @@ The sync exports extracted text with source path metadata. It does not replace E
 
 ### Safety behavior
 
-The indexer skips symlink traversal and known unsafe/system/dependency paths such as Windows system folders, recycle-bin folders, `.git`, and `node_modules`. Per-file errors are logged and stored without stopping the scan. File execution requires a safe preview plus explicit approval. Failed execution attempts are audited. Delete actions are not implemented.
+The indexer skips symlink traversal and known unsafe/system/dependency paths such as Windows system folders, recycle-bin folders, `.git`, and `node_modules`. Per-file errors are logged and stored without stopping the scan. File execution requires a safe preview plus explicit approval. Failed execution attempts are audited.
+
+Delete actions are not implemented. The recovery layer supports trash metadata, restore, restore-conflict detection, normal list/search hiding for active trash records, and explicit permanent-purge blocking. Permanent purge is disabled in the local MVP under policy `NO_PERMANENT_PURGE_IN_LOCAL_MVP`.
 
 ### Validation
 
 ```bash
 npm test
 npm audit --omit=dev
+```
+
+Current local MVP validation status:
+
+```text
+35 tests passing / 0 failing
 ```
 
 ## Next architectural decision
