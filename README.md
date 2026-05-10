@@ -12,6 +12,22 @@ The current objective is to finalize and optimize the **local MVP** in `services
 
 The local MVP should become stable, safe, boring, and reliable before adding more advanced production-platform features.
 
+## Enterprise platform direction
+
+The production target is a **Governed Enterprise Cognitive Workspace**: a trusted enterprise knowledge operating environment where files are ingested, understood, organized, searched, governed, recovered, measured, and continuously improved.
+
+The enterprise platform direction adds:
+
+- Admin-controlled page, capability, workspace, knowledge-area, and AI-agent permissions
+- Internal governed file ecosystem with Reference Mode, Copy Mode, and later Managed Mode
+- Search & Explore as the primary wiki-style knowledge base
+- Planning Center for AI-generated organization proposals and simulations
+- Governed Execution with approval, replay, recovery snapshots, and audit lineage
+- Recovery Center with trashbin, restore, rollback, and 30-day default retention
+- Operations Center with user tickets, AI-generated tickets, health signals, and improvement proposals
+- Stats & Insights with KPIs, health scoring, and measurable enterprise value
+- Apple-style calm enterprise UX with trust indicators and source references
+
 ## Strategic direction
 
 The recommended strategy is to evaluate and potentially fork **AnythingLLM** as the base product, then expand it with the missing filesystem intelligence layer.
@@ -41,7 +57,9 @@ EverythingApp adds the unique product layer:
 
 ## Documentation
 
-See the `/docs` folder:
+See the `/docs` folder.
+
+### Current local MVP documentation
 
 - [`PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md)
 - [`PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md)
@@ -57,6 +75,19 @@ See the `/docs` folder:
 - [`MVP_FINALIZATION_PLAN.md`](docs/MVP_FINALIZATION_PLAN.md)
 - [`KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md)
 - [`WINDOWS_LOCAL_SMOKE_TEST.md`](docs/WINDOWS_LOCAL_SMOKE_TEST.md)
+
+### Enterprise workspace documentation
+
+- [`ENTERPRISE_WORKSPACE_PRD.md`](docs/ENTERPRISE_WORKSPACE_PRD.md)
+- [`ENTERPRISE_TECHNICAL_ARCHITECTURE.md`](docs/ENTERPRISE_TECHNICAL_ARCHITECTURE.md)
+- [`ENTERPRISE_UX_SPEC.md`](docs/ENTERPRISE_UX_SPEC.md)
+- [`ENTERPRISE_ACCESS_CONTROL.md`](docs/ENTERPRISE_ACCESS_CONTROL.md)
+- [`INTERNAL_FILE_ECOSYSTEM.md`](docs/INTERNAL_FILE_ECOSYSTEM.md)
+- [`SEARCH_EXPLORE_WIKI.md`](docs/SEARCH_EXPLORE_WIKI.md)
+- [`PLANNING_EXECUTION_RECOVERY.md`](docs/PLANNING_EXECUTION_RECOVERY.md)
+- [`OPERATIONS_INSIGHTS_TICKETS.md`](docs/OPERATIONS_INSIGHTS_TICKETS.md)
+- [`MVP_LAUNCH_GATE.md`](docs/MVP_LAUNCH_GATE.md)
+- [`IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
 
 ## Initial stack recommendation
 
