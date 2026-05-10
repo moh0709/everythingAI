@@ -230,6 +230,61 @@ npm run search -- "supplier contract"
 
 Search uses SQLite FTS over filename, path, extension, and extracted content. Results include source paths and snippets where available. Active trash records are hidden from normal search by default.
 
+API search results are normalized through a stable local MVP `SearchResult` contract:
+
+```text
+id
+filename
+absolute_path
+relative_path
+extension
+mime_type
+size_bytes
+modified_at
+index_status
+extraction_status
+extraction_error_message
+snippet
+recovery_status
+source_reference
+```
+
+`source_reference` is mandatory when the source file exists in the index:
+
+```text
+file_id
+filename
+absolute_path
+relative_path
+source_type = local_file
+source_label
+```
+
+### Document context
+
+The stable document context endpoint is:
+
+```text
+GET /api/documents/:fileId/context
+```
+
+The older preview endpoint is still supported for compatibility:
+
+```text
+GET /api/files/:fileId/preview
+```
+
+Both endpoints return the same context shape:
+
+```text
+file
+previewText
+insight
+source_reference
+```
+
+The `file` object includes metadata, recovery state, indexing state, extraction state, extraction errors, source path, and source reference. Context remains available for trashed files so recovery/admin views can inspect them safely. Failed or stale files clearly expose `index_status = failed` and `index_error_message`.
+
 Semantic-style related search:
 
 ```bash
@@ -361,6 +416,7 @@ Use `Authorization: Bearer <API_TOKEN>` for protected routes.
 - `GET /api/search?q=supplier&limit=20`
 - `GET /api/search?q=supplier&includeTrashed=true`
 - `GET /api/semantic-search?q=supplier&limit=10`
+- `GET /api/documents/:fileId/context`
 - `POST /api/embeddings` with optional `{ "fileId": "...", "limit": 1000 }`
 - `POST /api/chat` with `{ "question": "Which files mention supplier?" }`
 - `POST /api/insights` with optional `{ "fileId": "...", "limit": 25, "useOllama": false }`
@@ -422,7 +478,7 @@ npm audit --omit=dev
 Current local MVP validation status:
 
 ```text
-36 tests passing / 0 failing
+41 tests passing / 0 failing
 ```
 
 ## Next architectural decision
