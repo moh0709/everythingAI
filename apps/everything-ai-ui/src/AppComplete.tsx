@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { BarChart3, Brain, CheckCircle, FolderOpen, Search, Settings, Upload, Zap } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { BarChart3, Brain, CheckCircle, FolderOpen, MessageCircle, Search, Settings, Shield, Sparkles, Upload, Zap } from 'lucide-react';
 import { apiRequest, ApiOptions, AppStatus, IndexedFile, Suggestion } from './api';
 import { addSourcePath, listSourcePaths, pauseSourcePath, resumeSourcePath, SourcePathRecord } from './sourcePathsApi';
 import {
@@ -13,7 +13,7 @@ import {
 } from './providerSettingsApi';
 import { agentCatalog, isLocalProvider, providerCatalog, providerLabel } from './providerCatalog';
 
-type Section = 'dashboard' | 'explorer' | 'planning' | 'analytics' | 'settings';
+type Section = 'dashboard' | 'explorer' | 'planning' | 'analytics' | 'settings' | 'askai';
 type PreviewRecord = { id: string; suggestion_id?: string; action_type: string; target_path?: string; suggested_value: string; preview_status: string; blocked_reason?: string };
 type FilePreview = { file?: IndexedFile & { extracted_text?: string }; insight?: { summary?: string; classification?: string } | null; previewText?: string; extracted_text?: string };
 
@@ -65,6 +65,9 @@ export function App() {
   const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);
   const [providerModels, setProviderModels] = useState<ProviderModels | null>(null);
   const [connectionMessage, setConnectionMessage] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState<'idle'|'ok'|'error'>('idle');
+  const [saveSettingsFeedback, setSaveSettingsFeedback] = useState('');
+  const [chatMessages, setChatMessages] = useState<{role:'user'|'assistant'|'error'; text:string; sources?:any[]}[]>([]);
   const [audit, setAudit] = useState<any[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('Ready for AI Analysis');
@@ -190,7 +193,7 @@ export function App() {
   }
 
   async function createPreview(suggestion: Suggestion) {
-    const payload = await apiRequest<{ preview: PreviewRecord }>(options, '/api/action-previews', { suggestionId: suggestion.id }, 'POST');
+    const payload = await apiRequest<{ preview: PreviewRecord }>(options, '/api/action-previews', { suggestionId: suggestion.id, destinationFolder: destinationFolder || undefined }, 'POST');
     setPreviews((current) => [payload.preview, ...current.filter((item) => item.suggestion_id !== suggestion.id)]);
   }
 
@@ -217,9 +220,20 @@ export function App() {
     if (!ready.length) return setMessage('No executable previews. Run Dry Run Preview first.');
     if (!window.confirm(`Execute ${ready.length} approved preview action(s)?`)) return;
     await run('Executing approved plan...', async () => {
-      for (const preview of ready) await apiRequest(options, '/api/action-executions', { previewId: preview.id, approve: true }, 'POST');
+      let succeeded = 0;
+      let skipped = 0;
+      for (const preview of ready) {
+        try {
+          const result = await apiRequest<any>(options, '/api/action-executions', { previewId: preview.id, approve: true }, 'POST');
+          if (result?.skipped) skipped++;
+          else succeeded++;
+        } catch {
+          skipped++;
+        }
+      }
       setPreviews([]);
       await refreshAll();
+      setMessage(`Execution complete: ${succeeded} succeeded, ${skipped} skipped.`);
     });
   }
 
@@ -235,15 +249,26 @@ export function App() {
     await run('Saving AI provider settings...', async () => {
       const payload = await saveProviderSettings(options, next);
       setProviderSettings(payload.settings);
+      setSaveSettingsFeedback('Settings saved successfully.');
+      setTimeout(() => setSaveSettingsFeedback(''), 4000);
     });
   }
 
   async function testAiProvider(provider: ProviderName) {
-    await run(`Testing ${providerLabel(provider)}...`, async () => {
+    setConnectionStatus('idle');
+    setConnectionMessage('Testing connection...');
+    try {
       const payload = await testProviderConnection(options, provider);
+      setConnectionStatus(payload.connected ? 'ok' : 'error');
       setConnectionMessage(payload.message);
-      setMessage(payload.message);
-    });
+      if (payload.connected) {
+        const modelsPayload = await apiRequest<any>(options, `/api/provider-settings/models/${provider}`);
+        setProviderModels((prev: any) => ({ ...prev, [provider]: modelsPayload.models }));
+      }
+    } catch (err: any) {
+      setConnectionStatus('error');
+      setConnectionMessage(err.message || 'Connection failed');
+    }
   }
 
   async function refreshModels() {
@@ -273,14 +298,22 @@ export function App() {
       {section === 'explorer' && <Explorer files={filteredFiles} allFiles={files} selectedFile={selectedFile} selectedPreview={filePreview} setSelectedFileId={loadFilePreview} query={query} setQuery={setQuery} searchEverything={searchEverything} showFilters={showFilters} setShowFilters={setShowFilters} filterExtension={filterExtension} setFilterExtension={setFilterExtension} filterStatus={filterStatus} setFilterStatus={setFilterStatus} extensionOptions={extensionOptions} />}
       {section === 'planning' && <Planning files={files} suggestions={suggestions} previews={previews} selectedSuggestionIds={selectedSuggestionIds} setSelectedSuggestionIds={setSelectedSuggestionIds} createPreview={createPreview} previewSelected={previewSelected} executePreview={executePreview} executeSelectedPreviews={executeSelectedPreviews} deepAnalysis={deepAnalysis} busy={busy} openSettings={() => setSection('settings')} destinationFolder={destinationFolder} setDestinationFolder={setDestinationFolder} />}
       {section === 'analytics' && <Analytics status={status} audit={audit} />}
-      {section === 'settings' && <SettingsView baseUrl={baseUrl} setBaseUrl={setBaseUrl} token={token} setToken={setToken} folderPath={folderPath} setFolderPath={setFolderPath} destinationFolder={destinationFolder} setDestinationFolder={setDestinationFolder} saveLocalSettings={saveLocalSettings} sourcePaths={sourcePaths} providerSettings={providerSettings} providerModels={providerModels} saveAiSettings={saveAiSettings} testAiProvider={testAiProvider} refreshModels={refreshModels} connectionMessage={connectionMessage} />}
+      {section === 'settings' && <SettingsView baseUrl={baseUrl} setBaseUrl={setBaseUrl} token={token} setToken={setToken} folderPath={folderPath} setFolderPath={setFolderPath} destinationFolder={destinationFolder} setDestinationFolder={setDestinationFolder} saveLocalSettings={saveLocalSettings} sourcePaths={sourcePaths} providerSettings={providerSettings} providerModels={providerModels} saveAiSettings={saveAiSettings} testAiProvider={testAiProvider} refreshModels={refreshModels} connectionMessage={connectionMessage} connectionStatus={connectionStatus} saveSettingsFeedback={saveSettingsFeedback} />}
+      {section === 'askai' && <AskAI options={options} chatMessages={chatMessages} setChatMessages={setChatMessages} />}
     </main>
   </div>;
 }
 
 function Header({ section, setSection, loadAudit, activeProvider }: any) {
-  const items: Section[] = ['dashboard', 'explorer', 'planning', 'analytics', 'settings'];
-  return <header className="top-nav"><div className="brand"><FolderOpen size={28} /><strong>EverythingAI</strong></div><nav>{items.map((item) => <button key={item} className={section === item ? 'active' : ''} onClick={() => item === 'analytics' ? loadAudit() : setSection(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}</nav><div className="provider-pill"><span />{providerLabel(activeProvider)}</div></header>;
+  const items: { id: Section; label: string }[] = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'explorer', label: 'Explorer' },
+    { id: 'planning', label: 'Planning' },
+    { id: 'askai', label: 'Ask AI' },
+    { id: 'analytics', label: 'Analytics' },
+    { id: 'settings', label: 'Settings' },
+  ];
+  return <header className="top-nav"><div className="brand"><FolderOpen size={28} /><strong>EverythingAI</strong></div><nav>{items.map((item) => <button key={item.id} className={section === item.id ? 'active' : ''} onClick={() => item.id === 'analytics' ? loadAudit() : setSection(item.id)}>{item.label}</button>)}</nav><div className="provider-pill"><span />{providerLabel(activeProvider)}</div></header>;
 }
 
 function Dashboard({ files, suggestions, totalSize, fileTypes, folderPath, setFolderPath, selectFolder, addTypedSourcePath, deepAnalysis, setSection, busy, sourcePaths, rescanSource, pauseSource, resumeSource, removeSource }: any) {
@@ -298,24 +331,117 @@ function Explorer({ files, allFiles, selectedFile, selectedPreview, setSelectedF
 
 function Planning({ files, suggestions, previews, selectedSuggestionIds, setSelectedSuggestionIds, createPreview, previewSelected, executePreview, executeSelectedPreviews, deepAnalysis, busy, openSettings, destinationFolder, setDestinationFolder }: any) {
   function toggleSuggestion(id: string) { const next = new Set(selectedSuggestionIds); if (next.has(id)) next.delete(id); else next.add(id); setSelectedSuggestionIds(next); }
-  return <section><div className="planning-head"><div><h1><Brain /> AI Planning Center</h1><p>Full planning workflow with AI settings, dry run previews, action selection, execution queue, and safety approval.</p></div><div className="button-row"><button className="outline" onClick={openSettings}>AI Settings</button><button className="purple" onClick={deepAnalysis} disabled={busy}>AI Analyze</button><button className="outline" onClick={previewSelected}>Dry Run Preview</button><button onClick={executeSelectedPreviews}>Execute Plan</button></div></div><div className="destination"><strong>Destination Folder / Planning Label</strong><input value={destinationFolder} onChange={(e) => setDestinationFolder(e.target.value)} placeholder="e.g. Finance, Projects, Customer Docs" /><p className="muted">Actual filesystem targets still come from backend-safe previews.</p></div><div className="planning-grid advanced"><div className="panel"><h3>AI Plan Summary</h3><p>Files analyzed: <b>{files.length}</b></p><p>Actions suggested: <b>{suggestions.length}</b></p><p>Average confidence: <b>{averageConfidence(suggestions)}</b></p><p>Selected actions: <b>{selectedSuggestionIds.size}</b></p><p>Dry-run previews: <b>{previews.length}</b></p><p>Executable previews: <b>{previews.filter((p: PreviewRecord) => p.preview_status === 'ready').length}</b></p></div><div className="panel wide"><h3>Suggested Actions</h3>{suggestions.slice(0, 60).map((s: Suggestion) => <div className="suggestion-line selectable" key={s.id}><label><input type="checkbox" checked={selectedSuggestionIds.has(s.id)} onChange={() => toggleSuggestion(s.id)} /> <b>{s.action_type}</b> → {s.suggested_value}</label><span className="chip blue">{Math.round(Number(s.confidence || 0) * 100)}%</span><button onClick={() => createPreview(s)}>Preview</button></div>)}</div><div className="panel wide"><h3>Dry Run / Execution Queue</h3>{!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}{previews.map((p: PreviewRecord) => <div className="suggestion-line" key={p.id}><div><b>{p.action_type}</b> → {p.target_path || p.suggested_value}<p className="muted">{p.preview_status === 'ready' ? 'Ready to execute' : `Blocked: ${p.blocked_reason}`}</p></div><span className={p.preview_status === 'ready' ? 'chip green' : 'chip orange'}>{p.preview_status}</span><button disabled={p.preview_status !== 'ready'} onClick={() => executePreview(p)}>Execute</button></div>)}</div></div></section>;
+  function selectAllSuggestions() { const visible = suggestions.slice(0, 60); const allSelected = visible.every((s: Suggestion) => selectedSuggestionIds.has(s.id)); if (allSelected) { const next = new Set(selectedSuggestionIds); visible.forEach((s: Suggestion) => next.delete(s.id)); setSelectedSuggestionIds(next); } else { const next = new Set(selectedSuggestionIds); visible.forEach((s: Suggestion) => next.add(s.id)); setSelectedSuggestionIds(next); } }
+  return <section><div className="planning-head"><div><h1><Brain /> AI Planning Center</h1><p>Full planning workflow with AI settings, dry run previews, action selection, execution queue, and safety approval.</p></div><div className="button-row"><button className="outline" onClick={openSettings}>AI Settings</button><button className="purple" onClick={deepAnalysis} disabled={busy}><Sparkles size={16} /> AI Analyze</button><button className="outline" onClick={previewSelected}>Dry Run Preview</button><button onClick={executeSelectedPreviews}>Execute Plan</button></div></div><div className="destination"><strong>Destination Folder / Planning Label</strong><input value={destinationFolder} onChange={(e) => setDestinationFolder(e.target.value)} placeholder="e.g. Finance, Projects, Customer Docs" /><p className="muted">Actual filesystem targets still come from backend-safe previews.</p></div><div className="planning-grid advanced"><div className="panel"><h3>AI Plan Summary</h3><p>Files analyzed: <b>{files.length}</b></p><p>Actions suggested: <b>{suggestions.length}</b></p><p>Average confidence: <b>{averageConfidence(suggestions)}</b></p><p>Selected actions: <b>{selectedSuggestionIds.size}</b></p><p>Dry-run previews: <b>{previews.length}</b></p><p>Executable previews: <b>{previews.filter((p: PreviewRecord) => p.preview_status === 'ready').length}</b></p></div><div className="panel wide"><div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}><h3>Suggested Actions</h3><button className="outline" onClick={selectAllSuggestions}>{suggestions.slice(0,60).every((s: Suggestion) => selectedSuggestionIds.has(s.id)) ? 'Deselect All' : 'Select All'}</button></div>{suggestions.slice(0, 60).map((s: Suggestion) => <div className="suggestion-line selectable" key={s.id}><label><input type="checkbox" checked={selectedSuggestionIds.has(s.id)} onChange={() => toggleSuggestion(s.id)} /> <b>{s.action_type}</b> → {s.suggested_value}</label><span className="chip blue">{Math.round(Number(s.confidence || 0) * 100)}%</span><button onClick={() => createPreview(s)}>Preview</button></div>)}</div><div className="panel wide"><h3>Dry Run / Execution Queue</h3>{!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}{previews.map((p: PreviewRecord) => <div className="suggestion-line" key={p.id}><div><b>{p.action_type}</b> → {p.target_path || p.suggested_value}<p className="muted">{p.preview_status === 'ready' ? 'Ready to execute' : `Blocked: ${p.blocked_reason}`}</p></div><span className={p.preview_status === 'ready' ? 'chip green' : 'chip orange'}>{p.preview_status}</span><button disabled={p.preview_status !== 'ready'} onClick={() => executePreview(p)}>Execute</button></div>)}</div></div></section>;
 }
 
 function Analytics({ status, audit }: any) {
   return <section><h1><BarChart3 /> Logging & Analytics Dashboard</h1><section className="stats-grid"><Stat title="Total Logs" value={audit.length} /><Stat title="Errors" value={audit.filter((e: any) => String(e.event_type).includes('failed')).length} /><Stat title="Actions" value={status?.executions || 0} /><Stat title="Active Watchers" value={status?.active_watch_roots || 0} /></section><div className="panel"><h2>Log Entries</h2><table><thead><tr><th>Timestamp</th><th>Category</th><th>Message</th></tr></thead><tbody>{audit.map((event: any) => <tr key={event.id}><td>{new Date(event.created_at).toLocaleString()}</td><td>{event.entity_type}</td><td>{event.event_type}</td></tr>)}</tbody></table></div></section>;
 }
 
-function SettingsView({ baseUrl, setBaseUrl, token, setToken, folderPath, setFolderPath, destinationFolder, setDestinationFolder, saveLocalSettings, sourcePaths, providerSettings, providerModels, saveAiSettings, testAiProvider, refreshModels, connectionMessage }: any) {
+function SettingsView({ baseUrl, setBaseUrl, token, setToken, folderPath, setFolderPath, destinationFolder, setDestinationFolder, saveLocalSettings, sourcePaths, providerSettings, providerModels, saveAiSettings, testAiProvider, refreshModels, connectionMessage, connectionStatus, saveSettingsFeedback }: any) {
   const [draft, setDraft] = useState<ProviderSettings | null>(providerSettings);
   const [filter, setFilter] = useState('');
+  const [testing, setTesting] = useState(false);
   useEffect(() => setDraft(providerSettings), [providerSettings]);
   if (!draft) return <section><h1><Settings /> Advanced Settings</h1><div className="panel">Loading provider settings...</div></section>;
   function update(path: string, value: any) { const copy: any = JSON.parse(JSON.stringify(draft)); const keys = path.split('.'); let current = copy; keys.slice(0, -1).forEach((key) => { current = current[key]; }); current[keys[keys.length - 1]] = value; setDraft(copy); }
+  async function handleTest() { setTesting(true); await testAiProvider(draft.activeProvider); setTesting(false); }
   const active = draft.activeProvider;
   const activeBlock: any = (draft as any)[active];
   const models = providerModels?.[active] || [];
   const visibleProviders = providerCatalog.filter((provider) => provider.label.toLowerCase().includes(filter.toLowerCase()) || provider.id.toLowerCase().includes(filter.toLowerCase()));
-  return <section><div className="settings-header"><div><h1><Settings /> Advanced Settings</h1><p>Configure all LLM providers, model selectors, agent integrations, planning rules, security, and local API connection.</p></div><div className="button-row"><button className="outline" onClick={refreshModels}>Refresh Models</button><button className="outline" onClick={() => testAiProvider(active)}>Test Connection</button><button onClick={() => saveAiSettings(draft)}>Save AI Settings</button></div></div>{connectionMessage && <div className="status-strip ready">{connectionMessage}</div>}<div className="panel"><h2><Brain /> AI Provider Configuration</h2><div className="explorer-search"><input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter providers..." /><button className="outline" onClick={() => setFilter('')}>Clear</button></div><div className="provider-grid expanded">{visibleProviders.map((provider) => { const Icon = provider.icon; const disabled = !isLocalProvider(provider.id) && !draft.remoteProvidersEnabled; return <button key={provider.id} className={`provider-card-button ${active === provider.id ? 'selected' : ''}`} disabled={disabled} onClick={() => update('activeProvider', provider.id)}><Icon /><strong>{provider.label}</strong><small>{disabled ? 'Disabled by policy' : provider.description}</small></button>; })}</div><label className="setting-check"><input type="checkbox" checked={draft.remoteProvidersEnabled} onChange={(e) => update('remoteProvidersEnabled', e.target.checked)} /> Enable remote providers through server policy</label></div><div className="panel"><h2>{providerLabel(active)} Configuration</h2><div className="settings-grid"><label>Endpoint URL<input value={activeBlock?.endpoint || ''} onChange={(e) => update(`${active}.endpoint`, e.target.value)} /></label>{active === 'azureOpenAI' && <><label>Deployment<input value={activeBlock?.deployment || ''} onChange={(e) => update('azureOpenAI.deployment', e.target.value)} /></label><label>API Version<input value={activeBlock?.apiVersion || ''} onChange={(e) => update('azureOpenAI.apiVersion', e.target.value)} /></label></>}{active !== 'ollama' && <label>API Key / Credential<input type="password" value={activeBlock?.apiKey || ''} onChange={(e) => update(`${active}.apiKey`, e.target.value)} placeholder="Stored in backend settings" /></label>}<label>Model<select value={activeBlock?.model || ''} onChange={(e) => update(`${active}.model`, e.target.value)}>{models.map((model: any) => <option key={model.id} value={model.id}>{model.name}</option>)}</select></label><label>Temperature: {activeBlock?.temperature ?? 0.2}<input type="range" min="0" max="2" step="0.1" value={activeBlock?.temperature ?? 0.2} onChange={(e) => update(`${active}.temperature`, Number(e.target.value))} /></label><label>Max Tokens<input type="number" value={activeBlock?.maxTokens || 4096} onChange={(e) => update(`${active}.maxTokens`, Number(e.target.value))} /></label>{active === 'ollama' && <label>Timeout MS<input type="number" value={(draft as any).ollama.timeoutMs} onChange={(e) => update('ollama.timeoutMs', Number(e.target.value))} /></label>}</div></div><div className="panel"><h2>Agent Integrations</h2><p className="muted">Registered connectors for coding agents. Runtime execution waits for the local client-agent bridge.</p><div className="provider-grid expanded">{agentCatalog.map((agent) => { const current = draft.agentIntegrations?.[agent.id] || {}; return <article key={agent.id} className="provider-card-button agent-card"><strong>{agent.label}</strong><small>{agent.description}</small><label className="setting-check"><input type="checkbox" checked={Boolean(current.enabled)} onChange={(e) => update(`agentIntegrations.${agent.id}.enabled`, e.target.checked)} /> Enabled</label><input value={current.command || ''} onChange={(e) => update(`agentIntegrations.${agent.id}.command`, e.target.value)} placeholder="command" /></article>; })}</div></div><div className="panel"><h2>Planning Rules</h2><div className="settings-grid"><label>Planning Strategy<select value={draft.planning.strategy} onChange={(e) => update('planning.strategy', e.target.value)}><option value="content-first">Content-first</option><option value="filename-first">Filename-first</option><option value="hybrid">Hybrid</option></select></label><label>Confidence Threshold: {draft.planning.confidenceThreshold}<input type="range" min="0" max="1" step="0.05" value={draft.planning.confidenceThreshold} onChange={(e) => update('planning.confidenceThreshold', Number(e.target.value))} /></label><label className="setting-check"><input type="checkbox" checked={draft.planning.allowRename} onChange={(e) => update('planning.allowRename', e.target.checked)} /> Allow rename suggestions</label><label className="setting-check"><input type="checkbox" checked={draft.planning.allowMove} onChange={(e) => update('planning.allowMove', e.target.checked)} /> Allow move suggestions</label><label className="setting-check"><input type="checkbox" checked={draft.planning.allowTag} onChange={(e) => update('planning.allowTag', e.target.checked)} /> Allow tag suggestions</label><label className="setting-check"><input type="checkbox" checked={draft.planning.requireApproval} onChange={(e) => update('planning.requireApproval', e.target.checked)} /> Require approval before execution</label></div></div><div className="panel settings-grid"><label>API Endpoint URL<input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} /></label><label>API Token<input value={token} onChange={(e) => setToken(e.target.value)} type="password" /></label><label>Default Folder Path<input value={folderPath} onChange={(e) => setFolderPath(e.target.value)} /></label><label>Destination Folder / Planning Label<input value={destinationFolder} onChange={(e) => setDestinationFolder(e.target.value)} /></label><label>Backend Source Paths<input value={`${sourcePaths.length} source path(s)`} readOnly /></label><button onClick={saveLocalSettings}>Save Local UI Settings</button></div><div className="panel"><h2><Shield /> Security & Privacy Settings</h2><div className="security-row red">Remote providers require explicit enablement <span>{draft.remoteProvidersEnabled ? 'On' : 'Off'}</span></div><div className="security-row yellow">Require file action confirmation <span>{draft.planning.requireApproval ? 'On' : 'Off'}</span></div><div className="security-row blue">Audit Trail <span>On</span></div></div></section>;
+  const statusDot = connectionStatus === 'ok' ? '🟢' : connectionStatus === 'error' ? '🔴' : '⚪';
+  return <section><div className="settings-header"><div><h1><Settings /> Advanced Settings</h1><p>Configure all LLM providers, model selectors, agent integrations, planning rules, security, and local API connection.</p></div><div className="button-row"><button className="outline" onClick={refreshModels}>Refresh Models</button><button className="outline" onClick={handleTest} disabled={testing}>{testing ? 'Testing...' : `${statusDot} Test Connection`}</button><button onClick={() => saveAiSettings(draft)}>Save AI Settings</button></div></div>{connectionMessage && <div className={`status-strip ${connectionStatus === 'ok' ? 'ready' : connectionStatus === 'error' ? 'error' : ''}`}>{statusDot} {connectionMessage}</div>}{saveSettingsFeedback && <div className="status-strip ready">✓ {saveSettingsFeedback}</div>}<div className="panel"><h2><Brain /> AI Provider Configuration</h2><div className="explorer-search"><input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Filter providers..." /><button className="outline" onClick={() => setFilter('')}>Clear</button></div><div className="provider-grid expanded">{visibleProviders.map((provider) => { const Icon = provider.icon; const disabled = !isLocalProvider(provider.id) && !draft.remoteProvidersEnabled; return <button key={provider.id} className={`provider-card-button ${active === provider.id ? 'selected' : ''}`} disabled={disabled} onClick={() => update('activeProvider', provider.id)}><Icon /><strong>{provider.label}</strong><small>{disabled ? 'Disabled by policy' : provider.description}</small></button>; })}</div><label className="setting-check"><input type="checkbox" checked={draft.remoteProvidersEnabled} onChange={(e) => update('remoteProvidersEnabled', e.target.checked)} /> Enable remote providers through server policy</label></div><div className="panel"><h2>{providerLabel(active)} Configuration</h2><div className="settings-grid"><label>Endpoint URL<input value={activeBlock?.endpoint || ''} onChange={(e) => update(`${active}.endpoint`, e.target.value)} /></label>{active === 'azureOpenAI' && <><label>Deployment<input value={activeBlock?.deployment || ''} onChange={(e) => update('azureOpenAI.deployment', e.target.value)} /></label><label>API Version<input value={activeBlock?.apiVersion || ''} onChange={(e) => update('azureOpenAI.apiVersion', e.target.value)} /></label></>}{active !== 'ollama' && <label>API Key / Credential<input type="password" value={activeBlock?.apiKey || ''} onChange={(e) => update(`${active}.apiKey`, e.target.value)} placeholder="Stored in backend settings" /></label>}<label>Model{models.length > 0 ? ` (${models.length} available)` : ''}<select value={activeBlock?.model || ''} onChange={(e) => update(`${active}.model`, e.target.value)}>{models.length === 0 && <option value={activeBlock?.model || ''}>{activeBlock?.model || 'No models — click Test Connection'}</option>}{models.map((model: any) => <option key={model.id} value={model.id}>{model.name}</option>)}</select></label><label>Temperature: {activeBlock?.temperature ?? 0.2}<input type="range" min="0" max="2" step="0.1" value={activeBlock?.temperature ?? 0.2} onChange={(e) => update(`${active}.temperature`, Number(e.target.value))} /></label><label>Max Tokens<input type="number" value={activeBlock?.maxTokens || 4096} onChange={(e) => update(`${active}.maxTokens`, Number(e.target.value))} /></label>{active === 'ollama' && <label>Timeout MS<input type="number" value={(draft as any).ollama.timeoutMs} onChange={(e) => update('ollama.timeoutMs', Number(e.target.value))} /></label>}</div></div><div className="panel"><h2>Agent Integrations</h2><p className="muted">Registered connectors for coding agents. Runtime execution waits for the local client-agent bridge.</p><div className="provider-grid expanded">{agentCatalog.map((agent) => { const current = draft.agentIntegrations?.[agent.id] || {}; return <article key={agent.id} className="provider-card-button agent-card"><strong>{agent.label}</strong><small>{agent.description}</small><label className="setting-check"><input type="checkbox" checked={Boolean(current.enabled)} onChange={(e) => update(`agentIntegrations.${agent.id}.enabled`, e.target.checked)} /> Enabled</label><input value={current.command || ''} onChange={(e) => update(`agentIntegrations.${agent.id}.command`, e.target.value)} placeholder="command" /></article>; })}</div></div><div className="panel"><h2>Planning Rules</h2><div className="settings-grid"><label>Planning Strategy<select value={draft.planning.strategy} onChange={(e) => update('planning.strategy', e.target.value)}><option value="content-first">Content-first</option><option value="filename-first">Filename-first</option><option value="hybrid">Hybrid</option></select></label><label>Confidence Threshold: {draft.planning.confidenceThreshold}<input type="range" min="0" max="1" step="0.05" value={draft.planning.confidenceThreshold} onChange={(e) => update('planning.confidenceThreshold', Number(e.target.value))} /></label><label className="setting-check"><input type="checkbox" checked={draft.planning.allowRename} onChange={(e) => update('planning.allowRename', e.target.checked)} /> Allow rename suggestions</label><label className="setting-check"><input type="checkbox" checked={draft.planning.allowMove} onChange={(e) => update('planning.allowMove', e.target.checked)} /> Allow move suggestions</label><label className="setting-check"><input type="checkbox" checked={draft.planning.allowTag} onChange={(e) => update('planning.allowTag', e.target.checked)} /> Allow tag suggestions</label><label className="setting-check"><input type="checkbox" checked={draft.planning.requireApproval} onChange={(e) => update('planning.requireApproval', e.target.checked)} /> Require approval before execution</label></div></div><div className="panel settings-grid"><label>API Endpoint URL<input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} /></label><label>API Token<input value={token} onChange={(e) => setToken(e.target.value)} type="password" /></label><label>Default Folder Path<input value={folderPath} onChange={(e) => setFolderPath(e.target.value)} /></label><label>Destination Folder / Planning Label<input value={destinationFolder} onChange={(e) => setDestinationFolder(e.target.value)} /></label><label>Backend Source Paths<input value={`${sourcePaths.length} source path(s)`} readOnly /></label><button onClick={saveLocalSettings}>Save Local UI Settings</button></div><div className="panel"><h2><Shield /> Security & Privacy Settings</h2><div className="security-row red">Remote providers require explicit enablement <span>{draft.remoteProvidersEnabled ? 'On' : 'Off'}</span></div><div className="security-row yellow">Require file action confirmation <span>{draft.planning.requireApproval ? 'On' : 'Off'}</span></div><div className="security-row blue">Audit Trail <span>On</span></div></div></section>;
 }
 
 function Stat({ title, value }: { title: string; value: any }) { return <div className="stat"><span>{title}</span><strong>{value}</strong></div>; }
+
+function AskAI({ options, chatMessages, setChatMessages }: { options: ApiOptions; chatMessages: {role:'user'|'assistant'|'error'; text:string; sources?:any[]}[]; setChatMessages: React.Dispatch<React.SetStateAction<{role:'user'|'assistant'|'error'; text:string; sources?:any[]}[]>> }) {
+  const [input, setInput] = useState('');
+  const [sending, setSending] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages]);
+
+  async function send() {
+    const question = input.trim();
+    if (!question || sending) return;
+    setInput('');
+    setSending(true);
+    setChatMessages((prev) => [...prev, { role: 'user', text: question }]);
+    try {
+      const res = await fetch(`${options.baseUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${options.token}` },
+        body: JSON.stringify({ question, limit: 5 }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+      setChatMessages((prev) => [...prev, { role: 'assistant', text: data.answer || '(no answer)', sources: data.sources }]);
+    } catch (err: any) {
+      setChatMessages((prev) => [...prev, { role: 'error', text: err.message || 'Request failed' }]);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  }
+
+  return (
+    <section className="askai-view">
+      <div className="askai-header">
+        <h1><MessageCircle /> Ask AI</h1>
+        <p>Chat with your knowledge base. The AI answers using your indexed files and their content, metadata, and tags.</p>
+        {chatMessages.length > 0 && <button className="outline" onClick={() => setChatMessages([])}>Clear chat</button>}
+      </div>
+      <div className="chat-messages">
+        {chatMessages.length === 0 && (
+          <div className="chat-empty">
+            <Brain size={48} />
+            <h2>Ask anything about your files</h2>
+            <p>Your AI assistant searches through indexed file content, filenames, metadata, and categories to answer your questions.</p>
+            <div className="chat-suggestions">
+              {['What documents do I have about invoices?', 'Summarize the most recent files I added', 'Which files are tagged as contracts?', 'What file types do I have the most of?'].map((s) => (
+                <button key={s} className="suggestion-chip" onClick={() => { setInput(s); }}>{s}</button>
+              ))}
+            </div>
+          </div>
+        )}
+        {chatMessages.map((msg, i) => (
+          <div key={i} className={`chat-bubble ${msg.role}`}>
+            <div className="bubble-content">{msg.text}</div>
+            {msg.sources && msg.sources.length > 0 && (
+              <div className="chat-sources">
+                <strong>Sources from knowledge base:</strong>
+                {msg.sources.map((src: any, j: number) => (
+                  <div key={j} className="chat-source-item">
+                    <div className="source-filename">{src.filename}</div>
+                    {src.absolute_path && <div className="source-path">{src.absolute_path}</div>}
+                    {src.category && <span className="source-tag">{src.category}</span>}
+                    {src.file_type && <span className="source-tag">{src.file_type}</span>}
+                    {src.snippet && <div className="source-snippet">{src.snippet}</div>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+        {sending && <div className="chat-bubble assistant thinking"><div className="bubble-content">Searching knowledge base<span className="dots">...</span></div></div>}
+        <div ref={bottomRef} />
+      </div>
+      <div className="chat-input-row">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKey}
+          placeholder="Ask about your files… (Enter to send, Shift+Enter for new line)"
+          rows={2}
+          disabled={sending}
+        />
+        <button onClick={send} disabled={sending || !input.trim()} className="purple">{sending ? '…' : 'Send'}</button>
+      </div>
+    </section>
+  );
+}

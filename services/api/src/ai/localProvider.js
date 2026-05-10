@@ -1,18 +1,19 @@
 export function buildPromptContext({ question, sources }) {
   const context = sources.map((source, index) => {
-    const reference = `${index + 1}. ${source.filename} (${source.absolute_path})`;
-    const snippet = source.snippet ? `\nSnippet: ${source.snippet}` : '';
-    return `${reference}${snippet}`;
+    const parts = [
+      `[${index + 1}] ${source.filename}`,
+      `Path: ${source.absolute_path}`,
+    ];
+    if (source.category) parts.push(`Category: ${source.category}`);
+    if (source.file_type) parts.push(`Type: ${source.file_type}`);
+    if (source.snippet) parts.push(`Content: ${source.snippet}`);
+    return parts.join('\n');
   }).join('\n\n');
 
   return [
-    'Answer the user question using only the provided local file sources.',
-    'Always cite source filenames and paths.',
-    '',
     `Question: ${question}`,
     '',
-    'Sources:',
-    context || 'No sources found.',
+    context ? `Retrieved file context:\n${context}` : 'No file context retrieved.',
   ].join('\n');
 }
 

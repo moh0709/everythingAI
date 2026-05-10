@@ -28,7 +28,7 @@ async function pathExists(filePath) {
   }
 }
 
-async function resolveTargetPath(suggestion) {
+async function resolveTargetPath(suggestion, destinationFolder = null) {
   if (suggestion.action_type === 'rename') {
     if (hasPathSeparators(suggestion.suggested_value)) {
       return {
@@ -39,6 +39,13 @@ async function resolveTargetPath(suggestion) {
 
     const sourceDir = path.dirname(suggestion.absolute_path);
     const targetPath = path.resolve(sourceDir, suggestion.suggested_value);
+
+    if (path.resolve(suggestion.absolute_path) === targetPath) {
+      return {
+        targetPath,
+        blockedReason: 'Rename target is identical to the current filename.',
+      };
+    }
 
     if (!isInsideDirectory(targetPath, sourceDir)) {
       return {
@@ -65,14 +72,16 @@ async function resolveTargetPath(suggestion) {
       };
     }
 
-    const sourceDir = path.dirname(suggestion.absolute_path);
-    const targetDir = path.resolve(sourceDir, suggestion.suggested_value);
+    const baseDir = (destinationFolder && path.isAbsolute(destinationFolder))
+      ? destinationFolder
+      : path.dirname(suggestion.absolute_path);
+    const targetDir = path.resolve(baseDir, suggestion.suggested_value);
     const targetPath = path.resolve(targetDir, suggestion.filename);
 
-    if (!isInsideDirectory(targetPath, sourceDir)) {
+    if (path.resolve(suggestion.absolute_path) === targetPath) {
       return {
         targetPath,
-        blockedReason: 'Move target escapes the source directory.',
+        blockedReason: 'File is already in the target folder.',
       };
     }
 
@@ -89,14 +98,14 @@ async function resolveTargetPath(suggestion) {
   return { targetPath: null, blockedReason: null };
 }
 
-export async function createActionPreview(db, { suggestionId }) {
+export async function createActionPreview(db, { suggestionId, destinationFolder = null }) {
   const suggestion = getOrganizationSuggestionById(db, suggestionId);
 
   if (!suggestion) {
     throw new Error(`Suggestion not found: ${suggestionId}`);
   }
 
-  const { targetPath, blockedReason } = await resolveTargetPath(suggestion);
+  const { targetPath, blockedReason } = await resolveTargetPath(suggestion, destinationFolder);
   const preview = {
     id: createPreviewId(suggestion.id),
     suggestion_id: suggestion.id,

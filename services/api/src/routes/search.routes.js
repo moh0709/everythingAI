@@ -83,7 +83,14 @@ export function createSearchRouter() {
       });
       db.close();
 
-      res.json(result);
+      // Only return sources that are actually referenced in the answer (by filename)
+      const answer = result.answer || '';
+      const allSources = result.sources || [];
+      const referencedSources = allSources.filter((s) =>
+        s.filename && answer.toLowerCase().includes(s.filename.toLowerCase())
+      );
+
+      res.json({ ...result, sources: referencedSources });
     } catch (error) {
       next(error);
     }

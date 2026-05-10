@@ -90,6 +90,20 @@ export function mergeAiProviderSettings(settings = {}) {
   for (const provider of PROVIDERS) {
     merged[provider] = { ...defaults[provider], ...(settings[provider] || {}) };
   }
+  // Ensure numeric fields are not stored as strings from JSON/UI inputs
+  if (merged.ollama) {
+    merged.ollama.timeoutMs = Number(merged.ollama.timeoutMs) || 120000;
+    merged.ollama.maxTokens = Number(merged.ollama.maxTokens) || 192;
+    merged.ollama.temperature = Number(merged.ollama.temperature) || 0.2;
+  }
+  for (const provider of PROVIDERS) {
+    if (merged[provider] && merged[provider].maxTokens !== undefined) {
+      merged[provider].maxTokens = Number(merged[provider].maxTokens) || 4096;
+    }
+    if (merged[provider] && merged[provider].temperature !== undefined) {
+      merged[provider].temperature = Number(merged[provider].temperature);
+    }
+  }
   merged.planning = { ...defaults.planning, ...(settings.planning || {}) };
   merged.agentIntegrations = Object.fromEntries(Object.entries(defaults.agentIntegrations).map(([key, value]) => [
     key,

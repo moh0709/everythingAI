@@ -45,8 +45,10 @@ export function createActionsRouter() {
       const suggestionId = requireBodyString(req, res, 'suggestionId');
       if (!suggestionId) return;
 
+      const destinationFolder = typeof req.body?.destinationFolder === 'string' ? req.body.destinationFolder.trim() : null;
+
       const db = openDatabase();
-      const preview = await createActionPreview(db, { suggestionId });
+      const preview = await createActionPreview(db, { suggestionId, destinationFolder: destinationFolder || null });
       db.close();
 
       res.status(201).json({ preview });
@@ -61,10 +63,19 @@ export function createActionsRouter() {
       if (!previewId) return;
 
       const db = openDatabase();
-      const execution = await executeActionPreview(db, {
-        previewId,
-        approve: req.body?.approve === true,
-      });
+      let execution;
+      try {
+        execution = await executeActionPreview(db, {
+          previewId,
+          approve: req.body?.approve === true,
+        });
+      } catch (execError) {
+        db.close();
+        if (execError.skippable) {
+          return res.status(200).json({ skipped: true, reason: execError.skipReason, previewId });
+        }
+        throw execError;
+      }
       db.close();
 
       res.status(201).json({ execution });

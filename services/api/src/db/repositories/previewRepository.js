@@ -138,3 +138,17 @@ export function markActionPreviewStale(db, previewId) {
     WHERE id = @previewId
   `).run({ previewId });
 }
+
+export function invalidateSiblingPreviewsByFileId(db, { fileId, excludePreviewId }) {
+  db.prepare(`
+    UPDATE action_previews
+    SET
+      can_execute = 0,
+      blocked_reason = 'source_relocated',
+      preview_status = 'blocked'
+    WHERE file_id = @fileId
+      AND id != @excludePreviewId
+      AND can_execute = 1
+      AND action_type IN ('move', 'rename')
+  `).run({ fileId, excludePreviewId });
+}

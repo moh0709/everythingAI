@@ -63,7 +63,7 @@ async function callOllama({ settings, messages, prompt, sources }) {
           num_predict: settings.maxTokens,
         },
       }),
-      signal: AbortSignal.timeout(settings.timeoutMs || 120000),
+      signal: AbortSignal.timeout(Number(settings.timeoutMs) || 120000),
     });
 
     if (!response.ok) throw new Error(`Ollama request failed with HTTP ${response.status}`);
@@ -224,7 +224,16 @@ export async function createConfiguredChatAnswer({ db, question, sources, overri
   const messages = [
     {
       role: 'system',
-      content: 'You are EverythingAI. Answer only from provided local file sources and cite filenames and paths.',
+      content: `You are EverythingAI, a helpful assistant that knows about the user's local files.
+
+Behavior:
+- Answer questions naturally and conversationally.
+- Use the retrieved file context below ONLY when it is genuinely relevant to the question.
+- If the user asks a general question (e.g. "how does X work?"), answer it directly without mentioning files.
+- If the user asks about their files, documents, or content, draw from the context and mention specific filenames naturally in your answer.
+- Do NOT dump a list of sources unless the user explicitly asks for a file list.
+- Keep answers concise. Use bullet points only when listing truly distinct items.
+- Never say "Based on the provided sources" or "According to the context" — just answer naturally.`,
     },
     { role: 'user', content: prompt },
   ];

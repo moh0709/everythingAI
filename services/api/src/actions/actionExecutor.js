@@ -12,6 +12,7 @@ import {
   upsertFileLabel,
 } from '../db/client.js';
 import { disableActionPreviewExecution } from '../previews/actionPreviewService.js';
+import { invalidateSiblingPreviewsByFileId } from '../db/repositories/previewRepository.js';
 import {
   invalidateActionPreview,
   validateActionPreview,
@@ -158,15 +159,22 @@ function assertSafeFilesystemPreview(preview) {
 
   const sourcePath = path.resolve(preview.source_path);
   const targetPath = path.resolve(preview.target_path);
-  const sourceDir = path.dirname(sourcePath);
-  const relativeTarget = path.relative(sourceDir, targetPath);
-
-  if (!relativeTarget || relativeTarget.startsWith('..') || path.isAbsolute(relativeTarget)) {
-    throw new Error('Target path escapes the allowed source directory boundary.');
-  }
 
   if (sourcePath === targetPath) {
-    throw new Error('Source and target paths are identical.');
+    const err = new Error('Source and target paths are identical — file is already at the destination.');
+    err.skippable = true;
+    err.skipReason = 'already_at_destination';
+    throw err;
+  }
+
+  // For renames (same directory), ensure target stays in the same folder.
+  // For moves, the target can be anywhere — the destination folder is user-controlled.
+  if (preview.action_type === 'rename') {
+    const sourceDir = path.dirname(sourcePath);
+    const targetDir = path.dirname(targetPath);
+    if (sourceDir.toLowerCase() !== targetDir.toLowerCase()) {
+      throw new Error('Rename target must be in the same directory as the source file.');
+    }
   }
 }
 
@@ -290,7 +298,10 @@ export async function executeActionPreview(db, {
   const validation = validateActionPreview(preview);
 
   if (!validation.valid) {
-    throw new Error(`Action preview failed validation: ${validation.reason}`);
+    const err = new Error(`Action preview failed validation: ${validation.reason}`);
+    err.skippable = true;
+    err.skipReason = validation.reason;
+    throw err;
   }
 
   const executionId = createId('execution');
@@ -325,6 +336,7 @@ export async function executeActionPreview(db, {
       await assertFilesystemExecutionPreconditions(db, preview);
       recoverySnapshot = createPreMutationSnapshot(db, { preview, executionId });
       await executeFilesystemAction(db, preview);
+      invalidateSiblingPreviewsByFileId(db, { fileId: preview.file_id, excludePreviewId: preview.id });
     } else if (preview.action_type === 'tag') {
       upsertFileLabel(db, { fileId: preview.file_id, tag: preview.suggested_value });
     } else if (preview.action_type === 'category') {
