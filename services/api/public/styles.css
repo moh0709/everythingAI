@@ -397,9 +397,45 @@ pre {
   font-weight: 700;
 }
 
+.batch-detail {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.batch-detail-card,
 .batch-queue-card {
   border-color: #c7d2fe;
   background: #ffffff;
+}
+
+.batch-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.batch-metrics span,
+.batch-execution-row {
+  border: 1px solid #e0e7ff;
+  border-radius: 8px;
+  padding: 0.55rem;
+  background: #f8fafc;
+  color: #374151;
+}
+
+.batch-execution-row {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.6fr) minmax(100px, 0.5fr) minmax(180px, 1fr);
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.45rem;
+}
+
+.batch-execution-row small {
+  color: var(--muted);
+  word-break: break-all;
 }
 
 .section-heading {
@@ -588,7 +624,8 @@ dialog::backdrop {
   }
 
   .folder-grid,
-  .metrics {
+  .metrics,
+  .batch-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -616,7 +653,9 @@ dialog::backdrop {
   .search-row,
   .global-search,
   .settings-grid,
-  .metrics {
+  .metrics,
+  .batch-metrics,
+  .batch-execution-row {
     grid-template-columns: 1fr;
   }
 
