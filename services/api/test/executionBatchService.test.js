@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {
+  listActionExecutions,
   listAuditLog,
   listIndexedFiles,
   openDatabase,
@@ -18,15 +19,16 @@ import {
   EXECUTION_BATCH_STATUSES,
   getExecutionBatchDetail,
   listExecutionBatchSummaries,
+  runExecutionBatch,
 } from '../src/executionBatches/executionBatchService.js';
 
 function tempDbPath() {
   return path.join(os.tmpdir(), `everythingai-execution-batch-service-test-${Date.now()}-${Math.random()}.sqlite`);
 }
 
-async function createFixture() {
+async function createFixture(filename = 'Batch Service Notes.md') {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'everythingai-execution-batch-service-'));
-  await fs.writeFile(path.join(root, 'Batch Service Notes.md'), '# Batch Service\nSupplier contract batch service test');
+  await fs.writeFile(path.join(root, filename), '# Batch Service\nSupplier contract batch service test');
   return root;
 }
 
@@ -42,8 +44,8 @@ function fileByName(db, filename) {
   return listIndexedFiles(db, { limit: 100 }).find((file) => file.filename === filename);
 }
 
-async function createPreviews(db, { conflictMove = false, root } = {}) {
-  const file = fileByName(db, 'Batch Service Notes.md');
+async function createPreviews(db, { conflictMove = false, root, filename = 'Batch Service Notes.md' } = {}) {
+  const file = fileByName(db, filename);
   const suggestions = generatePreviewSuggestions(db, { fileId: file.id });
 
   const tagSuggestion = suggestions.find((item) => item.action_type === 'tag');
@@ -242,6 +244,85 @@ test('rejects approving a batch that is no longer draft', async () => {
     () => approveExecutionBatch(db, { batchId: batch.id, approve: true }),
     /cannot be approved from status: approved/,
   );
+
+  db.close();
+});
+
+test('runs an approved execution batch through the safe executor', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview, movePreview, file } = await createPreviews(db, { root });
+  const batch = createExecutionBatch(db, { previewIds: [tagPreview.id, movePreview.id] });
+  approveExecutionBatch(db, { batchId: batch.id, approve: true });
+  const completed = await runExecutionBatch(db, { batchId: batch.id, approve: true });
+  const detail = getExecutionBatchDetail(db, batch.id);
+
+  assert.equal(completed.status, EXECUTION_BATCH_STATUSES.COMPLETED);
+  assert.equal(completed.summary.executed, 2);
+  assert.equal(completed.summary.failed, 0);
+  assert.equal(completed.summary.execution_ids.length, 2);
+  assert.equal(typeof completed.started_at, 'string');
+  assert.equal(typeof completed.completed_at, 'string');
+  assert.equal(detail.executions.length, 2);
+  assert.equal(detail.executions.every((execution) => execution.execution_batch_id === batch.id), true);
+  assert.equal(detail.executions.every((execution) => execution.status === 'executed'), true);
+  assert.notEqual(file.absolute_path, detail.executions.find((execution) => execution.action_type === 'move').target_path);
+
+  const eventTypes = batchAuditEvents(db, batch.id).map((event) => event.event_type);
+  assert.equal(eventTypes.includes('execution_batch.started'), true);
+  assert.equal(eventTypes.includes('execution_batch.completed'), true);
+
+  db.close();
+});
+
+test('rejects running batch without explicit approval or from wrong status', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview } = await createPreviews(db, { root });
+  const batch = createExecutionBatch(db, { previewIds: [tagPreview.id] });
+
+  await assert.rejects(
+    () => runExecutionBatch(db, { batchId: batch.id, approve: false }),
+    /Explicit approval is required/,
+  );
+  await assert.rejects(
+    () => runExecutionBatch(db, { batchId: batch.id, approve: true }),
+    /cannot run from status: draft/,
+  );
+  await assert.rejects(
+    () => runExecutionBatch(db, { batchId: 'missing-batch', approve: true }),
+    /Execution batch not found/,
+  );
+
+  db.close();
+});
+
+test('stops execution batch on first failure and marks completed_with_errors after partial success', async () => {
+  const root = await createFixture('Batch Service Notes.md');
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview, movePreview, file } = await createPreviews(db, { root });
+  const batch = createExecutionBatch(db, { previewIds: [tagPreview.id, movePreview.id] });
+  approveExecutionBatch(db, { batchId: batch.id, approve: true });
+  await fs.unlink(file.absolute_path);
+
+  const finalBatch = await runExecutionBatch(db, { batchId: batch.id, approve: true });
+  const detail = getExecutionBatchDetail(db, batch.id);
+
+  assert.equal(finalBatch.status, EXECUTION_BATCH_STATUSES.COMPLETED_WITH_ERRORS);
+  assert.equal(finalBatch.summary.executed, 1);
+  assert.equal(finalBatch.summary.failed, 1);
+  assert.equal(finalBatch.summary.execution_ids.length, 2);
+  assert.equal(finalBatch.summary.failed_preview_id, movePreview.id);
+  assert.match(finalBatch.summary.error_message, /Source file no longer exists/);
+  assert.equal(detail.executions.length, 2);
+  assert.equal(detail.executions.some((execution) => execution.status === 'failed'), true);
+  assert.equal(batchAuditEvents(db, batch.id).some((event) => event.event_type === 'execution_batch.completed_with_errors'), true);
 
   db.close();
 });
