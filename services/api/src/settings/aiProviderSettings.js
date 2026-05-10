@@ -24,7 +24,7 @@ const DEFAULT_SETTINGS = {
   activeProvider: 'ollama',
   ollama: {
     endpoint: process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434',
-    model: process.env.OLLAMA_MODEL || 'llama2',
+    model: process.env.OLLAMA_MODEL || '',
     temperature: 0.2,
     maxTokens: Number.parseInt(process.env.OLLAMA_NUM_PREDICT || '192', 10),
     timeoutMs: Number.parseInt(process.env.OLLAMA_TIMEOUT_MS || '120000', 10),
