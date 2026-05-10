@@ -14,6 +14,7 @@ import { scanFolder } from '../src/indexer/fileScanner.js';
 import { searchFiles } from '../src/search/searchService.js';
 import { annotateTrashState, filterActiveFiles } from '../src/recovery/trashVisibility.js';
 import {
+  blockPermanentPurge,
   listTrashRecords,
   moveFileToTrash,
   restoreTrashRecord,
@@ -152,6 +153,38 @@ test('prevents restoring when indexed file path changed after trashing', async (
   const stillTrashed = listTrashRecords(db, { status: 'trashed', limit: 10 });
   assert.equal(stillTrashed.length, 1);
   assert.equal(stillTrashed[0].id, trashRecord.id);
+
+  db.close();
+});
+
+test('blocks permanent purge in the local MVP and audits the denial', async () => {
+  const root = await createRecoveryFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const file = fileByName(db, 'Recovery Notes.txt');
+  const trashRecord = moveFileToTrash(db, { fileId: file.id });
+
+  assert.throws(
+    () => blockPermanentPurge(db, { trashId: trashRecord.id, requestedBy: 'test-suite' }),
+    (error) => (
+      error.statusCode === 403
+      && error.code === 'purge_disabled_in_mvp'
+      && error.policy === 'NO_PERMANENT_PURGE_IN_LOCAL_MVP'
+      && error.trashId === trashRecord.id
+    ),
+  );
+
+  const trashRecords = listTrashRecords(db, { status: 'trashed', limit: 10 });
+  const auditEvents = listAuditLog(db, { entityType: 'trash_record', entityId: trashRecord.id });
+
+  assert.equal(trashRecords.length, 1);
+  assert.equal(trashRecords[0].status, 'trashed');
+  assert.equal(auditEvents.some((event) => event.event_type === 'file.purge_blocked'), true);
+  assert.equal(
+    auditEvents.find((event) => event.event_type === 'file.purge_blocked').payload.policy,
+    'NO_PERMANENT_PURGE_IN_LOCAL_MVP',
+  );
 
   db.close();
 });
