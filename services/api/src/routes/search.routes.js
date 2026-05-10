@@ -1,17 +1,11 @@
 import { Router } from 'express';
-import {
-  openDatabase,
-  listActionExecutions,
-  listFileInsights,
-  listFileLabels,
-  listOrganizationSuggestions,
-} from '../db/client.js';
+import { openDatabase } from '../db/client.js';
 import { searchFiles } from '../search/searchService.js';
 import { semanticSearchFiles } from '../search/semanticSearch.js';
+import { unifiedSearch } from '../search/unifiedSearchService.js';
 import { generateEmbeddings } from '../embeddings/embeddingService.js';
 import { answerFromLocalFiles } from '../ai/chatPipeline.js';
 import { requireBodyString, requireQueryString, parseLimit } from '../utils/request.js';
-import { filterActiveFileLinkedRows } from '../recovery/trashVisibility.js';
 
 function includeTrashed(queryValue) {
   return queryValue?.toString().toLowerCase() === 'true';
@@ -54,68 +48,15 @@ export function createSearchRouter() {
     const query = requireQueryString(req, res, 'q');
     if (!query) return;
 
-    const limit = parseLimit(req.query.limit, 20);
-    const normalized = query.toLowerCase();
-    const includeTrash = includeTrashed(req.query.includeTrashed);
-    const includesQuery = (value) => (value || '').toString().toLowerCase().includes(normalized);
     const db = openDatabase();
-    const files = searchFiles(db, { query, limit, includeTrashed: includeTrash });
-    const semantic = semanticSearchFiles(db, { query, limit, includeTrashed: includeTrash });
-    const insights = filterActiveFileLinkedRows(db, listFileInsights(db, { limit: 500 }), {
-      includeTrashed: includeTrash,
-    }).filter((insight) => (
-      includesQuery(insight.filename)
-      || includesQuery(insight.absolute_path)
-      || includesQuery(insight.summary)
-      || includesQuery(insight.classification)
-      || includesQuery(insight.entities_json)
-    )).slice(0, limit);
-    const labels = filterActiveFileLinkedRows(db, listFileLabels(db, { limit: 500 }), {
-      includeTrashed: includeTrash,
-    }).filter((label) => (
-      includesQuery(label.filename)
-      || includesQuery(label.absolute_path)
-      || includesQuery(label.category)
-      || label.tags.some((tag) => includesQuery(tag))
-    )).slice(0, limit);
-    const suggestions = filterActiveFileLinkedRows(db, listOrganizationSuggestions(db, { limit: 500 }), {
-      includeTrashed: includeTrash,
-    }).filter((suggestion) => (
-      includesQuery(suggestion.filename)
-      || includesQuery(suggestion.absolute_path)
-      || includesQuery(suggestion.action_type)
-      || includesQuery(suggestion.suggested_value)
-      || includesQuery(suggestion.reason)
-    )).slice(0, limit);
-    const executions = filterActiveFileLinkedRows(db, listActionExecutions(db, { limit: 500 }), {
-      includeTrashed: includeTrash,
-    }).filter((execution) => (
-      includesQuery(execution.filename)
-      || includesQuery(execution.absolute_path)
-      || includesQuery(execution.action_type)
-      || includesQuery(execution.status)
-      || includesQuery(execution.source_path)
-      || includesQuery(execution.target_path)
-    )).slice(0, limit);
+    const result = unifiedSearch(db, {
+      query,
+      limit: parseLimit(req.query.limit, 20),
+      includeTrashed: includeTrashed(req.query.includeTrashed),
+    });
     db.close();
 
-    res.json({
-      query,
-      files,
-      semantic,
-      insights,
-      labels,
-      suggestions,
-      executions,
-      totals: {
-        files: files.length,
-        semantic: semantic.length,
-        insights: insights.length,
-        labels: labels.length,
-        suggestions: suggestions.length,
-        executions: executions.length,
-      },
-    });
+    res.json(result);
   });
 
   router.post('/embeddings', (req, res) => {
