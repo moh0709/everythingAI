@@ -1,146 +1,95 @@
-import express from 'express';
+import { Router } from 'express';
+import { openDatabase } from '../db/client.js';
 import {
   approveExecutionBatch,
-  attachExecutionToBatch,
   createExecutionBatch,
-  getExecutionBatchDetails,
+  getExecutionBatchDetail,
   listExecutionBatchSummaries,
-} from '../services/executionBatchService.js';
-import {
-  executeExecutionBatch,
-  rollbackExecutionBatch,
-} from '../services/executionBatchRunnerService.js';
-import {
-  verifyExecutionBatchById,
-} from '../services/executionVerificationService.js';
-import {
-  getExecutionBatchMetricsById,
-} from '../services/executionMetricsService.js';
-import {
-  evaluateExecutionBatchHealthById,
-} from '../services/executionHealthService.js';
+  runExecutionBatch,
+} from '../executionBatches/executionBatchService.js';
+import { parseLimit } from '../utils/request.js';
 
-const router = express.Router();
+export function createExecutionBatchesRouter() {
+  const router = Router();
 
-router.get('/', (req, res, next) => {
-  try {
-    const batches = listExecutionBatchSummaries(req.db, {
-      status: req.query?.status,
-      planningSessionId: req.query?.planningSessionId,
-      limit: req.query?.limit ? Number(req.query.limit) : undefined,
-    });
-
-    res.json({ batches });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get('/:batchId', (req, res, next) => {
-  try {
-    const batch = getExecutionBatchDetails(req.db, req.params.batchId);
-
-    if (!batch) {
-      return res.status(404).json({
-        error: 'Execution batch not found.',
+  router.post('/execution-batches', (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const batch = createExecutionBatch(db, {
+        previewIds: req.body?.previewIds,
+        planningSessionId: req.body?.planningSessionId || null,
       });
+      db.close();
+
+      res.status(201).json({ batch });
+    } catch (error) {
+      next(error);
     }
+  });
 
-    return res.json({ batch });
-  } catch (error) {
-    return next(error);
-  }
-});
+  router.get('/execution-batches', (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const batches = listExecutionBatchSummaries(db, {
+        status: req.query.status?.toString(),
+        planningSessionId: req.query.planningSessionId?.toString(),
+        limit: parseLimit(req.query.limit, 100),
+      });
+      db.close();
 
-router.get('/:batchId/verify', (req, res, next) => {
-  try {
-    const verification = verifyExecutionBatchById(req.db, req.params.batchId);
+      res.json({ batches });
+    } catch (error) {
+      next(error);
+    }
+  });
 
-    res.json({ verification });
-  } catch (error) {
-    next(error);
-  }
-});
+  router.get('/execution-batches/:batchId', (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const batch = getExecutionBatchDetail(db, req.params.batchId);
+      db.close();
 
-router.get('/:batchId/metrics', (req, res, next) => {
-  try {
-    const metrics = getExecutionBatchMetricsById(req.db, req.params.batchId);
+      if (!batch) {
+        return res.status(404).json({ error: 'Execution batch not found.' });
+      }
 
-    res.json({ metrics });
-  } catch (error) {
-    next(error);
-  }
-});
+      return res.json({ batch });
+    } catch (error) {
+      return next(error);
+    }
+  });
 
-router.get('/:batchId/health', (req, res, next) => {
-  try {
-    const health = evaluateExecutionBatchHealthById(req.db, req.params.batchId);
+  router.post('/execution-batches/:batchId/approve', (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const batch = approveExecutionBatch(db, {
+        batchId: req.params.batchId,
+        approve: req.body?.approve === true,
+      });
+      db.close();
 
-    res.json({ health });
-  } catch (error) {
-    next(error);
-  }
-});
+      res.json({ batch });
+    } catch (error) {
+      next(error);
+    }
+  });
 
-router.post('/', (req, res, next) => {
-  try {
-    const batch = createExecutionBatch(req.db, {
-      planningSessionId: req.body?.planningSessionId || null,
-      summary: req.body?.summary || {},
-    });
+  router.post('/execution-batches/:batchId/run', async (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const batch = await runExecutionBatch(db, {
+        batchId: req.params.batchId,
+        approve: req.body?.approve === true,
+      });
+      db.close();
 
-    res.status(201).json({ batch });
-  } catch (error) {
-    next(error);
-  }
-});
+      res.json({ batch });
+    } catch (error) {
+      next(error);
+    }
+  });
 
-router.post('/:batchId/approve', (req, res, next) => {
-  try {
-    const batch = approveExecutionBatch(req.db, req.params.batchId);
-    res.json({ batch });
-  } catch (error) {
-    next(error);
-  }
-});
+  return router;
+}
 
-router.post('/:batchId/executions', (req, res, next) => {
-  try {
-    const executions = attachExecutionToBatch(req.db, {
-      executionId: req.body?.executionId,
-      executionBatchId: req.params.batchId,
-    });
-
-    res.json({ executions });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post('/:batchId/execute', async (req, res, next) => {
-  try {
-    const result = await executeExecutionBatch(req.db, {
-      batchId: req.params.batchId,
-      approve: req.body?.approve === true,
-    });
-
-    res.json({ result });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post('/:batchId/rollback', async (req, res, next) => {
-  try {
-    const result = await rollbackExecutionBatch(req.db, {
-      batchId: req.params.batchId,
-      approve: req.body?.approve === true,
-    });
-
-    res.json({ result });
-  } catch (error) {
-    next(error);
-  }
-});
-
-export default router;
+export default createExecutionBatchesRouter;
