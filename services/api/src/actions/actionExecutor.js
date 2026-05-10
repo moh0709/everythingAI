@@ -112,6 +112,25 @@ function failExecution(db, { preview, error, executionId = createId('execution')
   return failedExecution;
 }
 
+function auditUndoFailure(db, { execution, error }) {
+  audit(db, {
+    eventType: 'action.undo_failed',
+    entityType: 'action_execution',
+    entityId: execution.id,
+    payload: {
+      execution_id: execution.id,
+      file_id: execution.file_id,
+      action_type: execution.action_type,
+      status: execution.status,
+      source_path: execution.source_path,
+      target_path: execution.target_path,
+      undo_source_path: execution.undo_source_path,
+      undo_target_path: execution.undo_target_path,
+      error_message: error.message,
+    },
+  });
+}
+
 async function pathExists(filePath) {
   try {
     await fs.access(filePath);
@@ -144,6 +163,29 @@ function assertSafeFilesystemPreview(preview) {
   }
 }
 
+function assertSafeUndoExecution(execution) {
+  if (!execution.undo_source_path) {
+    throw new Error('Execution has no undo source path.');
+  }
+
+  if (!execution.undo_target_path) {
+    throw new Error('Execution has no undo target path.');
+  }
+
+  const undoSourcePath = path.resolve(execution.undo_source_path);
+  const undoTargetPath = path.resolve(execution.undo_target_path);
+  const undoSourceDir = path.dirname(undoSourcePath);
+  const relativeTarget = path.relative(undoSourceDir, undoTargetPath);
+
+  if (!relativeTarget || relativeTarget.startsWith('..') || path.isAbsolute(relativeTarget)) {
+    throw new Error('Undo target path escapes the allowed source directory boundary.');
+  }
+
+  if (undoSourcePath === undoTargetPath) {
+    throw new Error('Undo source and target paths are identical.');
+  }
+}
+
 async function assertFilesystemExecutionPreconditions(db, preview) {
   assertSafeFilesystemPreview(preview);
 
@@ -162,6 +204,18 @@ async function assertFilesystemExecutionPreconditions(db, preview) {
   }
 }
 
+async function assertFilesystemUndoPreconditions(execution) {
+  assertSafeUndoExecution(execution);
+
+  if (!(await pathExists(execution.undo_source_path))) {
+    throw new Error('Undo source path no longer exists.');
+  }
+
+  if (await pathExists(execution.undo_target_path)) {
+    throw new Error('Undo target path already exists.');
+  }
+}
+
 function createPreMutationSnapshot(db, { preview, executionId }) {
   const file = getIndexedFileById(db, preview.file_id);
 
@@ -177,6 +231,24 @@ function createPreMutationSnapshot(db, { preview, executionId }) {
       preview,
       execution: { id: executionId, action_type: preview.action_type },
       reason: 'pre-mutation snapshot before filesystem action execution',
+    },
+  });
+}
+
+function createUndoPreMutationSnapshot(db, { execution }) {
+  const file = getIndexedFileById(db, execution.file_id);
+
+  return createRecoverySnapshot(db, {
+    fileId: execution.file_id,
+    previewId: execution.preview_id,
+    executionId: execution.id,
+    snapshotType: RECOVERY_SNAPSHOT_TYPES.UNDO_PRE_MUTATION,
+    sourcePath: execution.undo_source_path,
+    targetPath: execution.undo_target_path,
+    metadata: {
+      file,
+      execution,
+      reason: 'pre-mutation snapshot before filesystem undo',
     },
   });
 }
@@ -285,40 +357,53 @@ export async function undoActionExecution(db, { executionId, approve = false } =
     throw new Error(`Action execution not found: ${executionId}`);
   }
 
-  if (execution.status !== 'executed') {
-    throw new Error(`Action execution cannot be undone from status: ${execution.status}`);
-  }
-
-  if (execution.action_type === 'rename' || execution.action_type === 'move') {
-    if (!(await pathExists(execution.undo_source_path))) {
-      throw new Error('Undo source path no longer exists.');
+  try {
+    if (execution.status !== 'executed') {
+      throw new Error(`Action execution cannot be undone from status: ${execution.status}`);
     }
 
-    if (await pathExists(execution.undo_target_path)) {
-      throw new Error('Undo target path already exists.');
+    let recoverySnapshot = null;
+
+    if (execution.action_type === 'rename' || execution.action_type === 'move') {
+      await assertFilesystemUndoPreconditions(execution);
+
+      const currentFile = getIndexedFileById(db, execution.file_id);
+      const restoredRelativePath = deriveOriginalRelativePath(currentFile, execution.undo_target_path);
+      recoverySnapshot = createUndoPreMutationSnapshot(db, { execution });
+
+      await fs.mkdir(path.dirname(execution.undo_target_path), { recursive: true });
+      await fs.rename(execution.undo_source_path, execution.undo_target_path);
+
+      updateIndexedFileLocation(db, {
+        fileId: execution.file_id,
+        filename: path.basename(execution.undo_target_path),
+        absolutePath: execution.undo_target_path,
+        relativePath: restoredRelativePath,
+      });
     }
 
-    const currentFile = getIndexedFileById(db, execution.file_id);
-    const restoredRelativePath = deriveOriginalRelativePath(currentFile, execution.undo_target_path);
+    markActionExecutionUndone(db, execution.id);
 
-    await fs.mkdir(path.dirname(execution.undo_target_path), { recursive: true });
-    await fs.rename(execution.undo_source_path, execution.undo_target_path);
+    if (recoverySnapshot) {
+      markSnapshotUsed(db, {
+        snapshotId: recoverySnapshot.id,
+        executionId: execution.id,
+      });
+    }
 
-    updateIndexedFileLocation(db, {
-      fileId: execution.file_id,
-      filename: path.basename(execution.undo_target_path),
-      absolutePath: execution.undo_target_path,
-      relativePath: restoredRelativePath,
+    audit(db, {
+      eventType: 'action.undone',
+      entityType: 'action_execution',
+      entityId: execution.id,
+      payload: {
+        ...execution,
+        recovery_snapshot_id: recoverySnapshot?.id || null,
+      },
     });
+
+    return getActionExecutionById(db, execution.id);
+  } catch (error) {
+    auditUndoFailure(db, { execution, error });
+    throw error;
   }
-
-  markActionExecutionUndone(db, execution.id);
-  audit(db, {
-    eventType: 'action.undone',
-    entityType: 'action_execution',
-    entityId: execution.id,
-    payload: execution,
-  });
-
-  return getActionExecutionById(db, execution.id);
 }
