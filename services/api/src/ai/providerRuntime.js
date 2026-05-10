@@ -23,10 +23,14 @@ function normalizeEndpoint(endpoint) {
   return endpoint.replace(/\/$/, '');
 }
 
-function loadAiProviderSettings() {
-  const db = openDatabase();
-  const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
-  db.close();
+function loadAiProviderSettings(db) {
+  if (db) {
+    return mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
+  }
+
+  const defaultDb = openDatabase();
+  const settings = mergeAiProviderSettings(getAppSetting(defaultDb, SETTINGS_KEY) || getDefaultAiProviderSettings());
+  defaultDb.close();
   return settings;
 }
 
@@ -43,7 +47,7 @@ function unavailable({ provider, reason, prompt, sources }) {
 
 async function callOllama({ settings, messages, prompt, sources }) {
   const provider = 'ollama';
-  if (!settings.model) return unavailable({ provider, reason: 'No Ollama model is selected.', prompt, sources });
+  if (!settings.model) return unavailable({ provider: 'ollama-unconfigured', reason: 'OLLAMA_MODEL is not configured.', prompt, sources });
 
   try {
     const response = await fetch(`${normalizeEndpoint(settings.endpoint)}/api/chat`, {
@@ -213,8 +217,8 @@ async function callAzureOpenAI({ settings, messages, prompt, sources }) {
   }
 }
 
-export async function createConfiguredChatAnswer({ question, sources, overrideProvider } = {}) {
-  const settings = loadAiProviderSettings();
+export async function createConfiguredChatAnswer({ db, question, sources, overrideProvider } = {}) {
+  const settings = loadAiProviderSettings(db);
   const provider = overrideProvider || settings.activeProvider || 'ollama';
   const prompt = buildPromptContext({ question, sources });
   const messages = [
