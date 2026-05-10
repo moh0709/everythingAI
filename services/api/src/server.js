@@ -12,6 +12,7 @@ import { createSearchRouter } from './routes/search.routes.js';
 import { createIntelligenceRouter } from './routes/intelligence.routes.js';
 import { createWatchRouter } from './routes/watch.routes.js';
 import { createActionsRouter } from './routes/actions.routes.js';
+import { createRecoveryRouter } from './routes/recovery.routes.js';
 import { createIntegrationsRouter } from './routes/integrations.routes.js';
 import { createSystemRouter } from './routes/system.routes.js';
 import { createSourcePathsRouter } from './routes/sourcePaths.routes.js';
@@ -60,6 +61,7 @@ app.use('/api', requireApiToken, createSearchRouter());
 app.use('/api', requireApiToken, createIntelligenceRouter());
 app.use('/api', requireApiToken, createWatchRouter());
 app.use('/api', requireApiToken, createActionsRouter());
+app.use('/api', requireApiToken, createRecoveryRouter());
 app.use('/api', requireApiToken, createIntegrationsRouter());
 app.use('/api', requireApiToken, createSystemRouter());
 
