@@ -10,6 +10,7 @@ import {
   listExecutionsForBatch,
   updateExecutionBatch,
 } from '../db/repositories/executionRepository.js';
+import { executeActionPreview } from '../actions/actionExecutor.js';
 import { validateActionPreview } from '../services/previewValidationService.js';
 
 export const EXECUTION_BATCH_STATUSES = Object.freeze({
@@ -41,6 +42,24 @@ function audit(db, { eventType, entityType, entityId, payload }) {
     entity_id: entityId,
     payload_json: JSON.stringify(payload),
     created_at: now(),
+  });
+}
+
+function auditBatch(db, { eventType, batch }) {
+  audit(db, {
+    eventType,
+    entityType: 'execution_batch',
+    entityId: batch.id,
+    payload: {
+      id: batch.id,
+      planning_session_id: batch.planning_session_id,
+      status: batch.status,
+      summary: batch.summary,
+      error_message: batch.error_message,
+      approved_at: batch.approved_at,
+      started_at: batch.started_at,
+      completed_at: batch.completed_at,
+    },
   });
 }
 
@@ -148,18 +167,7 @@ export function createExecutionBatch(db, { previewIds, planningSessionId = null 
   insertExecutionBatch(db, batch);
 
   const createdBatch = getExecutionBatchById(db, batch.id);
-
-  audit(db, {
-    eventType: 'execution_batch.created',
-    entityType: 'execution_batch',
-    entityId: createdBatch.id,
-    payload: {
-      id: createdBatch.id,
-      planning_session_id: createdBatch.planning_session_id,
-      status: createdBatch.status,
-      summary: createdBatch.summary,
-    },
-  });
+  auditBatch(db, { eventType: 'execution_batch.created', batch: createdBatch });
 
   return createdBatch;
 }
@@ -194,20 +202,91 @@ export function approveExecutionBatch(db, { batchId, approve = false } = {}) {
     updated_at: approvedAt,
   });
 
-  audit(db, {
-    eventType: 'execution_batch.approved',
-    entityType: 'execution_batch',
-    entityId: approvedBatch.id,
-    payload: {
-      id: approvedBatch.id,
-      planning_session_id: approvedBatch.planning_session_id,
-      status: approvedBatch.status,
-      summary: approvedBatch.summary,
-      approved_at: approvedBatch.approved_at,
-    },
-  });
+  auditBatch(db, { eventType: 'execution_batch.approved', batch: approvedBatch });
 
   return approvedBatch;
+}
+
+export async function runExecutionBatch(db, { batchId, approve = false } = {}) {
+  if (!approve) {
+    throw new Error('Explicit approval is required to run an execution batch.');
+  }
+
+  const batch = getExecutionBatchById(db, batchId);
+
+  if (!batch) {
+    throw new Error(`Execution batch not found: ${batchId}`);
+  }
+
+  if (batch.status !== EXECUTION_BATCH_STATUSES.APPROVED) {
+    throw new Error(`Execution batch cannot run from status: ${batch.status}`);
+  }
+
+  const startedAt = now();
+  let runningBatch = persistBatch(db, batch, {
+    status: EXECUTION_BATCH_STATUSES.RUNNING,
+    started_at: startedAt,
+    updated_at: startedAt,
+  });
+  auditBatch(db, { eventType: 'execution_batch.started', batch: runningBatch });
+
+  const summary = {
+    ...runningBatch.summary,
+    executed: 0,
+    failed: 0,
+    execution_ids: [],
+    failed_execution_id: null,
+    failed_preview_id: null,
+    error_message: null,
+    stopped_on_first_failure: true,
+  };
+
+  for (const previewId of summary.preview_ids) {
+    try {
+      const execution = await executeActionPreview(db, {
+        previewId,
+        approve: true,
+        executionBatchId: runningBatch.id,
+      });
+
+      summary.executed += 1;
+      summary.execution_ids.push(execution.id);
+    } catch (error) {
+      summary.failed += 1;
+      summary.failed_execution_id = error.execution?.id || null;
+      summary.failed_preview_id = previewId;
+      summary.error_message = error.message;
+      if (error.execution?.id) {
+        summary.execution_ids.push(error.execution.id);
+      }
+      break;
+    }
+  }
+
+  const completedAt = now();
+  const finalStatus = summary.failed > 0
+    ? (summary.executed > 0
+      ? EXECUTION_BATCH_STATUSES.COMPLETED_WITH_ERRORS
+      : EXECUTION_BATCH_STATUSES.FAILED)
+    : EXECUTION_BATCH_STATUSES.COMPLETED;
+
+  const finalBatch = persistBatch(db, runningBatch, {
+    status: finalStatus,
+    summary,
+    error_message: summary.error_message,
+    completed_at: completedAt,
+    updated_at: completedAt,
+  });
+
+  const finalEventType = finalStatus === EXECUTION_BATCH_STATUSES.COMPLETED
+    ? 'execution_batch.completed'
+    : finalStatus === EXECUTION_BATCH_STATUSES.COMPLETED_WITH_ERRORS
+      ? 'execution_batch.completed_with_errors'
+      : 'execution_batch.failed';
+
+  auditBatch(db, { eventType: finalEventType, batch: finalBatch });
+
+  return finalBatch;
 }
 
 export function getExecutionBatchDetail(db, batchId) {
