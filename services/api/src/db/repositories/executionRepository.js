@@ -2,6 +2,7 @@ export function insertActionExecution(db, execution) {
   db.prepare(`
     INSERT INTO action_executions (
       id,
+      execution_batch_id,
       preview_id,
       file_id,
       action_type,
@@ -16,6 +17,7 @@ export function insertActionExecution(db, execution) {
     )
     VALUES (
       @id,
+      @execution_batch_id,
       @preview_id,
       @file_id,
       @action_type,
@@ -28,7 +30,10 @@ export function insertActionExecution(db, execution) {
       @executed_at,
       @undone_at
     )
-  `).run(execution);
+  `).run({
+    execution_batch_id: null,
+    ...execution,
+  });
 }
 
 export function getActionExecutionById(db, executionId) {
