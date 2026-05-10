@@ -8,16 +8,31 @@ const __dirname = path.dirname(__filename);
 const DEFAULT_DB_PATH = path.resolve(__dirname, '../../data/everythingai.sqlite');
 const SCHEMA_PATH = path.resolve(__dirname, 'schema.sql');
 
-function ensurePlanningSessionSchema(db) {
-  const suggestionColumns = db.prepare('PRAGMA table_info(organization_suggestions)').all();
-  const hasPlanningSessionId = suggestionColumns.some((column) => column.name === 'planning_session_id');
+function tableExists(db, tableName) {
+  return Boolean(db.prepare(`
+    SELECT name
+    FROM sqlite_master
+    WHERE type = 'table'
+      AND name = ?
+  `).get(tableName));
+}
 
-  if (!hasPlanningSessionId) {
+function columnExists(db, tableName, columnName) {
+  if (!tableExists(db, tableName)) return false;
+  return db.prepare(`PRAGMA table_info(${tableName})`).all().some((column) => column.name === columnName);
+}
+
+function ensureLegacyColumnsBeforeSchema(db) {
+  if (tableExists(db, 'organization_suggestions') && !columnExists(db, 'organization_suggestions', 'planning_session_id')) {
     db.exec(`
       ALTER TABLE organization_suggestions
       ADD COLUMN planning_session_id TEXT REFERENCES planning_sessions(id) ON DELETE SET NULL
     `);
   }
+}
+
+function ensurePlanningSessionSchema(db) {
+  ensureLegacyColumnsBeforeSchema(db);
 
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_organization_suggestions_planning_session_id
@@ -36,6 +51,7 @@ export function openDatabase(dbPath) {
   const db = new Database(resolvedPath);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
+  ensureLegacyColumnsBeforeSchema(db);
   db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
   ensurePlanningSessionSchema(db);
 
