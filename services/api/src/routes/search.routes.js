@@ -12,6 +12,10 @@ import { generateEmbeddings } from '../embeddings/embeddingService.js';
 import { answerFromLocalFiles } from '../ai/chatPipeline.js';
 import { requireBodyString, requireQueryString, parseLimit } from '../utils/request.js';
 
+function includeTrashed(queryValue) {
+  return queryValue?.toString().toLowerCase() === 'true';
+}
+
 export function createSearchRouter() {
   const router = Router();
 
@@ -23,6 +27,7 @@ export function createSearchRouter() {
     const results = searchFiles(db, {
       query,
       limit: parseLimit(req.query.limit, 20),
+      includeTrashed: includeTrashed(req.query.includeTrashed),
     });
     db.close();
 
@@ -49,9 +54,10 @@ export function createSearchRouter() {
 
     const limit = parseLimit(req.query.limit, 20);
     const normalized = query.toLowerCase();
+    const includeTrash = includeTrashed(req.query.includeTrashed);
     const includesQuery = (value) => (value || '').toString().toLowerCase().includes(normalized);
     const db = openDatabase();
-    const files = searchFiles(db, { query, limit });
+    const files = searchFiles(db, { query, limit, includeTrashed: includeTrash });
     const semantic = semanticSearchFiles(db, { query, limit });
     const insights = listFileInsights(db, { limit: 500 }).filter((insight) => (
       includesQuery(insight.filename)
