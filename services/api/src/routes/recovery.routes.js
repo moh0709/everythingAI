@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { openDatabase } from '../db/client.js';
 import { parseLimit, requireBodyString } from '../utils/request.js';
 import {
+  blockPermanentPurge,
   listTrashRecords,
   moveFileToTrash,
   restoreTrashRecord,
@@ -13,7 +14,12 @@ function sendServiceError(res, error) {
   }
 
   if (error.statusCode) {
-    return res.status(error.statusCode).json({ error: error.message });
+    return res.status(error.statusCode).json({
+      error: error.message,
+      code: error.code,
+      policy: error.policy,
+      trashId: error.trashId,
+    });
   }
 
   throw error;
@@ -79,6 +85,27 @@ export function createRecoveryRouter() {
         db.close();
         return sendServiceError(res, error);
       }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/recovery/trash/:trashId/purge', (req, res, next) => {
+    try {
+      const db = openDatabase();
+
+      try {
+        blockPermanentPurge(db, {
+          trashId: req.params.trashId,
+          requestedBy: req.body?.requestedBy?.toString() || 'api',
+        });
+      } catch (error) {
+        db.close();
+        return sendServiceError(res, error);
+      }
+
+      db.close();
+      return res.status(500).json({ error: 'unexpected purge state' });
     } catch (error) {
       next(error);
     }
