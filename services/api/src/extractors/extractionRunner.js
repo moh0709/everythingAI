@@ -1,4 +1,5 @@
-import { listFilesForExtraction, upsertFileExtraction } from '../db/client.js';
+import fs from 'node:fs/promises';
+import { listFilesForExtraction, markIndexedFileFailed, upsertFileExtraction } from '../db/client.js';
 import { extractDocument } from './documentExtractor.js';
 
 const MAX_DIAGNOSTIC_ITEMS = 100;
@@ -26,6 +27,15 @@ function createDiagnosticItem(file, extra = {}) {
   };
 }
 
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function extractIndexedFiles(db, {
   fileId,
   limit = 1000,
@@ -37,14 +47,31 @@ export async function extractIndexedFiles(db, {
     total: files.length,
     extracted: 0,
     failed: 0,
+    stale_missing: 0,
     unsupported: 0,
     skipped_unchanged: 0,
   };
   const failedItems = [];
+  const staleMissingItems = [];
   const unsupportedItems = [];
   const skippedItems = [];
 
   for (const file of files) {
+    if (!(await fileExists(file.absolute_path))) {
+      const message = `Indexed file no longer exists on disk: ${file.absolute_path}`;
+      markIndexedFileFailed(db, {
+        fileId: file.id,
+        errorMessage: message,
+      });
+      counters.stale_missing += 1;
+      logger.error(message);
+      pushDiagnostic(staleMissingItems, createDiagnosticItem(file, {
+        reason: 'missing_on_disk',
+        message,
+      }));
+      continue;
+    }
+
     if (shouldSkipExistingExtraction(file, { force })) {
       counters.skipped_unchanged += 1;
       pushDiagnostic(skippedItems, createDiagnosticItem(file, {
@@ -78,10 +105,12 @@ export async function extractIndexedFiles(db, {
   return {
     ...counters,
     failedItems,
+    staleMissingItems,
     unsupportedItems,
     skippedItems,
     diagnostics: {
       failedItems,
+      staleMissingItems,
       unsupportedItems,
       skippedItems,
     },
