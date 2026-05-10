@@ -172,11 +172,16 @@
                 <p class="muted">Create previews first, then add ready previews here for grouped approval and execution.</p>
               </div>
               <div class="button-row">
+                <button id="createBatchBtn">Create Batch</button>
+                <button id="approveBatchBtn" class="secondary">Approve Batch</button>
+                <button id="runBatchBtn" class="gradient-action">Run Batch</button>
+                <button id="refreshBatchBtn" class="secondary">Refresh Batch</button>
                 <button id="clearBatchQueueBtn" class="secondary">Clear Queue</button>
               </div>
             </div>
             <div id="batchQueueStatus" class="batch-status">No previews selected.</div>
             <div id="batchQueue" class="cards"></div>
+            <div id="batchDetail" class="batch-detail"></div>
           </section>
           <section class="panel">
             <h2>Action Log</h2>
@@ -278,6 +283,6 @@
     </dialog>
 
     <script src="/app.js?v=mvp-finalization-1" type="module"></script>
-    <script src="/batch-ui.js?v=sprint6-batch-queue-1" type="module"></script>
+    <script src="/batch-ui.js?v=sprint6-batch-lifecycle-1" type="module"></script>
   </body>
 </html>
