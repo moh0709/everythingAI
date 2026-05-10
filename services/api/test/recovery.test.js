@@ -7,6 +7,7 @@ import {
   listAuditLog,
   listIndexedFiles,
   openDatabase,
+  updateIndexedFileLocation,
   upsertIndexedFile,
 } from '../src/db/client.js';
 import { scanFolder } from '../src/indexer/fileScanner.js';
@@ -117,6 +118,40 @@ test('prevents restoring a trash record more than once', async () => {
     () => restoreTrashRecord(db, { trashId: trashRecord.id }),
     (error) => error.statusCode === 409 && /cannot be restored/.test(error.message),
   );
+
+  db.close();
+});
+
+test('prevents restoring when indexed file path changed after trashing', async () => {
+  const root = await createRecoveryFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const file = fileByName(db, 'Recovery Notes.txt');
+  const trashRecord = moveFileToTrash(db, { fileId: file.id });
+  const changedPath = path.join(root, 'Moved Recovery Notes.txt');
+
+  updateIndexedFileLocation(db, {
+    fileId: file.id,
+    filename: 'Moved Recovery Notes.txt',
+    absolutePath: changedPath,
+    relativePath: 'Moved Recovery Notes.txt',
+  });
+
+  assert.throws(
+    () => restoreTrashRecord(db, { trashId: trashRecord.id }),
+    (error) => (
+      error.statusCode === 409
+      && error.code === 'restore_conflict'
+      && error.conflict === 'indexed_path_changed'
+      && error.expected_path === trashRecord.original_absolute_path
+      && error.current_path === changedPath
+    ),
+  );
+
+  const stillTrashed = listTrashRecords(db, { status: 'trashed', limit: 10 });
+  assert.equal(stillTrashed.length, 1);
+  assert.equal(stillTrashed[0].id, trashRecord.id);
 
   db.close();
 });
