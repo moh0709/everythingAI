@@ -22,13 +22,26 @@ function columnExists(db, tableName, columnName) {
   return db.prepare(`PRAGMA table_info(${tableName})`).all().some((column) => column.name === columnName);
 }
 
-function ensureLegacyColumnsBeforeSchema(db) {
-  if (tableExists(db, 'organization_suggestions') && !columnExists(db, 'organization_suggestions', 'planning_session_id')) {
-    db.exec(`
-      ALTER TABLE organization_suggestions
-      ADD COLUMN planning_session_id TEXT REFERENCES planning_sessions(id) ON DELETE SET NULL
-    `);
+function addColumnIfMissing(db, tableName, columnName, definition) {
+  if (tableExists(db, tableName) && !columnExists(db, tableName, columnName)) {
+    db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
   }
+}
+
+function ensureLegacyColumnsBeforeSchema(db) {
+  addColumnIfMissing(
+    db,
+    'organization_suggestions',
+    'planning_session_id',
+    'TEXT REFERENCES planning_sessions(id) ON DELETE SET NULL',
+  );
+
+  addColumnIfMissing(
+    db,
+    'action_executions',
+    'execution_batch_id',
+    'TEXT REFERENCES execution_batches(id) ON DELETE SET NULL',
+  );
 }
 
 function ensurePlanningSessionSchema(db) {
@@ -37,6 +50,11 @@ function ensurePlanningSessionSchema(db) {
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_organization_suggestions_planning_session_id
     ON organization_suggestions(planning_session_id)
+  `);
+
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_action_executions_execution_batch_id
+    ON action_executions(execution_batch_id)
   `);
 }
 
@@ -621,6 +639,7 @@ export function insertActionExecution(db, execution) {
   db.prepare(`
     INSERT INTO action_executions (
       id,
+      execution_batch_id,
       preview_id,
       file_id,
       action_type,
@@ -635,6 +654,7 @@ export function insertActionExecution(db, execution) {
     )
     VALUES (
       @id,
+      @execution_batch_id,
       @preview_id,
       @file_id,
       @action_type,
@@ -647,7 +667,7 @@ export function insertActionExecution(db, execution) {
       @executed_at,
       @undone_at
     )
-  `).run(execution);
+  `).run({ execution_batch_id: null, ...execution });
 }
 
 export function getActionExecutionById(db, executionId) {
