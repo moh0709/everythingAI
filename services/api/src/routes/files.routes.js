@@ -13,16 +13,23 @@ import { runJob } from '../jobs/jobRunner.js';
 import { JOB_TYPES } from '../jobs/jobTypes.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 import { selectFolder } from '../utils/folderPicker.js';
+import { filterActiveFiles, annotateTrashState } from '../recovery/trashVisibility.js';
+
+function includeTrashed(queryValue) {
+  return queryValue?.toString().toLowerCase() === 'true';
+}
 
 export function createFilesRouter() {
   const router = Router();
 
   router.get('/files', (req, res) => {
     const db = openDatabase();
-    const files = listIndexedFiles(db, {
+    const files = filterActiveFiles(db, listIndexedFiles(db, {
       limit: parseLimit(req.query.limit, 100),
       status: req.query.status?.toString(),
       query: req.query.q?.toString(),
+    }), {
+      includeTrashed: includeTrashed(req.query.includeTrashed),
     });
     db.close();
 
@@ -32,17 +39,18 @@ export function createFilesRouter() {
   router.get('/files/:fileId/preview', (req, res) => {
     const db = openDatabase();
     const file = getIndexedFileById(db, req.params.fileId);
+    const annotatedFile = file ? annotateTrashState(db, [file])[0] : null;
     const insights = listFileInsights(db, { fileId: req.params.fileId, limit: 1 });
     db.close();
 
-    if (!file) {
+    if (!annotatedFile) {
       return res.status(404).json({ error: 'file not found' });
     }
 
     return res.json({
-      file,
+      file: annotatedFile,
       insight: insights[0] || null,
-      previewText: (file.extracted_text || '').slice(0, 5000),
+      previewText: (annotatedFile.extracted_text || '').slice(0, 5000),
     });
   });
 
