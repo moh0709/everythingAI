@@ -8,6 +8,7 @@ import {
   insertExecutionBatch,
   listExecutionBatches,
   listExecutionsForBatch,
+  updateExecutionBatch,
 } from '../db/repositories/executionRepository.js';
 import { validateActionPreview } from '../services/previewValidationService.js';
 
@@ -96,6 +97,24 @@ function buildDraftSummary(previews) {
   };
 }
 
+function persistBatch(db, batch, overrides = {}) {
+  const updated = {
+    id: batch.id,
+    planning_session_id: batch.planning_session_id,
+    status: overrides.status ?? batch.status,
+    summary_json: JSON.stringify(overrides.summary ?? batch.summary),
+    error_message: overrides.error_message ?? batch.error_message,
+    created_at: batch.created_at,
+    updated_at: overrides.updated_at ?? now(),
+    approved_at: overrides.approved_at ?? batch.approved_at,
+    started_at: overrides.started_at ?? batch.started_at,
+    completed_at: overrides.completed_at ?? batch.completed_at,
+  };
+
+  updateExecutionBatch(db, updated);
+  return getExecutionBatchById(db, batch.id);
+}
+
 export function createExecutionBatch(db, { previewIds, planningSessionId = null } = {}) {
   const normalizedPreviewIds = normalizePreviewIds(previewIds);
 
@@ -143,6 +162,52 @@ export function createExecutionBatch(db, { previewIds, planningSessionId = null 
   });
 
   return createdBatch;
+}
+
+export function approveExecutionBatch(db, { batchId, approve = false } = {}) {
+  if (!approve) {
+    throw new Error('Explicit approval is required to approve an execution batch.');
+  }
+
+  const batch = getExecutionBatchById(db, batchId);
+
+  if (!batch) {
+    throw new Error(`Execution batch not found: ${batchId}`);
+  }
+
+  if (batch.status !== EXECUTION_BATCH_STATUSES.DRAFT) {
+    throw new Error(`Execution batch cannot be approved from status: ${batch.status}`);
+  }
+
+  if (!batch.summary?.total_previews || batch.summary.total_previews < 1) {
+    throw new Error('Execution batch cannot be approved without previews.');
+  }
+
+  if (batch.summary.blocked_previews > 0) {
+    throw new Error('Execution batch cannot be approved while it contains blocked previews.');
+  }
+
+  const approvedAt = now();
+  const approvedBatch = persistBatch(db, batch, {
+    status: EXECUTION_BATCH_STATUSES.APPROVED,
+    approved_at: approvedAt,
+    updated_at: approvedAt,
+  });
+
+  audit(db, {
+    eventType: 'execution_batch.approved',
+    entityType: 'execution_batch',
+    entityId: approvedBatch.id,
+    payload: {
+      id: approvedBatch.id,
+      planning_session_id: approvedBatch.planning_session_id,
+      status: approvedBatch.status,
+      summary: approvedBatch.summary,
+      approved_at: approvedBatch.approved_at,
+    },
+  });
+
+  return approvedBatch;
 }
 
 export function getExecutionBatchDetail(db, batchId) {
