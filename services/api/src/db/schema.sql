@@ -184,9 +184,7 @@ CREATE TABLE IF NOT EXISTS recovery_snapshots (
   created_at TEXT NOT NULL,
   used_at TEXT,
   error_message TEXT,
-  FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE,
-  FOREIGN KEY (preview_id) REFERENCES action_previews(id) ON DELETE SET NULL,
-  FOREIGN KEY (execution_id) REFERENCES action_executions(id) ON DELETE SET NULL
+  FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_recovery_snapshots_file_id
