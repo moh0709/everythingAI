@@ -6,6 +6,7 @@ import {
 } from '../db/client.js';
 
 export const DEFAULT_TRASH_RETENTION_DAYS = 30;
+export const PURGE_BLOCKED_MESSAGE = 'Permanent purge is disabled in the local MVP. Restore or retain trash records instead.';
 
 function createId(prefix) {
   return crypto
@@ -237,4 +238,28 @@ export function restoreTrashRecord(db, { trashId, reason = null } = {}) {
   });
 
   return restoredRecord;
+}
+
+export function blockPermanentPurge(db, { trashId = null, requestedBy = 'local-mvp' } = {}) {
+  const entityId = trashId || 'permanent-purge';
+  const payload = {
+    trash_id: trashId,
+    requested_by: requestedBy,
+    blocked: true,
+    policy: 'NO_PERMANENT_PURGE_IN_LOCAL_MVP',
+    message: PURGE_BLOCKED_MESSAGE,
+  };
+
+  audit(db, {
+    eventType: 'file.purge_blocked',
+    entityType: 'trash_record',
+    entityId,
+    payload,
+  });
+
+  throw createServiceError(PURGE_BLOCKED_MESSAGE, 403, {
+    code: 'purge_disabled_in_mvp',
+    policy: 'NO_PERMANENT_PURGE_IN_LOCAL_MVP',
+    trashId,
+  });
 }
