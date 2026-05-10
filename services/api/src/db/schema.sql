@@ -171,6 +171,28 @@ CREATE INDEX IF NOT EXISTS idx_action_executions_preview_id
 CREATE INDEX IF NOT EXISTS idx_action_executions_file_id
   ON action_executions(file_id);
 
+CREATE TABLE IF NOT EXISTS trash_records (
+  id TEXT PRIMARY KEY,
+  file_id TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('trashed', 'restored', 'purged')),
+  original_absolute_path TEXT NOT NULL,
+  original_relative_path TEXT NOT NULL,
+  retention_until TEXT NOT NULL,
+  trashed_at TEXT NOT NULL,
+  restored_at TEXT,
+  restore_reason TEXT,
+  FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_trash_records_file_id
+  ON trash_records(file_id);
+
+CREATE INDEX IF NOT EXISTS idx_trash_records_status
+  ON trash_records(status);
+
+CREATE INDEX IF NOT EXISTS idx_trash_records_retention_until
+  ON trash_records(retention_until);
+
 CREATE TABLE IF NOT EXISTS audit_log (
   id TEXT PRIMARY KEY,
   event_type TEXT NOT NULL,
