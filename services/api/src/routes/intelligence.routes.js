@@ -3,10 +3,26 @@ import { openDatabase, listFileInsights } from '../db/client.js';
 import { generateFileInsights } from '../insights/insightService.js';
 import { findDuplicateFiles } from '../duplicates/duplicateService.js';
 import { buildKnowledgeIndex } from '../knowledge/knowledgeService.js';
+import { createDocumentContext } from '../documents/documentContextService.js';
 import { parseLimit } from '../utils/request.js';
 
 export function createIntelligenceRouter() {
   const router = Router();
+
+  router.get('/intelligence/document-context/:fileId', (req, res) => {
+    const db = openDatabase();
+    const document = createDocumentContext(db, {
+      fileId: req.params.fileId,
+      previewLimit: parseLimit(req.query.previewLimit, 5000),
+    });
+    db.close();
+
+    if (!document) {
+      return res.status(404).json({ error: 'Document context not found.' });
+    }
+
+    return res.json({ document });
+  });
 
   router.post('/insights', async (req, res, next) => {
     try {
