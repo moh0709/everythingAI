@@ -7,5 +7,5 @@ export async function answerFromLocalFiles(db, { question, limit = 5, provider }
   }
 
   const sources = searchFiles(db, { query: question, limit });
-  return createConfiguredChatAnswer({ question, sources, overrideProvider: provider });
+  return createConfiguredChatAnswer({ db, question, sources, overrideProvider: provider });
 }
