@@ -382,6 +382,26 @@ pre {
   padding: 1.1rem;
 }
 
+.batch-panel {
+  border-color: #c7d2fe;
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 34%);
+}
+
+.batch-status {
+  border: 1px dashed #a5b4fc;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.72);
+  color: #3730a3;
+  font-weight: 700;
+}
+
+.batch-queue-card {
+  border-color: #c7d2fe;
+  background: #ffffff;
+}
+
 .section-heading {
   display: flex;
   justify-content: space-between;
