@@ -12,7 +12,7 @@ import {
 import { scanFolder } from '../src/indexer/fileScanner.js';
 import { extractIndexedFiles } from '../src/extractors/extractionRunner.js';
 import { generateFileInsights } from '../src/insights/insightService.js';
-import { createSuggestionsForFile } from '../src/organizer/suggestionEngine.js';
+import { generatePreviewSuggestions } from '../src/suggestions/suggestionService.js';
 import { moveFileToTrash } from '../src/recovery/trashService.js';
 import { semanticSearchFiles } from '../src/search/semanticSearch.js';
 import { unifiedSearch } from '../src/search/unifiedSearchService.js';
@@ -86,8 +86,8 @@ test('unified search does not leak trashed file-linked rows by default', async (
 
   upsertFileLabel(db, { fileId: activeFile.id, tag: 'sharedtoken', category: 'supplier' });
   upsertFileLabel(db, { fileId: trashedFile.id, tag: 'sharedtoken', category: 'supplier' });
-  createSuggestionsForFile(db, { fileId: activeFile.id });
-  createSuggestionsForFile(db, { fileId: trashedFile.id });
+  generatePreviewSuggestions(db, { fileId: activeFile.id });
+  generatePreviewSuggestions(db, { fileId: trashedFile.id });
   moveFileToTrash(db, { fileId: trashedFile.id });
 
   const normalResult = unifiedSearch(db, { query: 'sharedtoken', limit: 10 });
