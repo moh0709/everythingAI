@@ -260,6 +260,19 @@ source_type = local_file
 source_label
 ```
 
+Search state clarity rules:
+
+```text
+active extracted file      -> visible in normal search with recovery_status = active and extraction_status = extracted
+active trashed file        -> hidden in normal search
+includeTrashed=true        -> returns trashed files with recovery_status = trashed
+failed extraction file     -> searchable by filename/path with extraction_status = failed and extraction_error_message
+unsupported file type      -> searchable by filename/path with extraction_status = unsupported and extraction_error_message
+stale/missing indexed file -> searchable by filename/path with index_status = failed and source_reference
+```
+
+This means the local MVP does not silently hide indexed problem records by default when a user searches by filename/path. It returns them with explicit state fields so users can understand why content may be missing.
+
 ### Document context
 
 The stable document context endpoint is:
@@ -478,7 +491,7 @@ npm audit --omit=dev
 Current local MVP validation status:
 
 ```text
-41 tests passing / 0 failing
+45 tests passing / 0 failing
 ```
 
 ## Next architectural decision
