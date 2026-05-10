@@ -13,6 +13,7 @@ import { scanFolder } from '../src/indexer/fileScanner.js';
 import { generatePreviewSuggestions } from '../src/suggestions/suggestionService.js';
 import { createActionPreview } from '../src/previews/actionPreviewService.js';
 import {
+  approveExecutionBatch,
   createExecutionBatch,
   EXECUTION_BATCH_STATUSES,
   getExecutionBatchDetail,
@@ -159,6 +160,88 @@ test('lists execution batches and returns batch detail with executions array', a
   assert.equal(detail.status, EXECUTION_BATCH_STATUSES.DRAFT);
   assert.deepEqual(detail.executions, []);
   assert.equal(getExecutionBatchDetail(db, 'missing-batch'), null);
+
+  db.close();
+});
+
+test('approves a draft execution batch with explicit approval', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview, movePreview } = await createPreviews(db, { root });
+  const batch = createExecutionBatch(db, { previewIds: [tagPreview.id, movePreview.id] });
+  const approved = approveExecutionBatch(db, { batchId: batch.id, approve: true });
+
+  assert.equal(approved.status, EXECUTION_BATCH_STATUSES.APPROVED);
+  assert.equal(typeof approved.approved_at, 'string');
+  assert.equal(approved.summary.total_previews, 2);
+  assert.equal(approved.summary.blocked_previews, 0);
+
+  const events = batchAuditEvents(db, batch.id);
+  assert.deepEqual(events.map((event) => event.event_type).sort(), [
+    'execution_batch.approved',
+    'execution_batch.created',
+  ].sort());
+  const approvedEvent = events.find((event) => event.event_type === 'execution_batch.approved');
+  assert.equal(approvedEvent.payload.status, EXECUTION_BATCH_STATUSES.APPROVED);
+  assert.equal(approvedEvent.payload.approved_at, approved.approved_at);
+
+  db.close();
+});
+
+test('rejects batch approval without explicit approval', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview } = await createPreviews(db, { root });
+  const batch = createExecutionBatch(db, { previewIds: [tagPreview.id] });
+
+  assert.throws(
+    () => approveExecutionBatch(db, { batchId: batch.id, approve: false }),
+    /Explicit approval is required/,
+  );
+  assert.equal(getExecutionBatchDetail(db, batch.id).status, EXECUTION_BATCH_STATUSES.DRAFT);
+  assert.equal(batchAuditEvents(db, batch.id).filter((event) => event.event_type === 'execution_batch.approved').length, 0);
+
+  db.close();
+});
+
+test('rejects approval for blocked-preview and missing batches', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview, movePreview } = await createPreviews(db, { root, conflictMove: true });
+  const blockedBatch = createExecutionBatch(db, { previewIds: [tagPreview.id, movePreview.id] });
+
+  assert.throws(
+    () => approveExecutionBatch(db, { batchId: blockedBatch.id, approve: true }),
+    /contains blocked previews/,
+  );
+  assert.throws(
+    () => approveExecutionBatch(db, { batchId: 'missing-batch', approve: true }),
+    /Execution batch not found/,
+  );
+  assert.equal(getExecutionBatchDetail(db, blockedBatch.id).status, EXECUTION_BATCH_STATUSES.DRAFT);
+
+  db.close();
+});
+
+test('rejects approving a batch that is no longer draft', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const { tagPreview } = await createPreviews(db, { root });
+  const batch = createExecutionBatch(db, { previewIds: [tagPreview.id] });
+  approveExecutionBatch(db, { batchId: batch.id, approve: true });
+
+  assert.throws(
+    () => approveExecutionBatch(db, { batchId: batch.id, approve: true }),
+    /cannot be approved from status: approved/,
+  );
 
   db.close();
 });
