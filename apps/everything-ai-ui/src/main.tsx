@@ -1,10 +1,10 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './AppComplete';
+import { UserApp } from './UserApp';
 import './styles.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <UserApp />
   </React.StrictMode>,
 );
