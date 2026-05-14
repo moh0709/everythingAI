@@ -17,10 +17,17 @@ type FilePreview = {
   extracted_text?: string;
 };
 
+type ChatSource = {
+  filename?: string;
+  absolute_path?: string;
+  snippet?: string;
+  score?: number;
+};
+
 type ChatMessage = {
   role: 'user' | 'assistant' | 'error';
   text: string;
-  sources?: unknown[];
+  sources?: ChatSource[];
 };
 
 type AuditEvent = {
