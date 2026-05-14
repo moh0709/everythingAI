@@ -3,6 +3,7 @@ export { default as AdminHeader, AdminHeader as NamedAdminHeader } from './Admin
 export { default as AdminHero, AdminHero as NamedAdminHero } from './AdminHero';
 export { default as AdminShell, AdminShell as NamedAdminShell } from './AdminShell';
 export { default as AdminStatusBanner, AdminStatusBanner as NamedAdminStatusBanner } from './AdminStatusBanner';
+export { default as AdminViewRouter, AdminViewRouter as NamedAdminViewRouter } from './AdminViewRouter';
 export { default as AnalyticsView, AnalyticsView as NamedAnalyticsView } from './AnalyticsView';
 export { default as AskAIView, AskAIView as NamedAskAIView } from './AskAIView';
 export { default as DashboardView, DashboardView as NamedDashboardView } from './DashboardView';
