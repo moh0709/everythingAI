@@ -1,14 +1,23 @@
 import { App as OperatorApp } from '../AppComplete';
+import { AdminRuntimeApp } from './AdminRuntimeApp';
 
 /**
  * AdminApp is the React boundary for operator/admin workflows.
  *
  * The official user-facing MVP must keep using UserApp.tsx through main.tsx.
- * This wrapper gives us a stable place to continue splitting AppComplete.tsx into
- * admin-specific components without exposing planning, execution, recovery, audit,
- * provider, or source-management workflows to the user UI.
+ * By default this wrapper still renders the existing AppComplete operator UI.
+ *
+ * To test the modular admin runtime locally, open the admin React entry with:
+ *
+ *   ?adminRuntime=modular
+ *
+ * This keeps the migration opt-in and avoids changing the current runtime behavior.
  */
 export function AdminApp() {
+  const useModularRuntime = new URLSearchParams(window.location.search).get('adminRuntime') === 'modular';
+
+  if (useModularRuntime) return <AdminRuntimeApp />;
+
   return <OperatorApp />;
 }
 
