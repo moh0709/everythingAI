@@ -68,6 +68,30 @@ To test the new modular admin runtime:
 http://localhost:5152/admin.html?adminRuntime=modular
 ```
 
+## Verification
+
+Before switching runtime behavior, validate the UI app locally:
+
+```bash
+cd apps/everything-ai-ui
+npm install
+npm run typecheck
+npm run build
+```
+
+Manual smoke checks:
+
+```txt
+User UI:
+http://localhost:5151
+
+Admin UI default runtime:
+http://localhost:5152/admin.html
+
+Admin UI modular runtime:
+http://localhost:5152/admin.html?adminRuntime=modular
+```
+
 ## Safety Rule
 
 Do not import admin/operator components into `UserApp.tsx`.
