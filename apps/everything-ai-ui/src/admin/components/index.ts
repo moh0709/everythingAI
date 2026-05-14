@@ -1,6 +1,7 @@
 export { default as AdminErrorBanner, AdminErrorBanner as NamedAdminErrorBanner } from './AdminErrorBanner';
 export { default as AdminHeader, AdminHeader as NamedAdminHeader } from './AdminHeader';
 export { default as AdminHero, AdminHero as NamedAdminHero } from './AdminHero';
+export { default as AdminShell, AdminShell as NamedAdminShell } from './AdminShell';
 export { default as AdminStatusBanner, AdminStatusBanner as NamedAdminStatusBanner } from './AdminStatusBanner';
 export { default as AnalyticsView, AnalyticsView as NamedAnalyticsView } from './AnalyticsView';
 export { default as AskAIView, AskAIView as NamedAskAIView } from './AskAIView';
