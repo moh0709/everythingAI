@@ -33,6 +33,13 @@ function createId(prefix) {
     .digest('hex');
 }
 
+function createSkippableError(message, skipReason) {
+  const err = new Error(message);
+  err.skippable = true;
+  err.skipReason = skipReason;
+  return err;
+}
+
 function relativeAfterAction(originalRelativePath, targetPath, sourcePath) {
   const originalDir = path.dirname(originalRelativePath);
   const sourceDir = path.dirname(sourcePath);
@@ -161,10 +168,7 @@ function assertSafeFilesystemPreview(preview) {
   const targetPath = path.resolve(preview.target_path);
 
   if (sourcePath === targetPath) {
-    const err = new Error('Source and target paths are identical — file is already at the destination.');
-    err.skippable = true;
-    err.skipReason = 'already_at_destination';
-    throw err;
+    throw createSkippableError('Source and target paths are identical — file is already at the destination.', 'already_at_destination');
   }
 
   // For renames (same directory), ensure target stays in the same folder.
@@ -210,12 +214,12 @@ async function assertFilesystemExecutionPreconditions(db, preview) {
 
   if (!(await pathExists(preview.source_path))) {
     invalidateActionPreview(db, preview.id, 'source_missing');
-    throw new Error('Source file no longer exists.');
+    throw createSkippableError('Source file no longer exists.', 'source_missing');
   }
 
   if (await pathExists(preview.target_path)) {
     invalidateActionPreview(db, preview.id, 'target_exists');
-    throw new Error('Target path already exists.');
+    throw createSkippableError('Target path already exists.', 'target_exists');
   }
 }
 
