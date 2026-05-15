@@ -60,8 +60,10 @@ export function SettingsView({
     </section>;
   }
 
+  const activeDraft = draft;
+
   function update(path: string, value: unknown) {
-    const copy: any = JSON.parse(JSON.stringify(draft));
+    const copy: any = JSON.parse(JSON.stringify(activeDraft));
     const keys = path.split('.');
     let current = copy;
     keys.slice(0, -1).forEach((key) => { current = current[key]; });
@@ -71,7 +73,7 @@ export function SettingsView({
 
   async function handleTest() {
     setTesting(true);
-    await testAiProvider(draft.activeProvider);
+    await testAiProvider(activeDraft.activeProvider);
     setTesting(false);
   }
 
@@ -86,7 +88,7 @@ export function SettingsView({
       <div className="button-row">
         <button className="outline" onClick={refreshModels}>Refresh Models</button>
         <button className="outline" onClick={handleTest} disabled={testing}>{testing ? 'Testing...' : 'Test Connection'}</button>
-        <button onClick={() => saveAiSettings(draft)}>Save AI Settings</button>
+        <button onClick={() => saveAiSettings(activeDraft)}>Save AI Settings</button>
       </div>
     </div>
 
@@ -121,8 +123,8 @@ export function SettingsView({
     </section>
 
     <ProviderSelectorPanel
-      activeProvider={draft.activeProvider}
-      remoteProvidersEnabled={draft.remoteProvidersEnabled}
+      activeProvider={activeDraft.activeProvider}
+      remoteProvidersEnabled={activeDraft.remoteProvidersEnabled}
       filter={filter}
       setFilter={setFilter}
       onSelectProvider={(provider) => update('activeProvider', provider)}
@@ -130,13 +132,13 @@ export function SettingsView({
     />
 
     <ProviderConfigurationPanel
-      draft={draft}
+      draft={activeDraft}
       providerModels={providerModels}
       update={update}
     />
 
     <PlanningPolicyPanel
-      planning={draft.planning}
+      planning={activeDraft.planning}
       update={update}
     />
   </section>;
