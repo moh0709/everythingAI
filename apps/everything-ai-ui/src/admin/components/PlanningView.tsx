@@ -5,6 +5,7 @@ import { averageConfidence } from '../utils/format';
 export type PreviewRecord = {
   id: string;
   suggestion_id?: string;
+  file_id?: string;
   action_type: string;
   target_path?: string;
   suggested_value: string;
@@ -29,6 +30,16 @@ type PlanningViewProps = {
   setDestinationFolder: (value: string) => void;
 };
 
+const FILESYSTEM_ACTIONS = new Set(['move', 'rename']);
+
+function isFilesystemAction(suggestion: Pick<Suggestion, 'action_type'>) {
+  return FILESYSTEM_ACTIONS.has(suggestion.action_type);
+}
+
+function isSameFileMutation(a: Suggestion, b: Suggestion) {
+  return a.file_id === b.file_id && isFilesystemAction(a) && isFilesystemAction(b);
+}
+
 export function PlanningView({
   files,
   suggestions,
@@ -45,10 +56,32 @@ export function PlanningView({
   destinationFolder,
   setDestinationFolder,
 }: PlanningViewProps) {
+  const selectedSuggestions = suggestions.filter((suggestion) => selectedSuggestionIds.has(suggestion.id));
+  const selectedFilesystemKeys = new Set(
+    selectedSuggestions
+      .filter(isFilesystemAction)
+      .map((suggestion) => suggestion.file_id),
+  );
+
   function toggleSuggestion(id: string) {
+    const suggestion = suggestions.find((item) => item.id === id);
+    if (!suggestion) return;
+
     const next = new Set(selectedSuggestionIds);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+
+    if (next.has(id)) {
+      next.delete(id);
+      setSelectedSuggestionIds(next);
+      return;
+    }
+
+    if (isFilesystemAction(suggestion)) {
+      suggestions
+        .filter((candidate) => isSameFileMutation(candidate, suggestion))
+        .forEach((candidate) => next.delete(candidate.id));
+    }
+
+    next.add(id);
     setSelectedSuggestionIds(next);
   }
 
@@ -60,7 +93,18 @@ export function PlanningView({
     if (allSelected) {
       visible.forEach((suggestion) => next.delete(suggestion.id));
     } else {
-      visible.forEach((suggestion) => next.add(suggestion.id));
+      const filesWithMutation = new Set<string>();
+      visible.forEach((suggestion) => {
+        if (!isFilesystemAction(suggestion)) {
+          next.add(suggestion.id);
+          return;
+        }
+
+        if (!filesWithMutation.has(suggestion.file_id)) {
+          next.add(suggestion.id);
+          filesWithMutation.add(suggestion.file_id);
+        }
+      });
     }
 
     setSelectedSuggestionIds(next);
@@ -99,27 +143,34 @@ export function PlanningView({
         <p>Selected actions: <b>{selectedSuggestionIds.size}</b></p>
         <p>Dry-run previews: <b>{previews.length}</b></p>
         <p>Executable previews: <b>{previews.filter((preview) => preview.preview_status === 'ready').length}</b></p>
+        <p className="muted">Safety: only one move/rename action can be selected per file. Tags and categories can still be selected freely.</p>
       </div>
 
       <div className="panel wide">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h3>Suggested Actions</h3>
           <button className="outline" onClick={selectAllSuggestions}>
-            {suggestions.slice(0, 60).every((suggestion) => selectedSuggestionIds.has(suggestion.id)) ? 'Deselect All' : 'Select All'}
+            {suggestions.slice(0, 60).every((suggestion) => selectedSuggestionIds.has(suggestion.id)) ? 'Deselect All' : 'Select Safe Batch'}
           </button>
         </div>
-        {suggestions.slice(0, 60).map((suggestion) => <div className="suggestion-line selectable" key={suggestion.id}>
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedSuggestionIds.has(suggestion.id)}
-              onChange={() => toggleSuggestion(suggestion.id)}
-            />
-            <b>{suggestion.action_type}</b> → {suggestion.suggested_value}
-          </label>
-          <span className="chip blue">{Math.round(Number(suggestion.confidence || 0) * 100)}%</span>
-          <button onClick={() => createPreview(suggestion)}>Preview</button>
-        </div>)}
+        {suggestions.slice(0, 60).map((suggestion) => {
+          const isSelected = selectedSuggestionIds.has(suggestion.id);
+          const disabledByMutationGuard = !isSelected && isFilesystemAction(suggestion) && selectedFilesystemKeys.has(suggestion.file_id);
+          return <div className="suggestion-line selectable" key={suggestion.id}>
+            <label title={disabledByMutationGuard ? 'Another move/rename action is already selected for this file.' : undefined}>
+              <input
+                type="checkbox"
+                checked={isSelected}
+                disabled={disabledByMutationGuard}
+                onChange={() => toggleSuggestion(suggestion.id)}
+              />
+              <b>{suggestion.action_type}</b> → {suggestion.suggested_value}
+            </label>
+            <span className="chip blue">{Math.round(Number(suggestion.confidence || 0) * 100)}%</span>
+            {disabledByMutationGuard && <span className="chip orange">file mutation already selected</span>}
+            <button onClick={() => createPreview(suggestion)}>Preview</button>
+          </div>;
+        })}
       </div>
 
       <div className="panel wide">
