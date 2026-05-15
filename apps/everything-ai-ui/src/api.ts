@@ -30,6 +30,7 @@ export type Suggestion = {
   file_id: string;
   filename?: string;
   action_type: string;
+  current_value?: string | null;
   suggested_value: string;
   reason: string;
   confidence: number;
