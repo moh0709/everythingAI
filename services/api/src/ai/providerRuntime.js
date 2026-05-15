@@ -1,5 +1,6 @@
 import { openDatabase, getAppSetting } from '../db/client.js';
 import { mergeAiProviderSettings, getDefaultAiProviderSettings, REMOTE_PROVIDERS } from '../settings/aiProviderSettings.js';
+import { fetchOllamaModels } from '../settings/providerModelFetchers.js';
 import { buildPromptContext } from './localProvider.js';
 
 const SETTINGS_KEY = 'ai_provider_settings';
@@ -45,16 +46,40 @@ function unavailable({ provider, reason, prompt, sources }) {
   };
 }
 
+function isLikelyEmbeddingModel(modelId = '') {
+  return /embed|embedding|nomic/i.test(modelId);
+}
+
+async function resolveOllamaModel(settings) {
+  if (settings.model) return settings.model;
+
+  const liveModels = await fetchOllamaModels({
+    endpoint: settings.endpoint,
+  });
+
+  const firstChatModel = liveModels?.find((model) => !isLikelyEmbeddingModel(model.id || model.name));
+  return firstChatModel?.id || liveModels?.[0]?.id || '';
+}
+
 async function callOllama({ settings, messages, prompt, sources }) {
   const provider = 'ollama';
-  if (!settings.model) return unavailable({ provider: 'ollama-unconfigured', reason: 'OLLAMA_MODEL is not configured.', prompt, sources });
+  const model = await resolveOllamaModel(settings);
+
+  if (!model) {
+    return unavailable({
+      provider: 'ollama-unconfigured',
+      reason: 'No Ollama model is configured and no live Ollama models were found.',
+      prompt,
+      sources,
+    });
+  }
 
   try {
     const response = await fetch(`${normalizeEndpoint(settings.endpoint)}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: settings.model,
+        model,
         stream: false,
         think: false,
         messages,
@@ -72,7 +97,7 @@ async function callOllama({ settings, messages, prompt, sources }) {
       answer: payload.message?.content || payload.response || 'Ollama returned an empty answer.',
       provider,
       provider_status: 'ok',
-      model: settings.model,
+      model,
       prompt,
       sources,
     };
