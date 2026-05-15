@@ -17,5 +17,10 @@
     "jsx": "react-jsx"
   },
   "include": ["src", "vite.config.ts"],
+  "exclude": [
+    "src/App.tsx",
+    "src/AppEnhanced.tsx",
+    "src/AppComplete.tsx"
+  ],
   "references": []
 }
