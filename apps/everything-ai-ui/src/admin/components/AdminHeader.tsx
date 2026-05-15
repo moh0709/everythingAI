@@ -1,5 +1,6 @@
 import { FolderOpen } from 'lucide-react';
-import { providerLabel, type ProviderName } from '../../providerCatalog';
+import { providerLabel } from '../../providerCatalog';
+import type { ProviderName } from '../../providerSettingsApi';
 import type { AdminSection } from '../types';
 
 type AdminHeaderProps = {
