@@ -108,12 +108,31 @@ export function AdminRuntimeApp() {
     });
   }
 
+  async function generateSuggestionsForFiles(files: Array<{ id: string }>) {
+    const generated: Suggestion[] = [];
+    for (const file of files) {
+      const payload = await apiRequest<{ suggestions: Suggestion[] }>(
+        options,
+        '/api/suggestions',
+        { fileId: file.id },
+        'POST',
+      );
+      generated.push(...(payload.suggestions || []));
+    }
+    return generated;
+  }
+
   async function deepAnalysis() {
-    await task.run('Running deep AI analysis...', async () => {
+    await task.run('Running deep AI analysis and planning...', async () => {
       await apiRequest(options, '/api/extract', {}, 'POST');
       await apiRequest(options, '/api/embeddings', { limit: 1000 }, 'POST');
       await apiRequest(options, '/api/insights', { limit: 100, useProvider: true }, 'POST');
-      await refreshAll();
+      const files = await workspace.refreshFiles(options);
+      await generateSuggestionsForFiles(files);
+      const suggestions = await workspace.refreshSuggestions(options);
+      await workspace.refreshStatus(options);
+      task.setMessage(`AI analysis complete. ${suggestions.length} suggested action(s) ready.`);
+      setSection('planning');
     });
   }
 
