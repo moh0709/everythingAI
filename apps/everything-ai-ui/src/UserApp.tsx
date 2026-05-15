@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Brain, FileText, MessageCircle, Search, Send, Server, Shield, Sparkles } from 'lucide-react';
+import { Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Shield, Sparkles } from 'lucide-react';
 import { apiRequest, ApiOptions, IndexedFile } from './api';
 
 const DEFAULT_API = 'http://127.0.0.1:4100';
@@ -11,7 +11,7 @@ const EXAMPLE_PROMPTS = [
   'Which files mention planning, invoices, customers, or projects?',
 ];
 
-type UserView = 'explore' | 'ask';
+type UserView = 'onboarding' | 'explore' | 'ask';
 
 type SourceReference = {
   file_id?: string;
@@ -43,6 +43,20 @@ type ChatMessage = {
   sources?: Array<{ filename?: string; absolute_path?: string; snippet?: string; score?: number }>;
 };
 
+type SetupStep = {
+  id: string;
+  label: string;
+  status: 'waiting' | 'working' | 'done' | 'failed';
+};
+
+const INITIAL_SETUP_STEPS: SetupStep[] = [
+  { id: 'folder', label: 'Select folder', status: 'waiting' },
+  { id: 'index', label: 'Index local files', status: 'waiting' },
+  { id: 'extract', label: 'Extract readable content', status: 'waiting' },
+  { id: 'insights', label: 'Generate source insights', status: 'waiting' },
+  { id: 'ready', label: 'Workspace ready', status: 'waiting' },
+];
+
 function formatSize(bytes = 0) {
   if (!bytes) return '0 Bytes';
   if (bytes < 1024) return `${bytes} Bytes`;
@@ -50,10 +64,16 @@ function formatSize(bytes = 0) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
+function updateStep(steps: SetupStep[], id: string, status: SetupStep['status']) {
+  return steps.map((step) => step.id === id ? { ...step, status } : step);
+}
+
 export function UserApp() {
   const [baseUrl, setBaseUrl] = useState(localStorage.getItem('everythingai.ui.baseUrl') || DEFAULT_API);
   const [token, setToken] = useState(localStorage.getItem('everythingai.ui.token') || DEFAULT_TOKEN);
-  const [view, setView] = useState<UserView>('explore');
+  const [view, setView] = useState<UserView>('onboarding');
+  const [folderPath, setFolderPath] = useState(localStorage.getItem('everythingai.ui.folderPath') || '');
+  const [setupSteps, setSetupSteps] = useState<SetupStep[]>(INITIAL_SETUP_STEPS);
   const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
   const [files, setFiles] = useState<IndexedFile[]>([]);
@@ -71,7 +91,12 @@ export function UserApp() {
   function saveConnection() {
     localStorage.setItem('everythingai.ui.baseUrl', baseUrl);
     localStorage.setItem('everythingai.ui.token', token);
+    localStorage.setItem('everythingai.ui.folderPath', folderPath);
     setStatus('Connection settings saved.');
+  }
+
+  function markStep(id: string, statusValue: SetupStep['status']) {
+    setSetupSteps((current) => updateStep(current, id, statusValue));
   }
 
   async function run(label: string, task: () => Promise<void>) {
@@ -93,7 +118,60 @@ export function UserApp() {
       const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
       setFiles(payload.files || []);
       if (!selectedFileId && payload.files?.[0]) setSelectedFileId(payload.files[0].id);
+      if (payload.files?.length) setView((current) => current === 'onboarding' ? 'explore' : current);
       setStatus(`Loaded ${payload.files?.length || 0} file(s).`);
+    });
+  }
+
+  async function selectFolder() {
+    await run('Opening folder picker...', async () => {
+      markStep('folder', 'working');
+      const result = await apiRequest<{ folderPath?: string; cancelled?: boolean }>(options, '/api/select-folder', {}, 'POST');
+      if (result.cancelled || !result.folderPath) {
+        markStep('folder', 'waiting');
+        setStatus('Folder selection cancelled.');
+        return;
+      }
+      setFolderPath(result.folderPath);
+      localStorage.setItem('everythingai.ui.folderPath', result.folderPath);
+      markStep('folder', 'done');
+      setStatus(`Folder selected: ${result.folderPath}`);
+    });
+  }
+
+  async function buildKnowledgeWorkspace(pathOverride = folderPath) {
+    const normalized = pathOverride.trim();
+    if (!normalized) {
+      setError('Select or enter a folder path first.');
+      return;
+    }
+
+    await run('Building local knowledge workspace...', async () => {
+      localStorage.setItem('everythingai.ui.folderPath', normalized);
+      markStep('folder', 'done');
+
+      markStep('index', 'working');
+      await apiRequest(options, '/api/index', { folderPath: normalized, auto: true, limit: 1000, useOllama: false }, 'POST');
+      markStep('index', 'done');
+
+      markStep('extract', 'working');
+      await apiRequest(options, '/api/extract', { limit: 1000 }, 'POST');
+      markStep('extract', 'done');
+
+      markStep('insights', 'working');
+      await apiRequest(options, '/api/insights', { limit: 100, useProvider: true }, 'POST');
+      markStep('insights', 'done');
+
+      const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
+      setFiles(payload.files || []);
+      if (payload.files?.[0]) {
+        setSelectedFileId(payload.files[0].id);
+        await loadDocumentContext(payload.files[0].id, false);
+      }
+
+      markStep('ready', 'done');
+      setView('explore');
+      setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s).`);
     });
   }
 
@@ -176,6 +254,7 @@ export function UserApp() {
     <header className="top-nav">
       <div className="brand"><Brain size={28} /><strong>EverythingAI</strong></div>
       <nav>
+        <button className={view === 'onboarding' ? 'active' : ''} onClick={() => setView('onboarding')}>Start</button>
         <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore</button>
         <button className={view === 'ask' ? 'active' : ''} onClick={openAskView}>Ask</button>
       </nav>
@@ -183,6 +262,52 @@ export function UserApp() {
     </header>
 
     <main className="page">
+      {view === 'onboarding' && <>
+        <section className="hero-row">
+          <div>
+            <h1><FolderOpen /> Connect your local knowledge</h1>
+            <p>Select a folder and EverythingAI will index, extract, analyze, and prepare it for search and chat. This user UI remains read-only and safe.</p>
+          </div>
+          <div className="hero-actions">
+            <button className="purple" onClick={selectFolder} disabled={busy}><FolderOpen size={16} /> Select Folder</button>
+            <button className="outline" onClick={() => buildKnowledgeWorkspace()} disabled={busy || !folderPath.trim()}><Sparkles size={16} /> Build Knowledge</button>
+          </div>
+        </section>
+
+        {error && <div className="error">{error}</div>}
+        <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
+
+        <section className="panel">
+          <div className="panel-title">
+            <div>
+              <h2><CheckCircle2 /> Setup Progress</h2>
+              <p>After setup, you can search files and ask questions with source-backed answers.</p>
+            </div>
+          </div>
+          <div className="source-list compact-source-list">
+            {setupSteps.map((step) => <div className="source-card" key={step.id}>
+              <strong>{step.label}</strong>
+              <p>{step.status === 'done' ? 'Completed' : step.status === 'working' ? 'Working...' : step.status === 'failed' ? 'Failed' : 'Waiting'}</p>
+            </div>)}
+          </div>
+        </section>
+
+        <section className="panel">
+          <div className="panel-title">
+            <div>
+              <h2><Server /> Connection & Folder</h2>
+              <p>Use defaults for local development, or adjust if your backend runs elsewhere.</p>
+            </div>
+            <button className="outline" onClick={saveConnection}>Save</button>
+          </div>
+          <div className="settings-grid">
+            <label>API Base URL<input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></label>
+            <label>API Token<input type="password" value={token} onChange={(event) => setToken(event.target.value)} /></label>
+            <label>Folder Path<input value={folderPath} onChange={(event) => setFolderPath(event.target.value)} placeholder="C:\\Users\\MOH\\Documents" /></label>
+          </div>
+        </section>
+      </>}
+
       {view === 'explore' && <>
         <section className="hero-row">
           <div>
