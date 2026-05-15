@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { scanFolder } from '../indexer/fileScanner.js';
-import { upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
+import { openDatabase, upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
 import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
 import { runJob } from '../jobs/jobRunner.js';
 import { JOB_TYPES } from '../jobs/jobTypes.js';
@@ -14,49 +14,71 @@ function watchId(rootPath) {
   return crypto.createHash('sha256').update(path.resolve(rootPath).toLowerCase()).digest('hex');
 }
 
-async function runWatchCycle(db, {
+async function runWatchCycle({
   id,
   absoluteRoot,
-  insert,
   extract,
   auto,
   logger,
 }) {
-  return runJob({
-    type: JOB_TYPES.WATCHER_CYCLE,
-    input: {
-      source: 'watcher',
-      watchRootId: id,
-      rootPath: absoluteRoot,
-      auto,
-      extract,
-    },
-    initialProgress: {
-      currentStep: 'watcher_cycle',
-      message: 'Running watcher scan and knowledge ingestion cycle.',
-    },
-  }, async () => {
-    const scan = await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
-    let knowledge = null;
+  const cycleDb = openDatabase();
+  const insert = cycleDb.transaction((record) => upsertIndexedFile(cycleDb, record));
 
-    if (auto) {
-      knowledge = await runKnowledgeIngestionPipeline(db, { extract, logger });
-    }
+  try {
+    return await runJob({
+      type: JOB_TYPES.WATCHER_CYCLE,
+      input: {
+        source: 'watcher',
+        watchRootId: id,
+        rootPath: absoluteRoot,
+        auto,
+        extract,
+      },
+      initialProgress: {
+        currentStep: 'watcher_cycle',
+        message: 'Running watcher scan and knowledge ingestion cycle.',
+      },
+    }, async () => {
+      const scan = await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
+      let knowledge = null;
 
+      if (auto) {
+        knowledge = await runKnowledgeIngestionPipeline(cycleDb, { extract, logger });
+      }
+
+      upsertWatchRoot(cycleDb, {
+        id,
+        root_path: absoluteRoot,
+        status: 'active',
+        last_event_at: new Date().toISOString(),
+        error_message: null,
+        created_at: new Date().toISOString(),
+      });
+
+      return {
+        scan,
+        knowledge,
+      };
+    });
+  } finally {
+    cycleDb.close();
+  }
+}
+
+function markWatchRootFailed({ id, absoluteRoot, error }) {
+  const db = openDatabase();
+  try {
     upsertWatchRoot(db, {
       id,
       root_path: absoluteRoot,
-      status: 'active',
+      status: 'failed',
       last_event_at: new Date().toISOString(),
-      error_message: null,
+      error_message: error.message,
       created_at: new Date().toISOString(),
     });
-
-    return {
-      scan,
-      knowledge,
-    };
-  });
+  } finally {
+    db.close();
+  }
 }
 
 export async function startFolderWatcher(db, {
@@ -75,7 +97,6 @@ export async function startFolderWatcher(db, {
     return { id, rootPath: absoluteRoot, status: 'active', already_running: true };
   }
 
-  const insert = db.transaction((record) => upsertIndexedFile(db, record));
   let timer = null;
   let running = false;
   let pending = false;
@@ -91,19 +112,12 @@ export async function startFolderWatcher(db, {
     try {
       do {
         pending = false;
-        const jobResult = await runWatchCycle(db, { id, absoluteRoot, insert, extract, auto, logger });
+        const jobResult = await runWatchCycle({ id, absoluteRoot, extract, auto, logger });
         lastJob = jobResult.job;
       } while (pending);
     } catch (error) {
       logger.error(`Watcher failed for ${absoluteRoot}: ${error.message}`);
-      upsertWatchRoot(db, {
-        id,
-        root_path: absoluteRoot,
-        status: 'failed',
-        last_event_at: new Date().toISOString(),
-        error_message: error.message,
-        created_at: new Date().toISOString(),
-      });
+      markWatchRootFailed({ id, absoluteRoot, error });
     } finally {
       running = false;
     }
