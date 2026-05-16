@@ -10,6 +10,13 @@ type ApiToast = {
 function apiSuccessToast(path: string, method: string, payload: any): ApiToast | null {
   const normalizedMethod = method.toUpperCase();
 
+  if (/^\/api\/files\/[^/]+\/reveal/.test(path)) {
+    return {
+      title: 'Source location opened',
+      message: payload?.file?.filename || 'The source file was revealed.',
+    };
+  }
+
   if (path.startsWith('/api/wiki/build')) {
     return {
       title: 'Wiki built',
