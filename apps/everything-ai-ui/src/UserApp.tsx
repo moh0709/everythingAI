@@ -104,6 +104,13 @@ function formatSize(bytes = 0) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
+function filePathHref(filePath = '') {
+  if (!filePath) return '';
+  const normalized = filePath.replace(/\\/g, '/');
+  const prefixed = normalized.startsWith('/') ? normalized : `/${normalized}`;
+  return `file://${encodeURI(prefixed)}`;
+}
+
 function updateStep(steps: SetupStep[], id: string, status: SetupStep['status']) {
   return steps.map((step) => step.id === id ? { ...step, status } : step);
 }
@@ -556,8 +563,8 @@ export function UserApp() {
                 {selectedWikiPage.sources.map((source) => <div className="source-card wiki-source-card" key={`${source.ref}-${source.file_id}`}>
                   <strong>[{source.ref}] {source.filename || 'Source'}</strong>
                   <p>{source.location || 'file-level reference'}</p>
-                  <small>{source.absolute_path}</small>
-                  {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source</button>}
+                  {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
+                  {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source context</button>}
                 </div>)}
               </div>
             </> : <p>Select a page to inspect sources.</p>}
