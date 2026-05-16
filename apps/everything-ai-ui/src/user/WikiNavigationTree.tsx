@@ -55,6 +55,20 @@ function sortPages(a: WikiPage, b: WikiPage) {
   return (typeOrder[a.page_type] ?? 9) - (typeOrder[b.page_type] ?? 9) || a.title.localeCompare(b.title);
 }
 
+function isSelectedWithinTopic(topic: WikiTopicNode, selectedPageId?: string) {
+  if (!selectedPageId) return false;
+  return topic.topicPage?.id === selectedPageId
+    || topic.filePages.some((page) => page.id === selectedPageId)
+    || topic.otherPages.some((page) => page.id === selectedPageId);
+}
+
+function isSelectedWithinCategory(category: WikiCategoryNode, selectedPageId?: string) {
+  if (!selectedPageId) return false;
+  return category.landingPage?.id === selectedPageId
+    || category.loosePages.some((page) => page.id === selectedPageId)
+    || category.topics.some((topic) => isSelectedWithinTopic(topic, selectedPageId));
+}
+
 function buildTree(pages: WikiPage[]) {
   const systemPages = pages.filter((page) => page.page_type === 'system').sort(sortPages);
   const categoryMap = new Map<string, {
@@ -136,50 +150,77 @@ function PageButton({ page, selectedPageId, onSelect, compact = false }: {
     onClick={() => onSelect(page.id)}
     title={page.summary || page.title}
   >
-    <span>{page.page_type}</span>
-    <strong>{page.title}</strong>
-    {!compact && <small>{sourceCount(page)} source(s)</small>}
+    <span className="wiki-tree-page-icon">{page.page_type === 'file' ? '📄' : page.page_type === 'topic' ? '📘' : page.page_type === 'category' ? '📁' : '🏠'}</span>
+    <span className="wiki-tree-page-label">
+      <strong>{page.title}</strong>
+      {!compact && <small>{sourceCount(page)} source(s)</small>}
+    </span>
   </button>;
 }
 
 export function WikiNavigationTree({ pages, selectedPageId, onSelect }: WikiNavigationTreeProps) {
   const tree = buildTree(pages);
 
-  return <div className="wiki-tree">
-    {tree.systemPages.length > 0 && <section className="wiki-tree-section">
-      <h3>Workspace</h3>
-      {tree.systemPages.map((page) => <PageButton key={page.id} page={page} selectedPageId={selectedPageId} onSelect={onSelect} />)}
+  return <div className="wiki-folder-tree">
+    {tree.systemPages.length > 0 && <section className="wiki-folder-section">
+      <div className="wiki-folder-section-title">Home</div>
+      <div className="wiki-folder-root-line">
+        {tree.systemPages.map((page) => <PageButton key={page.id} page={page} selectedPageId={selectedPageId} onSelect={onSelect} />)}
+      </div>
     </section>}
 
-    <section className="wiki-tree-section">
-      <h3>Categories</h3>
+    <section className="wiki-folder-section">
+      <div className="wiki-folder-section-title">Categories</div>
       {!tree.categories.length && <p className="muted">No categories generated yet.</p>}
-      {tree.categories.map((category) => <details key={category.name} className="wiki-tree-category" open>
-        <summary>
-          <span>
-            <strong>{category.name}</strong>
-            <small>{category.totalPages} page(s) · {category.totalSources} source(s)</small>
-          </span>
-        </summary>
-
-        {category.landingPage && <PageButton page={category.landingPage} selectedPageId={selectedPageId} onSelect={onSelect} />}
-
-        <div className="wiki-tree-topics">
-          {category.topics.map((topic) => <details key={`${category.name}-${topic.name}`} className="wiki-tree-topic" open={Boolean(topic.topicPage && selectedPageId === topic.topicPage.id)}>
+      <div className="wiki-folder-root-line">
+        {tree.categories.map((category) => {
+          const selectedInCategory = isSelectedWithinCategory(category, selectedPageId);
+          return <details key={category.name} className="wiki-folder-category" open={selectedInCategory || category.totalPages >= 3}>
             <summary>
-              <span>{topic.name}</span>
-              <small>{(topic.topicPage ? 1 : 0) + topic.filePages.length + topic.otherPages.length}</small>
+              <span className="wiki-folder-node-icon">📁</span>
+              <span className="wiki-folder-node-label">
+                <strong>{category.name}</strong>
+                <small>{category.totalPages} page(s) · {category.totalSources} source(s)</small>
+              </span>
             </summary>
 
-            {topic.topicPage && <PageButton compact page={topic.topicPage} selectedPageId={selectedPageId} onSelect={onSelect} />}
-            {topic.otherPages.map((page) => <PageButton compact key={page.id} page={page} selectedPageId={selectedPageId} onSelect={onSelect} />)}
-            {topic.filePages.length > 0 && <details className="wiki-tree-files">
-              <summary>Source file pages <small>{topic.filePages.length}</small></summary>
-              {topic.filePages.map((page) => <PageButton compact key={page.id} page={page} selectedPageId={selectedPageId} onSelect={onSelect} />)}
-            </details>}
-          </details>)}
-        </div>
-      </details>)}
+            <div className="wiki-folder-children">
+              {category.landingPage && <PageButton page={category.landingPage} selectedPageId={selectedPageId} onSelect={onSelect} />}
+
+              {category.topics.map((topic) => {
+                const topicPageCount = (topic.topicPage ? 1 : 0) + topic.filePages.length + topic.otherPages.length;
+                const selectedInTopic = isSelectedWithinTopic(topic, selectedPageId);
+                return <details key={`${category.name}-${topic.name}`} className="wiki-folder-topic" open={selectedInTopic}>
+                  <summary>
+                    <span className="wiki-folder-node-icon">📂</span>
+                    <span className="wiki-folder-node-label">
+                      <strong>{topic.name}</strong>
+                      <small>{topicPageCount} page(s)</small>
+                    </span>
+                  </summary>
+
+                  <div className="wiki-folder-children">
+                    {topic.topicPage && <PageButton compact page={topic.topicPage} selectedPageId={selectedPageId} onSelect={onSelect} />}
+                    {topic.otherPages.map((page) => <PageButton compact key={page.id} page={page} selectedPageId={selectedPageId} onSelect={onSelect} />)}
+                    {topic.filePages.length > 0 && <details className="wiki-folder-files" open={selectedInTopic}>
+                      <summary>
+                        <span className="wiki-folder-node-icon">🗂️</span>
+                        <span className="wiki-folder-node-label">
+                          <strong>Source file pages</strong>
+                          <small>{topic.filePages.length} file(s)</small>
+                        </span>
+                      </summary>
+                      <div className="wiki-folder-children">
+                        {topic.filePages.map((page) => <PageButton compact key={page.id} page={page} selectedPageId={selectedPageId} onSelect={onSelect} />)}
+                      </div>
+                    </details>}
+                  </div>
+                </details>;
+              })}
+            </div>
+          </details>;
+        })}
+      </div>
     </section>
   </div>;
 }
