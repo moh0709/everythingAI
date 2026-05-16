@@ -5,6 +5,7 @@ const SPREADSHEET_EXTENSIONS = new Set(['.xlsx', '.xls', '.csv']);
 const DOCUMENT_EXTENSIONS = new Set(['.pdf', '.docx', '.doc', '.txt', '.md', '.rtf']);
 const DEFAULT_FILE_CONTENT_LIMIT = Number.parseInt(process.env.EVERYTHINGAI_WIKI_FILE_CONTENT_LIMIT || '', 10) || 50000;
 const DEFAULT_TOPIC_CONTENT_LIMIT = Number.parseInt(process.env.EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT || '', 10) || 4000;
+const DEFAULT_CHUNK_CHAR_LIMIT = Number.parseInt(process.env.EVERYTHINGAI_WIKI_CHUNK_CHAR_LIMIT || '', 10) || 900;
 
 const CATEGORY_RULES = [
   { category: 'Finance', terms: ['finance', 'financial', 'invoice', 'payment', 'price', 'quote', 'budget', 'bank', 'accounting', 'value'] },
@@ -69,7 +70,7 @@ function limitText(text = '', limit = DEFAULT_FILE_CONTENT_LIMIT) {
 }
 
 function escapeTableCell(value = '') {
-  return String(value ?? '').replaceAll('\n', ' ').replaceAll('|', '\|').trim();
+  return String(value ?? '').replace(/\n/g, ' ').replace(/\|/g, '\\|').trim();
 }
 
 function markdownTable(headers, rows) {
@@ -80,7 +81,16 @@ function markdownTable(headers, rows) {
   return [headerLine, divider, ...body].join('\n');
 }
 
-function fileSource(file, index, evidence = '') {
+function looksLikeHeading(line) {
+  const clean = line.trim();
+  if (!clean || clean.length > 90) return false;
+  if (/^\d+(\.\d+)*\s+\S+/.test(clean)) return true;
+  if (/^[A-ZÆØÅ0-9][A-ZÆØÅ0-9\s:()/-]{5,}$/.test(clean)) return true;
+  if (!/[.!?]$/.test(clean) && clean.split(/\s+/).length <= 8 && clean.length >= 4) return true;
+  return false;
+}
+
+function fileSource(file, index, evidence = '', chunks = []) {
   return {
     ref: `S${index + 1}`,
     file_id: file.fileId || file.file_id || file.id,
@@ -89,15 +99,113 @@ function fileSource(file, index, evidence = '') {
     relative_path: file.relative_path,
     location: 'extracted document content',
     evidence,
+    chunks,
   };
+}
+
+function createSourceChunks(text = '', sourceRef = 'S1', { limit = DEFAULT_FILE_CONTENT_LIMIT, maxChunkChars = DEFAULT_CHUNK_CHAR_LIMIT, maxChunks = 120 } = {}) {
+  const limited = limitText(text, limit);
+  if (!limited) return [];
+
+  const rawLines = limited.split('\n');
+  const chunks = [];
+  let buffer = [];
+  let startLine = 1;
+  let charCursor = 0;
+  let chunkStartChar = 0;
+
+  function flushBuffer(endLine) {
+    const content = buffer.join('\n').trim();
+    if (!content) {
+      buffer = [];
+      return;
+    }
+
+    const chunkNumber = chunks.length + 1;
+    chunks.push({
+      ref: `${sourceRef}:C${chunkNumber}`,
+      source_ref: sourceRef,
+      chunk_number: chunkNumber,
+      line_start: startLine,
+      line_end: endLine,
+      char_start: chunkStartChar,
+      char_end: chunkStartChar + content.length,
+      location: `chunk ${chunkNumber}, lines ${startLine}-${endLine}`,
+      heading: looksLikeHeading(content) && !content.includes('\n'),
+      text: content,
+      evidence: evidenceSnippet(content),
+    });
+    buffer = [];
+  }
+
+  rawLines.forEach((rawLine, index) => {
+    if (chunks.length >= maxChunks) return;
+
+    const lineNumber = index + 1;
+    const line = rawLine.trim();
+    const isBlank = !line;
+    const isHeading = looksLikeHeading(line);
+    const currentLength = buffer.join('\n').length;
+
+    if (!buffer.length && !isBlank) {
+      startLine = lineNumber;
+      chunkStartChar = charCursor;
+    }
+
+    if (isHeading && buffer.length) {
+      flushBuffer(lineNumber - 1);
+      startLine = lineNumber;
+      chunkStartChar = charCursor;
+    }
+
+    if (isBlank) {
+      if (buffer.length) flushBuffer(lineNumber - 1);
+    } else if (currentLength + line.length > maxChunkChars && buffer.length) {
+      flushBuffer(lineNumber - 1);
+      startLine = lineNumber;
+      chunkStartChar = charCursor;
+      buffer.push(line);
+    } else {
+      buffer.push(line);
+    }
+
+    charCursor += rawLine.length + 1;
+  });
+
+  if (chunks.length < maxChunks && buffer.length) {
+    flushBuffer(rawLines.length);
+  }
+
+  return chunks;
+}
+
+function renderChunkText(chunk) {
+  const text = chunk.text.trim();
+  if (!text) return '';
+
+  if (/^#{1,6}\s/.test(text)) return `${text} **[${chunk.ref}]**`;
+  if (chunk.heading) return `### ${text} **[${chunk.ref}]**`;
+  if (/^[-*•]\s+/.test(text)) return `- ${text.replace(/^[-*•]\s+/, '')} **[${chunk.ref}]**`;
+  if (/^\d+[.)]\s+/.test(text)) return `- ${text} **[${chunk.ref}]**`;
+  return `${text} **[${chunk.ref}]**`;
+}
+
+function normalizeDocumentContent(text = '', { limit = DEFAULT_FILE_CONTENT_LIMIT, sourceRef = 'S1' } = {}) {
+  const chunks = createSourceChunks(text, sourceRef, { limit });
+  if (!chunks.length) return 'No extracted document content is available yet.';
+  return chunks.map(renderChunkText).join('\n\n');
 }
 
 function sourceFootnotes(sources) {
   if (!sources.length) return '';
+  const sourceLines = sources.map((source) => `- [${source.ref}] **${source.filename}** — ${source.location}`);
+  const chunkLines = sources.flatMap((source) => (source.chunks || []).slice(0, 30).map((chunk) => `- [${chunk.ref}] ${source.filename} — ${chunk.location}`));
+
   return [
     '## Sources',
     '',
-    ...sources.map((source) => `- [${source.ref}] **${source.filename}** — ${source.location}`),
+    ...sourceLines,
+    ...(chunkLines.length ? ['', '## Source Locations', '', ...chunkLines] : []),
     '',
     '## Evidence Snippets',
     '',
@@ -118,55 +226,15 @@ function buildRelatedPagesBlock(relatedPages = []) {
   return ['## Related Pages', '', ...relatedPages.map((page) => `- [[${page.title || page}]]`), ''].join('\n');
 }
 
-function looksLikeHeading(line) {
-  const clean = line.trim();
-  if (!clean || clean.length > 90) return false;
-  if (/^\d+(\.\d+)*\s+\S+/.test(clean)) return true;
-  if (/^[A-ZÆØÅ0-9][A-ZÆØÅ0-9\s:()/-]{5,}$/.test(clean)) return true;
-  if (!/[.!?]$/.test(clean) && clean.split(/\s+/).length <= 8 && clean.length >= 4) return true;
-  return false;
-}
-
-function normalizeDocumentContent(text = '', { limit = DEFAULT_FILE_CONTENT_LIMIT, sourceRef = 'S1' } = {}) {
-  const limited = limitText(text, limit);
-  if (!limited) return 'No extracted document content is available yet.';
-
-  const lines = limited
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line, index, arr) => line || arr[index - 1]);
-
-  const result = [];
-  let blankCount = 0;
-
-  for (const line of lines) {
-    if (!line) {
-      blankCount += 1;
-      if (blankCount <= 1) result.push('');
-      continue;
-    }
-    blankCount = 0;
-
-    if (/^#{1,6}\s/.test(line)) {
-      result.push(line);
-    } else if (/^[-*•]\s+/.test(line)) {
-      result.push(`- ${line.replace(/^[-*•]\s+/, '')} **[${sourceRef}]**`);
-    } else if (/^\d+[.)]\s+/.test(line)) {
-      result.push(`- ${line} **[${sourceRef}]**`);
-    } else if (looksLikeHeading(line)) {
-      result.push(`### ${line}`);
-    } else {
-      result.push(`${line} **[${sourceRef}]**`);
-    }
-  }
-
-  return result.join('\n');
-}
-
 function contentOverviewFromInsights(insights, sources) {
   const rows = insights.slice(0, 12).map((insight, index) => {
     const source = sources[index];
-    return [insight.filename, firstSentence(insight.summary) || 'No summary available yet.', source ? `[${source.ref}]` : ''];
+    const firstChunk = source?.chunks?.[0];
+    return [
+      insight.filename,
+      firstSentence(insight.summary) || 'No summary available yet.',
+      firstChunk ? `[${firstChunk.ref}]` : source ? `[${source.ref}]` : '',
+    ];
   });
   return rows.length ? markdownTable(['Document', 'Content summary', 'Source'], rows) : 'No document summaries are available yet.';
 }
@@ -184,6 +252,13 @@ function buildMediaBlock(files) {
   ].join('\n');
 }
 
+function makeSourceForInsight(insight, index, extractedByFileId, { limit = DEFAULT_FILE_CONTENT_LIMIT, maxChunks = 80 } = {}) {
+  const extractedText = extractedByFileId.get(insight.file_id)?.extracted_text || insight.summary || '';
+  const sourceRef = `S${index + 1}`;
+  const chunks = createSourceChunks(extractedText, sourceRef, { limit, maxChunks });
+  return fileSource(insight, index, evidenceSnippet(extractedText, insight.summary), chunks);
+}
+
 function buildWorkspaceMarkdown({ status, files, insights, sources }) {
   const categoryRows = Object.entries(insights.reduce((acc, insight) => {
     const key = insight.category || categoryFor(insight);
@@ -191,7 +266,10 @@ function buildWorkspaceMarkdown({ status, files, insights, sources }) {
     return acc;
   }, {})).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([topic, count]) => [topic, `${count} document(s)`]);
 
-  const recentDocuments = insights.slice(0, 10).map((insight, index) => [insight.filename, insight.category || 'General Knowledge', sources[index] ? `[${sources[index].ref}]` : '']);
+  const recentDocuments = insights.slice(0, 10).map((insight, index) => {
+    const firstChunk = sources[index]?.chunks?.[0];
+    return [insight.filename, insight.category || 'General Knowledge', firstChunk ? `[${firstChunk.ref}]` : sources[index] ? `[${sources[index].ref}]` : ''];
+  });
 
   return [
     buildPageHeader({
@@ -210,7 +288,7 @@ function buildWorkspaceMarkdown({ status, files, insights, sources }) {
     '',
     '## How to Use This Wiki',
     '',
-    'Open a category, then a topic, then a source-backed file page. File pages prioritize the extracted content from the original document. Source markers such as **[S1]** connect text back to the original source file.',
+    'Open a category, then a topic, then a source-backed file page. File pages prioritize the extracted content from the original document. Source markers such as **[S1:C3]** connect text back to a specific generated source chunk.',
     '',
     sourceFootnotes(sources),
   ].join('\n');
@@ -243,16 +321,19 @@ function buildCategoryMarkdown(category, categoryInsights, sources, relatedPages
   ].join('\n');
 }
 
-function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPages, allFiles, extractedByFileId) {
-  const sourceRows = sources.map((source) => [source.ref, source.filename, source.location]);
+function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPages, allFiles) {
+  const sourceRows = sources.map((source) => {
+    const firstChunk = source.chunks?.[0];
+    return [source.ref, source.filename, firstChunk ? firstChunk.location : source.location];
+  });
   const relatedFiles = allFiles.filter((file) => topicInsights.some((insight) => insight.file_id === file.id));
   const contentSections = topicInsights.slice(0, 6).map((insight, index) => {
     const source = sources[index];
-    const extractedText = extractedByFileId.get(insight.file_id)?.extracted_text || insight.summary || '';
+    const chunks = source.chunks?.slice(0, 8) || [];
     return [
       `### ${insight.filename} **[${source.ref}]**`,
       '',
-      normalizeDocumentContent(extractedText, { limit: DEFAULT_TOPIC_CONTENT_LIMIT, sourceRef: source.ref }),
+      chunks.length ? chunks.map(renderChunkText).join('\n\n') : 'No extracted source content is available yet.',
     ].join('\n');
   }).join('\n\n');
 
@@ -283,14 +364,14 @@ function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPage
 
 function buildFileMarkdown(insight, extractedFile, relatedPages) {
   const extractedContent = extractedFile?.extracted_text || '';
-  const evidence = evidenceSnippet(extractedContent, insight.summary);
-  const source = fileSource(insight, 0, evidence);
+  const chunks = createSourceChunks(extractedContent || insight.summary || '', 'S1', { limit: DEFAULT_FILE_CONTENT_LIMIT, maxChunks: 160 });
+  const source = fileSource(insight, 0, evidenceSnippet(extractedContent, insight.summary), chunks);
   const entities = parseEntities(insight.entities_json);
   const entityRows = Object.entries(entities).filter(([, values]) => Array.isArray(values) && values.length).flatMap(([group, values]) => values.slice(0, 12).map((value) => [group, value]));
   const category = insight.category || categoryFor(insight);
   const subcategory = insight.subcategory || subcategoryFor(insight);
   const updatedAt = insight.generated_at || new Date().toISOString();
-  const documentContent = normalizeDocumentContent(extractedContent || insight.summary || '', { limit: DEFAULT_FILE_CONTENT_LIMIT, sourceRef: source.ref });
+  const documentContent = chunks.length ? chunks.map(renderChunkText).join('\n\n') : 'No extracted document content is available yet.';
 
   return {
     id: `file-${insight.file_id}`,
@@ -377,7 +458,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
   });
 
   const pages = [];
-  const workspaceSources = enrichedInsights.slice(0, 10).map((insight, index) => fileSource(insight, index, evidenceSnippet(extractedByFileId.get(insight.file_id)?.extracted_text, insight.summary)));
+  const workspaceSources = enrichedInsights.slice(0, 10).map((insight, index) => makeSourceForInsight(insight, index, extractedByFileId, { limit: DEFAULT_TOPIC_CONTENT_LIMIT, maxChunks: 8 }));
 
   pages.push({
     id: 'workspace-overview',
@@ -404,7 +485,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
   const categoryPageRefs = Array.from(byCategory.keys()).map((category) => ({ id: `category-${safeSlug(category)}`, title: category, slug: `category-${safeSlug(category)}` }));
 
   for (const [category, categoryInsights] of byCategory.entries()) {
-    const categorySources = categoryInsights.slice(0, 14).map((insight, index) => fileSource(insight, index, evidenceSnippet(extractedByFileId.get(insight.file_id)?.extracted_text, insight.summary)));
+    const categorySources = categoryInsights.slice(0, 14).map((insight, index) => makeSourceForInsight(insight, index, extractedByFileId, { limit: DEFAULT_TOPIC_CONTENT_LIMIT, maxChunks: 4 }));
     const relatedPages = categoryPageRefs.filter((page) => page.title !== category).slice(0, 8);
     pages.push({
       id: `category-${safeSlug(category)}`,
@@ -437,7 +518,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
 
   for (const [topicKey, topicInsights] of byTopic.entries()) {
     const [category, topic] = topicKey.split('::');
-    const topicSources = topicInsights.slice(0, 14).map((insight, index) => fileSource(insight, index, evidenceSnippet(extractedByFileId.get(insight.file_id)?.extracted_text, insight.summary)));
+    const topicSources = topicInsights.slice(0, 14).map((insight, index) => makeSourceForInsight(insight, index, extractedByFileId, { limit: DEFAULT_TOPIC_CONTENT_LIMIT, maxChunks: 8 }));
     const relatedPages = [{ id: `category-${safeSlug(category)}`, title: category, slug: `category-${safeSlug(category)}` }, ...topicPageRefs.filter((page) => page.category === category && page.title !== topic).slice(0, 6)];
     pages.push({
       id: `topic-${safeSlug(category)}-${safeSlug(topic)}`,
@@ -451,7 +532,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
       related_topics: relatedPages.map((page) => page.title),
       related_pages: relatedPages,
       sources: topicSources,
-      markdown: buildTopicMarkdown(topic, category, topicInsights.slice(0, 14), topicSources, relatedPages, files, extractedByFileId),
+      markdown: buildTopicMarkdown(topic, category, topicInsights.slice(0, 14), topicSources, relatedPages, files),
       updated_at: new Date().toISOString(),
     });
   }
