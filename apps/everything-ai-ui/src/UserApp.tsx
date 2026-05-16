@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Shield, Sparkles } from 'lucide-react';
 import { apiRequest, ApiOptions, IndexedFile } from './api';
 
@@ -53,15 +53,24 @@ type WikiSource = {
   evidence?: string;
 };
 
+type WikiRelatedPage = {
+  id?: string;
+  title: string;
+  slug?: string;
+};
+
 type WikiPage = {
   id: string;
   title: string;
   slug: string;
-  page_type: 'system' | 'topic' | 'file' | string;
+  page_type: 'system' | 'category' | 'topic' | 'file' | string;
+  category?: string;
+  subcategory?: string;
   summary: string;
   markdown: string;
   source_file_ids: string[];
   related_topics: string[];
+  related_pages?: WikiRelatedPage[];
   sources: WikiSource[];
   updated_at: string;
 };
@@ -69,6 +78,7 @@ type WikiPage = {
 type WikiPayload = {
   generated_at: string;
   page_count: number;
+  categories?: WikiRelatedPage[];
   pages: WikiPage[];
 };
 
@@ -97,20 +107,61 @@ function updateStep(steps: SetupStep[], id: string, status: SetupStep['status'])
   return steps.map((step) => step.id === id ? { ...step, status } : step);
 }
 
-function renderMarkdownLine(line: string, index: number) {
-  if (line.startsWith('# ')) return <h1 key={index}>{line.slice(2)}</h1>;
-  if (line.startsWith('## ')) return <h2 key={index}>{line.slice(3)}</h2>;
-  if (line.startsWith('### ')) return <h3 key={index}>{line.slice(4)}</h3>;
-  if (line.startsWith('- ')) return <li key={index}>{line.slice(2)}</li>;
-  if (line.startsWith('> ')) return <blockquote key={index}>{line.slice(2)}</blockquote>;
-  if (!line.trim()) return <br key={index} />;
-  return <p key={index}>{line}</p>;
+function renderInlineMarkdown(text: string): ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+\])/g).filter(Boolean);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith('*') && part.endsWith('*')) return <em key={index}>{part.slice(1, -1)}</em>;
+    if (part.startsWith('[[') && part.endsWith(']]')) return <span key={index} className="wiki-link">{part.slice(2, -2)}</span>;
+    if (/^\[S\d+\]$/.test(part)) return <sup key={index} className="wiki-source-ref">{part}</sup>;
+    return part;
+  });
+}
+
+function parseTable(lines: string[], startIndex: number) {
+  const tableLines: string[] = [];
+  let index = startIndex;
+  while (index < lines.length && lines[index].trim().startsWith('|')) {
+    tableLines.push(lines[index]);
+    index += 1;
+  }
+  const rows = tableLines
+    .filter((line) => !/^\|\s*-+/.test(line.trim()))
+    .map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
+  const [headers = [], ...body] = rows;
+  return { headers, body, nextIndex: index };
 }
 
 function MarkdownArticle({ markdown }: { markdown: string }) {
-  return <article className="wiki-article">
-    {markdown.split('\n').map(renderMarkdownLine)}
-  </article>;
+  const lines = markdown.split('\n');
+  const nodes: ReactNode[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('|')) {
+      const table = parseTable(lines, index);
+      nodes.push(<table key={`table-${index}`} className="wiki-table">
+        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header)}</th>)}</tr></thead>
+        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell)}</td>)}</tr>)}</tbody>
+      </table>);
+      index = table.nextIndex;
+      continue;
+    }
+
+    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2))}</h1>);
+    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3))}</h2>);
+    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4))}</h3>);
+    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2))}</li>);
+    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2))}</blockquote>);
+    else if (!line.trim()) nodes.push(<br key={index} />);
+    else nodes.push(<p key={index}>{renderInlineMarkdown(line)}</p>);
+    index += 1;
+  }
+
+  return <article className="wiki-article">{nodes}</article>;
 }
 
 export function UserApp() {
@@ -458,7 +509,7 @@ export function UserApp() {
         {error && <div className="error">{error}</div>}
         <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
 
-        <section className="hero-row">
+        <section className="hero-row wiki-hero">
           <div>
             <h1><BookOpen /> Source-backed Wiki</h1>
             <p>Wikipedia-style pages generated from indexed files, insights, extracted text, and filebase metadata. Every page keeps source references.</p>
@@ -470,8 +521,8 @@ export function UserApp() {
           </div>
         </section>
 
-        <section className="explorer-grid">
-          <div className="panel">
+        <section className="wiki-layout">
+          <aside className="wiki-sidebar panel">
             <div className="panel-title">
               <div>
                 <h2><BookOpen /> Wiki Pages</h2>
@@ -479,43 +530,44 @@ export function UserApp() {
               </div>
             </div>
             {!wiki?.pages.length && <p className="muted">No wiki pages yet. Click Build Wiki after building your knowledge workspace.</p>}
-            <div className="source-list compact-source-list">
-              {wiki?.pages.map((page) => <button
-                key={page.id}
-                className={`source-card ${selectedWikiPage?.id === page.id ? 'selected' : ''}`}
-                onClick={() => setSelectedWikiPageId(page.id)}
-              >
+            <div className="wiki-page-list">
+              {wiki?.pages.map((page) => <button key={page.id} className={`wiki-page-button ${selectedWikiPage?.id === page.id ? 'selected' : ''}`} onClick={() => setSelectedWikiPageId(page.id)}>
+                <span className="wiki-page-type">{page.page_type}</span>
                 <strong>{page.title}</strong>
-                <p>{page.page_type} · {page.sources.length} source(s)</p>
+                <small>{page.category || 'Knowledge'}{page.subcategory ? ` / ${page.subcategory}` : ''}</small>
               </button>)}
             </div>
-          </div>
+          </aside>
 
-          <aside className="details">
+          <section className="wiki-main panel">
             {selectedWikiPage ? <>
-              <h2>{selectedWikiPage.title}</h2>
-              <p>{selectedWikiPage.summary}</p>
-              <p><strong>Updated:</strong> {selectedWikiPage.updated_at}</p>
-              <p><strong>Source files:</strong> {selectedWikiPage.source_file_ids.length}</p>
-              <div className="button-row">
+              <div className="wiki-titlebar">
+                <div>
+                  <span className="wiki-page-type">{selectedWikiPage.page_type}</span>
+                  <h1>{selectedWikiPage.title}</h1>
+                  <p>{selectedWikiPage.summary}</p>
+                </div>
                 <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this page</button>
               </div>
-              <h3>Sources of truth</h3>
+              <MarkdownArticle markdown={selectedWikiPage.markdown} />
+            </> : <p>Select a wiki page.</p>}
+          </section>
+
+          <aside className="wiki-source-rail panel">
+            {selectedWikiPage ? <>
+              <h3>Sources</h3>
+              <p className="muted">Source of truth for this article.</p>
               <div className="source-list compact-source-list">
-                {selectedWikiPage.sources.map((source) => <div className="source-card" key={`${source.ref}-${source.file_id}`}>
+                {selectedWikiPage.sources.map((source) => <div className="source-card wiki-source-card" key={`${source.ref}-${source.file_id}`}>
                   <strong>[{source.ref}] {source.filename || 'Source'}</strong>
                   <p>{source.location || 'file-level reference'}</p>
                   <small>{source.absolute_path}</small>
                   {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source</button>}
                 </div>)}
               </div>
-            </> : <p>Select a wiki page.</p>}
+            </> : <p>Select a page to inspect sources.</p>}
           </aside>
         </section>
-
-        {selectedWikiPage && <section className="panel">
-          <MarkdownArticle markdown={selectedWikiPage.markdown} />
-        </section>}
       </>}
 
       {view === 'ask' && <>
@@ -535,14 +587,7 @@ export function UserApp() {
               <h2>Ask a question about your indexed workspace</h2>
               <p>EverythingAI will answer using extracted local file context when sources are available.</p>
               <div className="chat-suggestions">
-                {EXAMPLE_PROMPTS.map((prompt) => <button
-                  key={prompt}
-                  className="suggestion-chip"
-                  onClick={() => askQuestion(prompt)}
-                  disabled={busy}
-                >
-                  {prompt}
-                </button>)}
+                {EXAMPLE_PROMPTS.map((prompt) => <button key={prompt} className="suggestion-chip" onClick={() => askQuestion(prompt)} disabled={busy}>{prompt}</button>)}
               </div>
             </div>}
 
@@ -559,26 +604,11 @@ export function UserApp() {
               </div>}
             </article>)}
 
-            {busy && <article className="chat-bubble assistant thinking">
-              <strong>EverythingAI</strong>
-              <p>Thinking<span className="dots">...</span></p>
-            </article>}
+            {busy && <article className="chat-bubble assistant thinking"><strong>EverythingAI</strong><p>Thinking<span className="dots">...</span></p></article>}
           </div>
 
           <form className="chat-input-row" onSubmit={handleChatSubmit}>
-            <textarea
-              ref={chatInputRef}
-              value={chatInput}
-              onChange={(event) => setChatInput(event.target.value)}
-              placeholder="Ask about indexed files, source context, documents, or extracted knowledge..."
-              rows={2}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  event.preventDefault();
-                  askQuestion();
-                }
-              }}
-            />
+            <textarea ref={chatInputRef} value={chatInput} onChange={(event) => setChatInput(event.target.value)} placeholder="Ask about indexed files, source context, documents, or extracted knowledge..." rows={2} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); askQuestion(); } }} />
             <button type="submit" disabled={busy || !chatInput.trim()}><Send size={16} /> Ask</button>
           </form>
         </section>
