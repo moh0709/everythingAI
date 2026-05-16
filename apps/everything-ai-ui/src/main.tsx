@@ -1,11 +1,13 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { UserApp } from './UserApp';
+import { ToastProvider } from './user/ToastProvider';
 import './styles.css';
 import './user/wikiNavigationTree.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <UserApp />
+    <ToastProvider />
   </React.StrictMode>,
 );
