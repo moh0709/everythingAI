@@ -4,7 +4,32 @@
 
 This roadmap converts the enterprise architecture into an executable MVP build sequence.
 
-The project should now prioritize disciplined implementation over more conceptual expansion.
+The project should prioritize disciplined implementation over more conceptual expansion.
+
+## Current execution reality
+
+As of the latest local MVP work, the project is not starting from Sprint 1 anymore. The backend local MVP foundation is already strong, and the active bottleneck is the **user-facing product experience**, especially the source-backed Wiki / Knowledge Base layer.
+
+Current confirmed direction:
+
+```text
+local files
+  -> indexing
+  -> extraction
+  -> content-first wiki generation
+  -> category/topic knowledge navigation
+  -> intelligent wiki search
+  -> source-backed reading mode
+  -> safe source inspection
+```
+
+Current active priority:
+
+```text
+finish the local user MVP experience before expanding into enterprise production-platform architecture
+```
+
+The enterprise roadmap below remains the strategic target, but the immediate execution path is now focused on the local MVP user experience and Wiki/Knowledge Base quality.
 
 ## Core implementation principle
 
@@ -13,10 +38,12 @@ Build one end-to-end loop before expanding.
 The first working system must support:
 
 ```text
-upload files
+upload/index files
   -> extract content
   -> search them
-  -> generate plan
+  -> generate source-backed knowledge pages
+  -> inspect source references
+  -> optionally generate plan
   -> simulate plan
   -> approve plan
   -> execute safely
@@ -82,7 +109,7 @@ extraction status UI
 
 Acceptance criteria:
 
-- Uploaded files are extracted.
+- Uploaded/indexed files are extracted.
 - Extracted content is stored.
 - Failed extractions create visible status.
 - Source file references are preserved.
@@ -98,16 +125,21 @@ search result cards
 source references
 knowledge areas
 semantic collections baseline
+content-first wiki pages
+category/topic navigation
+source-backed reading mode
 ```
 
 Deliverables:
 
 ```text
 retrieval service
-Qdrant integration
 Search & Explore page
 Knowledge Area page
 Document Context panel
+Source-backed Wiki view
+Reading Mode
+Wiki search
 ```
 
 Acceptance criteria:
@@ -115,6 +147,16 @@ Acceptance criteria:
 - User can search indexed files.
 - Results show filename, source location, summary, and trust indicators.
 - User can open document context.
+- User can build and browse source-backed Wiki pages.
+- Wiki pages prioritize the actual extracted document content over system metadata.
+- User can navigate category -> topic -> source file pages.
+- User can search inside the generated knowledge base.
+
+Current local status:
+
+```text
+implemented in local MVP user UI, still needs deeper citation rendering, persistent wiki storage, better AI topic generation, and richer media/table extraction
+```
 
 ## Sprint 4 — Planning Center and simulation
 
@@ -271,17 +313,28 @@ Acceptance criteria:
 Every sprint must preserve:
 
 ```text
-tenant isolation
+tenant isolation when production mode exists
 backend permission enforcement
 audit events
 recovery path for destructive actions
 source references
 clear UX feedback
+safe user/admin separation
+no destructive workflows in the ordinary user UI
 ```
 
-## Current execution priority
+## Immediate next implementation priorities
 
-Start with Sprint 1 and avoid expanding into advanced future layers until the core MVP loop is working.
+```text
+1. Finish frontend rendering for chunk citations like [S1:C3]
+2. Make citations clickable and linked to source locations / source preview
+3. Persist wiki pages and source chunks in SQLite
+4. Improve AI category/topic generation beyond rule-based grouping
+5. Improve extracted document formatting for book/blog-like reading
+6. Add page-level search and table of contents in Reading Mode
+7. Split UserApp.tsx into smaller maintainable components
+8. Add progress stages for Build Knowledge / Build Wiki
+```
 
 ## Strategic outcome
 
@@ -289,4 +342,10 @@ This roadmap converts EverythingAI from architecture into a buildable enterprise
 
 ```text
 Governed Enterprise Cognitive Workspace
+```
+
+The local MVP currently acts as the proving ground for the most important product principle:
+
+```text
+A safe, source-backed AI file brain that turns local files into searchable, readable, trusted knowledge.
 ```
