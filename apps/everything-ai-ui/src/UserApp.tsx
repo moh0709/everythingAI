@@ -1,6 +1,7 @@
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Shield, Sparkles } from 'lucide-react';
+import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Sparkles } from 'lucide-react';
 import { apiRequest, ApiOptions, IndexedFile } from './api';
+import { WikiNavigationTree } from './user/WikiNavigationTree';
 
 const DEFAULT_API = 'http://127.0.0.1:4100';
 const DEFAULT_TOKEN = 'replace-with-your-local-development-token';
@@ -512,7 +513,7 @@ export function UserApp() {
         <section className="hero-row wiki-hero">
           <div>
             <h1><BookOpen /> Source-backed Wiki</h1>
-            <p>Wikipedia-style pages generated from indexed files, insights, extracted text, and filebase metadata. Every page keeps source references.</p>
+            <p>Topics are organized by category and subcategory so users can dive into the knowledge base like an encyclopedia.</p>
           </div>
           <div className="hero-actions">
             <button className="purple" onClick={buildWiki} disabled={busy}><Sparkles size={16} /> Build Wiki</button>
@@ -525,18 +526,12 @@ export function UserApp() {
           <aside className="wiki-sidebar panel">
             <div className="panel-title">
               <div>
-                <h2><BookOpen /> Wiki Pages</h2>
-                <p>{wiki?.page_count || 0} generated page(s).</p>
+                <h2><BookOpen /> Knowledge Map</h2>
+                <p>{wiki?.page_count || 0} page(s), grouped by category.</p>
               </div>
             </div>
             {!wiki?.pages.length && <p className="muted">No wiki pages yet. Click Build Wiki after building your knowledge workspace.</p>}
-            <div className="wiki-page-list">
-              {wiki?.pages.map((page) => <button key={page.id} className={`wiki-page-button ${selectedWikiPage?.id === page.id ? 'selected' : ''}`} onClick={() => setSelectedWikiPageId(page.id)}>
-                <span className="wiki-page-type">{page.page_type}</span>
-                <strong>{page.title}</strong>
-                <small>{page.category || 'Knowledge'}{page.subcategory ? ` / ${page.subcategory}` : ''}</small>
-              </button>)}
-            </div>
+            {wiki?.pages.length ? <WikiNavigationTree pages={wiki.pages} selectedPageId={selectedWikiPage?.id} onSelect={setSelectedWikiPageId} /> : null}
           </aside>
 
           <section className="wiki-main panel">
