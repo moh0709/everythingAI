@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { openDatabase, listFileInsights } from '../db/client.js';
 import { generateFileInsights } from '../insights/insightService.js';
 import { findDuplicateFiles } from '../duplicates/duplicateService.js';
-import { buildKnowledgeIndex } from '../knowledge/knowledgeService.js';
+import { buildKnowledgeIndex, buildWikiPages } from '../knowledge/knowledgeService.js';
 import { createDocumentContext } from '../documents/documentContextService.js';
 import { parseLimit } from '../utils/request.js';
 
@@ -80,6 +80,40 @@ export function createIntelligenceRouter() {
       res.json({
         generated: insightResult.generated,
         knowledge,
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/wiki', (req, res) => {
+    const db = openDatabase();
+    const wiki = buildWikiPages(db, {
+      limit: parseLimit(req.query.limit, 500),
+      filePageLimit: parseLimit(req.query.filePageLimit, 50),
+    });
+    db.close();
+
+    res.json({ wiki });
+  });
+
+  router.post('/wiki/build', async (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const limit = parseLimit(req.body?.limit, 500);
+      const filePageLimit = parseLimit(req.body?.filePageLimit, 50);
+      const insightResult = await generateFileInsights(db, {
+        limit,
+        useOllama: req.body?.useOllama === true,
+        useProvider: req.body?.useProvider === true,
+        provider: req.body?.provider,
+      });
+      const wiki = buildWikiPages(db, { limit, filePageLimit });
+      db.close();
+
+      res.json({
+        generated: insightResult.generated,
+        wiki,
       });
     } catch (error) {
       next(error);
