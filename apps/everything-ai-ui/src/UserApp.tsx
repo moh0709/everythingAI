@@ -1,12 +1,13 @@
-import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, Maximize2, MessageCircle, Minimize2, Search, Send, Server, Sparkles } from 'lucide-react';
+import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { Brain } from 'lucide-react';
 import { apiRequest, ApiOptions } from './api';
 import type { IndexedFile } from './api';
-import { WikiNavigationTree } from './user/WikiNavigationTree';
-import type { UserView, SourceReference, DocumentContext, ChatMessage, WikiSource, WikiRelatedPage, WikiPage, WikiPayload, SetupStep } from './user/types';
-import { DEFAULT_API, DEFAULT_TOKEN, EXAMPLE_PROMPTS, INITIAL_SETUP_STEPS, formatSize, filePathHref, updateStep } from './user/userUtils';
-import { MarkdownArticle } from './user/wikiMarkdown';
-
+import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage, SetupStep } from './user/types';
+import { DEFAULT_API, DEFAULT_TOKEN, INITIAL_SETUP_STEPS, updateStep } from './user/userUtils';
+import { WikiView } from './user/WikiView';
+import { AskView } from './user/AskView';
+import { ExploreView } from './user/ExploreView';
+import { OnboardingView } from './user/OnboardingView';
 
 export function UserApp() {
   const [baseUrl, setBaseUrl] = useState(localStorage.getItem('everythingai.ui.baseUrl') || DEFAULT_API);
@@ -202,7 +203,7 @@ export function UserApp() {
     chatInputRef.current?.focus();
   }
 
-  function askAboutWikiPage(page = selectedWikiPage) {
+  function askAboutWikiPage(page: WikiPage | undefined = selectedWikiPage) {
     if (!page) return;
     askQuestion(`Explain the wiki page "${page.title}" and cite the relevant source documents.`);
   }
@@ -256,229 +257,53 @@ export function UserApp() {
     </header>
 
     <main className="page">
-      {view === 'onboarding' && <>
-        <section className="hero-row">
-          <div>
-            <h1><FolderOpen /> Connect your local knowledge</h1>
-            <p>Select a folder and EverythingAI will index, extract, analyze, and prepare it for search, wiki pages, and chat. This user UI remains read-only and safe.</p>
-          </div>
-          <div className="hero-actions">
-            <button className="purple" onClick={selectFolder} disabled={busy}><FolderOpen size={16} /> Select Folder</button>
-            <button className="outline" onClick={() => buildKnowledgeWorkspace()} disabled={busy || !folderPath.trim()}><Sparkles size={16} /> Build Knowledge</button>
-          </div>
-        </section>
+      {view === 'onboarding' && <OnboardingView
+        error={error} busy={busy} status={status}
+        setupSteps={setupSteps}
+        folderPath={folderPath} setFolderPath={setFolderPath}
+        baseUrl={baseUrl} setBaseUrl={setBaseUrl}
+        token={token} setToken={setToken}
+        selectFolder={selectFolder}
+        buildKnowledgeWorkspace={buildKnowledgeWorkspace}
+        saveConnection={saveConnection}
+      />}
 
-        {error && <div className="error">{error}</div>}
-        <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
+      {view === 'explore' && <ExploreView
+        error={error} busy={busy} status={status}
+        baseUrl={baseUrl} setBaseUrl={setBaseUrl}
+        token={token} setToken={setToken}
+        query={query} setQuery={setQuery}
+        files={files} selectedFile={selectedFile}
+        documentContext={documentContext}
+        refreshFiles={refreshFiles}
+        searchEverything={searchEverything}
+        handleAskFromHero={handleAskFromHero}
+        loadDocumentContext={(fileId) => loadDocumentContext(fileId)}
+        saveConnection={saveConnection}
+      />}
 
-        <section className="panel">
-          <div className="panel-title">
-            <div>
-              <h2><CheckCircle2 /> Setup Progress</h2>
-              <p>After setup, you can search files, read wiki pages, and ask source-backed questions.</p>
-            </div>
-          </div>
-          <div className="source-list compact-source-list">
-            {setupSteps.map((step) => <div className="source-card" key={step.id}>
-              <strong>{step.label}</strong>
-              <p>{step.status === 'done' ? 'Completed' : step.status === 'working' ? 'Working...' : step.status === 'failed' ? 'Failed' : 'Waiting'}</p>
-            </div>)}
-          </div>
-        </section>
+      {view === 'wiki' && <WikiView
+        error={error} busy={busy} status={status}
+        wiki={wiki} selectedWikiPage={selectedWikiPage}
+        readingMode={readingMode} activeSourceRef={activeSourceRef}
+        sourceCardRefs={sourceCardRefs}
+        buildWiki={buildWiki} refreshWiki={refreshWiki}
+        setReadingMode={setReadingMode}
+        openWikiPage={openWikiPage}
+        askAboutWikiPage={askAboutWikiPage}
+        revealSourceFile={revealSourceFile}
+        openSourceContext={(fileId) => { setView('explore'); loadDocumentContext(fileId); }}
+        handleCitationClick={handleCitationClick}
+      />}
 
-        <section className="panel">
-          <div className="panel-title">
-            <div>
-              <h2><Server /> Connection & Folder</h2>
-              <p>Use defaults for local development, or adjust if your backend runs elsewhere.</p>
-            </div>
-            <button className="outline" onClick={saveConnection}>Save</button>
-          </div>
-          <div className="settings-grid">
-            <label>API Base URL<input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></label>
-            <label>API Token<input type="password" value={token} onChange={(event) => setToken(event.target.value)} /></label>
-            <label>Folder Path<input value={folderPath} onChange={(event) => setFolderPath(event.target.value)} placeholder="C:\\Users\\MOH\\Documents" /></label>
-          </div>
-        </section>
-      </>}
-
-      {view === 'explore' && <>
-        <section className="hero-row">
-          <div>
-            <h1><Search /> Explore your indexed knowledge</h1>
-            <p>Search, ask questions, and inspect source-backed file context. Planning, moving, recovery, and audit controls are reserved for the admin/operator interface.</p>
-          </div>
-          <div className="hero-actions">
-            <div className="search-box">
-              <Search size={18} />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') searchEverything(); }} placeholder="Search or ask about your files..." />
-            </div>
-            <button className="purple" onClick={searchEverything} disabled={busy}>Search</button>
-            <button className="outline" onClick={handleAskFromHero} disabled={busy}>Ask AI</button>
-          </div>
-        </section>
-
-        {error && <div className="error">{error}</div>}
-        <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
-
-        <section className="panel">
-          <div className="panel-title">
-            <div>
-              <h2><Server /> Connection</h2>
-              <p>Official user UI runs on port 5151. Backend API stays on port 4100.</p>
-            </div>
-            <button className="outline" onClick={saveConnection}>Save</button>
-          </div>
-          <div className="settings-grid">
-            <label>API Base URL<input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></label>
-            <label>API Token<input type="password" value={token} onChange={(event) => setToken(event.target.value)} /></label>
-          </div>
-        </section>
-
-        <section className="explorer-grid">
-          <div className="panel">
-            <div className="panel-title">
-              <div>
-                <h2><FileText /> Files</h2>
-                <p>{files.length} visible file(s). This UI only reads and searches indexed knowledge.</p>
-              </div>
-              <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
-            </div>
-            <table>
-              <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
-              <tbody>{files.map((file) => <tr key={file.id} onClick={() => loadDocumentContext(file.id)} className={selectedFile?.id === file.id ? 'selected' : ''}>
-                <td>{file.filename}</td>
-                <td><span className="chip blue">{file.extension || 'file'}</span></td>
-                <td>{formatSize(file.size_bytes)}</td>
-                <td>{file.extraction_status || file.index_status || 'indexed'}</td>
-              </tr>)}</tbody>
-            </table>
-          </div>
-
-          <aside className="details">
-            <h2>{documentContext?.file?.filename || selectedFile?.filename || 'Select a file'}</h2>
-            {documentContext ? <>
-              <p><strong>Path:</strong> {documentContext.file?.absolute_path}</p>
-              <p><strong>Recovery:</strong> {(documentContext.file as any)?.recovery_status || 'active'}</p>
-              <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'unknown'}</p>
-              <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
-              {documentContext.insight?.summary && <><h3>Insight</h3><p>{documentContext.insight.summary}</p></>}
-              <h3>Preview Text</h3>
-              <div className="preview-box text-preview">{documentContext.previewText || 'No preview text available.'}</div>
-            </> : <p>Select a file to inspect source-backed context.</p>}
-          </aside>
-        </section>
-      </>}
-
-      {view === 'wiki' && <>
-        {error && <div className="error">{error}</div>}
-        <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
-
-        <section className="hero-row wiki-hero">
-          <div>
-            <h1><BookOpen /> Source-backed Wiki</h1>
-            <p>Topics are organized by category and subcategory so users can dive into the knowledge base like an encyclopedia.</p>
-          </div>
-          <div className="hero-actions">
-            <button className="purple" onClick={buildWiki} disabled={busy}><Sparkles size={16} /> Build Wiki</button>
-            <button className="outline" onClick={refreshWiki} disabled={busy}>Refresh Wiki</button>
-            <button className="outline" onClick={() => setReadingMode((value) => !value)} disabled={!selectedWikiPage}>
-              {readingMode ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              {readingMode ? 'Exit Reading' : 'Reading Mode'}
-            </button>
-            <button className="outline" onClick={() => askAboutWikiPage()} disabled={!selectedWikiPage || busy}>Ask about page</button>
-          </div>
-        </section>
-
-        <section className="wiki-layout">
-          <aside className="wiki-sidebar panel">
-            <div className="panel-title">
-              <div>
-                <h2><BookOpen /> Knowledge Map</h2>
-                <p>{wiki?.page_count || 0} page(s), grouped by category.</p>
-              </div>
-            </div>
-            {!wiki?.pages.length && <p className="muted">No wiki pages yet. Click Build Wiki after building your knowledge workspace.</p>}
-            {wiki?.pages.length ? <WikiNavigationTree pages={wiki.pages} selectedPageId={selectedWikiPage?.id} onSelect={openWikiPage} /> : null}
-          </aside>
-
-          <section className="wiki-main panel">
-            {selectedWikiPage ? <>
-              <div className="wiki-titlebar">
-                <div>
-                  <span className="wiki-page-type">{selectedWikiPage.page_type}</span>
-                  <h1>{selectedWikiPage.title}</h1>
-                  <p>{selectedWikiPage.summary}</p>
-                </div>
-                <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this page</button>
-              </div>
-              <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleCitationClick} />
-            </> : <p>Select a wiki page.</p>}
-          </section>
-
-          <aside className="wiki-source-rail panel">
-            {selectedWikiPage ? <>
-              <h3>Sources</h3>
-              <p className="muted">Source of truth for this article.</p>
-              <div className="source-list compact-source-list">
-                {selectedWikiPage.sources.map((source) => <div className={`source-card wiki-source-card${activeSourceRef === source.ref ? ' wiki-source-card-active' : ''}`} key={`${source.ref}-${source.file_id}`} ref={(el) => { sourceCardRefs.current[source.ref] = el; }}>
-                  <strong>[{source.ref}] {source.filename || 'Source'}</strong>
-                  <p>{source.location || 'file-level reference'}</p>
-                  {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
-                  <div className="source-actions">
-                    {source.file_id && <button className="outline" onClick={() => revealSourceFile(source.file_id as string)}>Reveal in folder</button>}
-                    {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source context</button>}
-                  </div>
-                </div>)}
-              </div>
-            </> : <p>Select a page to inspect sources.</p>}
-          </aside>
-        </section>
-      </>}
-
-      {view === 'ask' && <>
-        {error && <div className="error">{error}</div>}
-        <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
-
-        <section className="askai-view">
-          <div className="askai-header">
-            <h1><MessageCircle /> Ask EverythingAI</h1>
-            <p>Ask source-backed questions across indexed local knowledge. Answers are generated through the configured local provider.</p>
-            <span className="chip blue"><Sparkles size={14} /> Source-backed chat</span>
-          </div>
-
-          <div className="chat-messages">
-            {!chatMessages.length && <div className="chat-empty">
-              <MessageCircle size={48} />
-              <h2>Ask a question about your indexed workspace</h2>
-              <p>EverythingAI will answer using extracted local file context when sources are available.</p>
-              <div className="chat-suggestions">
-                {EXAMPLE_PROMPTS.map((prompt) => <button key={prompt} className="suggestion-chip" onClick={() => askQuestion(prompt)} disabled={busy}>{prompt}</button>)}
-              </div>
-            </div>}
-
-            {chatMessages.map((message, index) => <article key={`${message.role}-${index}`} className={`chat-bubble ${message.role}`}>
-              <strong>{message.role === 'user' ? 'You' : message.role === 'assistant' ? 'EverythingAI' : 'Error'}</strong>
-              <p>{message.text}</p>
-              {!!message.sources?.length && <div className="chat-sources">
-                {message.sources.map((source, sourceIndex) => <div key={`${source.filename}-${sourceIndex}`} className="chat-source-item">
-                  <span className="source-filename">{source.filename || 'Source'}</span>
-                  {source.absolute_path && <span className="source-path">{source.absolute_path}</span>}
-                  {typeof source.score === 'number' && <span className="source-tag">Score: {source.score.toFixed(3)}</span>}
-                  {source.snippet && <span className="source-snippet">{source.snippet}</span>}
-                </div>)}
-              </div>}
-            </article>)}
-
-            {busy && <article className="chat-bubble assistant thinking"><strong>EverythingAI</strong><p>Thinking<span className="dots">...</span></p></article>}
-          </div>
-
-          <form className="chat-input-row" onSubmit={handleChatSubmit}>
-            <textarea ref={chatInputRef} value={chatInput} onChange={(event) => setChatInput(event.target.value)} placeholder="Ask about indexed files, source context, documents, or extracted knowledge..." rows={2} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); askQuestion(); } }} />
-            <button type="submit" disabled={busy || !chatInput.trim()}><Send size={16} /> Ask</button>
-          </form>
-        </section>
-      </>}
+      {view === 'ask' && <AskView
+        error={error} busy={busy} status={status}
+        chatMessages={chatMessages}
+        chatInput={chatInput} setChatInput={setChatInput}
+        chatInputRef={chatInputRef}
+        handleChatSubmit={handleChatSubmit}
+        askQuestion={askQuestion}
+      />}
     </main>
   </div>;
 }
