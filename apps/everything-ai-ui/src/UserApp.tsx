@@ -123,7 +123,7 @@ function findWikiPageByLabel(pages: WikiPage[], label: string) {
 }
 
 function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void): ReactNode[] {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+\])/g).filter(Boolean);
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+(?::C\d+)?\])/g).filter(Boolean);
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>;
     if (part.startsWith('*') && part.endsWith('*')) return <em key={index}>{part.slice(1, -1)}</em>;
@@ -135,7 +135,9 @@ function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?:
       }
       return <span key={index} className="wiki-link">{label}</span>;
     }
-    if (/^\[S\d+\]$/.test(part)) return <sup key={index} className="wiki-source-ref">{part}</sup>;
+    if (/^\[S\d+(?::C\d+)?\]$/.test(part)) {
+      return <sup key={index} className="wiki-source-ref">{part}</sup>;
+    }
     return part;
   });
 }
