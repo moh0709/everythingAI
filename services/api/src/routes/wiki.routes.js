@@ -2,12 +2,14 @@ import crypto from 'node:crypto';
 import { Router } from 'express';
 import { openDatabase } from '../db/client.js';
 import { persistWikiPages, listPersistedWikiPages } from '../db/wikiRepository.js';
+import { replacePersistedWikiPages } from '../db/wikiSelectivePersistence.js';
 import {
   saveWikiFileFingerprints,
   saveWikiPageDependencies,
   updateWikiBuildState,
 } from '../db/wikiIncrementalRepository.js';
 import { buildIncrementalWikiPlan } from '../knowledge/wikiIncrementalService.js';
+import { buildSelectiveReplacementPlan } from '../knowledge/wikiSelectiveRebuildService.js';
 import { generateFileInsights } from '../insights/insightService.js';
 import { buildWikiPages } from '../knowledge/knowledgeService.js';
 import { parseLimit } from '../utils/request.js';
@@ -82,18 +84,51 @@ export function createWikiRouter() {
       });
 
       const generatedWiki = buildWikiPages(db, { limit, filePageLimit });
-      const wiki = persistWikiPages(db, generatedWiki);
 
-      saveWikiPageDependencies(db, wiki.pages || []);
-      saveWikiFileFingerprints(db, buildFingerprintsFromWiki(wiki));
+      const replacementPlan = buildSelectiveReplacementPlan(db, generatedWiki);
 
-      updateWikiBuildState(db, 'last_full_build_at', new Date().toISOString());
+      let wiki;
+
+      if (replacementPlan.strategy === 'selective-replacement') {
+        const affectedPageIds = new Set(
+          replacementPlan.pages_to_replace.map((page) => page.id)
+        );
+
+        const pagesToReplace = generatedWiki.pages.filter((page) =>
+          affectedPageIds.has(page.id)
+        );
+
+        wiki = replacePersistedWikiPages(
+          db,
+          pagesToReplace,
+          generatedWiki.generated_at
+        );
+
+        updateWikiBuildState(
+          db,
+          'last_incremental_build_at',
+          new Date().toISOString()
+        );
+      } else {
+        wiki = persistWikiPages(db, generatedWiki);
+
+        updateWikiBuildState(
+          db,
+          'last_full_build_at',
+          new Date().toISOString()
+        );
+      }
+
+      saveWikiPageDependencies(db, generatedWiki.pages || []);
+      saveWikiFileFingerprints(db, buildFingerprintsFromWiki(generatedWiki));
+
       updateWikiBuildState(db, 'last_page_count', String(wiki.page_count || 0));
 
       db.close();
 
       res.json({
         generated: insightResult.generated,
+        replacement_plan: replacementPlan,
         wiki,
       });
     } catch (error) {
