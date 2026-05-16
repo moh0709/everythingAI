@@ -98,7 +98,7 @@ function apiSuccessToast(path: string, method: string, payload: any): ApiToast |
   if (normalizedMethod !== 'GET') {
     return {
       title: 'Action completed',
-      message: path.replace('/api/', '').replaceAll('-', ' '),
+      message: path.replace('/api/', '').replace(/-/g, ' '),
     };
   }
 
