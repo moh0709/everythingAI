@@ -1,8 +1,12 @@
 import { Router } from 'express';
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   openDatabase,
   listIndexedFiles,
   upsertIndexedFile,
+  getIndexedFileById,
 } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
 import { extractIndexedFiles } from '../extractors/extractionRunner.js';
@@ -32,6 +36,28 @@ function sendDocumentContext(req, res) {
   return res.json(context);
 }
 
+function revealFile(filePath) {
+  if (process.platform === 'win32') {
+    spawn('explorer.exe', ['/select,', filePath], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    }).unref();
+    return;
+  }
+
+  const folder = fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()
+    ? filePath
+    : path.dirname(filePath);
+
+  if (process.platform === 'darwin') {
+    spawn('open', [folder], { detached: true, stdio: 'ignore' }).unref();
+    return;
+  }
+
+  spawn('xdg-open', [folder], { detached: true, stdio: 'ignore' }).unref();
+}
+
 export function createFilesRouter() {
   const router = Router();
 
@@ -52,6 +78,27 @@ export function createFilesRouter() {
   router.get('/files/:fileId/preview', sendDocumentContext);
 
   router.get('/documents/:fileId/context', sendDocumentContext);
+
+  router.post('/files/:fileId/reveal', (req, res, next) => {
+    try {
+      const db = openDatabase();
+      const file = getIndexedFileById(db, req.params.fileId);
+      db.close();
+
+      if (!file) {
+        return res.status(404).json({ error: 'file not found' });
+      }
+
+      if (!fs.existsSync(file.absolute_path)) {
+        return res.status(404).json({ error: 'source file no longer exists', file });
+      }
+
+      revealFile(file.absolute_path);
+      return res.json({ revealed: true, file });
+    } catch (error) {
+      return next(error);
+    }
+  });
 
   router.post('/index', async (req, res, next) => {
     try {
