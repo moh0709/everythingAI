@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Shield, Sparkles } from 'lucide-react';
+import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Shield, Sparkles } from 'lucide-react';
 import { apiRequest, ApiOptions, IndexedFile } from './api';
 
 const DEFAULT_API = 'http://127.0.0.1:4100';
@@ -11,7 +11,7 @@ const EXAMPLE_PROMPTS = [
   'Which files mention planning, invoices, customers, or projects?',
 ];
 
-type UserView = 'onboarding' | 'explore' | 'ask';
+type UserView = 'onboarding' | 'explore' | 'wiki' | 'ask';
 
 type SourceReference = {
   file_id?: string;
@@ -43,6 +43,35 @@ type ChatMessage = {
   sources?: Array<{ filename?: string; absolute_path?: string; snippet?: string; score?: number }>;
 };
 
+type WikiSource = {
+  ref: string;
+  file_id?: string;
+  filename?: string;
+  absolute_path?: string;
+  relative_path?: string;
+  location?: string;
+  evidence?: string;
+};
+
+type WikiPage = {
+  id: string;
+  title: string;
+  slug: string;
+  page_type: 'system' | 'topic' | 'file' | string;
+  summary: string;
+  markdown: string;
+  source_file_ids: string[];
+  related_topics: string[];
+  sources: WikiSource[];
+  updated_at: string;
+};
+
+type WikiPayload = {
+  generated_at: string;
+  page_count: number;
+  pages: WikiPage[];
+};
+
 type SetupStep = {
   id: string;
   label: string;
@@ -68,6 +97,22 @@ function updateStep(steps: SetupStep[], id: string, status: SetupStep['status'])
   return steps.map((step) => step.id === id ? { ...step, status } : step);
 }
 
+function renderMarkdownLine(line: string, index: number) {
+  if (line.startsWith('# ')) return <h1 key={index}>{line.slice(2)}</h1>;
+  if (line.startsWith('## ')) return <h2 key={index}>{line.slice(3)}</h2>;
+  if (line.startsWith('### ')) return <h3 key={index}>{line.slice(4)}</h3>;
+  if (line.startsWith('- ')) return <li key={index}>{line.slice(2)}</li>;
+  if (line.startsWith('> ')) return <blockquote key={index}>{line.slice(2)}</blockquote>;
+  if (!line.trim()) return <br key={index} />;
+  return <p key={index}>{line}</p>;
+}
+
+function MarkdownArticle({ markdown }: { markdown: string }) {
+  return <article className="wiki-article">
+    {markdown.split('\n').map(renderMarkdownLine)}
+  </article>;
+}
+
 export function UserApp() {
   const [baseUrl, setBaseUrl] = useState(localStorage.getItem('everythingai.ui.baseUrl') || DEFAULT_API);
   const [token, setToken] = useState(localStorage.getItem('everythingai.ui.token') || DEFAULT_TOKEN);
@@ -80,6 +125,8 @@ export function UserApp() {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [documentContext, setDocumentContext] = useState<DocumentContext | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [wiki, setWiki] = useState<WikiPayload | null>(null);
+  const [selectedWikiPageId, setSelectedWikiPageId] = useState<string | null>(null);
   const [status, setStatus] = useState('Ready');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -87,6 +134,7 @@ export function UserApp() {
 
   const options: ApiOptions = useMemo(() => ({ baseUrl, token }), [baseUrl, token]);
   const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
+  const selectedWikiPage = wiki?.pages.find((page) => page.id === selectedWikiPageId) || wiki?.pages[0];
 
   function saveConnection() {
     localStorage.setItem('everythingai.ui.baseUrl', baseUrl);
@@ -120,6 +168,25 @@ export function UserApp() {
       if (!selectedFileId && payload.files?.[0]) setSelectedFileId(payload.files[0].id);
       if (payload.files?.length) setView((current) => current === 'onboarding' ? 'explore' : current);
       setStatus(`Loaded ${payload.files?.length || 0} file(s).`);
+    });
+  }
+
+  async function refreshWiki() {
+    await run('Loading source-backed wiki pages...', async () => {
+      const payload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki?limit=500&filePageLimit=50');
+      setWiki(payload.wiki);
+      if (!selectedWikiPageId && payload.wiki.pages[0]) setSelectedWikiPageId(payload.wiki.pages[0].id);
+      setStatus(`Loaded ${payload.wiki.page_count || 0} wiki page(s).`);
+    });
+  }
+
+  async function buildWiki() {
+    await run('Building source-backed wiki pages...', async () => {
+      const payload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki/build', { limit: 500, filePageLimit: 50, useProvider: true }, 'POST');
+      setWiki(payload.wiki);
+      if (payload.wiki.pages[0]) setSelectedWikiPageId(payload.wiki.pages[0].id);
+      setView('wiki');
+      setStatus(`Built ${payload.wiki.page_count || 0} source-backed wiki page(s).`);
     });
   }
 
@@ -162,6 +229,10 @@ export function UserApp() {
       await apiRequest(options, '/api/insights', { limit: 100, useProvider: true }, 'POST');
       markStep('insights', 'done');
 
+      const wikiPayload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki?limit=500&filePageLimit=50');
+      setWiki(wikiPayload.wiki);
+      if (wikiPayload.wiki.pages[0]) setSelectedWikiPageId(wikiPayload.wiki.pages[0].id);
+
       const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
       setFiles(payload.files || []);
       if (payload.files?.[0]) {
@@ -170,8 +241,8 @@ export function UserApp() {
       }
 
       markStep('ready', 'done');
-      setView('explore');
-      setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s).`);
+      setView('wiki');
+      setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s) and ${wikiPayload.wiki.page_count || 0} wiki page(s).`);
     });
   }
 
@@ -226,6 +297,11 @@ export function UserApp() {
     chatInputRef.current?.focus();
   }
 
+  function askAboutWikiPage(page = selectedWikiPage) {
+    if (!page) return;
+    askQuestion(`Explain the wiki page "${page.title}" and cite the relevant source documents.`);
+  }
+
   function openAskView() {
     setView('ask');
     setTimeout(() => chatInputRef.current?.focus(), 0);
@@ -247,6 +323,7 @@ export function UserApp() {
 
   useEffect(() => {
     refreshFiles().catch(() => undefined);
+    refreshWiki().catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -256,6 +333,7 @@ export function UserApp() {
       <nav>
         <button className={view === 'onboarding' ? 'active' : ''} onClick={() => setView('onboarding')}>Start</button>
         <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore</button>
+        <button className={view === 'wiki' ? 'active' : ''} onClick={() => setView('wiki')}>Wiki</button>
         <button className={view === 'ask' ? 'active' : ''} onClick={openAskView}>Ask</button>
       </nav>
       <div className="provider-pill"><span />User MVP • Safe mode</div>
@@ -266,7 +344,7 @@ export function UserApp() {
         <section className="hero-row">
           <div>
             <h1><FolderOpen /> Connect your local knowledge</h1>
-            <p>Select a folder and EverythingAI will index, extract, analyze, and prepare it for search and chat. This user UI remains read-only and safe.</p>
+            <p>Select a folder and EverythingAI will index, extract, analyze, and prepare it for search, wiki pages, and chat. This user UI remains read-only and safe.</p>
           </div>
           <div className="hero-actions">
             <button className="purple" onClick={selectFolder} disabled={busy}><FolderOpen size={16} /> Select Folder</button>
@@ -281,7 +359,7 @@ export function UserApp() {
           <div className="panel-title">
             <div>
               <h2><CheckCircle2 /> Setup Progress</h2>
-              <p>After setup, you can search files and ask questions with source-backed answers.</p>
+              <p>After setup, you can search files, read wiki pages, and ask source-backed questions.</p>
             </div>
           </div>
           <div className="source-list compact-source-list">
@@ -374,6 +452,70 @@ export function UserApp() {
             </> : <p>Select a file to inspect source-backed context.</p>}
           </aside>
         </section>
+      </>}
+
+      {view === 'wiki' && <>
+        {error && <div className="error">{error}</div>}
+        <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
+
+        <section className="hero-row">
+          <div>
+            <h1><BookOpen /> Source-backed Wiki</h1>
+            <p>Wikipedia-style pages generated from indexed files, insights, extracted text, and filebase metadata. Every page keeps source references.</p>
+          </div>
+          <div className="hero-actions">
+            <button className="purple" onClick={buildWiki} disabled={busy}><Sparkles size={16} /> Build Wiki</button>
+            <button className="outline" onClick={refreshWiki} disabled={busy}>Refresh Wiki</button>
+            <button className="outline" onClick={() => askAboutWikiPage()} disabled={!selectedWikiPage || busy}>Ask about page</button>
+          </div>
+        </section>
+
+        <section className="explorer-grid">
+          <div className="panel">
+            <div className="panel-title">
+              <div>
+                <h2><BookOpen /> Wiki Pages</h2>
+                <p>{wiki?.page_count || 0} generated page(s).</p>
+              </div>
+            </div>
+            {!wiki?.pages.length && <p className="muted">No wiki pages yet. Click Build Wiki after building your knowledge workspace.</p>}
+            <div className="source-list compact-source-list">
+              {wiki?.pages.map((page) => <button
+                key={page.id}
+                className={`source-card ${selectedWikiPage?.id === page.id ? 'selected' : ''}`}
+                onClick={() => setSelectedWikiPageId(page.id)}
+              >
+                <strong>{page.title}</strong>
+                <p>{page.page_type} · {page.sources.length} source(s)</p>
+              </button>)}
+            </div>
+          </div>
+
+          <aside className="details">
+            {selectedWikiPage ? <>
+              <h2>{selectedWikiPage.title}</h2>
+              <p>{selectedWikiPage.summary}</p>
+              <p><strong>Updated:</strong> {selectedWikiPage.updated_at}</p>
+              <p><strong>Source files:</strong> {selectedWikiPage.source_file_ids.length}</p>
+              <div className="button-row">
+                <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this page</button>
+              </div>
+              <h3>Sources of truth</h3>
+              <div className="source-list compact-source-list">
+                {selectedWikiPage.sources.map((source) => <div className="source-card" key={`${source.ref}-${source.file_id}`}>
+                  <strong>[{source.ref}] {source.filename || 'Source'}</strong>
+                  <p>{source.location || 'file-level reference'}</p>
+                  <small>{source.absolute_path}</small>
+                  {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source</button>}
+                </div>)}
+              </div>
+            </> : <p>Select a wiki page.</p>}
+          </aside>
+        </section>
+
+        {selectedWikiPage && <section className="panel">
+          <MarkdownArticle markdown={selectedWikiPage.markdown} />
+        </section>}
       </>}
 
       {view === 'ask' && <>
