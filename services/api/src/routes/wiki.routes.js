@@ -7,6 +7,7 @@ import {
   saveWikiPageDependencies,
   updateWikiBuildState,
 } from '../db/wikiIncrementalRepository.js';
+import { buildIncrementalWikiPlan } from '../knowledge/wikiIncrementalService.js';
 import { generateFileInsights } from '../insights/insightService.js';
 import { buildWikiPages } from '../knowledge/knowledgeService.js';
 import { parseLimit } from '../utils/request.js';
@@ -54,6 +55,16 @@ export function createWikiRouter() {
     db.close();
 
     res.json({ wiki });
+  });
+
+  router.get('/wiki/rebuild-plan', (_req, res) => {
+    const db = openDatabase();
+
+    const plan = buildIncrementalWikiPlan(db);
+
+    db.close();
+
+    res.json({ plan });
   });
 
   router.post('/wiki/build', async (req, res, next) => {
