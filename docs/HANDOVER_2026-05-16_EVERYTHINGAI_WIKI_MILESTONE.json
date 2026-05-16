@@ -1,0 +1,458 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Wiki & Local MVP Milestone Handover",
+    "version": "2.0",
+    "date": "2026-05-16",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "url": "https://github.com/moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "executive_summary": {
+      "project_identity": "EverythingAI / EverythingApp is a local-first AI-powered file brain that indexes local files, extracts document content, supports search/chat, generates source-backed Wikipedia-style knowledge pages, and safely supports governed file organization workflows.",
+      "current_phase": "Local MVP user experience hardening, with strong focus on source-backed Wiki / Knowledge Base quality.",
+      "latest_confirmed_direction": "The Wiki must behave like a content-first encyclopedia/book/blog reader built from the actual content inside local documents, PDFs, books, spreadsheets, images, and other indexed files. Metadata must be secondary, not dominant.",
+      "current_bottleneck": "The backend foundation is strong; the remaining bottleneck is polished product UX, source precision, persisted wiki architecture, and maintainable frontend component structure.",
+      "handover_timing_reason": "Context is large and the project reached a stable milestone: Wiki direction confirmed, major UI/UX pieces working, and next work requires careful architecture decisions."
+    },
+    "documentation_verification": {
+      "verification_status": "Reviewed key docs and updated the most important roadmap/current-state docs before producing this handover.",
+      "updated_in_this_handover_step": [
+        {
+          "path": "docs/MVP_FINALIZATION_PLAN.md",
+          "commit": "2c2281ffc74f722b26537881eed766a4970ae8da",
+          "reason": "Updated current MVP scope, Wiki/Knowledge UX status, active/completed UI work, and remaining next steps."
+        },
+        {
+          "path": "docs/IMPLEMENTATION_ROADMAP.md",
+          "commit": "fc069dc15bfb7bd9cd1de6074ba05b38f3d2b2b3",
+          "reason": "Updated roadmap current execution reality and immediate priorities around local MVP and source-backed Wiki."
+        },
+        {
+          "path": "docs/HANDOVER_2026-05-16_EVERYTHINGAI_WIKI_MILESTONE.json",
+          "commit": "created by this operation",
+          "reason": "Full JSON handover for next AI agent."
+        }
+      ],
+      "reviewed_docs": [
+        {
+          "path": "README.md",
+          "status": "Mostly accurate for backend/local MVP but not fully updated for the latest React user UI Wiki milestone. Do not treat it as the only current source for UI status. It should be updated after local typecheck/build/backend tests are confirmed after latest changes."
+        },
+        {
+          "path": "docs/MVP_FINALIZATION_PLAN.md",
+          "status": "Updated and should be treated as the most current local MVP finalization plan."
+        },
+        {
+          "path": "docs/IMPLEMENTATION_ROADMAP.md",
+          "status": "Updated with the current execution reality and immediate Wiki priorities."
+        },
+        {
+          "path": "docs/SPRINT6_UI_WORKFLOW_PLAN.md",
+          "status": "Historical/partially outdated. It focuses on the old services/api/public UI and API-only gaps. Current active user UI work is in apps/everything-ai-ui. Use this doc only for background on older UI workflow gaps."
+        },
+        {
+          "path": "docs/MVP_UI_VALIDATION_GAPS.md",
+          "status": "Historical/partially outdated. It documents earlier Sprint 5/6 UI gaps around old browser UI and API-only workflows. Current React UI has moved beyond parts of it."
+        }
+      ],
+      "important_warning": "Documentation is now more aligned, but README.md still needs a final update after the next local validation run confirms typecheck/build/tests. Do not claim final production readiness."
+    },
+    "branch_and_governance_rules": {
+      "branch": "main",
+      "hard_rules": [
+        "Work directly on main unless user explicitly changes policy.",
+        "Do not introduce long-lived feature branches.",
+        "Do not expose destructive/operator workflows in the ordinary user UI.",
+        "Keep the official user UI safe and non-destructive.",
+        "Keep dangerous planning/execution/recovery/admin controls isolated in admin/operator interfaces.",
+        "Permanent purge remains disabled in the local MVP under NO_PERMANENT_PURGE_IN_LOCAL_MVP.",
+        "Move/rename actions must remain preview + approval gated.",
+        "Preserve auditability and recovery-first architecture.",
+        "Always give explicit file paths when changing or discussing code."
+      ],
+      "user_preferences": [
+        "Be precise and direct.",
+        "When code changes are discussed, always mention exact file and folder paths.",
+        "When full file code is requested, provide complete final code, not partial snippets.",
+        "Ask only when information is truly insufficient; otherwise proceed with best effort."
+      ]
+    },
+    "architecture_current_state": {
+      "backend_api": {
+        "url": "http://127.0.0.1:4100",
+        "path": "services/api",
+        "entry": "services/api/src/server.js",
+        "package": "services/api/package.json",
+        "stack": [
+          "Node.js",
+          "Express",
+          "better-sqlite3",
+          "SQLite",
+          "pdf-parse",
+          "mammoth",
+          "read-excel-file",
+          "Ollama/local provider integrations where configured"
+        ],
+        "responsibilities": [
+          "Local folder indexing",
+          "Document extraction",
+          "Search/unified search/semantic-style search",
+          "AI chat over indexed knowledge",
+          "Insights/classification",
+          "Knowledge/Wiki generation",
+          "Safe suggestions/action previews/executions",
+          "Execution batches",
+          "Recovery/trash/restore",
+          "Audit logging",
+          "Source reveal/open behavior"
+        ]
+      },
+      "user_ui": {
+        "url": "http://localhost:5151",
+        "path": "apps/everything-ai-ui",
+        "entry": "apps/everything-ai-ui/src/main.tsx",
+        "main_component": "apps/everything-ai-ui/src/UserApp.tsx",
+        "status": "Functional and improving. Contains Start, Explore, Wiki, and Ask sections. User confirmed latest Wiki direction/features work.",
+        "role": "Safe user-facing AI knowledge workspace. No destructive operator workflow should be exposed here."
+      },
+      "admin_ui": {
+        "url": "http://localhost:5152/admin.html",
+        "path": "apps/everything-ai-ui/src/admin",
+        "status": "Exists as separate admin/operator UI. Should continue to host operator workflows rather than putting them into the user UI.",
+        "role": "Operator/admin control center for planning, action governance, recovery, provider/source settings, audit inspection, and future automation governance."
+      },
+      "legacy_static_ui": {
+        "path": "services/api/public",
+        "status": "Still exists, but current active user/admin UI work is in apps/everything-ai-ui. Do not build new user-facing MVP features in services/api/public unless deliberately maintaining legacy/admin compatibility."
+      }
+    },
+    "startup_and_validation_commands": {
+      "full_debug_start": {
+        "command": "cd E:\\01PROJEKTER\\EverythingAI && .\\start_all_debug.bat",
+        "what_it_does": [
+          "git pull origin main",
+          "npm install in services/api",
+          "npm install in apps/everything-ai-ui",
+          "npm run typecheck in apps/everything-ai-ui",
+          "npm run build in apps/everything-ai-ui",
+          "starts backend API on 4100",
+          "starts user UI on 5151",
+          "starts admin UI on 5152/admin.html"
+        ]
+      },
+      "manual_ui_validation": [
+        "Open http://localhost:5151",
+        "Go to Wiki",
+        "Click Build Wiki",
+        "Verify toast appears after completion",
+        "Verify Knowledge Map tree is visible",
+        "Use Wiki search",
+        "Open category/topic/file pages",
+        "Toggle Reading Mode",
+        "Click [[Related Page]] links",
+        "Use Sources -> Reveal in folder",
+        "Use Sources -> Open source context"
+      ],
+      "backend_tests": "cd E:\\01PROJEKTER\\EverythingAI\\services\\api && npm test",
+      "ui_typecheck": "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && npm run typecheck",
+      "ui_build": "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && npm run build"
+    },
+    "verified_working_by_user": [
+      "Wiki view exists and works",
+      "Content-first wiki generation is a much better direction",
+      "Category/topic tree navigation is improving",
+      "Intelligent Wiki search was added",
+      "Toast feedback was added and startup script passed after replaceAll compatibility fix",
+      "Reading Mode works",
+      "Clickable related page links work",
+      "Reveal source file in folder works",
+      "Open source context works"
+    ],
+    "recent_implementation_milestones": [
+      {
+        "area": "Source-backed Wiki foundation",
+        "summary": "Added backend Wiki routes and generator, then iterated from minimal metadata-heavy pages to content-first pages based on extracted document content.",
+        "important_files": [
+          "services/api/src/knowledge/knowledgeService.js",
+          "services/api/src/routes/intelligence.routes.js",
+          "apps/everything-ai-ui/src/UserApp.tsx"
+        ]
+      },
+      {
+        "area": "Wikipedia-style UI",
+        "summary": "Added Wiki tab, article rendering, source rail, category/topic/file page navigation, and styles.",
+        "important_files": [
+          "apps/everything-ai-ui/src/UserApp.tsx",
+          "apps/everything-ai-ui/src/user/WikiNavigationTree.tsx",
+          "apps/everything-ai-ui/src/user/wikiNavigationTree.css",
+          "apps/everything-ai-ui/src/styles.css"
+        ]
+      },
+      {
+        "area": "Intelligent Wiki search",
+        "summary": "Added search inside the Wiki Knowledge Map, ranking title/category/topic/summary/full article/source filenames/source paths/evidence snippets.",
+        "important_files": [
+          "apps/everything-ai-ui/src/user/WikiNavigationTree.tsx",
+          "apps/everything-ai-ui/src/user/wikiNavigationTree.css"
+        ]
+      },
+      {
+        "area": "Reading Mode and related links",
+        "summary": "Added Reading Mode and clickable wiki-style [[Related Page]] links in article body.",
+        "important_files": [
+          "apps/everything-ai-ui/src/UserApp.tsx",
+          "apps/everything-ai-ui/src/user/wikiNavigationTree.css"
+        ]
+      },
+      {
+        "area": "Toast feedback",
+        "summary": "Added user toast bus/provider/viewport and API-level success/error notifications for user-triggered actions.",
+        "important_files": [
+          "apps/everything-ai-ui/src/user/ToastViewport.tsx",
+          "apps/everything-ai-ui/src/user/ToastProvider.tsx",
+          "apps/everything-ai-ui/src/user/toastBus.ts",
+          "apps/everything-ai-ui/src/api.ts",
+          "apps/everything-ai-ui/src/main.tsx",
+          "apps/everything-ai-ui/src/styles.css"
+        ]
+      },
+      {
+        "area": "Source file opening",
+        "summary": "Added backend route to reveal source file in the local OS file manager and wired UI source actions.",
+        "important_files": [
+          "services/api/src/routes/files.routes.js",
+          "apps/everything-ai-ui/src/UserApp.tsx",
+          "apps/everything-ai-ui/src/api.ts"
+        ]
+      },
+      {
+        "area": "Chunk-level source citation generation",
+        "summary": "Backend Wiki generator now creates chunk-level references such as [S1:C3], Source Locations, chunk line ranges, character ranges, and evidence snippets. Frontend badge rendering for these chunk refs is not fully completed yet.",
+        "important_files": [
+          "services/api/src/knowledge/knowledgeService.js"
+        ]
+      }
+    ],
+    "current_wiki_knowledge_base_status": {
+      "direction": "Confirmed by user as correct and improving.",
+      "core_principle": "Wiki pages must prioritize real document/file content. Metadata and technical system details should be minimized or moved lower on the page.",
+      "implemented_capabilities": [
+        "Build Wiki from indexed/extracted local files",
+        "Workspace overview page",
+        "Category landing pages",
+        "Topic pages across multiple related files",
+        "File pages based on extracted document content",
+        "Knowledge Map tree organized by category/topic/source file pages",
+        "Intelligent Wiki search with ranked results",
+        "Markdown/article rendering with headings, tables, bold, italic, blockquotes, source markers, and related links",
+        "Reading Mode",
+        "Sources rail",
+        "Reveal source file in folder",
+        "Open source context",
+        "Toast feedback on actions",
+        "Initial chunk-level citation generation in backend"
+      ],
+      "known_limitations": [
+        "Wiki pages are currently generated live/in-memory from existing data; they are not yet persisted as wiki_pages/wiki_sections/wiki_sources tables.",
+        "Category/topic generation is still partly rule-based and should become more AI/embedding-driven.",
+        "Chunk-level citations are generated in backend markdown but frontend badge rendering/click behavior for [S1:C3] still needs finishing.",
+        "Citations do not yet open a source preview or scroll to a specific source chunk.",
+        "PDF page numbers are not yet reliable because extraction currently works mainly from text extraction output, not a rich page-aware extraction model.",
+        "Images/tables/charts from PDFs/Excel are not yet richly extracted and embedded into wiki article sections.",
+        "UserApp.tsx is too large and should be split soon."
+      ]
+    },
+    "critical_current_files": {
+      "frontend_user": [
+        "apps/everything-ai-ui/src/main.tsx",
+        "apps/everything-ai-ui/src/UserApp.tsx",
+        "apps/everything-ai-ui/src/api.ts",
+        "apps/everything-ai-ui/src/styles.css",
+        "apps/everything-ai-ui/src/user/WikiNavigationTree.tsx",
+        "apps/everything-ai-ui/src/user/wikiNavigationTree.css",
+        "apps/everything-ai-ui/src/user/ToastProvider.tsx",
+        "apps/everything-ai-ui/src/user/ToastViewport.tsx",
+        "apps/everything-ai-ui/src/user/toastBus.ts"
+      ],
+      "frontend_admin": [
+        "apps/everything-ai-ui/src/admin/AdminApp.tsx",
+        "apps/everything-ai-ui/src/admin/components/AdminHeader.tsx",
+        "apps/everything-ai-ui/src/admin/components/SettingsView.tsx"
+      ],
+      "backend_wiki_and_intelligence": [
+        "services/api/src/knowledge/knowledgeService.js",
+        "services/api/src/routes/intelligence.routes.js",
+        "services/api/src/documents/documentContextService.js"
+      ],
+      "backend_files_and_sources": [
+        "services/api/src/routes/files.routes.js",
+        "services/api/src/db/client.js",
+        "services/api/src/extractors/extractionRunner.js",
+        "services/api/src/indexer/fileScanner.js"
+      ],
+      "startup_and_docs": [
+        "start_all_debug.bat",
+        "README.md",
+        "docs/MVP_FINALIZATION_PLAN.md",
+        "docs/IMPLEMENTATION_ROADMAP.md",
+        "docs/HANDOVER_2026-05-16_EVERYTHINGAI_WIKI_MILESTONE.json"
+      ]
+    },
+    "important_api_routes_currently_used_by_user_ui": {
+      "setup_and_files": [
+        "POST /api/select-folder",
+        "POST /api/index",
+        "POST /api/extract",
+        "GET /api/files?limit=250",
+        "GET /api/intelligence/document-context/:fileId",
+        "POST /api/files/:fileId/reveal"
+      ],
+      "search_and_chat": [
+        "GET /api/unified-search?q=...&limit=50",
+        "POST /api/chat"
+      ],
+      "wiki_and_knowledge": [
+        "GET /api/wiki?limit=500&filePageLimit=50",
+        "POST /api/wiki/build",
+        "POST /api/insights"
+      ],
+      "admin_operator_area_existing_backend": [
+        "POST /api/suggestions",
+        "POST /api/action-previews",
+        "POST /api/action-executions",
+        "POST /api/action-executions/:executionId/undo",
+        "POST /api/execution-batches",
+        "POST /api/execution-batches/:batchId/approve",
+        "POST /api/execution-batches/:batchId/run",
+        "GET /api/recovery/trash",
+        "POST /api/recovery/trash/:id/restore",
+        "GET /api/audit-log"
+      ]
+    },
+    "latest_known_issue_and_next_fix": {
+      "issue": "Frontend rendering for chunk citation markers [S1:C3] was attempted but not completed cleanly because UserApp.tsx is large and a tool payload/update issue interrupted the update.",
+      "backend_status": "Chunk-level citations are generated in services/api/src/knowledge/knowledgeService.js and appear in wiki markdown after rebuilding Wiki.",
+      "frontend_status": "UserApp.tsx currently needs a small targeted update: renderInlineMarkdown regex should support [S1:C3] in addition to [S1], and optionally make citation badges clickable later.",
+      "recommended_next_action": {
+        "file": "apps/everything-ai-ui/src/UserApp.tsx",
+        "change": "Find renderInlineMarkdown() and change citation regex from only [S\\d+] to [S\\d+(?::C\\d+)?]. Ensure chunk refs render with class wiki-source-ref.",
+        "test": "Run npm run typecheck and npm run build in apps/everything-ai-ui, then rebuild Wiki and confirm [S1:C3] shows as citation badge."
+      }
+    },
+    "recommended_next_implementation_sequence": [
+      {
+        "priority": 1,
+        "title": "Finish chunk citation rendering",
+        "files": [
+          "apps/everything-ai-ui/src/UserApp.tsx"
+        ],
+        "details": "Render [S1:C3] as citation badges, not plain text. Keep [S1] support."
+      },
+      {
+        "priority": 2,
+        "title": "Make citations clickable",
+        "files": [
+          "apps/everything-ai-ui/src/UserApp.tsx",
+          "apps/everything-ai-ui/src/user/wikiNavigationTree.css"
+        ],
+        "details": "Click [S1:C3] to highlight/scroll to Source Locations entry or open a source preview panel/modal. Do not overbuild until chunk rendering is validated."
+      },
+      {
+        "priority": 3,
+        "title": "Split UserApp.tsx",
+        "files": [
+          "apps/everything-ai-ui/src/UserApp.tsx",
+          "apps/everything-ai-ui/src/user/*"
+        ],
+        "details": "Move Wiki view, Ask view, Explore view, MarkdownArticle, source rail, and setup/onboarding pieces into smaller components. This is important because UserApp.tsx is now too large and risky to patch."
+      },
+      {
+        "priority": 4,
+        "title": "Persist Wiki pages and source chunks in SQLite",
+        "files": [
+          "services/api/src/db/client.js",
+          "services/api/src/knowledge/knowledgeService.js",
+          "services/api/src/routes/intelligence.routes.js"
+        ],
+        "details": "Add wiki_pages, wiki_page_sections, wiki_page_sources, wiki_source_chunks, wiki_page_relations. This will support versioning, search, incremental rebuilds, and stable source references."
+      },
+      {
+        "priority": 5,
+        "title": "Improve AI topic/category generation",
+        "files": [
+          "services/api/src/knowledge/knowledgeService.js"
+        ],
+        "details": "Move from mostly rule-based category generation toward AI/embedding-assisted clustering. Keep deterministic fallback."
+      },
+      {
+        "priority": 6,
+        "title": "Improve document reading quality",
+        "files": [
+          "services/api/src/knowledge/knowledgeService.js",
+          "services/api/src/extractors/*"
+        ],
+        "details": "Better heading detection, remove headers/footers, remove duplicates/OCR artifacts, preserve document hierarchy, create clean chapter/section reading surfaces."
+      },
+      {
+        "priority": 7,
+        "title": "Add richer table/image/chart handling",
+        "files": [
+          "services/api/src/extractors/*",
+          "services/api/src/knowledge/knowledgeService.js",
+          "apps/everything-ai-ui/src/user/*"
+        ],
+        "details": "Detect tables from CSV/XLSX and render them. Later extract PDF images/screenshots and display through safe preview routes."
+      },
+      {
+        "priority": 8,
+        "title": "Add build progress stages",
+        "files": [
+          "services/api/src/jobs/*",
+          "services/api/src/routes/*",
+          "apps/everything-ai-ui/src/UserApp.tsx or split components"
+        ],
+        "details": "Build Wiki and Build Knowledge should report stages/progress, not only final toast."
+      }
+    ],
+    "testing_notes": {
+      "latest_user_confirmation": "User confirmed the latest working batch: Yes. It works.",
+      "not_yet_verified_after_last_backend_change": [
+        "Backend npm test after chunk-level citation generation",
+        "UI typecheck/build after any future UserApp.tsx citation rendering update",
+        "Frontend visual rendering of [S1:C3] badges"
+      ],
+      "safe_next_test": [
+        "git pull origin main",
+        ".\\start_all_debug.bat",
+        "Wait for UI typecheck/build to pass",
+        "Open http://localhost:5151",
+        "Wiki -> Build Wiki",
+        "Open file wiki page",
+        "Confirm Source Locations section appears",
+        "Confirm text includes chunk refs like [S1:C3]"
+      ]
+    },
+    "known_risks": [
+      "UserApp.tsx is large and patching it as a full file is now error-prone. Split it before major additional UI work.",
+      "Docs still include historical/legacy UI files and older phase language. Next agent should not blindly follow old services/api/public UI docs for current user UI work.",
+      "Wiki generation is not yet persisted, so generated pages may be regenerated each request/build rather than managed as durable knowledge pages.",
+      "Source citations are generated from text chunks, not true PDF page-aware extraction yet.",
+      "file:// links may be blocked by browser security, but backend reveal route exists and is more reliable.",
+      "API-level toasts can be noisy because GET /api/files and GET /api/wiki also trigger success toasts. If user complains, add a silent option to apiRequest."
+    ],
+    "do_not_break": [
+      "Official user UI remains safe/non-destructive.",
+      "Admin/operator UI remains separate.",
+      "Permanent purge remains blocked.",
+      "Action execution remains approval-gated.",
+      "Source references remain visible and trustworthy.",
+      "Build/test commands in start_all_debug.bat must remain reliable for the user."
+    ],
+    "handover_prompt_for_next_agent": "You are continuing EverythingAI / EverythingApp from a local MVP Wiki milestone. Work directly on main. First read docs/HANDOVER_2026-05-16_EVERYTHINGAI_WIKI_MILESTONE.json, docs/MVP_FINALIZATION_PLAN.md, docs/IMPLEMENTATION_ROADMAP.md, apps/everything-ai-ui/src/UserApp.tsx, apps/everything-ai-ui/src/user/WikiNavigationTree.tsx, apps/everything-ai-ui/src/user/wikiNavigationTree.css, services/api/src/knowledge/knowledgeService.js, services/api/src/routes/files.routes.js, and apps/everything-ai-ui/src/api.ts. The user confirmed the Wiki direction and recent features work. The immediate next task is to finish frontend rendering for chunk citations like [S1:C3], then make citations clickable, then split UserApp.tsx before deeper UI work. Keep the user UI safe and non-destructive. Do not expose admin/operator file-mutation workflows in the ordinary user UI. Always give exact file paths when changing code."
+  }
+}
