@@ -1,5 +1,5 @@
 import React, { FormEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, MessageCircle, Search, Send, Server, Sparkles } from 'lucide-react';
+import { BookOpen, Brain, CheckCircle2, FileText, FolderOpen, Maximize2, MessageCircle, Minimize2, Search, Send, Server, Sparkles } from 'lucide-react';
 import { apiRequest, ApiOptions, IndexedFile } from './api';
 import { WikiNavigationTree } from './user/WikiNavigationTree';
 
@@ -115,12 +115,26 @@ function updateStep(steps: SetupStep[], id: string, status: SetupStep['status'])
   return steps.map((step) => step.id === id ? { ...step, status } : step);
 }
 
-function renderInlineMarkdown(text: string): ReactNode[] {
+function findWikiPageByLabel(pages: WikiPage[], label: string) {
+  const normalized = label.trim().toLowerCase();
+  return pages.find((page) => page.title.toLowerCase() === normalized)
+    || pages.find((page) => page.slug.toLowerCase() === normalized.replace(/\s+/g, '-'))
+    || pages.find((page) => page.title.toLowerCase().includes(normalized));
+}
+
+function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+\])/g).filter(Boolean);
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>;
     if (part.startsWith('*') && part.endsWith('*')) return <em key={index}>{part.slice(1, -1)}</em>;
-    if (part.startsWith('[[') && part.endsWith(']]')) return <span key={index} className="wiki-link">{part.slice(2, -2)}</span>;
+    if (part.startsWith('[[') && part.endsWith(']]')) {
+      const label = part.slice(2, -2);
+      const page = findWikiPageByLabel(pages, label);
+      if (page && onWikiLink) {
+        return <button key={index} type="button" className="wiki-inline-link" onClick={() => onWikiLink(page.id)}>{label}</button>;
+      }
+      return <span key={index} className="wiki-link">{label}</span>;
+    }
     if (/^\[S\d+\]$/.test(part)) return <sup key={index} className="wiki-source-ref">{part}</sup>;
     return part;
   });
@@ -140,7 +154,7 @@ function parseTable(lines: string[], startIndex: number) {
   return { headers, body, nextIndex: index };
 }
 
-function MarkdownArticle({ markdown }: { markdown: string }) {
+function MarkdownArticle({ markdown, pages, onWikiLink }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void }) {
   const lines = markdown.split('\n');
   const nodes: ReactNode[] = [];
   let index = 0;
@@ -152,20 +166,20 @@ function MarkdownArticle({ markdown }: { markdown: string }) {
     if (trimmed.startsWith('|')) {
       const table = parseTable(lines, index);
       nodes.push(<table key={`table-${index}`} className="wiki-table">
-        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header)}</th>)}</tr></thead>
-        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell)}</td>)}</tr>)}</tbody>
+        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, pages, onWikiLink)}</th>)}</tr></thead>
+        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, pages, onWikiLink)}</td>)}</tr>)}</tbody>
       </table>);
       index = table.nextIndex;
       continue;
     }
 
-    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2))}</h1>);
-    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3))}</h2>);
-    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4))}</h3>);
-    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2))}</li>);
-    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2))}</blockquote>);
+    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink)}</h1>);
+    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3), pages, onWikiLink)}</h2>);
+    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4), pages, onWikiLink)}</h3>);
+    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink)}</li>);
+    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink)}</blockquote>);
     else if (!line.trim()) nodes.push(<br key={index} />);
-    else nodes.push(<p key={index}>{renderInlineMarkdown(line)}</p>);
+    else nodes.push(<p key={index}>{renderInlineMarkdown(line, pages, onWikiLink)}</p>);
     index += 1;
   }
 
@@ -186,6 +200,7 @@ export function UserApp() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [wiki, setWiki] = useState<WikiPayload | null>(null);
   const [selectedWikiPageId, setSelectedWikiPageId] = useState<string | null>(null);
+  const [readingMode, setReadingMode] = useState(false);
   const [status, setStatus] = useState('Ready');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -334,6 +349,13 @@ export function UserApp() {
     else await task();
   }
 
+  async function revealSourceFile(fileId: string) {
+    await run('Opening source file location...', async () => {
+      await apiRequest(options, `/api/files/${fileId}/reveal`, {}, 'POST');
+      setStatus('Source file location opened.');
+    });
+  }
+
   async function askQuestion(questionText = chatInput) {
     const question = questionText.trim();
     if (!question || busy) return;
@@ -361,6 +383,11 @@ export function UserApp() {
     askQuestion(`Explain the wiki page "${page.title}" and cite the relevant source documents.`);
   }
 
+  function openWikiPage(pageId: string) {
+    setSelectedWikiPageId(pageId);
+    setView('wiki');
+  }
+
   function openAskView() {
     setView('ask');
     setTimeout(() => chatInputRef.current?.focus(), 0);
@@ -386,7 +413,7 @@ export function UserApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div className="app">
+  return <div className={`app ${readingMode ? 'wiki-reading-mode-active' : ''}`}>
     <header className="top-nav">
       <div className="brand"><Brain size={28} /><strong>EverythingAI</strong></div>
       <nav>
@@ -525,6 +552,10 @@ export function UserApp() {
           <div className="hero-actions">
             <button className="purple" onClick={buildWiki} disabled={busy}><Sparkles size={16} /> Build Wiki</button>
             <button className="outline" onClick={refreshWiki} disabled={busy}>Refresh Wiki</button>
+            <button className="outline" onClick={() => setReadingMode((value) => !value)} disabled={!selectedWikiPage}>
+              {readingMode ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              {readingMode ? 'Exit Reading' : 'Reading Mode'}
+            </button>
             <button className="outline" onClick={() => askAboutWikiPage()} disabled={!selectedWikiPage || busy}>Ask about page</button>
           </div>
         </section>
@@ -538,7 +569,7 @@ export function UserApp() {
               </div>
             </div>
             {!wiki?.pages.length && <p className="muted">No wiki pages yet. Click Build Wiki after building your knowledge workspace.</p>}
-            {wiki?.pages.length ? <WikiNavigationTree pages={wiki.pages} selectedPageId={selectedWikiPage?.id} onSelect={setSelectedWikiPageId} /> : null}
+            {wiki?.pages.length ? <WikiNavigationTree pages={wiki.pages} selectedPageId={selectedWikiPage?.id} onSelect={openWikiPage} /> : null}
           </aside>
 
           <section className="wiki-main panel">
@@ -551,7 +582,7 @@ export function UserApp() {
                 </div>
                 <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this page</button>
               </div>
-              <MarkdownArticle markdown={selectedWikiPage.markdown} />
+              <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} />
             </> : <p>Select a wiki page.</p>}
           </section>
 
@@ -564,7 +595,10 @@ export function UserApp() {
                   <strong>[{source.ref}] {source.filename || 'Source'}</strong>
                   <p>{source.location || 'file-level reference'}</p>
                   {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
-                  {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source context</button>}
+                  <div className="source-actions">
+                    {source.file_id && <button className="outline" onClick={() => revealSourceFile(source.file_id as string)}>Reveal in folder</button>}
+                    {source.file_id && <button className="outline" onClick={() => { setView('explore'); loadDocumentContext(source.file_id as string); }}>Open source context</button>}
+                  </div>
                 </div>)}
               </div>
             </> : <p>Select a page to inspect sources.</p>}
