@@ -1,0 +1,23 @@
+.wiki-tree{display:grid;gap:1rem}
+.wiki-tree-section{display:grid;gap:.75rem}
+.wiki-tree-section h3{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:#475569;margin:.25rem 0}
+.wiki-tree-category{border:1px solid #e2e8f0;border-radius:14px;background:#fff;overflow:hidden}
+.wiki-tree-category>summary{cursor:pointer;list-style:none;padding:.9rem 1rem;background:linear-gradient(180deg,#eff6ff,#fff);border-bottom:1px solid #e2e8f0;color:#0f172a}
+.wiki-tree-category>summary::-webkit-details-marker,.wiki-tree-topic>summary::-webkit-details-marker,.wiki-tree-files>summary::-webkit-details-marker{display:none}
+.wiki-tree-category>summary span{display:grid;gap:.2rem}
+.wiki-tree-category>summary strong{font-size:1rem;color:#1e3a8a}
+.wiki-tree-category>summary small{color:#64748b;font-weight:700}
+.wiki-tree-topics{display:grid;gap:.55rem;padding:.75rem}
+.wiki-tree-topic{border-left:3px solid #bfdbfe;background:#f8fafc;border-radius:10px;padding:.55rem .65rem}
+.wiki-tree-topic>summary{display:flex;justify-content:space-between;align-items:center;gap:.7rem;cursor:pointer;color:#334155;font-weight:800}
+.wiki-tree-topic>summary small,.wiki-tree-files>summary small{background:#e0e7ff;color:#3730a3;border-radius:999px;padding:.12rem .45rem;font-size:.7rem}
+.wiki-tree-files{margin-top:.45rem;padding-left:.55rem;border-left:1px dashed #cbd5e1}
+.wiki-tree-files>summary{cursor:pointer;color:#64748b;font-size:.84rem;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.wiki-tree-page{width:100%;display:grid!important;justify-content:stretch!important;text-align:left!important;background:#fff!important;color:#0f172a!important;border:1px solid #e2e8f0!important;border-radius:10px!important;padding:.7rem!important;gap:.2rem!important;margin:.35rem 0;box-shadow:none!important}
+.wiki-tree-page.compact{padding:.55rem .65rem!important;margin:.28rem 0;background:#fff!important}
+.wiki-tree-page.selected{border-color:#2563eb!important;background:#dbeafe!important;box-shadow:0 8px 16px rgba(37,99,235,.12)!important}
+.wiki-tree-page span{text-transform:uppercase;letter-spacing:.07em;color:#2563eb;font-size:.68rem;font-weight:900}
+.wiki-tree-page strong{font-size:.9rem;line-height:1.25;white-space:normal;overflow:hidden;text-overflow:ellipsis}
+.wiki-tree-page small{color:#64748b;font-weight:700}
+.wiki-sidebar{min-width:0}
+.wiki-sidebar .panel-title{position:sticky;top:0;background:#fff;z-index:1;padding-bottom:.75rem;border-bottom:1px solid #e2e8f0}
