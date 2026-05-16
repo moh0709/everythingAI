@@ -122,7 +122,11 @@ function findWikiPageByLabel(pages: WikiPage[], label: string) {
     || pages.find((page) => page.title.toLowerCase().includes(normalized));
 }
 
-function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void): ReactNode[] {
+function normalizeCitationRef(part: string): string {
+  return part.slice(1, -1).split(':')[0];
+}
+
+function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void, onSourceRefClick?: (ref: string) => void): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+(?::C\d+)?\])/g).filter(Boolean);
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>;
@@ -136,6 +140,9 @@ function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?:
       return <span key={index} className="wiki-link">{label}</span>;
     }
     if (/^\[S\d+(?::C\d+)?\]$/.test(part)) {
+      if (onSourceRefClick) {
+        return <button key={index} type="button" className="wiki-source-ref wiki-source-ref-btn" onClick={() => onSourceRefClick(normalizeCitationRef(part))}>{part}</button>;
+      }
       return <sup key={index} className="wiki-source-ref">{part}</sup>;
     }
     return part;
@@ -156,7 +163,7 @@ function parseTable(lines: string[], startIndex: number) {
   return { headers, body, nextIndex: index };
 }
 
-function MarkdownArticle({ markdown, pages, onWikiLink }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void }) {
+function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
   const lines = markdown.split('\n');
   const nodes: ReactNode[] = [];
   let index = 0;
@@ -168,20 +175,20 @@ function MarkdownArticle({ markdown, pages, onWikiLink }: { markdown: string; pa
     if (trimmed.startsWith('|')) {
       const table = parseTable(lines, index);
       nodes.push(<table key={`table-${index}`} className="wiki-table">
-        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, pages, onWikiLink)}</th>)}</tr></thead>
-        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, pages, onWikiLink)}</td>)}</tr>)}</tbody>
+        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, pages, onWikiLink, onSourceRefClick)}</th>)}</tr></thead>
+        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, pages, onWikiLink, onSourceRefClick)}</td>)}</tr>)}</tbody>
       </table>);
       index = table.nextIndex;
       continue;
     }
 
-    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink)}</h1>);
-    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3), pages, onWikiLink)}</h2>);
-    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4), pages, onWikiLink)}</h3>);
-    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink)}</li>);
-    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink)}</blockquote>);
+    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink, onSourceRefClick)}</h1>);
+    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3), pages, onWikiLink, onSourceRefClick)}</h2>);
+    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4), pages, onWikiLink, onSourceRefClick)}</h3>);
+    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink, onSourceRefClick)}</li>);
+    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink, onSourceRefClick)}</blockquote>);
     else if (!line.trim()) nodes.push(<br key={index} />);
-    else nodes.push(<p key={index}>{renderInlineMarkdown(line, pages, onWikiLink)}</p>);
+    else nodes.push(<p key={index}>{renderInlineMarkdown(line, pages, onWikiLink, onSourceRefClick)}</p>);
     index += 1;
   }
 
@@ -203,10 +210,12 @@ export function UserApp() {
   const [wiki, setWiki] = useState<WikiPayload | null>(null);
   const [selectedWikiPageId, setSelectedWikiPageId] = useState<string | null>(null);
   const [readingMode, setReadingMode] = useState(false);
+  const [activeSourceRef, setActiveSourceRef] = useState<string | null>(null);
   const [status, setStatus] = useState('Ready');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const sourceCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const options: ApiOptions = useMemo(() => ({ baseUrl, token }), [baseUrl, token]);
   const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
@@ -387,7 +396,13 @@ export function UserApp() {
 
   function openWikiPage(pageId: string) {
     setSelectedWikiPageId(pageId);
+    setActiveSourceRef(null);
     setView('wiki');
+  }
+
+  function handleCitationClick(ref: string) {
+    setActiveSourceRef(ref);
+    sourceCardRefs.current[ref]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function openAskView() {
@@ -584,7 +599,7 @@ export function UserApp() {
                 </div>
                 <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this page</button>
               </div>
-              <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} />
+              <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleCitationClick} />
             </> : <p>Select a wiki page.</p>}
           </section>
 
@@ -593,7 +608,7 @@ export function UserApp() {
               <h3>Sources</h3>
               <p className="muted">Source of truth for this article.</p>
               <div className="source-list compact-source-list">
-                {selectedWikiPage.sources.map((source) => <div className="source-card wiki-source-card" key={`${source.ref}-${source.file_id}`}>
+                {selectedWikiPage.sources.map((source) => <div className={`source-card wiki-source-card${activeSourceRef === source.ref ? ' wiki-source-card-active' : ''}`} key={`${source.ref}-${source.file_id}`} ref={(el) => { sourceCardRefs.current[source.ref] = el; }}>
                   <strong>[{source.ref}] {source.filename || 'Source'}</strong>
                   <p>{source.location || 'file-level reference'}</p>
                   {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
