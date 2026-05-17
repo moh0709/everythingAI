@@ -22,7 +22,7 @@ type WikiViewProps = {
   setReadingMode: React.Dispatch<React.SetStateAction<boolean>>;
   openWikiPage: (pageId: string) => void;
   askAboutWikiPage: (page?: WikiPage) => void;
-  revealSourceFile: (fileId: string) => void;
+  revealSourceFile: (fileId: string, absolutePath?: string) => void;
   openSourceContext: (fileId: string) => void;
   handleCitationClick: (ref: string) => void;
 };
@@ -122,7 +122,7 @@ export function WikiView({
               <p>{source.location || 'file-level reference'}</p>
               {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
               <div className="source-actions">
-                {source.file_id && <button className="outline" onClick={() => revealSourceFile(source.file_id as string)}>Reveal in folder</button>}
+                {source.file_id && <button className="outline" onClick={() => revealSourceFile(source.file_id as string, source.absolute_path || undefined)}>Reveal in folder</button>}
                 {source.file_id && <button className="outline" onClick={() => openSourceContext(source.file_id as string)}>Open source context</button>}
               </div>
             </div>)}
