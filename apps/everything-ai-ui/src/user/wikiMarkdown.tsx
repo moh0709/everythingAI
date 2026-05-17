@@ -147,7 +147,7 @@ function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick }: {
   return (
     <section className="wiki-tabbed-sections">
       <div className="wiki-tabbed-header">
-        <h2>Additional Document Details</h2>
+        <h2>Document Details</h2>
         <p>Metadata, related pages, source locations, and evidence are grouped here so the document content stays readable.</p>
       </div>
       <div className="wiki-tab-list" role="tablist" aria-label="Wiki document detail sections">
@@ -173,9 +173,13 @@ function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick }: {
 
 export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
   const { visibleLines, tabbedSections } = useMemo(() => splitArticleSections(markdown.split('\n')), [markdown]);
+  const documentContent = renderMarkdownLines(visibleLines, pages, onWikiLink, onSourceRefClick, true);
 
   return <article className="wiki-article">
-    {renderMarkdownLines(visibleLines, pages, onWikiLink, onSourceRefClick, true)}
+    <section className="wiki-document-content">
+      <div className="wiki-document-content-label">Document Content</div>
+      {documentContent}
+    </section>
     <WikiTabbedSections sections={tabbedSections} pages={pages} onWikiLink={onWikiLink} onSourceRefClick={onSourceRefClick} />
   </article>;
 }
