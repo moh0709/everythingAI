@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ApiOptions } from '../api';
 import {
+  clearWikiRebuildJobs,
   fetchWikiJobs,
   startWikiRebuildJob,
   type WikiJob,
@@ -25,6 +26,7 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
   const [jobs, setJobs] = useState<WikiJob[]>([]);
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
+  const [clearing, setClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function loadJobs() {
@@ -51,6 +53,20 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
     }
   }
 
+  async function handleClearHistory() {
+    try {
+      setClearing(true);
+      setError(null);
+
+      const response = await clearWikiRebuildJobs(options);
+      setJobs(response.jobs || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to clear rebuild history');
+    } finally {
+      setClearing(false);
+    }
+  }
+
   useEffect(() => {
     setLoading(true);
 
@@ -70,6 +86,8 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
     [jobs]
   );
 
+  const clearDisabled = clearing || activeJobs.length > 0 || !jobs.length;
+
   return (
     <section className="wiki-rebuild-panel panel">
       <div className="wiki-rebuild-panel-header">
@@ -78,14 +96,36 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
           <p>Operational incremental rebuild monitoring</p>
         </div>
 
-        <button
-          type="button"
-          className="purple"
-          onClick={handleStartRebuild}
-          disabled={running}
-        >
-          {running ? 'Starting…' : 'Start Async Rebuild'}
-        </button>
+        <div className="wiki-rebuild-actions">
+          <button
+            type="button"
+            className="outline wiki-rebuild-clear-button"
+            onClick={handleClearHistory}
+            disabled={clearDisabled}
+            title="Clears completed and failed rebuild job cards. Running or queued jobs are kept for safety."
+          >
+            {clearing ? 'Clearing…' : 'Clear History'}
+          </button>
+
+          <div className="wiki-action-with-help">
+            <button
+              type="button"
+              className="purple"
+              onClick={handleStartRebuild}
+              disabled={running}
+            >
+              {running ? 'Starting…' : 'Start Async Rebuild'}
+            </button>
+            <span
+              className="wiki-help-icon"
+              tabIndex={0}
+              aria-label="Start Async Rebuild help"
+              data-tooltip="Runs the Wiki rebuild in the background. It checks changed files, updates affected Wiki pages, preserves unchanged pages, and shows progress without blocking the interface."
+            >
+              i
+            </span>
+          </div>
+        </div>
       </div>
 
       {error ? (
