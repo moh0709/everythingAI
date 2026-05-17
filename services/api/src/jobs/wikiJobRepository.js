@@ -113,6 +113,17 @@ export function updateWikiJob(db, jobId, updates = {}) {
   return getWikiJob(db, jobId);
 }
 
+export function clearCompletedWikiJobs(db) {
+  ensureWikiJobSchema(db);
+
+  const result = db.prepare(`
+    DELETE FROM wiki_rebuild_jobs
+    WHERE status IN ('completed', 'failed')
+  `).run();
+
+  return result.changes || 0;
+}
+
 export function getWikiJob(db, jobId) {
   ensureWikiJobSchema(db);
 
