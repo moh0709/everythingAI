@@ -284,6 +284,7 @@ export function UserApp() {
 
       {view === 'wiki' && <WikiView
         error={error} busy={busy} status={status}
+        options={options}
         wiki={wiki} selectedWikiPage={selectedWikiPage}
         readingMode={readingMode} activeSourceRef={activeSourceRef}
         sourceCardRefs={sourceCardRefs}
