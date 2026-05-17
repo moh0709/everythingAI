@@ -1,18 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
+import type { ApiOptions } from '../api';
 import {
   fetchWikiJobs,
   startWikiRebuildJob,
+  type WikiJob,
 } from './wikiJobsApi';
-
-type WikiJob = {
-  id: string;
-  status: string;
-  stage: string;
-  progress_percent: number;
-  created_at?: string;
-  updated_at?: string;
-  metadata?: Record<string, unknown>;
-};
 
 function formatTimestamp(value?: string) {
   if (!value) return '—';
@@ -24,7 +16,11 @@ function formatTimestamp(value?: string) {
   }
 }
 
-export function WikiRebuildPanel() {
+type WikiRebuildPanelProps = {
+  options: ApiOptions;
+};
+
+export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
   const [jobs, setJobs] = useState<WikiJob[]>([]);
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
@@ -32,7 +28,7 @@ export function WikiRebuildPanel() {
 
   async function loadJobs() {
     try {
-      const response = await fetchWikiJobs();
+      const response = await fetchWikiJobs(options);
       setJobs(response.jobs || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load rebuild jobs');
@@ -44,7 +40,7 @@ export function WikiRebuildPanel() {
       setRunning(true);
       setError(null);
 
-      await startWikiRebuildJob();
+      await startWikiRebuildJob(options);
 
       await loadJobs();
     } catch (err) {
@@ -66,7 +62,7 @@ export function WikiRebuildPanel() {
     }, 2500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [options]);
 
   const activeJobs = useMemo(
     () => jobs.filter((job) => job.status === 'queued' || job.status === 'running'),
@@ -74,7 +70,7 @@ export function WikiRebuildPanel() {
   );
 
   return (
-    <section className="wiki-rebuild-panel">
+    <section className="wiki-rebuild-panel panel">
       <div className="wiki-rebuild-panel-header">
         <div>
           <h3>Wiki Rebuild Orchestration</h3>
@@ -83,7 +79,7 @@ export function WikiRebuildPanel() {
 
         <button
           type="button"
-          className="primary-button"
+          className="purple"
           onClick={handleStartRebuild}
           disabled={running}
         >
