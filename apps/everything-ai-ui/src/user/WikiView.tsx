@@ -1,7 +1,9 @@
 import React, { MutableRefObject } from 'react';
+import type { ApiOptions } from '../api';
 import { BookOpen, Maximize2, Minimize2, Sparkles } from 'lucide-react';
 import { WikiNavigationTree } from './WikiNavigationTree';
 import { MarkdownArticle } from './wikiMarkdown';
+import { WikiRebuildPanel } from './WikiRebuildPanel';
 import { filePathHref } from './userUtils';
 import type { WikiPage, WikiPayload } from './types';
 
@@ -9,6 +11,7 @@ type WikiViewProps = {
   error: string;
   busy: boolean;
   status: string;
+  options: ApiOptions;
   wiki: WikiPayload | null;
   selectedWikiPage: WikiPage | undefined;
   readingMode: boolean;
@@ -25,7 +28,7 @@ type WikiViewProps = {
 };
 
 export function WikiView({
-  error, busy, status, wiki, selectedWikiPage, readingMode, activeSourceRef,
+  error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
   askAboutWikiPage, revealSourceFile, openSourceContext, handleCitationClick,
 }: WikiViewProps) {
@@ -48,6 +51,8 @@ export function WikiView({
         <button className="outline" onClick={() => askAboutWikiPage()} disabled={!selectedWikiPage || busy}>Ask about page</button>
       </div>
     </section>
+
+    <WikiRebuildPanel options={options} />
 
     <section className="wiki-layout">
       <aside className="wiki-sidebar panel">
