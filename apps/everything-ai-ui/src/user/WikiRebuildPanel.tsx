@@ -5,6 +5,7 @@ import {
   startWikiRebuildJob,
   type WikiJob,
 } from './wikiJobsApi';
+import './wikiRebuildPanel.css';
 
 function formatTimestamp(value?: string) {
   if (!value) return '—';
