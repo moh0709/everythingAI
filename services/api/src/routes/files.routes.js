@@ -37,11 +37,12 @@ function sendDocumentContext(req, res) {
 }
 
 function revealFile(filePath) {
-  if (process.platform === 'win32') {
-    const normalizedPath = path.normalize(filePath);
-    const command = `explorer.exe /select,"${normalizedPath}"`;
+  const normalizedPath = path.normalize(filePath);
 
-    spawn('cmd.exe', ['/c', command], {
+  if (process.platform === 'win32') {
+    const explorerArgument = `/select,${normalizedPath}`;
+
+    spawn('explorer.exe', [explorerArgument], {
       detached: true,
       stdio: 'ignore',
       windowsHide: false,
@@ -49,12 +50,12 @@ function revealFile(filePath) {
     return;
   }
 
-  const folder = fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()
-    ? filePath
-    : path.dirname(filePath);
+  const folder = fs.existsSync(normalizedPath) && fs.statSync(normalizedPath).isDirectory()
+    ? normalizedPath
+    : path.dirname(normalizedPath);
 
   if (process.platform === 'darwin') {
-    spawn('open', ['-R', filePath], { detached: true, stdio: 'ignore' }).unref();
+    spawn('open', ['-R', normalizedPath], { detached: true, stdio: 'ignore' }).unref();
     return;
   }
 
