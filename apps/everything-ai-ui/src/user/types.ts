@@ -32,6 +32,20 @@ export type ChatMessage = {
   sources?: Array<{ filename?: string; absolute_path?: string; snippet?: string; score?: number }>;
 };
 
+export type WikiSourceChunk = {
+  ref: string;
+  source_ref?: string;
+  chunk_number?: number;
+  line_start?: number;
+  line_end?: number;
+  char_start?: number;
+  char_end?: number;
+  location?: string;
+  heading?: boolean;
+  text?: string;
+  evidence?: string;
+};
+
 export type WikiSource = {
   ref: string;
   file_id?: string;
@@ -40,6 +54,7 @@ export type WikiSource = {
   relative_path?: string;
   location?: string;
   evidence?: string;
+  chunks?: WikiSourceChunk[];
 };
 
 export type WikiRelatedPage = {
