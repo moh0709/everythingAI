@@ -38,10 +38,13 @@ function sendDocumentContext(req, res) {
 
 function revealFile(filePath) {
   if (process.platform === 'win32') {
-    spawn('explorer.exe', ['/select,', filePath], {
+    const normalizedPath = path.normalize(filePath);
+    const command = `explorer.exe /select,"${normalizedPath}"`;
+
+    spawn('cmd.exe', ['/c', command], {
       detached: true,
       stdio: 'ignore',
-      windowsHide: true,
+      windowsHide: false,
     }).unref();
     return;
   }
@@ -51,7 +54,7 @@ function revealFile(filePath) {
     : path.dirname(filePath);
 
   if (process.platform === 'darwin') {
-    spawn('open', [folder], { detached: true, stdio: 'ignore' }).unref();
+    spawn('open', ['-R', filePath], { detached: true, stdio: 'ignore' }).unref();
     return;
   }
 
