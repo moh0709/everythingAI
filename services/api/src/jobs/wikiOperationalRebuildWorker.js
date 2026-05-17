@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { openDatabase } from '../db/client.js';
 import { buildWikiPages } from '../knowledge/knowledgeService.js';
 import { buildIncrementalWikiPlan } from '../knowledge/wikiIncrementalService.js';
@@ -9,6 +10,13 @@ import {
   saveWikiPageDependencies,
   updateWikiBuildState,
 } from '../db/wikiIncrementalRepository.js';
+
+function hashContent(value) {
+  return crypto
+    .createHash('sha1')
+    .update(value || '')
+    .digest('hex');
+}
 
 function buildFingerprintsFromWiki(wiki) {
   const fingerprints = new Map();
@@ -25,7 +33,7 @@ function buildFingerprintsFromWiki(wiki) {
       fingerprints.set(source.file_id, {
         file_id: source.file_id,
         absolute_path: source.absolute_path || null,
-        content_hash: combinedText,
+        content_hash: hashContent(combinedText),
         content_length: combinedText.length,
         extracted_at: new Date().toISOString(),
       });
@@ -62,8 +70,12 @@ export async function runOperationalWikiRebuild({ update, limit = 500, filePageL
     const replacementPlan = buildSelectiveReplacementPlan(db, generatedWiki);
 
     let persistedWiki;
+    let effectiveStrategy = replacementPlan.strategy;
 
-    if (replacementPlan.strategy === 'selective-replacement') {
+    if (
+      replacementPlan.strategy === 'selective-replacement' &&
+      replacementPlan.pages_to_replace.length > 0
+    ) {
       const affectedPageIds = new Set(
         replacementPlan.pages_to_replace.map((page) => page.id)
       );
@@ -88,8 +100,15 @@ export async function runOperationalWikiRebuild({ update, limit = 500, filePageL
         new Date().toISOString()
       );
     } else {
+      effectiveStrategy = replacementPlan.strategy === 'selective-replacement'
+        ? 'full-persist-fallback'
+        : 'full-persist';
+
       update('full-persist', 75, {
         message: 'Persisting full wiki snapshot',
+        reason: replacementPlan.strategy === 'selective-replacement'
+          ? 'Changed files had no mapped persisted wiki pages yet.'
+          : 'No selective replacement required.',
       });
 
       persistedWiki = persistWikiPages(db, generatedWiki);
@@ -103,6 +122,7 @@ export async function runOperationalWikiRebuild({ update, limit = 500, filePageL
 
     update('metadata-sync', 90, {
       page_count: persistedWiki.page_count,
+      strategy: effectiveStrategy,
     });
 
     saveWikiPageDependencies(db, generatedWiki.pages || []);
@@ -116,7 +136,10 @@ export async function runOperationalWikiRebuild({ update, limit = 500, filePageL
 
     return {
       incremental_plan: incrementalPlan,
-      replacement_plan: replacementPlan,
+      replacement_plan: {
+        ...replacementPlan,
+        effective_strategy: effectiveStrategy,
+      },
       wiki: persistedWiki,
     };
   } finally {
