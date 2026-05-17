@@ -37,6 +37,7 @@ The local MVP is focused on:
 - intelligent wiki search
 - reading mode
 - source reveal/open context actions
+- source verification UX with citations, source cards, copy citation/path actions, and preview drawer foundation
 
 ## Not part of local MVP finalization
 
@@ -141,16 +142,23 @@ Completed:
 - [x] Add source rail with file path, source context, and reveal-in-folder action
 - [x] Add toast notification system for important user-triggered actions
 - [x] Add `start_all_debug.bat` to validate/build UI and start backend/user/admin dev servers
+- [x] Render chunk-level citation badges such as `[S1:C3]`
+- [x] Make citations clickable and highlight matching source cards
+- [x] Add source card actions: preview source, copy citation, copy path, reveal in folder, and open source context
+- [x] Add source preview drawer foundation for source metadata, evidence, path, and chunks
+- [x] Separate article reading content from supporting metadata using Document Content and Document Details tabs
+- [x] Group About This Document, Extracted Entities, Related Pages, Sources, Source Locations, and Evidence Snippets into tabs
+- [x] Add async Wiki rebuild orchestration panel with live progress, clear history, and help tooltips
+- [x] Remove noisy success toasts from GET/polling requests
 
 Remaining:
 
-- [ ] Finish frontend renderer styling for chunk citation badges `[S1:C3]`
-- [ ] Make citations clickable and jump to Source Locations / source preview
-- [ ] Add true progress feedback during Build Knowledge / Build Wiki, not only final toast
+- [ ] Complete source preview drawer styling and responsive layout validation
+- [ ] Make `[S1:C3]` chunk clicks scroll directly to the matching chunk inside the preview drawer
 - [ ] Add page-level search inside selected wiki article
 - [ ] Add better table/image extraction and rendering in wiki pages
 - [ ] Reduce metadata further in reading surfaces
-- [ ] Split `UserApp.tsx` into smaller components
+- [ ] Split remaining large `UserApp.tsx` responsibilities into smaller state/controller modules
 - [ ] Add clearer local settings instructions
 
 ### Phase 7 — Documentation finalization
@@ -162,6 +170,7 @@ Tasks:
 - [x] Add MVP finalization plan
 - [x] Add known limitations document
 - [x] Add current handover JSON for next AI agent
+- [x] Update MVP finalization plan with Phase 1 evidence-inspection progress
 - [ ] Update README with final local test results after latest changes are validated locally
 - [ ] Update Windows smoke test after local tests
 - [ ] Add dedicated Wiki/Knowledge Base technical design doc
@@ -202,6 +211,6 @@ The local MVP is finalized when:
 
 The local MVP should be boring, safe, and reliable before adding more intelligence.
 
-The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, and traceable citations.
+The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, and traceable citations.
 
 Do not add production-platform features until the local MVP is stable.
