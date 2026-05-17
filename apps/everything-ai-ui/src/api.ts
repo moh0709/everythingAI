@@ -10,6 +10,10 @@ type ApiToast = {
 function apiSuccessToast(path: string, method: string, payload: any): ApiToast | null {
   const normalizedMethod = method.toUpperCase();
 
+  if (normalizedMethod === 'GET') {
+    return null;
+  }
+
   if (/^\/api\/files\/[^/]+\/reveal/.test(path)) {
     return {
       title: 'Source location opened',
@@ -17,17 +21,24 @@ function apiSuccessToast(path: string, method: string, payload: any): ApiToast |
     };
   }
 
+  if (path.startsWith('/api/wiki/jobs/rebuild')) {
+    return {
+      title: 'Async rebuild started',
+      message: payload?.job?.id || 'Wiki rebuild job has been queued.',
+    };
+  }
+
+  if (path.startsWith('/api/wiki/jobs/clear')) {
+    return {
+      title: 'Rebuild history cleared',
+      message: `${payload?.deleted ?? 0} old job record(s) removed.`,
+    };
+  }
+
   if (path.startsWith('/api/wiki/build')) {
     return {
       title: 'Wiki built',
       message: `${payload?.wiki?.page_count ?? 0} source-backed wiki page(s) generated.`,
-    };
-  }
-
-  if (path.startsWith('/api/wiki')) {
-    return {
-      title: 'Wiki loaded',
-      message: `${payload?.wiki?.page_count ?? 0} wiki page(s) ready.`,
     };
   }
 
@@ -67,27 +78,6 @@ function apiSuccessToast(path: string, method: string, payload: any): ApiToast |
     };
   }
 
-  if (path.startsWith('/api/unified-search')) {
-    return {
-      title: 'Search complete',
-      message: `${payload?.files?.length ?? 0} file match(es) found.`,
-    };
-  }
-
-  if (path.startsWith('/api/files') && normalizedMethod === 'GET') {
-    return {
-      title: 'Files loaded',
-      message: `${payload?.files?.length ?? 0} indexed file(s) visible.`,
-    };
-  }
-
-  if (path.startsWith('/api/intelligence/document-context/')) {
-    return {
-      title: 'Source context loaded',
-      message: payload?.document?.file?.filename || 'Document context is ready.',
-    };
-  }
-
   if (path.startsWith('/api/knowledge/build')) {
     return {
       title: 'Knowledge base built',
@@ -95,21 +85,10 @@ function apiSuccessToast(path: string, method: string, payload: any): ApiToast |
     };
   }
 
-  if (path.startsWith('/api/knowledge')) {
-    return {
-      title: 'Knowledge loaded',
-      message: `${payload?.classification_count ?? 0} classification group(s) available.`,
-    };
-  }
-
-  if (normalizedMethod !== 'GET') {
-    return {
-      title: 'Action completed',
-      message: path.replace('/api/', '').replace(/-/g, ' '),
-    };
-  }
-
-  return null;
+  return {
+    title: 'Action completed',
+    message: path.replace('/api/', '').replace(/-/g, ' '),
+  };
 }
 
 export async function apiRequest<T>(options: ApiOptions, path: string, body?: unknown, method = 'GET'): Promise<T> {
