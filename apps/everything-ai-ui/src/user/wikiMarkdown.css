@@ -1,0 +1,36 @@
+.wiki-tabbed-sections {
+  margin-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.wiki-tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.wiki-tab {
+  border: 1px solid #dbe4f0;
+  border-radius: 999px;
+  background: #fff;
+  color: #475569;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.wiki-tab.active {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+}
+
+.wiki-tab-panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  padding: 1rem;
+}
