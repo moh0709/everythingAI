@@ -13,6 +13,7 @@ import { buildSelectiveReplacementPlan } from '../knowledge/wikiSelectiveRebuild
 import { generateFileInsights } from '../insights/insightService.js';
 import { buildWikiPages } from '../knowledge/knowledgeService.js';
 import { parseLimit } from '../utils/request.js';
+import { createWikiJobsRouter } from './wikiJobs.routes.js';
 
 function buildFingerprintsFromWiki(wiki) {
   const fingerprints = new Map();
@@ -44,6 +45,7 @@ function buildFingerprintsFromWiki(wiki) {
 
 export function createWikiRouter() {
   const router = Router();
+  router.use(createWikiJobsRouter());
 
   router.get('/wiki', (req, res) => {
     const db = openDatabase();
