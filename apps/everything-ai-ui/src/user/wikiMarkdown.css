@@ -1,7 +1,66 @@
+.wiki-document-content {
+  position: relative;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 1.35rem 1.45rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.wiki-document-content-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wiki-document-content-label::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.14);
+}
+
+.wiki-document-content > :last-child {
+  margin-bottom: 0;
+}
+
 .wiki-tabbed-sections {
   margin-top: 2rem;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 1.5rem;
+  border: 1px solid rgba(99, 102, 241, 0.16);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent 30%),
+    #f8fafc;
+  padding: 1.25rem;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+}
+
+.wiki-tabbed-header {
+  margin-bottom: 1rem;
+}
+
+.wiki-tabbed-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.wiki-tabbed-header p {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.92rem;
 }
 
 .wiki-tab-list {
@@ -9,6 +68,8 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.8rem;
 }
 
 .wiki-tab {
@@ -20,17 +81,52 @@
   font-size: 0.82rem;
   font-weight: 800;
   cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.wiki-tab:hover,
+.wiki-tab:focus {
+  border-color: #a855f7;
+  color: #4f46e5;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.14);
+  outline: none;
 }
 
 .wiki-tab.active {
   border-color: #6366f1;
   background: linear-gradient(135deg, #6366f1, #a855f7);
   color: #fff;
+  box-shadow: 0 10px 24px rgba(99, 102, 241, 0.22);
 }
 
 .wiki-tab-panel {
   border: 1px solid #e2e8f0;
   border-radius: 16px;
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.86);
   padding: 1rem;
+}
+
+.wiki-tab-panel > :first-child {
+  margin-top: 0;
+}
+
+.wiki-tab-panel > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 720px) {
+  .wiki-document-content,
+  .wiki-tabbed-sections {
+    padding: 1rem;
+  }
+
+  .wiki-tab-list {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .wiki-tab {
+    width: 100%;
+    text-align: left;
+  }
 }
