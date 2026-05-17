@@ -9,14 +9,14 @@ function hashContent(value) {
 }
 
 function normalizeExtractedRow(row) {
-  const text = row.extracted_text || row.content || '';
+  const text = row.extracted_text || '';
 
   return {
     file_id: row.file_id || row.id,
-    absolute_path: row.absolute_path || row.path || null,
+    absolute_path: row.absolute_path || null,
     content_hash: hashContent(text),
     content_length: text.length,
-    extracted_at: row.extracted_at || row.updated_at || null,
+    extracted_at: row.extracted_at || row.modified_at || null,
   };
 }
 
@@ -25,12 +25,12 @@ export function collectCurrentWikiFingerprints(db) {
     SELECT
       f.id,
       f.absolute_path,
-      d.content AS extracted_text,
-      d.updated_at,
-      d.created_at
-    FROM files f
-    LEFT JOIN document_extractions d
-      ON d.file_id = f.id
+      f.modified_at,
+      e.extracted_text,
+      e.extracted_at
+    FROM indexed_files f
+    LEFT JOIN file_extractions e
+      ON e.file_id = f.id
   `).all();
 
   return rows.map(normalizeExtractedRow);
