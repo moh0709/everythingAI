@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   openDatabase,
   listIndexedFiles,
@@ -36,13 +37,33 @@ function sendDocumentContext(req, res) {
   return res.json(context);
 }
 
+function normalizeRevealPath(filePath) {
+  if (!filePath) return filePath;
+
+  let normalized = filePath;
+
+  if (normalized.startsWith('file://')) {
+    normalized = fileURLToPath(normalized);
+  } else if (/%[0-9A-Fa-f]{2}/.test(normalized)) {
+    try {
+      normalized = decodeURIComponent(normalized);
+    } catch {
+      // Keep original value if it is not valid URI-encoded text.
+    }
+  }
+
+  return path.normalize(normalized).normalize('NFC');
+}
+
 function revealFile(filePath) {
-  const normalizedPath = path.normalize(filePath);
+  const normalizedPath = normalizeRevealPath(filePath);
 
   if (process.platform === 'win32') {
-    const explorerArgument = `/select,${normalizedPath}`;
+    const targetPath = fs.existsSync(normalizedPath) && fs.statSync(normalizedPath).isDirectory()
+      ? normalizedPath
+      : normalizedPath;
 
-    spawn('explorer.exe', [explorerArgument], {
+    spawn('explorer.exe', [`/select,"${targetPath}"`], {
       detached: true,
       stdio: 'ignore',
       windowsHide: false,
@@ -93,12 +114,14 @@ export function createFilesRouter() {
         return res.status(404).json({ error: 'file not found' });
       }
 
-      if (!fs.existsSync(file.absolute_path)) {
+      const revealPath = normalizeRevealPath(file.absolute_path);
+
+      if (!fs.existsSync(revealPath)) {
         return res.status(404).json({ error: 'source file no longer exists', file });
       }
 
-      revealFile(file.absolute_path);
-      return res.json({ revealed: true, file });
+      revealFile(revealPath);
+      return res.json({ revealed: true, file: { ...file, absolute_path: revealPath } });
     } catch (error) {
       return next(error);
     }
