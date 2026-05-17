@@ -174,9 +174,9 @@ export function UserApp() {
     else await task();
   }
 
-  async function revealSourceFile(fileId: string) {
+  async function revealSourceFile(fileId: string, absolutePath?: string) {
     await run('Opening source file location...', async () => {
-      await apiRequest(options, `/api/files/${fileId}/reveal`, {}, 'POST');
+      await apiRequest(options, `/api/files/${fileId}/reveal`, { absolutePath }, 'POST');
       setStatus('Source file location opened.');
     });
   }
