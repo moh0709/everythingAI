@@ -1,5 +1,8 @@
 import crypto from 'node:crypto';
-import { getWikiPagesDependingOnFiles } from '../db/wikiIncrementalRepository.js';
+import {
+  ensureWikiIncrementalSchema,
+  getWikiPagesDependingOnFiles,
+} from '../db/wikiIncrementalRepository.js';
 
 function hashContent(value) {
   return crypto
@@ -37,6 +40,8 @@ export function collectCurrentWikiFingerprints(db) {
 }
 
 export function detectChangedWikiFiles(db, currentFingerprints = []) {
+  ensureWikiIncrementalSchema(db);
+
   const existingRows = db.prepare(`
     SELECT *
     FROM wiki_file_fingerprints
@@ -78,6 +83,8 @@ export function detectChangedWikiFiles(db, currentFingerprints = []) {
 }
 
 export function buildIncrementalWikiPlan(db) {
+  ensureWikiIncrementalSchema(db);
+
   const currentFingerprints = collectCurrentWikiFingerprints(db);
 
   const result = detectChangedWikiFiles(db, currentFingerprints);
