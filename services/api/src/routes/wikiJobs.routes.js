@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { openDatabase } from '../db/client.js';
-import { listWikiJobs } from '../jobs/wikiJobRepository.js';
+import { clearCompletedWikiJobs, listWikiJobs } from '../jobs/wikiJobRepository.js';
 import {
   createAsyncWikiJob,
   executeAsyncWikiJob,
@@ -20,6 +20,20 @@ export function createWikiJobsRouter() {
     db.close();
 
     res.json({ jobs });
+  });
+
+  router.post('/wiki/jobs/clear', (_req, res) => {
+    const db = openDatabase();
+
+    const deleted = clearCompletedWikiJobs(db);
+    const jobs = listWikiJobs(db, 50);
+
+    db.close();
+
+    return res.json({
+      deleted,
+      jobs,
+    });
   });
 
   router.get('/wiki/jobs/:jobId', (req, res) => {
@@ -49,7 +63,7 @@ export function createWikiJobsRouter() {
       update('completed', 100, {
         changed_file_count: result.incremental_plan?.changed_file_count || 0,
         affected_page_count: result.replacement_plan?.affected_page_count || 0,
-        strategy: result.replacement_plan?.strategy || 'unknown',
+        strategy: result.replacement_plan?.effective_strategy || result.replacement_plan?.strategy || 'unknown',
         page_count: result.wiki?.page_count || 0,
       });
     });
