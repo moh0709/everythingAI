@@ -6,6 +6,8 @@ import {
   executeAsyncWikiJob,
   getAsyncWikiJob,
 } from '../jobs/wikiRebuildExecutor.js';
+import { runOperationalWikiRebuild } from '../jobs/wikiOperationalRebuildWorker.js';
+import { parseLimit } from '../utils/request.js';
 
 export function createWikiJobsRouter() {
   const router = Router();
@@ -32,33 +34,24 @@ export function createWikiJobsRouter() {
     return res.json({ job });
   });
 
-  router.post('/wiki/jobs/rebuild', (_req, res) => {
+  router.post('/wiki/jobs/rebuild', (req, res) => {
     const job = createAsyncWikiJob('wiki-rebuild');
+    const limit = parseLimit(req.body?.limit, 500);
+    const filePageLimit = parseLimit(req.body?.filePageLimit, 50);
 
     executeAsyncWikiJob(job, async ({ update }) => {
-      update('planning', 10, {
-        message: 'Preparing rebuild plan',
+      const result = await runOperationalWikiRebuild({
+        update,
+        limit,
+        filePageLimit,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 250));
-
-      update('fingerprinting', 30, {
-        message: 'Scanning knowledge fingerprints',
+      update('completed', 100, {
+        changed_file_count: result.incremental_plan?.changed_file_count || 0,
+        affected_page_count: result.replacement_plan?.affected_page_count || 0,
+        strategy: result.replacement_plan?.strategy || 'unknown',
+        page_count: result.wiki?.page_count || 0,
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 250));
-
-      update('dependency-analysis', 55, {
-        message: 'Calculating affected pages',
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 250));
-
-      update('selective-rebuild', 80, {
-        message: 'Executing selective rebuild plan',
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 250));
     });
 
     return res.status(202).json({
