@@ -22,6 +22,15 @@ export async function startWikiRebuildJob(options: ApiOptions, payload = {}) {
   );
 }
 
+export async function clearWikiRebuildJobs(options: ApiOptions) {
+  return apiRequest<{ deleted: number; jobs: WikiJob[] }>(
+    options,
+    '/api/wiki/jobs/clear',
+    {},
+    'POST'
+  );
+}
+
 export async function fetchWikiJobs(options: ApiOptions) {
   return apiRequest<{ jobs: WikiJob[] }>(options, '/api/wiki/jobs');
 }
