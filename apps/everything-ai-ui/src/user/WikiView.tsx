@@ -45,6 +45,11 @@ async function copySourcePath(pathValue?: string | null) {
   await navigator.clipboard.writeText(pathValue);
 }
 
+async function copyCitationRef(ref?: string | null) {
+  if (!ref) return;
+  await navigator.clipboard.writeText(`[${ref}]`);
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
@@ -128,6 +133,7 @@ export function WikiView({
               {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
               <div className="source-actions">
                 {source.file_id && <button className="outline" onClick={() => revealSourceFile(source.file_id as string, source.absolute_path || undefined)}>Reveal in folder</button>}
+                <button className="outline" onClick={() => copyCitationRef(source.ref)}>Copy citation</button>
                 {source.absolute_path && <button className="outline" onClick={() => copySourcePath(source.absolute_path)}>Copy path</button>}
                 {source.file_id && <button className="outline" onClick={() => openSourceContext(source.file_id as string)}>Open source context</button>}
               </div>
