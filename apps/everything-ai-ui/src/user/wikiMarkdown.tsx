@@ -1,5 +1,20 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import type { WikiPage } from './types';
+import './wikiMarkdown.css';
+
+const TABBED_SECTION_TITLES = new Set([
+  'About This Document',
+  'Extracted Entities',
+  'Related Pages',
+  'Sources',
+  'Source Locations',
+  'Evidence Snippets',
+]);
+
+type MarkdownSection = {
+  title: string;
+  lines: string[];
+};
 
 export function findWikiPageByLabel(pages: WikiPage[], label: string) {
   const normalized = label.trim().toLowerCase();
@@ -49,14 +64,56 @@ function parseTable(lines: string[], startIndex: number) {
   return { headers, body, nextIndex: index };
 }
 
-export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
-  const lines = markdown.split('\n');
+function sectionTitleFromLine(line: string) {
+  if (!line.startsWith('## ')) return null;
+  return line.slice(3).trim();
+}
+
+function splitArticleSections(lines: string[]) {
+  const visibleLines: string[] = [];
+  const tabbedSections: MarkdownSection[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const title = sectionTitleFromLine(lines[index]);
+
+    if (!title || !TABBED_SECTION_TITLES.has(title)) {
+      visibleLines.push(lines[index]);
+      index += 1;
+      continue;
+    }
+
+    const sectionLines: string[] = [];
+    index += 1;
+
+    while (index < lines.length) {
+      const nextTitle = sectionTitleFromLine(lines[index]);
+      if (nextTitle && TABBED_SECTION_TITLES.has(nextTitle)) break;
+
+      sectionLines.push(lines[index]);
+      index += 1;
+    }
+
+    tabbedSections.push({ title, lines: sectionLines });
+  }
+
+  return { visibleLines, tabbedSections };
+}
+
+function renderMarkdownLines(lines: string[], pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void, onSourceRefClick?: (ref: string) => void, skipFirstTitle = false) {
   const nodes: ReactNode[] = [];
   let index = 0;
+  let skippedFirstTitle = false;
 
   while (index < lines.length) {
     const line = lines[index];
     const trimmed = line.trim();
+
+    if (skipFirstTitle && !skippedFirstTitle && line.startsWith('# ')) {
+      skippedFirstTitle = true;
+      index += 1;
+      continue;
+    }
 
     if (trimmed.startsWith('|')) {
       const table = parseTable(lines, index);
@@ -78,5 +135,47 @@ export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick 
     index += 1;
   }
 
-  return <article className="wiki-article">{nodes}</article>;
+  return nodes;
+}
+
+function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick }: { sections: MarkdownSection[]; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
+  const [activeTitle, setActiveTitle] = useState(sections[0]?.title || '');
+  const activeSection = sections.find((section) => section.title === activeTitle) || sections[0];
+
+  if (!sections.length || !activeSection) return null;
+
+  return (
+    <section className="wiki-tabbed-sections">
+      <div className="wiki-tabbed-header">
+        <h2>Additional Document Details</h2>
+        <p>Metadata, related pages, source locations, and evidence are grouped here so the document content stays readable.</p>
+      </div>
+      <div className="wiki-tab-list" role="tablist" aria-label="Wiki document detail sections">
+        {sections.map((section) => (
+          <button
+            key={section.title}
+            type="button"
+            role="tab"
+            aria-selected={section.title === activeSection.title}
+            className={section.title === activeSection.title ? 'wiki-tab active' : 'wiki-tab'}
+            onClick={() => setActiveTitle(section.title)}
+          >
+            {section.title}
+          </button>
+        ))}
+      </div>
+      <div className="wiki-tab-panel" role="tabpanel">
+        {renderMarkdownLines(activeSection.lines, pages, onWikiLink, onSourceRefClick)}
+      </div>
+    </section>
+  );
+}
+
+export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
+  const { visibleLines, tabbedSections } = useMemo(() => splitArticleSections(markdown.split('\n')), [markdown]);
+
+  return <article className="wiki-article">
+    {renderMarkdownLines(visibleLines, pages, onWikiLink, onSourceRefClick, true)}
+    <WikiTabbedSections sections={tabbedSections} pages={pages} onWikiLink={onWikiLink} onSourceRefClick={onSourceRefClick} />
+  </article>;
 }
