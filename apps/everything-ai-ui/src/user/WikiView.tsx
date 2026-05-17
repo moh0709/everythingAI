@@ -1,11 +1,12 @@
-import React, { MutableRefObject } from 'react';
+import React, { MutableRefObject, useMemo, useState } from 'react';
 import type { ApiOptions } from '../api';
 import { BookOpen, Maximize2, Minimize2, Sparkles } from 'lucide-react';
 import { WikiNavigationTree } from './WikiNavigationTree';
 import { MarkdownArticle } from './wikiMarkdown';
 import { WikiRebuildPanel } from './WikiRebuildPanel';
+import { WikiSourcePreviewDrawer } from './WikiSourcePreviewDrawer';
 import { filePathHref } from './userUtils';
-import type { WikiPage, WikiPayload } from './types';
+import type { WikiPage, WikiPayload, WikiSource } from './types';
 
 type WikiViewProps = {
   error: string;
@@ -50,11 +51,36 @@ async function copyCitationRef(ref?: string | null) {
   await navigator.clipboard.writeText(`[${ref}]`);
 }
 
+function normalizeSourceRef(ref: string) {
+  return ref.replace(/^\[/, '').replace(/\]$/, '').split(':')[0];
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
   askAboutWikiPage, revealSourceFile, openSourceContext, handleCitationClick,
 }: WikiViewProps) {
+  const [previewSource, setPreviewSource] = useState<WikiSource | null>(null);
+
+  const sourcesByRef = useMemo(() => {
+    const map = new Map<string, WikiSource>();
+    for (const source of selectedWikiPage?.sources || []) {
+      map.set(source.ref, source);
+    }
+    return map;
+  }, [selectedWikiPage]);
+
+  function openSourcePreview(source?: WikiSource | null) {
+    if (!source) return;
+    setPreviewSource(source);
+  }
+
+  function handleSourceCitationClick(ref: string) {
+    const sourceRef = normalizeSourceRef(ref);
+    handleCitationClick(sourceRef);
+    openSourcePreview(sourcesByRef.get(sourceRef));
+  }
+
   return <>
     {error && <div className="error">{error}</div>}
     <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
@@ -114,7 +140,7 @@ export function WikiView({
               <HelpIcon label="Ask about this page help" tooltip="Opens the Ask flow with this exact Wiki article as context, so the answer can reference relevant indexed source documents." />
             </div>
           </div>
-          <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleCitationClick} />
+          <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleSourceCitationClick} />
         </> : <p>Select a wiki page.</p>}
       </section>
 
@@ -132,6 +158,7 @@ export function WikiView({
               <p>{source.location || 'file-level reference'}</p>
               {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
               <div className="source-actions">
+                <button className="outline" onClick={() => openSourcePreview(source)}>Preview source</button>
                 {source.file_id && <button className="outline" onClick={() => revealSourceFile(source.file_id as string, source.absolute_path || undefined)}>Reveal in folder</button>}
                 <button className="outline" onClick={() => copyCitationRef(source.ref)}>Copy citation</button>
                 {source.absolute_path && <button className="outline" onClick={() => copySourcePath(source.absolute_path)}>Copy path</button>}
@@ -142,5 +169,12 @@ export function WikiView({
         </> : <p>Select a page to inspect sources.</p>}
       </aside>
     </section>
+
+    <WikiSourcePreviewDrawer
+      source={previewSource}
+      onClose={() => setPreviewSource(null)}
+      onCopyCitation={copyCitationRef}
+      onCopyPath={copySourcePath}
+    />
   </>;
 }
