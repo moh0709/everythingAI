@@ -80,6 +80,26 @@ app.use('/api', requireApiToken, createSystemRouter());
 app.use('/api', notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`EverythingAI API listening on port ${PORT}`);
-});
+function startServer(retries = 5) {
+  const server = app.listen(PORT, () => {
+    console.log(`EverythingAI API listening on port ${PORT}`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE' && retries > 0) {
+      console.warn(`Port ${PORT} in use, retrying in 1s… (${retries} retries left)`);
+      server.close();
+      setTimeout(() => startServer(retries - 1), 1000);
+    } else {
+      throw err;
+    }
+  });
+
+  const shutdown = () => {
+    server.close(() => process.exit(0));
+  };
+  process.once('SIGTERM', shutdown);
+  process.once('SIGINT', shutdown);
+}
+
+startServer();
