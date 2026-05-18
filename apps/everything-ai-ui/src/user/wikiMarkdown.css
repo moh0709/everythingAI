@@ -114,6 +114,190 @@
   margin-bottom: 0;
 }
 
+.wiki-source-preview-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 60;
+  width: min(520px, 94vw);
+  height: 100vh;
+  overflow-y: auto;
+  border-left: 1px solid rgba(99, 102, 241, 0.22);
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.12), transparent 32%),
+    #ffffff;
+  box-shadow: -22px 0 60px rgba(15, 23, 42, 0.22);
+  padding: 1rem;
+}
+
+.wiki-source-preview-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin: -1rem -1rem 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(10px);
+}
+
+.wiki-source-preview-ref {
+  display: inline-flex;
+  margin-bottom: 0.45rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.wiki-source-preview-header h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.15rem;
+}
+
+.wiki-source-preview-header p {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.wiki-source-preview-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.wiki-source-preview-path {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  padding: 0.85rem;
+}
+
+.wiki-source-preview-path span,
+.wiki-source-preview-section-title-row span {
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wiki-source-preview-path code {
+  color: #334155;
+  font-size: 0.78rem;
+  word-break: break-all;
+}
+
+.wiki-source-preview-section {
+  margin-top: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.88);
+  padding: 1rem;
+}
+
+.wiki-source-preview-section h4 {
+  margin: 0 0 0.75rem;
+  color: #0f172a;
+  font-size: 0.98rem;
+}
+
+.wiki-source-preview-section blockquote {
+  margin: 0;
+  border-left: 4px solid #6366f1;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  padding: 0.8rem 0.95rem;
+  line-height: 1.55;
+}
+
+.wiki-source-preview-section-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.wiki-source-preview-section-title-row h4 {
+  margin: 0;
+}
+
+.wiki-source-preview-chunks {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.wiki-source-preview-chunk {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 0.9rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.wiki-source-preview-chunk.active {
+  border-color: #6366f1;
+  box-shadow: 0 14px 34px rgba(99, 102, 241, 0.22);
+  transform: translateY(-1px);
+}
+
+.wiki-source-preview-chunk-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.6rem;
+}
+
+.wiki-source-preview-chunk-top strong {
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 0.22rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.wiki-source-preview-chunk-top span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.wiki-source-preview-chunk p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.wiki-source-preview-chunk pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+  margin: 0.75rem 0 0;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
 @media (max-width: 720px) {
   .wiki-document-content,
   .wiki-tabbed-sections {
@@ -128,5 +312,13 @@
   .wiki-tab {
     width: 100%;
     text-align: left;
+  }
+
+  .wiki-source-preview-drawer {
+    width: 100vw;
+  }
+
+  .wiki-source-preview-header {
+    display: grid;
   }
 }
