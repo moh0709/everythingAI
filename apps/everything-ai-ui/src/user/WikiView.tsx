@@ -55,12 +55,17 @@ function normalizeSourceRef(ref: string) {
   return ref.replace(/^\[/, '').replace(/\]$/, '').split(':')[0];
 }
 
+function normalizeChunkRef(ref: string) {
+  return ref.replace(/^\[/, '').replace(/\]$/, '');
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
   askAboutWikiPage, revealSourceFile, openSourceContext, handleCitationClick,
 }: WikiViewProps) {
   const [previewSource, setPreviewSource] = useState<WikiSource | null>(null);
+  const [activeChunkRef, setActiveChunkRef] = useState<string | null>(null);
 
   const sourcesByRef = useMemo(() => {
     const map = new Map<string, WikiSource>();
@@ -70,15 +75,17 @@ export function WikiView({
     return map;
   }, [selectedWikiPage]);
 
-  function openSourcePreview(source?: WikiSource | null) {
+  function openSourcePreview(source?: WikiSource | null, chunkRef?: string | null) {
     if (!source) return;
     setPreviewSource(source);
+    setActiveChunkRef(chunkRef || null);
   }
 
   function handleSourceCitationClick(ref: string) {
     const sourceRef = normalizeSourceRef(ref);
+    const chunkRef = ref.includes(':') ? normalizeChunkRef(ref) : null;
     handleCitationClick(sourceRef);
-    openSourcePreview(sourcesByRef.get(sourceRef));
+    openSourcePreview(sourcesByRef.get(sourceRef), chunkRef);
   }
 
   return <>
@@ -172,7 +179,11 @@ export function WikiView({
 
     <WikiSourcePreviewDrawer
       source={previewSource}
-      onClose={() => setPreviewSource(null)}
+      activeChunkRef={activeChunkRef}
+      onClose={() => {
+        setPreviewSource(null);
+        setActiveChunkRef(null);
+      }}
       onCopyCitation={copyCitationRef}
       onCopyPath={copySourcePath}
     />
