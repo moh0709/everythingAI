@@ -1,0 +1,303 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Wiki Evidence Workspace Milestone Handover",
+    "version": "3.0",
+    "date": "2026-05-19",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "url": "https://github.com/moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "executive_summary": {
+      "project_identity": "EverythingAI / EverythingApp is a local-first AI-powered file brain and evidence-backed knowledge workspace that indexes local files, extracts document content, builds source-backed Wiki pages, supports Ask/Search workflows, and safely enables governed operational actions.",
+      "current_phase": "Local MVP Wiki evidence workspace milestone reached. The project has moved beyond a file indexer/chatbot into a content-first operational encyclopedia with source verification UX.",
+      "latest_confirmed_direction": "The Wiki must behave like a content-first encyclopedia/book/blog reader built from actual local document content. Source verification, citations, evidence snippets, preview drawers, source cards, and chunk-level navigation are now core product direction, not optional polish.",
+      "major_milestone": "Phase 1 — Advanced Wiki UX & Source Verification Layer is effectively complete. Citation-to-source-to-chunk evidence inspection is implemented in the user UI.",
+      "current_bottleneck": "The frontend evidence UX foundation is strong. The next bottleneck is Phase 2 durable knowledge engine architecture: persisted chunk/source tables, semantic relations, stronger extraction, embeddings, AI clustering, and deeper backend knowledge object persistence.",
+      "handover_timing_reason": "A new handover is required because the project architecture and product identity significantly evolved after the previous Wiki milestone handover. The evidence inspection workflow is now a stable milestone and should become the new continuation baseline."
+    },
+    "branch_and_governance_rules": {
+      "branch": "main",
+      "hard_rules": [
+        "Work directly on main unless user explicitly changes policy.",
+        "Do not introduce long-lived feature branches.",
+        "Always give exact file paths when discussing or changing code.",
+        "Do not expose destructive/operator workflows in the ordinary user UI.",
+        "Keep the official user UI safe and non-destructive.",
+        "Keep dangerous planning/execution/recovery/admin controls isolated in admin/operator interfaces.",
+        "Permanent purge remains disabled in the local MVP under NO_PERMANENT_PURGE_IN_LOCAL_MVP.",
+        "Move/rename actions must remain preview + approval gated.",
+        "Preserve auditability and recovery-first architecture.",
+        "Do not claim production readiness without local tests/build validation."
+      ],
+      "user_preferences": [
+        "Be precise and direct.",
+        "When code changes are discussed, always mention exact file and folder paths.",
+        "When full file code is requested, provide complete final code, not partial snippets.",
+        "Ask only when information is truly insufficient; otherwise proceed with best effort.",
+        "Use the project roadmap/docs as the authority when evaluating progress."
+      ]
+    },
+    "architecture_current_state": {
+      "backend_api": {
+        "url": "http://127.0.0.1:4100",
+        "path": "services/api",
+        "entry": "services/api/src/server.js",
+        "package": "services/api/package.json",
+        "responsibilities": [
+          "Local folder indexing",
+          "Document extraction",
+          "Search/unified search/semantic-style search",
+          "AI chat over indexed knowledge",
+          "Insights/classification",
+          "Persistent/source-backed Wiki generation",
+          "Incremental Wiki rebuild planning",
+          "Async Wiki rebuild jobs",
+          "Source reveal/open behavior",
+          "Safe suggestions/action previews/executions",
+          "Execution batches",
+          "Recovery/trash/restore",
+          "Audit logging"
+        ]
+      },
+      "user_ui": {
+        "url": "http://localhost:5151",
+        "path": "apps/everything-ai-ui",
+        "entry": "apps/everything-ai-ui/src/main.tsx",
+        "main_component": "apps/everything-ai-ui/src/UserApp.tsx",
+        "status": "Functional and significantly improved. Contains Start, Explore, Wiki, and Ask sections. Wiki now includes content-first reading surfaces, source cards, source preview drawer, citation/chunk evidence navigation, async rebuild panel, and operational verification actions.",
+        "role": "Safe user-facing AI knowledge workspace. No destructive operator workflow should be exposed here."
+      },
+      "admin_ui": {
+        "url": "http://localhost:5152/admin.html",
+        "path": "apps/everything-ai-ui/src/admin",
+        "status": "Exists as separate admin/operator UI. Continue to host operator workflows here rather than in the safe user UI.",
+        "role": "Operator/admin control center for planning, action governance, recovery, provider/source settings, audit inspection, and future automation governance."
+      },
+      "legacy_static_ui": {
+        "path": "services/api/public",
+        "status": "Still exists, but current active user/admin UI work is in apps/everything-ai-ui. Do not build new user-facing MVP features in services/api/public unless deliberately maintaining legacy/admin compatibility."
+      }
+    },
+    "startup_and_validation_commands": {
+      "full_debug_start": {
+        "command": "cd E:\\01PROJEKTER\\EverythingAI && .\\start_all_debug.bat",
+        "what_it_does": [
+          "git pull origin main",
+          "npm install in services/api",
+          "npm install in apps/everything-ai-ui",
+          "npm run typecheck in apps/everything-ai-ui",
+          "npm run build in apps/everything-ai-ui",
+          "starts backend API on 4100",
+          "starts user UI on 5151",
+          "starts admin UI on 5152/admin.html"
+        ]
+      },
+      "backend_tests": "cd E:\\01PROJEKTER\\EverythingAI\\services\\api && npm test",
+      "ui_typecheck": "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && npm run typecheck",
+      "ui_build": "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && npm run build",
+      "manual_ui_validation": [
+        "Open http://localhost:5151",
+        "Go to Wiki",
+        "Confirm Document Content card is visible",
+        "Confirm Document Details tabs are visible below content",
+        "Click citation badges [S1] and [S1:C3]",
+        "Confirm matching source card highlights",
+        "Confirm Source Preview Drawer opens",
+        "Confirm chunk-level citation scrolls/highlights chunk when chunk data exists",
+        "Use source card actions: Preview source, Copy citation, Copy path, Reveal in folder, Open source context",
+        "Run Start Async Rebuild and confirm job panel progresses/completes",
+        "Confirm GET polling does not spam success toasts"
+      ]
+    },
+    "latest_phase_1_completed_work": {
+      "phase_name": "Advanced Wiki UX & Source Verification Layer",
+      "status": "Effectively complete, pending final local validation after latest commits.",
+      "completed_capabilities": [
+        "Content-first Wiki pages",
+        "Duplicate title removal in article renderer",
+        "Document Content reading card",
+        "Document Details tabs grouping metadata/support sections",
+        "Tabs for About This Document, Extracted Entities, Related Pages, Sources, Source Locations, Evidence Snippets",
+        "Chunk-level citation badge rendering for [S1:C3]",
+        "Clickable citations",
+        "Source card highlight and scroll synchronization",
+        "Source Preview Drawer foundation",
+        "Citation click opens Source Preview Drawer",
+        "Chunk-aware drawer behavior",
+        "Active chunk highlighting",
+        "Chunk scrolling inside drawer when matching chunk data exists",
+        "Source card actions: Preview source, Copy citation, Copy path, Reveal in folder, Open source context",
+        "Async Wiki rebuild orchestration panel",
+        "Clear rebuild history endpoint and UI button",
+        "Help/info tooltips for key Wiki actions",
+        "GET/polling success toast suppression",
+        "Responsive drawer and tab styling",
+        "Documentation updated in docs/MVP_FINALIZATION_PLAN.md"
+      ],
+      "important_note": "The Windows Explorer Reveal in folder action opens Explorer but exact file selection is still unreliable for some encoded/Unicode paths. Do not block roadmap progress on this; Copy path has been added as a practical fallback."
+    },
+    "important_recent_commits": [
+      {
+        "commit": "424cc50",
+        "summary": "Add wiki source chunk frontend types",
+        "files": ["apps/everything-ai-ui/src/user/types.ts"]
+      },
+      {
+        "commit": "82f06c9",
+        "summary": "Add wiki source preview drawer",
+        "files": ["apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx"]
+      },
+      {
+        "commit": "27f79aa",
+        "summary": "Wire source preview drawer into wiki view",
+        "files": ["apps/everything-ai-ui/src/user/WikiView.tsx"]
+      },
+      {
+        "commit": "88824c2",
+        "summary": "Add chunk-aware source preview drawer behavior",
+        "files": ["apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx"]
+      },
+      {
+        "commit": "0d9f876",
+        "summary": "Track active chunk in wiki source preview",
+        "files": ["apps/everything-ai-ui/src/user/WikiView.tsx"]
+      },
+      {
+        "commit": "8936a0e",
+        "summary": "Polish source preview drawer and active chunk styling",
+        "files": ["apps/everything-ai-ui/src/user/wikiMarkdown.css"]
+      },
+      {
+        "commit": "cd4f166",
+        "summary": "Document Phase 1 wiki evidence inspection progress",
+        "files": ["docs/MVP_FINALIZATION_PLAN.md"]
+      }
+    ],
+    "critical_current_files": {
+      "frontend_user": [
+        "apps/everything-ai-ui/src/main.tsx",
+        "apps/everything-ai-ui/src/UserApp.tsx",
+        "apps/everything-ai-ui/src/api.ts",
+        "apps/everything-ai-ui/src/styles.css",
+        "apps/everything-ai-ui/src/user/types.ts",
+        "apps/everything-ai-ui/src/user/WikiView.tsx",
+        "apps/everything-ai-ui/src/user/WikiNavigationTree.tsx",
+        "apps/everything-ai-ui/src/user/wikiNavigationTree.css",
+        "apps/everything-ai-ui/src/user/wikiMarkdown.tsx",
+        "apps/everything-ai-ui/src/user/wikiMarkdown.css",
+        "apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx",
+        "apps/everything-ai-ui/src/user/WikiRebuildPanel.tsx",
+        "apps/everything-ai-ui/src/user/wikiRebuildPanel.css",
+        "apps/everything-ai-ui/src/user/wikiJobsApi.ts",
+        "apps/everything-ai-ui/src/user/ToastProvider.tsx",
+        "apps/everything-ai-ui/src/user/ToastViewport.tsx",
+        "apps/everything-ai-ui/src/user/toastBus.ts"
+      ],
+      "backend_wiki_and_jobs": [
+        "services/api/src/routes/wiki.routes.js",
+        "services/api/src/routes/wikiJobs.routes.js",
+        "services/api/src/jobs/wikiJobRepository.js",
+        "services/api/src/jobs/wikiRebuildExecutor.js",
+        "services/api/src/jobs/wikiOperationalRebuildWorker.js",
+        "services/api/src/knowledge/knowledgeService.js",
+        "services/api/src/knowledge/wikiIncrementalService.js",
+        "services/api/src/knowledge/wikiSelectiveRebuildService.js",
+        "services/api/src/db/wikiRepository.js",
+        "services/api/src/db/wikiIncrementalRepository.js",
+        "services/api/src/db/wikiSelectivePersistence.js"
+      ],
+      "backend_files_and_sources": [
+        "services/api/src/routes/files.routes.js",
+        "services/api/src/db/client.js",
+        "services/api/src/extractors/extractionRunner.js",
+        "services/api/src/indexer/fileScanner.js",
+        "services/api/src/documents/documentContextService.js"
+      ],
+      "docs": [
+        "README.md",
+        "docs/MVP_FINALIZATION_PLAN.md",
+        "docs/IMPLEMENTATION_ROADMAP.md",
+        "docs/HANDOVER_2026-05-16_EVERYTHINGAI_WIKI_MILESTONE.json",
+        "docs/HANDOVER_2026-05-19_EVERYTHINGAI_WIKI_EVIDENCE_WORKSPACE_MILESTONE.json"
+      ]
+    },
+    "known_limitations": [
+      "Latest frontend changes need local typecheck/build validation after this handover commit.",
+      "Source Preview Drawer depends on source.chunks being present in backend Wiki output; it gracefully shows no chunk-level preview if chunks are unavailable.",
+      "Chunk refs in markdown currently normalize to source ref for source-card lookup and full ref for drawer chunk scrolling.",
+      "Windows Explorer Reveal in folder still does not reliably select exact files for some encoded/Unicode paths. Copy path is implemented as fallback.",
+      "Wiki source chunks are not yet represented as a durable first-class SQLite table with stable IDs and page-level PDF references.",
+      "PDF page numbers are not yet reliable because extraction is not fully page-aware.",
+      "Images/tables/charts from PDFs/Excel are not yet richly extracted and embedded into Wiki article sections.",
+      "UserApp.tsx has been reduced but still contains significant state/controller responsibilities and should be further decomposed later."
+    ],
+    "recommended_next_sequence": [
+      {
+        "priority": 1,
+        "title": "Local validation of Phase 1 evidence workspace",
+        "files": ["apps/everything-ai-ui/src/user/*", "services/api/src/routes/*", "services/api/src/jobs/*"],
+        "actions": [
+          "Run .\\start_all_debug.bat",
+          "Confirm UI typecheck/build passes",
+          "Test Wiki source preview drawer",
+          "Test [S1] and [S1:C3] citation clicks",
+          "Test copy citation/path actions",
+          "Test async rebuild panel"
+        ]
+      },
+      {
+        "priority": 2,
+        "title": "Update README and smoke test docs after validation",
+        "files": ["README.md", "docs/*"],
+        "details": "Do not update README as final unless local validation passes. Include exact test results."
+      },
+      {
+        "priority": 3,
+        "title": "Create dedicated Wiki/Knowledge Base technical design doc",
+        "files": ["docs/WIKI_KNOWLEDGE_BASE_TECHNICAL_DESIGN.md"],
+        "details": "Document source model, citation model, chunk model, rebuild jobs, persistence strategy, and Phase 2 durable engine design."
+      },
+      {
+        "priority": 4,
+        "title": "Begin Phase 2 durable knowledge engine",
+        "files": [
+          "services/api/src/db/client.js",
+          "services/api/src/db/wikiRepository.js",
+          "services/api/src/knowledge/knowledgeService.js",
+          "services/api/src/extractors/*",
+          "apps/everything-ai-ui/src/user/*"
+        ],
+        "details": "Add first-class persisted wiki_source_chunks, wiki_page_sections, wiki_page_relations, stable chunk IDs, semantic relation graph, and future embedding hooks."
+      }
+    ],
+    "phase_2_architecture_intent": {
+      "name": "Durable Knowledge Engine",
+      "purpose": "Turn the current generated Wiki/evidence UX into a durable backend cognitive layer with persistent source chunks, stable evidence objects, semantic relations, and incremental rebuild intelligence.",
+      "planned_capabilities": [
+        "wiki_pages table hardening",
+        "wiki_page_sections table",
+        "wiki_page_sources table",
+        "wiki_source_chunks table",
+        "wiki_page_relations table",
+        "stable chunk IDs independent of render order",
+        "PDF page-aware extraction where possible",
+        "table/image/chart extraction pipeline",
+        "embedding/provider abstraction",
+        "AI/embedding-assisted category and topic clustering",
+        "semantic related-page generation",
+        "citation coverage scoring",
+        "source density indicators",
+        "weak-source warnings",
+        "versioned Wiki rebuilds",
+        "incremental rebuild based on source fingerprints and dependencies",
+        "future WebSocket/SSE rebuild progress streaming"
+      ]
+    },
+    "handover_prompt_for_next_agent": "You are continuing EverythingAI / EverythingApp from the Wiki Evidence Workspace milestone. Work directly on main. First read docs/HANDOVER_2026-05-19_EVERYTHINGAI_WIKI_EVIDENCE_WORKSPACE_MILESTONE.json, docs/MVP_FINALIZATION_PLAN.md, docs/IMPLEMENTATION_ROADMAP.md, apps/everything-ai-ui/src/UserApp.tsx, apps/everything-ai-ui/src/user/WikiView.tsx, apps/everything-ai-ui/src/user/wikiMarkdown.tsx, apps/everything-ai-ui/src/user/wikiMarkdown.css, apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx, apps/everything-ai-ui/src/user/types.ts, services/api/src/knowledge/knowledgeService.js, services/api/src/routes/wiki.routes.js, services/api/src/routes/wikiJobs.routes.js, services/api/src/jobs/wikiOperationalRebuildWorker.js, and services/api/src/routes/files.routes.js. The current product direction is a source-backed operational encyclopedia / AI evidence workspace. Phase 1 evidence inspection UX is effectively complete but needs local validation. Next priority: run tests/build, update README/smoke docs with validation results, then begin Phase 2 durable knowledge engine design. Keep user UI safe and non-destructive. Do not expose admin/operator file-mutation workflows in ordinary user UI. Always give exact file paths when changing code."
+  }
+}
