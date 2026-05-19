@@ -3,7 +3,14 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { openDatabase, upsertIndexedFile } from '../src/db/client.js';
-import { persistWikiPages, listPersistedWikiPages } from '../src/db/wikiRepository.js';
+import {
+  getPersistedWikiChunkByRef,
+  getPersistedWikiPageBySlug,
+  getPersistedWikiPageEvidence,
+  listPersistedWikiPages,
+  persistWikiPages,
+  recordWikiRebuild,
+} from '../src/db/wikiRepository.js';
 
 function tempDbPath() {
   return path.join(os.tmpdir(), `everythingai-wiki-repository-test-${Date.now()}-${Math.random()}.sqlite`);
@@ -27,7 +34,7 @@ function insertSourceFile(db) {
   });
 }
 
-test('persists durable wiki pages, sections, sources, chunks, and relations', () => {
+test('persists durable wiki pages, sections, sources, chunks, relations, and rebuild records', () => {
   const db = openDatabase(tempDbPath());
   insertSourceFile(db);
 
@@ -90,6 +97,23 @@ test('persists durable wiki pages, sections, sources, chunks, and relations', ()
 
   const persisted = persistWikiPages(db, wiki);
   const listed = listPersistedWikiPages(db);
+  const bySlug = getPersistedWikiPageBySlug(db, 'workspace-overview');
+  const evidence = getPersistedWikiPageEvidence(db, 'workspace-overview');
+  const chunk = getPersistedWikiChunkByRef(db, {
+    pageId: 'workspace-overview',
+    chunkRef: 'S1:C1',
+  });
+  const rebuild = recordWikiRebuild(db, {
+    id: 'wiki-rebuild-test',
+    mode: 'full',
+    status: 'completed',
+    input: { reason: 'test' },
+    summary: { page_count: persisted.page_count },
+    startedAt: '2026-05-19T12:00:00.000Z',
+    completedAt: '2026-05-19T12:00:01.000Z',
+    createdAt: '2026-05-19T12:00:00.000Z',
+  });
+
   const rawPage = db.prepare('SELECT * FROM wiki_pages WHERE id = ?').get('workspace-overview');
   const rawSectionCount = db.prepare('SELECT COUNT(*) AS count FROM wiki_page_sections WHERE page_id = ?').get('workspace-overview');
   const rawSource = db.prepare('SELECT * FROM wiki_page_sources WHERE page_id = ? AND source_ref = ?').get('workspace-overview', 'S1');
@@ -114,6 +138,17 @@ test('persists durable wiki pages, sections, sources, chunks, and relations', ()
   assert.equal(workspace.sources[0].ref, 'S1');
   assert.equal(workspace.sources[0].chunks[0].ref, 'S1:C1');
   assert.equal(workspace.related_pages[0].id, 'category-legal');
+  assert.equal(workspace.sections.some((section) => section.heading === 'Evidence'), true);
+
+  assert.equal(bySlug.id, 'workspace-overview');
+  assert.equal(bySlug.sources[0].chunks[0].stable_chunk_key, rawChunk.stable_chunk_key);
+  assert.equal(evidence.page.id, 'workspace-overview');
+  assert.equal(evidence.sources[0].source_ref, 'S1');
+  assert.equal(evidence.chunks[0].chunk_ref, 'S1:C1');
+  assert.equal(chunk.filename, 'Alpha Notes.md');
+  assert.equal(chunk.absolute_path, 'C:\\EverythingAI\\Alpha Notes.md');
+  assert.equal(rebuild.status, 'completed');
+  assert.deepEqual(JSON.parse(rebuild.summary_json), { page_count: 2 });
 
   db.close();
 });
