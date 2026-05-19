@@ -37,7 +37,7 @@ The local MVP is focused on:
 - intelligent wiki search
 - reading mode
 - source reveal/open context actions
-- source verification UX with citations, source cards, copy citation/path actions, and preview drawer foundation
+- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, and persisted source chunks
 
 ## Not part of local MVP finalization
 
@@ -56,7 +56,7 @@ The following items are intentionally deferred to the production-platform phase:
 
 ### Phase 1 — Stabilization
 
-Status: mostly complete, validation ongoing
+Status: complete / validated locally
 
 Tasks:
 
@@ -66,14 +66,16 @@ Tasks:
 - [x] Add local MVP vs central platform documentation
 - [x] Add Windows smoke test guide
 - [x] Backend automated test baseline previously validated: 78 passed / 0 failed
-- [ ] Re-run `npm test` after latest Wiki/source precision changes and watcher database-path fix
-- [ ] Fix any new test failures if found
+- [x] Re-run `npm test` after latest Wiki/source precision changes and watcher database-path fix
+- [x] Fix new test failures found during validation
 
-Validation note:
+Validation result:
 
 ```text
-GitHub Issue #20 tracks the pending desktop validation run for the watcher test fix.
-Do not mark Phase 1 fully validated until services/api npm test is confirmed green locally.
+Date: 2026-05-19
+Command: cd E:\01PROJEKTER\EverythingAI\services\api && npm test
+Result: 80 tests / 80 passed / 0 failed
+Issue #20: closed as completed
 ```
 
 ### Phase 2 — Scanner optimization
@@ -92,7 +94,7 @@ Tasks:
 
 ### Phase 3 — Watcher optimization
 
-Status: in progress
+Status: in progress / watcher regression fixed
 
 Tasks:
 
@@ -100,7 +102,7 @@ Tasks:
 - [x] Prevent overlapping rescans
 - [x] Add queued pending rerun handling
 - [x] Fix watcher cycles to use the caller database path instead of the default database path
-- [ ] Validate watcher test fix on desktop through Issue #20
+- [x] Validate watcher test fix on desktop through Issue #20
 - [ ] Add watcher stress test on Windows
 - [ ] Add UI status for watcher queue/running state
 
@@ -115,9 +117,13 @@ Tasks:
 - [x] Generate content-first wiki pages from extracted text
 - [x] Generate chunk-level wiki citation markers such as `[S1:C3]`
 - [x] Add persistent Wiki/Knowledge Base technical design for durable pages, sections, sources, chunks, relations, and rebuilds
+- [x] Add durable Wiki schema tables for pages, sections, sources, chunks, relations, and rebuilds
+- [x] Add durable Wiki repository read/write helpers
+- [x] Add durable Wiki evidence API routes
+- [x] Add backend tests for durable Wiki persistence and evidence routes
+- [x] Add frontend TypeScript contracts and API helpers for durable Wiki evidence
 - [ ] Avoid regenerating embeddings for unchanged extracted text
 - [ ] Add future provider interface for real neural embeddings
-- [ ] Add persistent source chunk table implementation
 - [ ] Add PDF page-level source references where extractor can provide page metadata
 
 ### Phase 5 — Safety hardening
@@ -160,6 +166,7 @@ Completed:
 - [x] Group About This Document, Extracted Entities, Related Pages, Sources, Source Locations, and Evidence Snippets into tabs
 - [x] Add async Wiki rebuild orchestration panel with live progress, clear history, and help tooltips
 - [x] Remove noisy success toasts from GET/polling requests
+- [x] Add frontend types/API helpers for durable Wiki page, evidence, and chunk endpoints
 
 Remaining:
 
@@ -183,8 +190,27 @@ Tasks:
 - [x] Update MVP finalization plan with Phase 1 evidence-inspection progress
 - [x] Add dedicated Wiki/Knowledge Base technical design doc
 - [x] Link dedicated Wiki/Knowledge Base technical design doc from README
-- [ ] Update README with final local test results after latest changes are validated locally
+- [x] Update documentation with backend validation result after durable Wiki changes
+- [x] Update documentation with frontend typecheck/build validation result after durable Wiki types/API helpers
 - [ ] Update Windows smoke test after local tests
+
+## Latest validation results
+
+```text
+Backend:
+cd E:\01PROJEKTER\EverythingAI\services\api
+npm test
+Result: 80 tests / 80 passed / 0 failed
+
+Frontend:
+cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
+npm run typecheck
+Result: passed
+
+cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
+npm run build
+Result: passed
+```
 
 ## Environment variables for MVP optimization
 
@@ -222,6 +248,6 @@ The local MVP is finalized when:
 
 The local MVP should be boring, safe, and reliable before adding more intelligence.
 
-The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, and traceable citations.
+The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, traceable citations, durable source chunks, and rebuild history.
 
 Do not add production-platform features until the local MVP is stable.
