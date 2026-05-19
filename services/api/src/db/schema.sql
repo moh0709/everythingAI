@@ -269,6 +269,170 @@ CREATE TABLE IF NOT EXISTS file_embeddings (
 CREATE INDEX IF NOT EXISTS idx_file_embeddings_model
   ON file_embeddings(embedding_model);
 
+CREATE TABLE IF NOT EXISTS wiki_pages (
+  id TEXT PRIMARY KEY,
+  slug TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  page_type TEXT NOT NULL CHECK (page_type IN ('system', 'category', 'topic', 'file')),
+  category TEXT,
+  subcategory TEXT,
+  summary TEXT,
+  markdown TEXT NOT NULL,
+  content_hash TEXT NOT NULL,
+  source_fingerprint TEXT NOT NULL,
+  citation_coverage_score REAL,
+  weak_source_warning INTEGER NOT NULL DEFAULT 0,
+  rebuild_version INTEGER NOT NULL DEFAULT 1,
+  status TEXT NOT NULL CHECK (status IN ('active', 'stale', 'failed', 'archived')),
+  generated_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  error_message TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_pages_slug
+  ON wiki_pages(slug);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_pages_type
+  ON wiki_pages(page_type);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_pages_category
+  ON wiki_pages(category);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_pages_status
+  ON wiki_pages(status);
+
+CREATE TABLE IF NOT EXISTS wiki_page_sections (
+  id TEXT PRIMARY KEY,
+  page_id TEXT NOT NULL,
+  section_key TEXT NOT NULL,
+  heading TEXT NOT NULL,
+  heading_level INTEGER NOT NULL,
+  body_markdown TEXT NOT NULL,
+  order_index INTEGER NOT NULL,
+  content_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (page_id) REFERENCES wiki_pages(id) ON DELETE CASCADE,
+  UNIQUE (page_id, section_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_sections_page_id
+  ON wiki_page_sections(page_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_sections_key
+  ON wiki_page_sections(section_key);
+
+CREATE TABLE IF NOT EXISTS wiki_page_sources (
+  id TEXT PRIMARY KEY,
+  page_id TEXT NOT NULL,
+  file_id TEXT NOT NULL,
+  source_ref TEXT NOT NULL,
+  filename TEXT NOT NULL,
+  absolute_path TEXT NOT NULL,
+  relative_path TEXT,
+  location TEXT,
+  evidence TEXT,
+  source_order INTEGER NOT NULL,
+  source_hash TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (page_id) REFERENCES wiki_pages(id) ON DELETE CASCADE,
+  FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE,
+  UNIQUE (page_id, source_ref)
+);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_sources_page_id
+  ON wiki_page_sources(page_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_sources_file_id
+  ON wiki_page_sources(file_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_sources_ref
+  ON wiki_page_sources(page_id, source_ref);
+
+CREATE TABLE IF NOT EXISTS wiki_source_chunks (
+  id TEXT PRIMARY KEY,
+  page_id TEXT NOT NULL,
+  page_source_id TEXT NOT NULL,
+  file_id TEXT NOT NULL,
+  source_ref TEXT NOT NULL,
+  chunk_ref TEXT NOT NULL,
+  chunk_number INTEGER NOT NULL,
+  stable_chunk_key TEXT NOT NULL,
+  heading TEXT,
+  text TEXT NOT NULL,
+  evidence TEXT,
+  location TEXT,
+  line_start INTEGER,
+  line_end INTEGER,
+  char_start INTEGER,
+  char_end INTEGER,
+  page_number INTEGER,
+  content_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (page_id) REFERENCES wiki_pages(id) ON DELETE CASCADE,
+  FOREIGN KEY (page_source_id) REFERENCES wiki_page_sources(id) ON DELETE CASCADE,
+  FOREIGN KEY (file_id) REFERENCES indexed_files(id) ON DELETE CASCADE,
+  UNIQUE (page_id, chunk_ref)
+);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_source_chunks_page_id
+  ON wiki_source_chunks(page_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_source_chunks_file_id
+  ON wiki_source_chunks(file_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_source_chunks_source
+  ON wiki_source_chunks(page_source_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_source_chunks_ref
+  ON wiki_source_chunks(page_id, chunk_ref);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_source_chunks_stable_key
+  ON wiki_source_chunks(stable_chunk_key);
+
+CREATE TABLE IF NOT EXISTS wiki_page_relations (
+  id TEXT PRIMARY KEY,
+  source_page_id TEXT NOT NULL,
+  target_page_id TEXT NOT NULL,
+  relation_type TEXT NOT NULL CHECK (relation_type IN ('category', 'topic', 'source_file', 'semantic', 'entity', 'manual')),
+  label TEXT,
+  score REAL,
+  evidence_json TEXT NOT NULL DEFAULT '[]',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (source_page_id) REFERENCES wiki_pages(id) ON DELETE CASCADE,
+  FOREIGN KEY (target_page_id) REFERENCES wiki_pages(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_relations_source
+  ON wiki_page_relations(source_page_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_relations_target
+  ON wiki_page_relations(target_page_id);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_page_relations_type
+  ON wiki_page_relations(relation_type);
+
+CREATE TABLE IF NOT EXISTS wiki_rebuilds (
+  id TEXT PRIMARY KEY,
+  mode TEXT NOT NULL CHECK (mode IN ('full', 'incremental', 'selective')),
+  status TEXT NOT NULL CHECK (status IN ('queued', 'running', 'completed', 'failed', 'cancelled')),
+  input_json TEXT NOT NULL,
+  summary_json TEXT NOT NULL DEFAULT '{}',
+  started_at TEXT,
+  completed_at TEXT,
+  created_at TEXT NOT NULL,
+  error_message TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_rebuilds_status
+  ON wiki_rebuilds(status);
+
+CREATE INDEX IF NOT EXISTS idx_wiki_rebuilds_created_at
+  ON wiki_rebuilds(created_at);
+
 CREATE TABLE IF NOT EXISTS app_settings (
   key TEXT PRIMARY KEY,
   value_json TEXT NOT NULL,
