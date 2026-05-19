@@ -37,7 +37,7 @@ The local MVP is focused on:
 - intelligent wiki search
 - reading mode
 - source reveal/open context actions
-- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, and persisted source chunks
+- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, and evidence quality badges
 
 ## Not part of local MVP finalization
 
@@ -167,6 +167,7 @@ Completed:
 - [x] Add async Wiki rebuild orchestration panel with live progress, clear history, and help tooltips
 - [x] Remove noisy success toasts from GET/polling requests
 - [x] Add frontend types/API helpers for durable Wiki page, evidence, and chunk endpoints
+- [x] Add Wiki evidence quality badges for source count, section count, citation coverage, weak-source warning, and source fingerprint
 
 Remaining:
 
@@ -192,6 +193,7 @@ Tasks:
 - [x] Link dedicated Wiki/Knowledge Base technical design doc from README
 - [x] Update documentation with backend validation result after durable Wiki changes
 - [x] Update documentation with frontend typecheck/build validation result after durable Wiki types/API helpers
+- [x] Update documentation with frontend typecheck/build validation result after Wiki evidence quality badges
 - [ ] Update Windows smoke test after local tests
 
 ## Latest validation results
@@ -248,6 +250,6 @@ The local MVP is finalized when:
 
 The local MVP should be boring, safe, and reliable before adding more intelligence.
 
-The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, traceable citations, durable source chunks, and rebuild history.
+The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, and visible evidence quality indicators.
 
 Do not add production-platform features until the local MVP is stable.
