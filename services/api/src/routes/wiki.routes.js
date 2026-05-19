@@ -1,7 +1,14 @@
 import crypto from 'node:crypto';
 import { Router } from 'express';
 import { openDatabase } from '../db/client.js';
-import { persistWikiPages, listPersistedWikiPages } from '../db/wikiRepository.js';
+import {
+  getPersistedWikiChunkByRef,
+  getPersistedWikiPageBySlug,
+  getPersistedWikiPageEvidence,
+  listPersistedWikiPages,
+  persistWikiPages,
+  recordWikiRebuild,
+} from '../db/wikiRepository.js';
 import { replacePersistedWikiPages } from '../db/wikiSelectivePersistence.js';
 import {
   saveWikiFileFingerprints,
@@ -43,6 +50,11 @@ function buildFingerprintsFromWiki(wiki) {
   return [...fingerprints.values()];
 }
 
+function closeAndSend(db, res, payload, status = 200) {
+  db.close();
+  return res.status(status).json(payload);
+}
+
 export function createWikiRouter() {
   const router = Router();
   router.use(createWikiJobsRouter());
@@ -61,6 +73,52 @@ export function createWikiRouter() {
     res.json({ wiki });
   });
 
+  router.get('/wiki/pages/:slug', (req, res) => {
+    const db = openDatabase();
+    const page = getPersistedWikiPageBySlug(db, req.params.slug);
+
+    if (!page) {
+      return closeAndSend(db, res, {
+        error: 'Wiki page not found',
+        slug: req.params.slug,
+      }, 404);
+    }
+
+    return closeAndSend(db, res, { page });
+  });
+
+  router.get('/wiki/pages/:pageId/evidence', (req, res) => {
+    const db = openDatabase();
+    const evidence = getPersistedWikiPageEvidence(db, req.params.pageId);
+
+    if (!evidence) {
+      return closeAndSend(db, res, {
+        error: 'Wiki page evidence not found',
+        pageId: req.params.pageId,
+      }, 404);
+    }
+
+    return closeAndSend(db, res, { evidence });
+  });
+
+  router.get('/wiki/pages/:pageId/chunks/:chunkRef', (req, res) => {
+    const db = openDatabase();
+    const chunk = getPersistedWikiChunkByRef(db, {
+      pageId: req.params.pageId,
+      chunkRef: req.params.chunkRef,
+    });
+
+    if (!chunk) {
+      return closeAndSend(db, res, {
+        error: 'Wiki source chunk not found',
+        pageId: req.params.pageId,
+        chunkRef: req.params.chunkRef,
+      }, 404);
+    }
+
+    return closeAndSend(db, res, { chunk });
+  });
+
   router.get('/wiki/rebuild-plan', (_req, res) => {
     const db = openDatabase();
 
@@ -72,9 +130,11 @@ export function createWikiRouter() {
   });
 
   router.post('/wiki/build', async (req, res, next) => {
-    try {
-      const db = openDatabase();
+    const db = openDatabase();
+    const rebuildId = crypto.randomUUID();
+    const startedAt = new Date().toISOString();
 
+    try {
       const limit = parseLimit(req.body?.limit, 500);
       const filePageLimit = parseLimit(req.body?.filePageLimit, 50);
 
@@ -126,14 +186,49 @@ export function createWikiRouter() {
 
       updateWikiBuildState(db, 'last_page_count', String(wiki.page_count || 0));
 
+      const rebuild = recordWikiRebuild(db, {
+        id: rebuildId,
+        mode: replacementPlan.strategy === 'selective-replacement' ? 'selective' : 'full',
+        status: 'completed',
+        input: { limit, filePageLimit },
+        summary: {
+          generated: insightResult.generated,
+          page_count: wiki.page_count || 0,
+          replacement_strategy: replacementPlan.strategy,
+        },
+        startedAt,
+        completedAt: new Date().toISOString(),
+        createdAt: startedAt,
+      });
+
       db.close();
 
       res.json({
         generated: insightResult.generated,
         replacement_plan: replacementPlan,
+        rebuild,
         wiki,
       });
     } catch (error) {
+      try {
+        recordWikiRebuild(db, {
+          id: rebuildId,
+          mode: 'full',
+          status: 'failed',
+          input: {
+            limit: req.body?.limit,
+            filePageLimit: req.body?.filePageLimit,
+          },
+          summary: {},
+          startedAt,
+          completedAt: new Date().toISOString(),
+          createdAt: startedAt,
+          errorMessage: error.message,
+        });
+        db.close();
+      } catch {
+        db.close();
+      }
       next(error);
     }
   });
