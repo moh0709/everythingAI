@@ -59,6 +59,16 @@ function normalizeChunkRef(ref: string) {
   return ref.replace(/^\[/, '').replace(/\]$/, '');
 }
 
+function formatCitationCoverage(score?: number | null) {
+  if (score == null) return null;
+  return `${Math.round(score * 100)}% citation coverage`;
+}
+
+function shortHash(value?: string | null) {
+  if (!value) return null;
+  return value.slice(0, 10);
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
@@ -74,6 +84,9 @@ export function WikiView({
     }
     return map;
   }, [selectedWikiPage]);
+
+  const citationCoverageLabel = formatCitationCoverage(selectedWikiPage?.citation_coverage_score);
+  const sourceFingerprint = shortHash(selectedWikiPage?.source_fingerprint);
 
   function openSourcePreview(source?: WikiSource | null, chunkRef?: string | null) {
     if (!source) return;
@@ -141,6 +154,13 @@ export function WikiView({
               <span className="wiki-page-type">{selectedWikiPage.page_type}</span>
               <h1>{selectedWikiPage.title}</h1>
               <p>{selectedWikiPage.summary}</p>
+              <div className="wiki-evidence-badges" aria-label="Wiki evidence quality">
+                <span>{selectedWikiPage.sources.length} source(s)</span>
+                <span>{selectedWikiPage.sections?.length || 0} section(s)</span>
+                {citationCoverageLabel ? <span>{citationCoverageLabel}</span> : null}
+                {selectedWikiPage.weak_source_warning ? <span className="warning">Weak source coverage</span> : null}
+                {sourceFingerprint ? <span title={selectedWikiPage.source_fingerprint}>Fingerprint {sourceFingerprint}</span> : null}
+              </div>
             </div>
             <div className="wiki-action-with-help">
               <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this page</button>
