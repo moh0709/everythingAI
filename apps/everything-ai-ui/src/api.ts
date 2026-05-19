@@ -1,4 +1,5 @@
 import { showUserToast } from './user/toastBus';
+import type { WikiPage, WikiPageEvidence, WikiSourceChunkDetail } from './user/types';
 
 export type ApiOptions = { baseUrl: string; token: string };
 
@@ -136,6 +137,21 @@ export async function apiRequest<T>(options: ApiOptions, path: string, body?: un
     }
     throw error;
   }
+}
+
+export function getWikiPage(options: ApiOptions, slug: string) {
+  return apiRequest<{ page: WikiPage }>(options, `/api/wiki/pages/${encodeURIComponent(slug)}`);
+}
+
+export function getWikiPageEvidence(options: ApiOptions, pageId: string) {
+  return apiRequest<{ evidence: WikiPageEvidence }>(options, `/api/wiki/pages/${encodeURIComponent(pageId)}/evidence`);
+}
+
+export function getWikiSourceChunk(options: ApiOptions, pageId: string, chunkRef: string) {
+  return apiRequest<{ chunk: WikiSourceChunkDetail }>(
+    options,
+    `/api/wiki/pages/${encodeURIComponent(pageId)}/chunks/${encodeURIComponent(chunkRef)}`,
+  );
 }
 
 export type IndexedFile = {
