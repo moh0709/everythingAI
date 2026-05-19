@@ -1,0 +1,139 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import os from 'node:os';
+import path from 'node:path';
+import express from 'express';
+import { openDatabase, upsertIndexedFile } from '../src/db/client.js';
+import { persistWikiPages } from '../src/db/wikiRepository.js';
+import { createWikiRouter } from '../src/routes/wiki.routes.js';
+
+function tempDbPath() {
+  return path.join(os.tmpdir(), `everythingai-wiki-routes-test-${Date.now()}-${Math.random()}.sqlite`);
+}
+
+function insertSourceFile(db) {
+  upsertIndexedFile(db, {
+    id: 'file-alpha',
+    filename: 'Alpha Notes.md',
+    absolute_path: 'C:\\EverythingAI\\Alpha Notes.md',
+    relative_path: 'Alpha Notes.md',
+    extension: '.md',
+    mime_type: 'text/markdown',
+    size_bytes: 128,
+    created_at: '2026-05-19T00:00:00.000Z',
+    modified_at: '2026-05-19T00:00:00.000Z',
+    content_hash: 'alpha-content-hash',
+    index_status: 'indexed',
+    last_indexed_at: '2026-05-19T00:00:00.000Z',
+    error_message: null,
+  });
+}
+
+function seedWiki(db) {
+  insertSourceFile(db);
+
+  persistWikiPages(db, {
+    generated_at: '2026-05-19T12:00:00.000Z',
+    pages: [
+      {
+        id: 'workspace-overview',
+        slug: 'workspace-overview',
+        title: 'Workspace Overview',
+        page_type: 'system',
+        category: 'Filebase Intelligence',
+        subcategory: 'Workspace Summary',
+        summary: 'Workspace page with source-backed evidence.',
+        markdown: '# Workspace Overview\n\n## Evidence\n\nAlpha source content **[S1:C1]**',
+        sources: [
+          {
+            ref: 'S1',
+            file_id: 'file-alpha',
+            filename: 'Alpha Notes.md',
+            absolute_path: 'C:\\EverythingAI\\Alpha Notes.md',
+            relative_path: 'Alpha Notes.md',
+            location: 'extracted document content',
+            evidence: 'Alpha source evidence.',
+            chunks: [
+              {
+                ref: 'S1:C1',
+                source_ref: 'S1',
+                chunk_number: 1,
+                line_start: 1,
+                line_end: 2,
+                char_start: 0,
+                char_end: 42,
+                location: 'chunk 1, lines 1-2',
+                heading: false,
+                text: 'Alpha source content',
+                evidence: 'Alpha source content',
+              },
+            ],
+          },
+        ],
+        related_pages: [],
+      },
+    ],
+  });
+}
+
+async function withTestServer(dbPath, callback) {
+  const app = express();
+  app.use(express.json());
+  app.use('/api', createWikiRouter({ openDb: () => openDatabase(dbPath) }));
+
+  const server = http.createServer(app);
+  await new Promise((resolve) => server.listen(0, resolve));
+
+  try {
+    const address = server.address();
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+    await callback(baseUrl);
+  } finally {
+    await new Promise((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
+}
+
+async function getJson(url) {
+  const response = await fetch(url);
+  const body = await response.json();
+  return { response, body };
+}
+
+test('durable wiki evidence routes expose pages, evidence, and source chunks', async () => {
+  const dbPath = tempDbPath();
+  const seedDb = openDatabase(dbPath);
+  seedWiki(seedDb);
+  seedDb.close();
+
+  await withTestServer(dbPath, async (baseUrl) => {
+    const wikiResult = await getJson(`${baseUrl}/api/wiki`);
+    assert.equal(wikiResult.response.status, 200);
+    assert.equal(wikiResult.body.wiki.page_count, 1);
+    assert.equal(wikiResult.body.wiki.pages[0].slug, 'workspace-overview');
+
+    const pageResult = await getJson(`${baseUrl}/api/wiki/pages/workspace-overview`);
+    assert.equal(pageResult.response.status, 200);
+    assert.equal(pageResult.body.page.id, 'workspace-overview');
+    assert.equal(pageResult.body.page.sources[0].ref, 'S1');
+    assert.equal(pageResult.body.page.sources[0].chunks[0].ref, 'S1:C1');
+
+    const evidenceResult = await getJson(`${baseUrl}/api/wiki/pages/workspace-overview/evidence`);
+    assert.equal(evidenceResult.response.status, 200);
+    assert.equal(evidenceResult.body.evidence.page.id, 'workspace-overview');
+    assert.equal(evidenceResult.body.evidence.sources[0].source_ref, 'S1');
+    assert.equal(evidenceResult.body.evidence.chunks[0].chunk_ref, 'S1:C1');
+
+    const chunkResult = await getJson(`${baseUrl}/api/wiki/pages/workspace-overview/chunks/S1:C1`);
+    assert.equal(chunkResult.response.status, 200);
+    assert.equal(chunkResult.body.chunk.chunk_ref, 'S1:C1');
+    assert.equal(chunkResult.body.chunk.filename, 'Alpha Notes.md');
+    assert.equal(chunkResult.body.chunk.absolute_path, 'C:\\EverythingAI\\Alpha Notes.md');
+
+    const missingResult = await getJson(`${baseUrl}/api/wiki/pages/missing-page`);
+    assert.equal(missingResult.response.status, 404);
+    assert.equal(missingResult.body.error, 'Wiki page not found');
+  });
+});
