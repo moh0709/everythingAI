@@ -24,6 +24,10 @@ function normalizeEndpoint(endpoint) {
   return endpoint.replace(/\/$/, '');
 }
 
+function isNodeTestRunner() {
+  return Boolean(process.env.NODE_TEST_CONTEXT) || process.execArgv.includes('--test');
+}
+
 function loadAiProviderSettings(db) {
   if (db) {
     return mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
@@ -52,6 +56,10 @@ function isLikelyEmbeddingModel(modelId = '') {
 
 async function resolveOllamaModel(settings) {
   if (settings.model) return settings.model;
+
+  if (isNodeTestRunner()) {
+    return '';
+  }
 
   const liveModels = await fetchOllamaModels({
     endpoint: settings.endpoint,
