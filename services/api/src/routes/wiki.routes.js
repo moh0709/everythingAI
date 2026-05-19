@@ -55,12 +55,12 @@ function closeAndSend(db, res, payload, status = 200) {
   return res.status(status).json(payload);
 }
 
-export function createWikiRouter() {
+export function createWikiRouter({ openDb = openDatabase } = {}) {
   const router = Router();
   router.use(createWikiJobsRouter());
 
   router.get('/wiki', (req, res) => {
-    const db = openDatabase();
+    const db = openDb();
 
     const limit = parseLimit(req.query.limit, 500);
     const filePageLimit = parseLimit(req.query.filePageLimit, 50);
@@ -74,7 +74,7 @@ export function createWikiRouter() {
   });
 
   router.get('/wiki/pages/:slug', (req, res) => {
-    const db = openDatabase();
+    const db = openDb();
     const page = getPersistedWikiPageBySlug(db, req.params.slug);
 
     if (!page) {
@@ -88,7 +88,7 @@ export function createWikiRouter() {
   });
 
   router.get('/wiki/pages/:pageId/evidence', (req, res) => {
-    const db = openDatabase();
+    const db = openDb();
     const evidence = getPersistedWikiPageEvidence(db, req.params.pageId);
 
     if (!evidence) {
@@ -102,7 +102,7 @@ export function createWikiRouter() {
   });
 
   router.get('/wiki/pages/:pageId/chunks/:chunkRef', (req, res) => {
-    const db = openDatabase();
+    const db = openDb();
     const chunk = getPersistedWikiChunkByRef(db, {
       pageId: req.params.pageId,
       chunkRef: req.params.chunkRef,
@@ -120,7 +120,7 @@ export function createWikiRouter() {
   });
 
   router.get('/wiki/rebuild-plan', (_req, res) => {
-    const db = openDatabase();
+    const db = openDb();
 
     const plan = buildIncrementalWikiPlan(db);
 
@@ -130,7 +130,7 @@ export function createWikiRouter() {
   });
 
   router.post('/wiki/build', async (req, res, next) => {
-    const db = openDatabase();
+    const db = openDb();
     const rebuildId = crypto.randomUUID();
     const startedAt = new Date().toISOString();
 
