@@ -66,8 +66,15 @@ Tasks:
 - [x] Add local MVP vs central platform documentation
 - [x] Add Windows smoke test guide
 - [x] Backend automated test baseline previously validated: 78 passed / 0 failed
-- [ ] Re-run `npm test` after latest Wiki/source precision changes
+- [ ] Re-run `npm test` after latest Wiki/source precision changes and watcher database-path fix
 - [ ] Fix any new test failures if found
+
+Validation note:
+
+```text
+GitHub Issue #20 tracks the pending desktop validation run for the watcher test fix.
+Do not mark Phase 1 fully validated until services/api npm test is confirmed green locally.
+```
 
 ### Phase 2 — Scanner optimization
 
@@ -92,6 +99,8 @@ Tasks:
 - [x] Add debounce
 - [x] Prevent overlapping rescans
 - [x] Add queued pending rerun handling
+- [x] Fix watcher cycles to use the caller database path instead of the default database path
+- [ ] Validate watcher test fix on desktop through Issue #20
 - [ ] Add watcher stress test on Windows
 - [ ] Add UI status for watcher queue/running state
 
@@ -105,9 +114,10 @@ Tasks:
 - [x] Add force extraction option internally
 - [x] Generate content-first wiki pages from extracted text
 - [x] Generate chunk-level wiki citation markers such as `[S1:C3]`
+- [x] Add persistent Wiki/Knowledge Base technical design for durable pages, sections, sources, chunks, relations, and rebuilds
 - [ ] Avoid regenerating embeddings for unchanged extracted text
 - [ ] Add future provider interface for real neural embeddings
-- [ ] Add persistent source chunk table design / implementation
+- [ ] Add persistent source chunk table implementation
 - [ ] Add PDF page-level source references where extractor can provide page metadata
 
 ### Phase 5 — Safety hardening
@@ -171,9 +181,10 @@ Tasks:
 - [x] Add known limitations document
 - [x] Add current handover JSON for next AI agent
 - [x] Update MVP finalization plan with Phase 1 evidence-inspection progress
+- [x] Add dedicated Wiki/Knowledge Base technical design doc
+- [x] Link dedicated Wiki/Knowledge Base technical design doc from README
 - [ ] Update README with final local test results after latest changes are validated locally
 - [ ] Update Windows smoke test after local tests
-- [ ] Add dedicated Wiki/Knowledge Base technical design doc
 
 ## Environment variables for MVP optimization
 
