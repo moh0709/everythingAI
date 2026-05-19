@@ -14,14 +14,19 @@ function watchId(rootPath) {
   return crypto.createHash('sha256').update(path.resolve(rootPath).toLowerCase()).digest('hex');
 }
 
+function resolveWatcherDatabasePath(db) {
+  return db?.name || process.env.EVERYTHINGAI_DB_PATH;
+}
+
 async function runWatchCycle({
   id,
   absoluteRoot,
+  databasePath,
   extract,
   auto,
   logger,
 }) {
-  const cycleDb = openDatabase();
+  const cycleDb = openDatabase(databasePath);
   const insert = cycleDb.transaction((record) => upsertIndexedFile(cycleDb, record));
 
   try {
@@ -65,8 +70,8 @@ async function runWatchCycle({
   }
 }
 
-function markWatchRootFailed({ id, absoluteRoot, error }) {
-  const db = openDatabase();
+function markWatchRootFailed({ id, absoluteRoot, databasePath, error }) {
+  const db = openDatabase(databasePath);
   try {
     upsertWatchRoot(db, {
       id,
@@ -92,6 +97,7 @@ export async function startFolderWatcher(db, {
 
   const absoluteRoot = path.resolve(rootPath);
   const id = watchId(absoluteRoot);
+  const databasePath = resolveWatcherDatabasePath(db);
 
   if (activeWatchers.has(id)) {
     return { id, rootPath: absoluteRoot, status: 'active', already_running: true };
@@ -112,12 +118,12 @@ export async function startFolderWatcher(db, {
     try {
       do {
         pending = false;
-        const jobResult = await runWatchCycle({ id, absoluteRoot, extract, auto, logger });
+        const jobResult = await runWatchCycle({ id, absoluteRoot, databasePath, extract, auto, logger });
         lastJob = jobResult.job;
       } while (pending);
     } catch (error) {
       logger.error(`Watcher failed for ${absoluteRoot}: ${error.message}`);
-      markWatchRootFailed({ id, absoluteRoot, error });
+      markWatchRootFailed({ id, absoluteRoot, databasePath, error });
     } finally {
       running = false;
     }
