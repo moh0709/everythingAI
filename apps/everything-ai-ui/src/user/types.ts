@@ -32,14 +32,28 @@ export type ChatMessage = {
   sources?: Array<{ filename?: string; absolute_path?: string; snippet?: string; score?: number }>;
 };
 
+export type WikiPageSection = {
+  id: string;
+  section_key: string;
+  heading: string;
+  heading_level: number;
+  body_markdown: string;
+  order_index: number;
+  content_hash?: string;
+};
+
 export type WikiSourceChunk = {
+  id?: string;
   ref: string;
+  chunk_ref?: string;
   source_ref?: string;
   chunk_number?: number;
+  stable_chunk_key?: string;
   line_start?: number;
   line_end?: number;
   char_start?: number;
   char_end?: number;
+  page_number?: number;
   location?: string;
   heading?: boolean;
   text?: string;
@@ -47,13 +61,16 @@ export type WikiSourceChunk = {
 };
 
 export type WikiSource = {
+  id?: string;
   ref: string;
+  source_ref?: string;
   file_id?: string;
   filename?: string;
   absolute_path?: string;
   relative_path?: string;
   location?: string;
   evidence?: string;
+  source_hash?: string;
   chunks?: WikiSourceChunk[];
 };
 
@@ -61,6 +78,9 @@ export type WikiRelatedPage = {
   id?: string;
   title: string;
   slug?: string;
+  relation_type?: string;
+  score?: number | null;
+  evidence?: unknown[];
 };
 
 export type WikiPage = {
@@ -75,8 +95,40 @@ export type WikiPage = {
   source_file_ids: string[];
   related_topics: string[];
   related_pages?: WikiRelatedPage[];
+  sections?: WikiPageSection[];
   sources: WikiSource[];
+  citation_coverage_score?: number | null;
+  weak_source_warning?: boolean;
+  content_hash?: string;
+  source_fingerprint?: string;
   updated_at: string;
+};
+
+export type WikiPageEvidence = {
+  page: Pick<WikiPage, 'id' | 'slug' | 'title' | 'page_type' | 'category' | 'subcategory' | 'citation_coverage_score' | 'weak_source_warning' | 'updated_at'>;
+  sections: WikiPageSection[];
+  sources: Array<WikiSource & { source_ref: string }>;
+  chunks: Array<WikiSourceChunk & {
+    page_id?: string;
+    page_source_id?: string;
+    file_id?: string;
+    chunk_ref: string;
+    stable_chunk_key: string;
+    content_hash?: string;
+  }>;
+  relations: WikiRelatedPage[];
+};
+
+export type WikiSourceChunkDetail = WikiSourceChunk & {
+  page_id?: string;
+  page_source_id?: string;
+  file_id?: string;
+  chunk_ref: string;
+  stable_chunk_key: string;
+  content_hash?: string;
+  filename?: string;
+  absolute_path?: string;
+  relative_path?: string;
 };
 
 export type WikiPayload = {
