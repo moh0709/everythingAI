@@ -36,6 +36,47 @@
   margin-bottom: 0;
 }
 
+.wiki-evidence-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.8rem;
+}
+
+.wiki-evidence-badges span {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #dbe4f0;
+  border-radius: 999px;
+  background: #f8fafc;
+  color: #475569;
+  padding: 0.28rem 0.58rem;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+}
+
+.wiki-evidence-badges span::before {
+  content: '';
+  width: 0.38rem;
+  height: 0.38rem;
+  margin-right: 0.38rem;
+  border-radius: 999px;
+  background: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.wiki-evidence-badges span.warning {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.wiki-evidence-badges span.warning::before {
+  background: #f97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.14);
+}
+
 .wiki-tabbed-sections {
   margin-top: 2rem;
   border: 1px solid rgba(99, 102, 241, 0.16);
