@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import type { WikiSource } from './types';
+import type { WikiSource, WikiSourceChunk } from './types';
 
 type WikiSourcePreviewDrawerProps = {
   source: WikiSource | null;
@@ -12,6 +12,21 @@ type WikiSourcePreviewDrawerProps = {
 function normalizeChunkRef(ref?: string | null) {
   if (!ref) return null;
   return ref.replace(/^\[/, '').replace(/\]$/, '');
+}
+
+function rangeLabel(label: string, start?: number, end?: number) {
+  if (start == null && end == null) return null;
+  if (start != null && end != null) return `${label} ${start}-${end}`;
+  return `${label} ${start ?? end}`;
+}
+
+function chunkMeta(chunk: WikiSourceChunk) {
+  return [
+    chunk.page_number != null ? `Page ${chunk.page_number}` : null,
+    rangeLabel('Lines', chunk.line_start, chunk.line_end),
+    rangeLabel('Chars', chunk.char_start, chunk.char_end),
+    chunk.stable_chunk_key ? `Key ${chunk.stable_chunk_key.slice(0, 10)}` : null,
+  ].filter(Boolean) as string[];
 }
 
 export function WikiSourcePreviewDrawer({
@@ -59,6 +74,13 @@ export function WikiSourcePreviewDrawer({
         </div>
       ) : null}
 
+      {source.id || source.source_hash ? (
+        <div className="wiki-source-preview-path">
+          <span>Durable source</span>
+          <code>{source.id || source.source_hash}</code>
+        </div>
+      ) : null}
+
       {source.evidence ? (
         <section className="wiki-source-preview-section">
           <h4>Evidence</h4>
@@ -74,19 +96,23 @@ export function WikiSourcePreviewDrawer({
         {chunks.length ? (
           <div className="wiki-source-preview-chunks">
             {chunks.map((chunk) => {
-              const isActive = normalizedActiveChunkRef === chunk.ref;
+              const chunkRef = chunk.ref || chunk.chunk_ref || '';
+              const isActive = normalizedActiveChunkRef === chunkRef;
+              const meta = chunkMeta(chunk);
 
               return (
                 <article
-                  key={chunk.ref}
+                  key={chunk.id || chunkRef}
                   className={`wiki-source-preview-chunk${isActive ? ' active' : ''}`}
-                  id={`chunk-${chunk.ref}`}
-                  ref={(el) => { chunkRefs.current[chunk.ref] = el; }}
+                  id={`chunk-${chunkRef}`}
+                  ref={(el) => { chunkRefs.current[chunkRef] = el; }}
                 >
                   <div className="wiki-source-preview-chunk-top">
-                    <strong>{chunk.ref}</strong>
+                    <strong>{chunkRef}</strong>
                     <span>{chunk.location || `Chunk ${chunk.chunk_number || ''}`}</span>
                   </div>
+                  {meta.length ? <div className="wiki-source-preview-chunk-meta">{meta.map((label) => <span key={label}>{label}</span>)}</div> : null}
+                  {chunk.id ? <code className="wiki-source-preview-chunk-id">{chunk.id}</code> : null}
                   {chunk.evidence ? <p>{chunk.evidence}</p> : null}
                   {chunk.text && chunk.text !== chunk.evidence ? <pre>{chunk.text}</pre> : null}
                 </article>
