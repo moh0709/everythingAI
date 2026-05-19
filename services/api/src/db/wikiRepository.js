@@ -44,7 +44,7 @@ function pageSourceFingerprint(page) {
   return hashText((page.sources || []).map((source) => sourceHash(source)).join('\n'));
 }
 
-function stableChunkKey({ page, source, chunk }) {
+function stableChunkKey({ source, chunk }) {
   return hashText([
     source.file_id || '',
     source.absolute_path || '',
@@ -312,6 +312,81 @@ function splitMarkdownSections(page, timestamp) {
       updated_at: timestamp,
     };
   });
+}
+
+function hydrateWikiPage({ page, sections = [], sources = [], chunks = [], relations = [] }) {
+  const chunksBySource = new Map();
+  for (const chunk of chunks) {
+    const key = chunk.page_source_id;
+    if (!chunksBySource.has(key)) chunksBySource.set(key, []);
+    chunksBySource.get(key).push({
+      id: chunk.id,
+      ref: chunk.chunk_ref,
+      chunk_ref: chunk.chunk_ref,
+      source_ref: chunk.source_ref,
+      chunk_number: chunk.chunk_number,
+      stable_chunk_key: chunk.stable_chunk_key,
+      line_start: chunk.line_start,
+      line_end: chunk.line_end,
+      char_start: chunk.char_start,
+      char_end: chunk.char_end,
+      page_number: chunk.page_number,
+      location: chunk.location,
+      heading: Boolean(chunk.heading),
+      text: chunk.text,
+      evidence: chunk.evidence,
+    });
+  }
+
+  const hydratedSources = sources.map((source) => ({
+    id: source.id,
+    ref: source.source_ref,
+    source_ref: source.source_ref,
+    file_id: source.file_id,
+    filename: source.filename,
+    absolute_path: source.absolute_path,
+    relative_path: source.relative_path,
+    location: source.location,
+    evidence: source.evidence,
+    source_hash: source.source_hash,
+    chunks: chunksBySource.get(source.id) || [],
+  }));
+
+  return {
+    id: page.id,
+    title: page.title,
+    slug: page.slug,
+    page_type: page.page_type,
+    category: page.category,
+    subcategory: page.subcategory,
+    summary: page.summary,
+    markdown: page.markdown,
+    source_file_ids: hydratedSources.map((source) => source.file_id).filter(Boolean),
+    related_topics: [],
+    related_pages: relations.map((relation) => ({
+      id: relation.target_page_id,
+      title: relation.label,
+      slug: relation.target_page_id,
+      relation_type: relation.relation_type,
+      score: relation.score,
+      evidence: parseJson(relation.evidence_json, []),
+    })),
+    sections: sections.map((section) => ({
+      id: section.id,
+      section_key: section.section_key,
+      heading: section.heading,
+      heading_level: section.heading_level,
+      body_markdown: section.body_markdown,
+      order_index: section.order_index,
+      content_hash: section.content_hash,
+    })),
+    sources: hydratedSources,
+    citation_coverage_score: page.citation_coverage_score,
+    weak_source_warning: Boolean(page.weak_source_warning),
+    content_hash: page.content_hash,
+    source_fingerprint: page.source_fingerprint,
+    updated_at: page.updated_at,
+  };
 }
 
 function insertPages(db, pages = [], generatedAt = new Date().toISOString()) {
@@ -607,7 +682,7 @@ function insertPages(db, pages = [], generatedAt = new Date().toISOString()) {
           source_ref: chunk.source_ref || source.ref,
           chunk_ref: chunkRef,
           chunk_number: chunk.chunk_number || chunkIndex + 1,
-          stable_chunk_key: stableChunkKey({ page, source, chunk: { ...chunk, ref: chunkRef } }),
+          stable_chunk_key: stableChunkKey({ source, chunk: { ...chunk, ref: chunkRef } }),
           heading: chunk.heading ? String(chunk.heading) : null,
           text: chunkText,
           evidence: chunk.evidence || '',
@@ -678,6 +753,38 @@ export function persistWikiPages(db, wiki) {
   return listPersistedWikiPages(db);
 }
 
+function getEvidenceRowsForPageIds(db, pageIds) {
+  if (!pageIds.length) return { sections: [], sources: [], chunks: [], relations: [] };
+  const placeholders = pageIds.map(() => '?').join(',');
+
+  return {
+    sections: db.prepare(`
+      SELECT *
+      FROM wiki_page_sections
+      WHERE page_id IN (${placeholders})
+      ORDER BY page_id ASC, order_index ASC
+    `).all(...pageIds),
+    sources: db.prepare(`
+      SELECT *
+      FROM wiki_page_sources
+      WHERE page_id IN (${placeholders})
+      ORDER BY page_id ASC, source_order ASC, source_ref ASC
+    `).all(...pageIds),
+    chunks: db.prepare(`
+      SELECT *
+      FROM wiki_source_chunks
+      WHERE page_id IN (${placeholders})
+      ORDER BY page_id ASC, source_ref ASC, chunk_number ASC
+    `).all(...pageIds),
+    relations: db.prepare(`
+      SELECT *
+      FROM wiki_page_relations
+      WHERE source_page_id IN (${placeholders})
+      ORDER BY source_page_id ASC, label ASC
+    `).all(...pageIds),
+  };
+}
+
 export function listPersistedWikiPages(db, { limit = 500 } = {}) {
   ensureWikiPersistenceSchema(db);
 
@@ -700,101 +807,38 @@ export function listPersistedWikiPages(db, { limit = 500 } = {}) {
   if (!pageRows.length) return null;
 
   const pageIds = pageRows.map((page) => page.id);
-  const placeholders = pageIds.map(() => '?').join(',');
+  const evidence = getEvidenceRowsForPageIds(db, pageIds);
 
-  const sourceRows = db.prepare(`
-    SELECT *
-    FROM wiki_page_sources
-    WHERE page_id IN (${placeholders})
-    ORDER BY page_id ASC, source_order ASC, source_ref ASC
-  `).all(...pageIds);
-
-  const chunkRows = db.prepare(`
-    SELECT *
-    FROM wiki_source_chunks
-    WHERE page_id IN (${placeholders})
-    ORDER BY page_id ASC, source_ref ASC, chunk_number ASC
-  `).all(...pageIds);
-
-  const relationRows = db.prepare(`
-    SELECT *
-    FROM wiki_page_relations
-    WHERE source_page_id IN (${placeholders})
-    ORDER BY source_page_id ASC, label ASC
-  `).all(...pageIds);
-
-  const chunksByPageAndSource = new Map();
-  for (const chunk of chunkRows) {
-    const key = `${chunk.page_id}:${chunk.source_ref}`;
-    if (!chunksByPageAndSource.has(key)) chunksByPageAndSource.set(key, []);
-    chunksByPageAndSource.get(key).push({
-      id: chunk.id,
-      ref: chunk.chunk_ref,
-      chunk_ref: chunk.chunk_ref,
-      source_ref: chunk.source_ref,
-      chunk_number: chunk.chunk_number,
-      stable_chunk_key: chunk.stable_chunk_key,
-      line_start: chunk.line_start,
-      line_end: chunk.line_end,
-      char_start: chunk.char_start,
-      char_end: chunk.char_end,
-      page_number: chunk.page_number,
-      location: chunk.location,
-      heading: Boolean(chunk.heading),
-      text: chunk.text,
-      evidence: chunk.evidence,
-    });
+  const sectionsByPage = new Map();
+  for (const section of evidence.sections) {
+    if (!sectionsByPage.has(section.page_id)) sectionsByPage.set(section.page_id, []);
+    sectionsByPage.get(section.page_id).push(section);
   }
 
   const sourcesByPage = new Map();
-  for (const source of sourceRows) {
+  for (const source of evidence.sources) {
     if (!sourcesByPage.has(source.page_id)) sourcesByPage.set(source.page_id, []);
-    sourcesByPage.get(source.page_id).push({
-      id: source.id,
-      ref: source.source_ref,
-      source_ref: source.source_ref,
-      file_id: source.file_id,
-      filename: source.filename,
-      absolute_path: source.absolute_path,
-      relative_path: source.relative_path,
-      location: source.location,
-      evidence: source.evidence,
-      source_hash: source.source_hash,
-      chunks: chunksByPageAndSource.get(`${source.page_id}:${source.source_ref}`) || [],
-    });
+    sourcesByPage.get(source.page_id).push(source);
+  }
+
+  const chunksByPage = new Map();
+  for (const chunk of evidence.chunks) {
+    if (!chunksByPage.has(chunk.page_id)) chunksByPage.set(chunk.page_id, []);
+    chunksByPage.get(chunk.page_id).push(chunk);
   }
 
   const relationsByPage = new Map();
-  for (const relation of relationRows) {
+  for (const relation of evidence.relations) {
     if (!relationsByPage.has(relation.source_page_id)) relationsByPage.set(relation.source_page_id, []);
-    relationsByPage.get(relation.source_page_id).push({
-      id: relation.target_page_id,
-      title: relation.label,
-      slug: relation.target_page_id,
-      relation_type: relation.relation_type,
-      score: relation.score,
-      evidence: parseJson(relation.evidence_json, []),
-    });
+    relationsByPage.get(relation.source_page_id).push(relation);
   }
 
-  const pages = pageRows.map((page) => ({
-    id: page.id,
-    title: page.title,
-    slug: page.slug,
-    page_type: page.page_type,
-    category: page.category,
-    subcategory: page.subcategory,
-    summary: page.summary,
-    markdown: page.markdown,
-    source_file_ids: (sourcesByPage.get(page.id) || []).map((source) => source.file_id).filter(Boolean),
-    related_topics: [],
-    related_pages: relationsByPage.get(page.id) || [],
+  const pages = pageRows.map((page) => hydrateWikiPage({
+    page,
+    sections: sectionsByPage.get(page.id) || [],
     sources: sourcesByPage.get(page.id) || [],
-    citation_coverage_score: page.citation_coverage_score,
-    weak_source_warning: Boolean(page.weak_source_warning),
-    content_hash: page.content_hash,
-    source_fingerprint: page.source_fingerprint,
-    updated_at: page.updated_at,
+    chunks: chunksByPage.get(page.id) || [],
+    relations: relationsByPage.get(page.id) || [],
   }));
 
   const categories = pages
@@ -807,4 +851,110 @@ export function listPersistedWikiPages(db, { limit = 500 } = {}) {
     categories,
     pages,
   };
+}
+
+export function getPersistedWikiPageBySlug(db, slug) {
+  ensureWikiPersistenceSchema(db);
+
+  const page = db.prepare(`
+    SELECT *
+    FROM wiki_pages
+    WHERE slug = @slug
+      AND status = 'active'
+  `).get({ slug });
+
+  if (!page) return null;
+
+  const evidence = getEvidenceRowsForPageIds(db, [page.id]);
+  return hydrateWikiPage({
+    page,
+    sections: evidence.sections,
+    sources: evidence.sources,
+    chunks: evidence.chunks,
+    relations: evidence.relations,
+  });
+}
+
+export function getPersistedWikiPageEvidence(db, pageId) {
+  ensureWikiPersistenceSchema(db);
+
+  const page = db.prepare(`
+    SELECT id, slug, title, page_type, category, subcategory, citation_coverage_score, weak_source_warning, updated_at
+    FROM wiki_pages
+    WHERE id = @pageId
+      AND status = 'active'
+  `).get({ pageId });
+
+  if (!page) return null;
+
+  const evidence = getEvidenceRowsForPageIds(db, [pageId]);
+  return {
+    page,
+    sections: evidence.sections,
+    sources: evidence.sources,
+    chunks: evidence.chunks,
+    relations: evidence.relations,
+  };
+}
+
+export function getPersistedWikiChunkByRef(db, { pageId, chunkRef }) {
+  ensureWikiPersistenceSchema(db);
+
+  return db.prepare(`
+    SELECT c.*, s.filename, s.absolute_path, s.relative_path
+    FROM wiki_source_chunks c
+    JOIN wiki_page_sources s ON s.id = c.page_source_id
+    WHERE c.page_id = @pageId
+      AND c.chunk_ref = @chunkRef
+  `).get({ pageId, chunkRef }) || null;
+}
+
+export function recordWikiRebuild(db, {
+  id = crypto.randomUUID(),
+  mode = 'full',
+  status = 'completed',
+  input = {},
+  summary = {},
+  startedAt = null,
+  completedAt = null,
+  createdAt = new Date().toISOString(),
+  errorMessage = null,
+} = {}) {
+  ensureWikiPersistenceSchema(db);
+
+  db.prepare(`
+    INSERT INTO wiki_rebuilds (
+      id,
+      mode,
+      status,
+      input_json,
+      summary_json,
+      started_at,
+      completed_at,
+      created_at,
+      error_message
+    ) VALUES (
+      @id,
+      @mode,
+      @status,
+      @input_json,
+      @summary_json,
+      @started_at,
+      @completed_at,
+      @created_at,
+      @error_message
+    )
+  `).run({
+    id,
+    mode,
+    status,
+    input_json: safeJson(input, {}),
+    summary_json: safeJson(summary, {}),
+    started_at: startedAt,
+    completed_at: completedAt,
+    created_at: createdAt,
+    error_message: errorMessage,
+  });
+
+  return db.prepare('SELECT * FROM wiki_rebuilds WHERE id = ?').get(id);
 }
