@@ -115,6 +115,7 @@ See the `/docs` folder.
 - [`EXECUTION_BATCH_WORKFLOW.md`](docs/EXECUTION_BATCH_WORKFLOW.md)
 - [`MVP_SMOKE_TEST_RUNBOOK.md`](docs/MVP_SMOKE_TEST_RUNBOOK.md)
 - [`MVP_API_ROUTES.md`](docs/MVP_API_ROUTES.md)
+- [`WIKI_KNOWLEDGE_BASE_TECHNICAL_DESIGN.md`](docs/WIKI_KNOWLEDGE_BASE_TECHNICAL_DESIGN.md)
 
 ### Enterprise workspace documentation
 
