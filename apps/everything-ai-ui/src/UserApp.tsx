@@ -1,9 +1,9 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
-import type { IndexedFile } from './api';
-import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage } from './user/types';
+import type { UserView, ChatMessage, WikiPayload, WikiPage } from './user/types';
 import { useConnectionSettings } from './user/useConnectionSettings';
+import { useFileDocumentState } from './user/useFileDocumentState';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
 import { useWikiState } from './user/useWikiState';
@@ -38,16 +38,20 @@ export function UserApp() {
     openWikiPage: selectWikiPage,
     handleCitationClick,
   } = useWikiState();
+  const {
+    files,
+    selectedFileId,
+    selectedFile,
+    documentContext,
+    setDocumentContext,
+    loadFiles,
+    selectFile,
+  } = useFileDocumentState();
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
-  const [files, setFiles] = useState<IndexedFile[]>([]);
-  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
-  const [documentContext, setDocumentContext] = useState<DocumentContext | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
 
   function saveConnection() {
     saveConnectionSettings();
@@ -56,9 +60,8 @@ export function UserApp() {
 
   async function refreshFiles() {
     await run('Loading indexed files...', async () => {
-      const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
-      setFiles(payload.files || []);
-      if (!selectedFileId && payload.files?.[0]) setSelectedFileId(payload.files[0].id);
+      const payload = await apiRequest<{ files: any[] }>(options, '/api/files?limit=250');
+      loadFiles(payload.files || []);
       if (payload.files?.length) setView((current) => current === 'onboarding' ? 'explore' : current);
       setStatus(`Loaded ${payload.files?.length || 0} file(s).`);
     });
@@ -126,12 +129,9 @@ export function UserApp() {
       setWiki(wikiPayload.wiki);
       selectFirstWikiPage(wikiPayload.wiki);
 
-      const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
-      setFiles(payload.files || []);
-      if (payload.files?.[0]) {
-        setSelectedFileId(payload.files[0].id);
-        await loadDocumentContext(payload.files[0].id, false);
-      }
+      const payload = await apiRequest<{ files: any[] }>(options, '/api/files?limit=250');
+      loadFiles(payload.files || []);
+      if (payload.files?.[0]) await loadDocumentContext(payload.files[0].id, false);
 
       markStep('ready', 'done');
       setView('wiki');
@@ -147,19 +147,16 @@ export function UserApp() {
         return;
       }
       const payload = await apiRequest<any>(options, `/api/unified-search?q=${encodeURIComponent(normalized)}&limit=50`);
-      setFiles(payload.files || []);
-      if (payload.files?.[0]) {
-        setSelectedFileId(payload.files[0].id);
-        await loadDocumentContext(payload.files[0].id, false);
-      }
+      loadFiles(payload.files || []);
+      if (payload.files?.[0]) await loadDocumentContext(payload.files[0].id, false);
       setStatus(`Search complete: ${payload.files?.length || 0} file match(es).`);
     });
   }
 
   async function loadDocumentContext(fileId: string, wrap = true) {
     const task = async () => {
-      const payload = await apiRequest<{ document: DocumentContext }>(options, `/api/intelligence/document-context/${fileId}`);
-      setSelectedFileId(fileId);
+      const payload = await apiRequest<any>(options, `/api/intelligence/document-context/${fileId}`);
+      selectFile(fileId);
       setDocumentContext(payload.document);
       setStatus(`Context loaded: ${payload.document.file?.filename || fileId}`);
     };
