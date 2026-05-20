@@ -1,19 +1,27 @@
-import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Brain } from 'lucide-react';
-import { apiRequest, ApiOptions } from './api';
+import { apiRequest } from './api';
 import type { IndexedFile } from './api';
 import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage, SetupStep } from './user/types';
-import { DEFAULT_API, DEFAULT_TOKEN, INITIAL_SETUP_STEPS, updateStep } from './user/userUtils';
+import { INITIAL_SETUP_STEPS, updateStep } from './user/userUtils';
+import { useConnectionSettings } from './user/useConnectionSettings';
 import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
 import { OnboardingView } from './user/OnboardingView';
 
 export function UserApp() {
-  const [baseUrl, setBaseUrl] = useState(localStorage.getItem('everythingai.ui.baseUrl') || DEFAULT_API);
-  const [token, setToken] = useState(localStorage.getItem('everythingai.ui.token') || DEFAULT_TOKEN);
+  const {
+    baseUrl,
+    setBaseUrl,
+    token,
+    setToken,
+    folderPath,
+    setFolderPath,
+    options,
+    saveConnectionSettings,
+  } = useConnectionSettings();
   const [view, setView] = useState<UserView>('onboarding');
-  const [folderPath, setFolderPath] = useState(localStorage.getItem('everythingai.ui.folderPath') || '');
   const [setupSteps, setSetupSteps] = useState<SetupStep[]>(INITIAL_SETUP_STEPS);
   const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
@@ -31,14 +39,11 @@ export function UserApp() {
   const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
   const sourceCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const options: ApiOptions = useMemo(() => ({ baseUrl, token }), [baseUrl, token]);
   const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
   const selectedWikiPage = wiki?.pages.find((page) => page.id === selectedWikiPageId) || wiki?.pages[0];
 
   function saveConnection() {
-    localStorage.setItem('everythingai.ui.baseUrl', baseUrl);
-    localStorage.setItem('everythingai.ui.token', token);
-    localStorage.setItem('everythingai.ui.folderPath', folderPath);
+    saveConnectionSettings();
     setStatus('Connection settings saved.');
   }
 
