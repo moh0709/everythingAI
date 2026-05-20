@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, FolderOpen, Server, Sparkles } from 'lucide-react';
 import type { SetupStep } from './types';
+import './localSettingsHelp.css';
 
 type OnboardingViewProps = {
   error: string;
