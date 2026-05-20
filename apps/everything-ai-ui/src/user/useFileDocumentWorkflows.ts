@@ -8,7 +8,6 @@ type ActionRunner = (label: string, task: () => Promise<void>) => Promise<void>;
 type UseFileDocumentWorkflowsArgs = {
   options: ApiOptions;
   query: string;
-  selectedFileId: string | null;
   run: ActionRunner;
   loadFiles: (files: IndexedFile[]) => void;
   selectFile: (fileId: string) => void;
@@ -20,7 +19,6 @@ type UseFileDocumentWorkflowsArgs = {
 export function useFileDocumentWorkflows({
   options,
   query,
-  selectedFileId,
   run,
   loadFiles,
   selectFile,
