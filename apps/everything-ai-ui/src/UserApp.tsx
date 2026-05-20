@@ -2,9 +2,9 @@ import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
 import type { IndexedFile } from './api';
-import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage, SetupStep } from './user/types';
-import { INITIAL_SETUP_STEPS, updateStep } from './user/userUtils';
+import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage } from './user/types';
 import { useConnectionSettings } from './user/useConnectionSettings';
+import { useSetupProgress } from './user/useSetupProgress';
 import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
@@ -21,8 +21,8 @@ export function UserApp() {
     options,
     saveConnectionSettings,
   } = useConnectionSettings();
+  const { setupSteps, markStep } = useSetupProgress();
   const [view, setView] = useState<UserView>('onboarding');
-  const [setupSteps, setSetupSteps] = useState<SetupStep[]>(INITIAL_SETUP_STEPS);
   const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
   const [files, setFiles] = useState<IndexedFile[]>([]);
@@ -45,10 +45,6 @@ export function UserApp() {
   function saveConnection() {
     saveConnectionSettings();
     setStatus('Connection settings saved.');
-  }
-
-  function markStep(id: string, statusValue: SetupStep['status']) {
-    setSetupSteps((current) => updateStep(current, id, statusValue));
   }
 
   async function run(label: string, task: () => Promise<void>) {
