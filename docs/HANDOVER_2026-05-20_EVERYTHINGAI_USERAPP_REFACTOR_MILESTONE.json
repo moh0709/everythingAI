@@ -1,0 +1,319 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — UserApp Refactor Milestone Handover",
+    "version": "1.0",
+    "date": "2026-05-20",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule. Do not create long-lived feature branches by default."
+    },
+    "executive_summary": {
+      "project_identity": "EverythingAI is a local-first, source-backed AI knowledge workspace for indexing local files, extracting content, browsing generated Wiki-style knowledge pages, searching indexed sources, and asking source-grounded questions.",
+      "milestone_summary": "The frontend user app controller has been significantly modularized. UserApp.tsx is no longer a large state-heavy component; most reusable state and several API workflows have been extracted into focused hooks under apps/everything-ai-ui/src/user/.",
+      "current_mvp_status": "Frontend typecheck and production build are passing after the refactor. Backend baseline remains documented as 80 tests passing. Phase 6 UI/Wiki polish is nearly complete, with UserApp refactoring now advanced enough for continuation without forcing risky broad changes.",
+      "strategic_direction": "The project is moving from a file organizer/search app toward an evidence-backed operational knowledge workspace, where AI-derived knowledge is traceable to source files, citations, chunks, and evidence metadata."
+    },
+    "latest_validation": {
+      "frontend": {
+        "working_directory": "E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui",
+        "commands": [
+          "npm run typecheck",
+          "npm run build"
+        ],
+        "result": "passed",
+        "user_reported_output_summary": "TypeScript completed with no errors. Vite production build completed successfully with 1533 modules transformed."
+      },
+      "backend": {
+        "working_directory": "E:\\01PROJEKTER\\EverythingAI\\services\\api",
+        "command": "npm test",
+        "last_known_result": "80 tests / 80 passed / 0 failed",
+        "source": "Previously recorded MVP finalization validation. Backend was not rerun during this UserApp refactor batch."
+      }
+    },
+    "new_or_recent_documentation": [
+      {
+        "path": "docs/FRONTEND_USERAPP_HOOK_STRUCTURE.md",
+        "purpose": "Manual describing the new frontend UserApp hook structure, extracted responsibilities, remaining UserApp responsibilities, validation commands, and future refactor policy."
+      },
+      {
+        "path": "docs/VALIDATION_2026-05-20_USERAPP_WORKFLOW_HOOKS.md",
+        "purpose": "Validation note for file/document workflow and Wiki workflow extraction."
+      },
+      {
+        "path": "docs/VALIDATION_2026-05-20_USERAPP_ASK_STATE_HOOK.md",
+        "purpose": "Validation note for Ask/chat state hook extraction."
+      },
+      {
+        "path": "docs/VALIDATION_2026-05-20_USERAPP_FILE_DOCUMENT_STATE_HOOK.md",
+        "purpose": "Validation note for file/document state hook extraction."
+      },
+      {
+        "path": "docs/VALIDATION_2026-05-20_USERAPP_WIKI_STATE_HOOK.md",
+        "purpose": "Validation note for Wiki state hook extraction."
+      },
+      {
+        "path": "docs/VALIDATION_2026-05-20_USERAPP_ACTION_RUNNER_HOOK.md",
+        "purpose": "Validation note for status/error/busy action runner hook extraction."
+      },
+      {
+        "path": "docs/VALIDATION_2026-05-20_USERAPP_SETUP_PROGRESS_HOOK.md",
+        "purpose": "Validation note for setup progress hook extraction."
+      }
+    ],
+    "frontend_structure_after_refactor": {
+      "main_controller": {
+        "path": "apps/everything-ai-ui/src/UserApp.tsx",
+        "role": "Thin orchestration layer for the official safe user UI. It composes hooks and page views, coordinates navigation, and keeps the central onboarding/build flow visible."
+      },
+      "views": [
+        {
+          "path": "apps/everything-ai-ui/src/user/OnboardingView.tsx",
+          "role": "Start/setup UI for selecting folder, showing setup progress, and building the local knowledge workspace."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/ExploreView.tsx",
+          "role": "Explore/search UI for indexed files and document context."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/WikiView.tsx",
+          "role": "Wiki/knowledge page UI with reading mode, source rail, source evidence actions, and citation interactions."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/AskView.tsx",
+          "role": "Ask/chat UI for source-grounded questions."
+        }
+      ],
+      "hooks": [
+        {
+          "path": "apps/everything-ai-ui/src/user/useConnectionSettings.ts",
+          "owns": [
+            "baseUrl",
+            "token",
+            "folderPath",
+            "derived API options",
+            "browser-local persistence for connection settings"
+          ],
+          "status": "extracted and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useSetupProgress.ts",
+          "owns": [
+            "setup step state",
+            "markStep() helper"
+          ],
+          "status": "extracted and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useUserActionRunner.ts",
+          "owns": [
+            "status",
+            "error",
+            "busy",
+            "shared run(label, task) wrapper"
+          ],
+          "status": "extracted and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useWikiState.ts",
+          "owns": [
+            "Wiki payload state",
+            "selected Wiki page ID",
+            "selected Wiki page derivation",
+            "reading mode state",
+            "active source reference state",
+            "source card refs",
+            "Wiki page selection helper",
+            "citation scroll/highlight helper"
+          ],
+          "status": "extracted and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useFileDocumentState.ts",
+          "owns": [
+            "indexed files state",
+            "selected file ID",
+            "selected file derivation",
+            "document context state",
+            "file list loading helper",
+            "file selection helper"
+          ],
+          "status": "extracted and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useAskState.ts",
+          "owns": [
+            "chat input state",
+            "chat messages state",
+            "chat input ref",
+            "chat input clearing",
+            "message append helpers",
+            "chat input focus helper",
+            "chat submit handler"
+          ],
+          "status": "extracted and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useFileDocumentWorkflows.ts",
+          "owns": [
+            "refreshFiles()",
+            "searchEverything()",
+            "loadDocumentContext()",
+            "revealSourceFile()"
+          ],
+          "status": "extracted, wired, and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useWikiWorkflows.ts",
+          "owns": [
+            "refreshWiki()",
+            "buildWiki()"
+          ],
+          "status": "extracted, wired, and validated"
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useAskWorkflows.ts",
+          "owns": [
+            "prepared askQuestion() API workflow foundation"
+          ],
+          "status": "created but not wired into UserApp.tsx because a full controller patch was blocked once by connector safety checks. Current app state is validated and stable without forcing this change."
+        }
+      ]
+    },
+    "what_intentionally_remains_in_userapp": {
+      "path": "apps/everything-ai-ui/src/UserApp.tsx",
+      "remaining_responsibilities": [
+        "active view state",
+        "global query state",
+        "top-level navigation",
+        "saveConnection() wrapper",
+        "selectFolder()",
+        "buildKnowledgeWorkspace()",
+        "askQuestion() for now",
+        "askAboutWikiPage()",
+        "openWikiPage() cross-view wrapper",
+        "openAskView()",
+        "handleAskFromHero()"
+      ],
+      "reasoning": "UserApp.tsx should remain the visible orchestration layer. The central onboarding workflow should not be hidden too early because it touches folder selection, indexing, extraction, insights, Wiki loading, file loading, document context loading, setup progress, view navigation, and user-facing status messages."
+    },
+    "important_known_limitations": [
+      {
+        "limitation": "Connector safety checks blocked some large or broad file replacements.",
+        "impact": "Large MVP plan updates and full UserApp controller rewrites may be blocked. Use smaller patches or dedicated documentation notes instead."
+      },
+      {
+        "limitation": "The Ask workflow hook exists but is not wired yet.",
+        "impact": "No runtime problem is expected because UserApp.tsx still owns askQuestion(). Do not force this refactor unless there is a clear reason and a small safe patch can be accepted."
+      },
+      {
+        "limitation": "buildKnowledgeWorkspace() remains in UserApp.tsx.",
+        "impact": "This is intentional. It should stay visible until the broader MVP smoke test is complete."
+      },
+      {
+        "limitation": "Large docs/MVP_FINALIZATION_PLAN.md replacements have been blocked before.",
+        "impact": "Prefer focused validation notes in docs/ and smaller targeted documentation files."
+      }
+    ],
+    "recent_validated_commit_groups": [
+      {
+        "group": "UserApp state and hook extraction",
+        "commits": [
+          "aae668a Extract user connection settings hook",
+          "bd90c21 Use connection settings hook in UserApp",
+          "e3f9ccb Extract user setup progress hook",
+          "cd96b40 Use setup progress hook in UserApp",
+          "5e9f0e0 Extract user action runner hook",
+          "96f731a Use action runner hook in UserApp",
+          "a949d3f Extract user wiki state hook",
+          "25dafa1 Use wiki state hook in UserApp",
+          "80fb922 Extract user file document state hook",
+          "c23123c Use file document state hook in UserApp",
+          "6418bdc Extract user ask state hook",
+          "6c6fad0 Use ask state hook in UserApp"
+        ]
+      },
+      {
+        "group": "Workflow hook extraction",
+        "commits": [
+          "e5eee9c Extract file document workflow hook",
+          "0156709 Extract wiki workflow hook",
+          "1c46272 Extract ask workflow hook",
+          "faca40a Use file and wiki workflow hooks in UserApp",
+          "94d5b18 Remove unused selected file workflow parameter",
+          "b9fc3fd Allow selected file workflow compatibility option"
+        ]
+      },
+      {
+        "group": "Documentation and validation notes",
+        "commits": [
+          "c490e99 Record UserApp workflow hooks validation note",
+          "d08c0f6 Document frontend UserApp hook structure"
+        ]
+      }
+    ],
+    "recommended_next_steps": [
+      {
+        "priority": 1,
+        "task": "Stop major UserApp refactoring temporarily and run broader MVP smoke testing.",
+        "reason": "Frontend typecheck/build is green after many refactor batches. The next risk is not TypeScript but runtime behavior across indexing, Wiki, Explore, Ask, source drawer, and folder selection."
+      },
+      {
+        "priority": 2,
+        "task": "Run local user UI smoke test on Windows.",
+        "suggested_steps": [
+          "Start backend and frontend using the documented local debug flow.",
+          "Open http://localhost:5151.",
+          "Verify Start page local settings guidance renders correctly.",
+          "Select or enter a safe local test folder.",
+          "Build knowledge workspace.",
+          "Verify Explore loads files and document context.",
+          "Verify Wiki loads pages, citations, source rail, and source preview drawer.",
+          "Verify Ask can answer a question and show sources.",
+          "Verify no console errors."
+        ]
+      },
+      {
+        "priority": 3,
+        "task": "Update or create a Windows smoke-test manual after runtime testing.",
+        "reason": "Phase 7 still needs Windows smoke-test documentation aligned with the current validated frontend behavior."
+      },
+      {
+        "priority": 4,
+        "task": "Only after smoke testing, consider wiring useAskWorkflows.ts into UserApp.tsx with a very small patch.",
+        "reason": "The hook exists, but the app is already validated. Avoid forcing this unless needed."
+      },
+      {
+        "priority": 5,
+        "task": "Keep buildKnowledgeWorkspace() in UserApp.tsx until the local MVP is runtime-smoke-tested.",
+        "reason": "It is the central onboarding orchestration and should remain easy to inspect."
+      }
+    ],
+    "do_not_do_next": [
+      "Do not broadly rewrite UserApp.tsx in one large patch.",
+      "Do not combine UX changes and workflow refactors in one commit.",
+      "Do not move buildKnowledgeWorkspace() before smoke testing.",
+      "Do not claim runtime validation beyond typecheck/build unless the user actually runs the app and reports results.",
+      "Do not update large documentation files by full replacement if connector safety checks block them; use focused docs/ validation notes instead."
+    ],
+    "validation_commands_for_next_agent": {
+      "frontend": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui",
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "backend": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\services\\api",
+        "npm test"
+      ]
+    },
+    "current_assessment": {
+      "phase_6_ui_wiki_polish": "Nearly complete from a static/frontend validation standpoint.",
+      "userapp_refactor": "Advanced and stable enough. Further refactor should be paused until runtime smoke testing.",
+      "next_best_milestone": "Windows local MVP smoke test and smoke-test documentation update."
+    }
+  }
+}
