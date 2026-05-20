@@ -61,10 +61,24 @@ export function OnboardingView({
         </div>
         <button className="outline" onClick={saveConnection}>Save</button>
       </div>
+      <div className="settings-help-grid">
+        <div>
+          <strong>Local ports</strong>
+          <p>User UI runs on <code>localhost:5151</code>. Backend API runs on <code>localhost:4100</code>.</p>
+        </div>
+        <div>
+          <strong>Safe user mode</strong>
+          <p>This screen builds the read/search/Wiki workspace. File move and rename execution stay outside the user reading flow.</p>
+        </div>
+        <div>
+          <strong>Folder path</strong>
+          <p>Use Select Folder when possible. Manual paths should point to the local folder you want indexed.</p>
+        </div>
+      </div>
       <div className="settings-grid">
         <label>API Base URL<input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></label>
         <label>API Token<input type="password" value={token} onChange={(event) => setToken(event.target.value)} /></label>
-        <label>Folder Path<input value={folderPath} onChange={(event) => setFolderPath(event.target.value)} placeholder="C:\\Users\\MOH\\Documents" /></label>
+        <label>Folder Path<input value={folderPath} onChange={(event) => setFolderPath(event.target.value)} placeholder="Local folder path" /></label>
       </div>
     </section>
   </>;
