@@ -79,6 +79,15 @@ function backfillWikiSourceRefs(db) {
 function backfillWikiChunkRefs(db) {
   if (!tableExists(db, 'wiki_source_chunks')) return;
 
+  if (columnExists(db, 'wiki_source_chunks', 'page_source_id')) {
+    db.exec(`
+      UPDATE wiki_source_chunks
+      SET page_source_id = COALESCE(page_source_id, '')
+      WHERE page_source_id IS NULL
+    `);
+    console.log('[ok] wiki_source_chunks.page_source_id: backfilled where null');
+  }
+
   if (columnExists(db, 'wiki_source_chunks', 'source_ref')) {
     db.exec(`
       UPDATE wiki_source_chunks
@@ -192,6 +201,13 @@ function repairWikiSchema(db) {
     'wiki_page_sources',
     'source_hash',
     'TEXT',
+  );
+
+  addColumnIfMissing(
+    db,
+    'wiki_source_chunks',
+    'page_source_id',
+    "TEXT NOT NULL DEFAULT ''",
   );
 
   addColumnIfMissing(
@@ -339,6 +355,7 @@ function repairWikiSchema(db) {
 
   createIndexIfPossible(db, 'wiki_pages', 'status', 'idx_wiki_pages_status');
   createCompositeIndexIfPossible(db, 'wiki_page_sources', ['page_id', 'source_ref'], 'idx_wiki_page_sources_ref');
+  createIndexIfPossible(db, 'wiki_source_chunks', 'page_source_id', 'idx_wiki_source_chunks_source');
   createCompositeIndexIfPossible(db, 'wiki_source_chunks', ['page_id', 'chunk_ref'], 'idx_wiki_source_chunks_ref');
   createIndexIfPossible(db, 'wiki_source_chunks', 'stable_chunk_key', 'idx_wiki_source_chunks_stable_key');
   createIndexIfPossible(db, 'wiki_rebuilds', 'status', 'idx_wiki_rebuilds_status');
