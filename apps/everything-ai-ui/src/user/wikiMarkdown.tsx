@@ -16,6 +16,13 @@ type MarkdownSection = {
   lines: string[];
 };
 
+type MarkdownRenderOptions = {
+  pages?: WikiPage[];
+  onWikiLink?: (pageId: string) => void;
+  onSourceRefClick?: (ref: string) => void;
+  searchTerm?: string;
+};
+
 export function findWikiPageByLabel(pages: WikiPage[], label: string) {
   const normalized = label.trim().toLowerCase();
   return pages.find((page) => page.title.toLowerCase() === normalized)
@@ -27,18 +34,45 @@ export function normalizeCitationRef(part: string): string {
   return part.slice(1, -1).split(':')[0];
 }
 
-export function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void, onSourceRefClick?: (ref: string) => void): ReactNode[] {
+function escapeRegExp(value: string) {
+  return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function highlightText(text: string, searchTerm?: string): ReactNode[] | string {
+  const term = searchTerm?.trim();
+  if (!term) return text;
+
+  const regex = new RegExp(`(${escapeRegExp(term)})`, 'ig');
+  const parts = text.split(regex).filter(Boolean);
+  if (parts.length <= 1) return text;
+
+  return parts.map((part, index) => (
+    part.toLowerCase() === term.toLowerCase()
+      ? <mark key={index} className="wiki-search-highlight">{part}</mark>
+      : part
+  ));
+}
+
+export function countMarkdownMatches(markdown: string, searchTerm: string) {
+  const term = searchTerm.trim();
+  if (!term) return 0;
+  const regex = new RegExp(escapeRegExp(term), 'ig');
+  return markdown.match(regex)?.length || 0;
+}
+
+export function renderInlineMarkdown(text: string, options: MarkdownRenderOptions = {}): ReactNode[] {
+  const { pages = [], onWikiLink, onSourceRefClick, searchTerm } = options;
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+(?::C\d+)?\])/g).filter(Boolean);
   return parts.map((part, index) => {
-    if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{part.slice(2, -2)}</strong>;
-    if (part.startsWith('*') && part.endsWith('*')) return <em key={index}>{part.slice(1, -1)}</em>;
+    if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{highlightText(part.slice(2, -2), searchTerm)}</strong>;
+    if (part.startsWith('*') && part.endsWith('*')) return <em key={index}>{highlightText(part.slice(1, -1), searchTerm)}</em>;
     if (part.startsWith('[[') && part.endsWith(']]')) {
       const label = part.slice(2, -2);
       const page = findWikiPageByLabel(pages, label);
       if (page && onWikiLink) {
-        return <button key={index} type="button" className="wiki-inline-link" onClick={() => onWikiLink(page.id)}>{label}</button>;
+        return <button key={index} type="button" className="wiki-inline-link" onClick={() => onWikiLink(page.id)}>{highlightText(label, searchTerm)}</button>;
       }
-      return <span key={index} className="wiki-link">{label}</span>;
+      return <span key={index} className="wiki-link">{highlightText(label, searchTerm)}</span>;
     }
     if (/^\[S\d+(?::C\d+)?\]$/.test(part)) {
       if (onSourceRefClick) {
@@ -46,7 +80,7 @@ export function renderInlineMarkdown(text: string, pages: WikiPage[] = [], onWik
       }
       return <sup key={index} className="wiki-source-ref">{part}</sup>;
     }
-    return part;
+    return highlightText(part, searchTerm);
   });
 }
 
@@ -100,7 +134,7 @@ function splitArticleSections(lines: string[]) {
   return { visibleLines, tabbedSections };
 }
 
-function renderMarkdownLines(lines: string[], pages: WikiPage[] = [], onWikiLink?: (pageId: string) => void, onSourceRefClick?: (ref: string) => void, skipFirstTitle = false) {
+function renderMarkdownLines(lines: string[], options: MarkdownRenderOptions = {}, skipFirstTitle = false) {
   const nodes: ReactNode[] = [];
   let index = 0;
   let skippedFirstTitle = false;
@@ -118,27 +152,27 @@ function renderMarkdownLines(lines: string[], pages: WikiPage[] = [], onWikiLink
     if (trimmed.startsWith('|')) {
       const table = parseTable(lines, index);
       nodes.push(<table key={`table-${index}`} className="wiki-table">
-        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, pages, onWikiLink, onSourceRefClick)}</th>)}</tr></thead>
-        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, pages, onWikiLink, onSourceRefClick)}</td>)}</tr>)}</tbody>
+        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, options)}</th>)}</tr></thead>
+        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, options)}</td>)}</tr>)}</tbody>
       </table>);
       index = table.nextIndex;
       continue;
     }
 
-    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink, onSourceRefClick)}</h1>);
-    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3), pages, onWikiLink, onSourceRefClick)}</h2>);
-    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4), pages, onWikiLink, onSourceRefClick)}</h3>);
-    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink, onSourceRefClick)}</li>);
-    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2), pages, onWikiLink, onSourceRefClick)}</blockquote>);
+    if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2), options)}</h1>);
+    else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3), options)}</h2>);
+    else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4), options)}</h3>);
+    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2), options)}</li>);
+    else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2), options)}</blockquote>);
     else if (!line.trim()) nodes.push(<br key={index} />);
-    else nodes.push(<p key={index}>{renderInlineMarkdown(line, pages, onWikiLink, onSourceRefClick)}</p>);
+    else nodes.push(<p key={index}>{renderInlineMarkdown(line, options)}</p>);
     index += 1;
   }
 
   return nodes;
 }
 
-function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick }: { sections: MarkdownSection[]; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
+function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick, searchTerm }: { sections: MarkdownSection[]; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void; searchTerm?: string }) {
   const [activeTitle, setActiveTitle] = useState(sections[0]?.title || '');
   const activeSection = sections.find((section) => section.title === activeTitle) || sections[0];
 
@@ -165,21 +199,21 @@ function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick }: {
         ))}
       </div>
       <div className="wiki-tab-panel" role="tabpanel">
-        {renderMarkdownLines(activeSection.lines, pages, onWikiLink, onSourceRefClick)}
+        {renderMarkdownLines(activeSection.lines, { pages, onWikiLink, onSourceRefClick, searchTerm })}
       </div>
     </section>
   );
 }
 
-export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void }) {
+export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick, searchTerm }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void; searchTerm?: string }) {
   const { visibleLines, tabbedSections } = useMemo(() => splitArticleSections(markdown.split('\n')), [markdown]);
-  const documentContent = renderMarkdownLines(visibleLines, pages, onWikiLink, onSourceRefClick, true);
+  const documentContent = renderMarkdownLines(visibleLines, { pages, onWikiLink, onSourceRefClick, searchTerm }, true);
 
   return <article className="wiki-article">
     <section className="wiki-document-content">
       <div className="wiki-document-content-label">Document Content</div>
       {documentContent}
     </section>
-    <WikiTabbedSections sections={tabbedSections} pages={pages} onWikiLink={onWikiLink} onSourceRefClick={onSourceRefClick} />
+    <WikiTabbedSections sections={tabbedSections} pages={pages} onWikiLink={onWikiLink} onSourceRefClick={onSourceRefClick} searchTerm={searchTerm} />
   </article>;
 }
