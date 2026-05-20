@@ -23,6 +23,12 @@ type MarkdownRenderOptions = {
   searchTerm?: string;
 };
 
+type MarkdownImage = {
+  alt: string;
+  url: string;
+  title?: string;
+};
+
 export function findWikiPageByLabel(pages: WikiPage[], label: string) {
   const normalized = label.trim().toLowerCase();
   return pages.find((page) => page.title.toLowerCase() === normalized)
@@ -51,6 +57,38 @@ function highlightText(text: string, searchTerm?: string): ReactNode[] | string 
       ? <mark key={index} className="wiki-search-highlight">{part}</mark>
       : part
   ));
+}
+
+function parseMarkdownImage(line: string): MarkdownImage | null {
+  const match = line.trim().match(/^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]+)")?\)$/);
+  if (!match) return null;
+  return {
+    alt: match[1] || 'Wiki image',
+    url: match[2],
+    title: match[3],
+  };
+}
+
+function isSafeImageUrl(url: string) {
+  return /^(https?:\/\/|data:image\/|blob:)/i.test(url);
+}
+
+function renderMarkdownImage(image: MarkdownImage, key: React.Key) {
+  if (!isSafeImageUrl(image.url)) {
+    return (
+      <figure key={key} className="wiki-image-card blocked">
+        <div className="wiki-image-placeholder">Image reference</div>
+        <figcaption>{image.alt} — source preview required for local file paths.</figcaption>
+      </figure>
+    );
+  }
+
+  return (
+    <figure key={key} className="wiki-image-card">
+      <img src={image.url} alt={image.alt} title={image.title} loading="lazy" />
+      {(image.title || image.alt) ? <figcaption>{image.title || image.alt}</figcaption> : null}
+    </figure>
+  );
 }
 
 export function countMarkdownMatches(markdown: string, searchTerm: string) {
@@ -149,12 +187,21 @@ function renderMarkdownLines(lines: string[], options: MarkdownRenderOptions = {
       continue;
     }
 
+    const image = parseMarkdownImage(line);
+    if (image) {
+      nodes.push(renderMarkdownImage(image, `image-${index}`));
+      index += 1;
+      continue;
+    }
+
     if (trimmed.startsWith('|')) {
       const table = parseTable(lines, index);
-      nodes.push(<table key={`table-${index}`} className="wiki-table">
-        <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, options)}</th>)}</tr></thead>
-        <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, options)}</td>)}</tr>)}</tbody>
-      </table>);
+      nodes.push(<div key={`table-wrap-${index}`} className="wiki-table-wrap">
+        <table className="wiki-table">
+          <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, options)}</th>)}</tr></thead>
+          <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, options)}</td>)}</tr>)}</tbody>
+        </table>
+      </div>);
       index = table.nextIndex;
       continue;
     }
