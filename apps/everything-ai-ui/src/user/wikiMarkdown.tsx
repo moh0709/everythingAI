@@ -179,7 +179,11 @@ function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick, sea
   if (!sections.length || !activeSection) return null;
 
   return (
-    <section className="wiki-tabbed-sections">
+    <details className="wiki-tabbed-sections">
+      <summary className="wiki-tabbed-summary">
+        <span>Document Details</span>
+        <small>{sections.length} metadata section(s): sources, entities, relations, and evidence</small>
+      </summary>
       <div className="wiki-tabbed-header">
         <h2>Document Details</h2>
         <p>Metadata, related pages, source locations, and evidence are grouped here so the document content stays readable.</p>
@@ -201,7 +205,7 @@ function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick, sea
       <div className="wiki-tab-panel" role="tabpanel">
         {renderMarkdownLines(activeSection.lines, { pages, onWikiLink, onSourceRefClick, searchTerm })}
       </div>
-    </section>
+    </details>
   );
 }
 
