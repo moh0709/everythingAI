@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
+import type { IndexedFile } from './api';
 import type { UserView, WikiPayload, WikiPage } from './user/types';
 import { useAskState } from './user/useAskState';
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useFileDocumentState } from './user/useFileDocumentState';
+import { useFileDocumentWorkflows } from './user/useFileDocumentWorkflows';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
 import { useWikiState } from './user/useWikiState';
+import { useWikiWorkflows } from './user/useWikiWorkflows';
 import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
@@ -62,37 +65,31 @@ export function UserApp() {
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
 
+  const { refreshFiles, searchEverything, loadDocumentContext, revealSourceFile } = useFileDocumentWorkflows({
+    options,
+    query,
+    selectedFileId,
+    run,
+    loadFiles,
+    selectFile,
+    setDocumentContext,
+    setStatus,
+    setView,
+  });
+
+  const { refreshWiki, buildWiki } = useWikiWorkflows({
+    options,
+    selectedWikiPageId,
+    run,
+    setWiki,
+    selectFirstWikiPage,
+    setStatus,
+    setView,
+  });
+
   function saveConnection() {
     saveConnectionSettings();
     setStatus('Connection settings saved.');
-  }
-
-  async function refreshFiles() {
-    await run('Loading indexed files...', async () => {
-      const payload = await apiRequest<{ files: any[] }>(options, '/api/files?limit=250');
-      loadFiles(payload.files || []);
-      if (payload.files?.length) setView((current) => current === 'onboarding' ? 'explore' : current);
-      setStatus(`Loaded ${payload.files?.length || 0} file(s).`);
-    });
-  }
-
-  async function refreshWiki() {
-    await run('Loading source-backed wiki pages...', async () => {
-      const payload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki?limit=500&filePageLimit=50');
-      setWiki(payload.wiki);
-      if (!selectedWikiPageId && payload.wiki.pages[0]) selectFirstWikiPage(payload.wiki);
-      setStatus(`Loaded ${payload.wiki.page_count || 0} wiki page(s).`);
-    });
-  }
-
-  async function buildWiki() {
-    await run('Building source-backed wiki pages...', async () => {
-      const payload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki/build', { limit: 500, filePageLimit: 50, useProvider: true }, 'POST');
-      setWiki(payload.wiki);
-      selectFirstWikiPage(payload.wiki);
-      setView('wiki');
-      setStatus(`Built ${payload.wiki.page_count || 0} source-backed wiki page(s).`);
-    });
   }
 
   async function selectFolder() {
@@ -138,46 +135,13 @@ export function UserApp() {
       setWiki(wikiPayload.wiki);
       selectFirstWikiPage(wikiPayload.wiki);
 
-      const payload = await apiRequest<{ files: any[] }>(options, '/api/files?limit=250');
+      const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
       loadFiles(payload.files || []);
       if (payload.files?.[0]) await loadDocumentContext(payload.files[0].id, false);
 
       markStep('ready', 'done');
       setView('wiki');
       setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s) and ${wikiPayload.wiki.page_count || 0} wiki page(s).`);
-    });
-  }
-
-  async function searchEverything() {
-    await run('Searching EverythingAI...', async () => {
-      const normalized = query.trim();
-      if (!normalized) {
-        await refreshFiles();
-        return;
-      }
-      const payload = await apiRequest<any>(options, `/api/unified-search?q=${encodeURIComponent(normalized)}&limit=50`);
-      loadFiles(payload.files || []);
-      if (payload.files?.[0]) await loadDocumentContext(payload.files[0].id, false);
-      setStatus(`Search complete: ${payload.files?.length || 0} file match(es).`);
-    });
-  }
-
-  async function loadDocumentContext(fileId: string, wrap = true) {
-    const task = async () => {
-      const payload = await apiRequest<any>(options, `/api/intelligence/document-context/${fileId}`);
-      selectFile(fileId);
-      setDocumentContext(payload.document);
-      setStatus(`Context loaded: ${payload.document.file?.filename || fileId}`);
-    };
-
-    if (wrap) await run('Loading document context...', task);
-    else await task();
-  }
-
-  async function revealSourceFile(fileId: string, absolutePath?: string) {
-    await run('Opening source file location...', async () => {
-      await apiRequest(options, `/api/files/${fileId}/reveal`, { absolutePath }, 'POST');
-      setStatus('Source file location opened.');
     });
   }
 
