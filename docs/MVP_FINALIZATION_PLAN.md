@@ -38,7 +38,7 @@ The local MVP is focused on:
 - page-level article search
 - reading mode
 - source reveal/open context actions
-- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, evidence quality badges, durable chunk metadata display, hardened active chunk matching, collapsed metadata details, responsive source preview drawer behavior, safer table/image rendering, and clearer local settings guidance
+- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, evidence quality badges, durable chunk metadata display, hardened active chunk matching, collapsed metadata details, responsive source preview drawer behavior, safer table/image rendering, clearer local settings guidance, and extracted frontend connection-settings state
 
 ## Not part of local MVP finalization
 
@@ -175,10 +175,11 @@ Completed:
 - [x] Improve source preview drawer responsive layout for narrow screens
 - [x] Add safer table/image rendering in wiki pages
 - [x] Add clearer local settings instructions in Start and Explore views
+- [x] Extract connection/folder settings state from `UserApp.tsx` into `useConnectionSettings`
 
 Remaining:
 
-- [ ] Split remaining large `UserApp.tsx` responsibilities into smaller state/controller modules
+- [ ] Continue splitting remaining large `UserApp.tsx` workflow responsibilities into smaller state/controller modules
 
 ### Phase 7 — Documentation finalization
 
@@ -202,6 +203,7 @@ Tasks:
 - [x] Update documentation with frontend typecheck/build validation result after responsive source drawer polish
 - [x] Update documentation with frontend typecheck/build validation result after table/image rendering polish
 - [x] Update documentation with frontend typecheck/build validation result after local settings guidance polish
+- [x] Update documentation with frontend typecheck/build validation result after connection settings hook extraction
 - [ ] Update Windows smoke test after local tests
 
 ## Latest validation results
@@ -231,7 +233,6 @@ EVERYTHINGAI_EXCLUDE_EXTENSIONS=.exe,.dll,.iso,.zip
 EVERYTHINGAI_WATCH_DEBOUNCE_MS=1000
 EVERYTHINGAI_WIKI_FILE_CONTENT_LIMIT=50000
 EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT=4000
-EVERYTHINGAI_WIKI_CHUNK_CHAR_LIMIT=900
 ```
 
 ## Definition of done
@@ -258,6 +259,6 @@ The local MVP is finalized when:
 
 The local MVP should be boring, safe, and reliable before adding more intelligence.
 
-The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, page-level article search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, visible evidence quality indicators, durable chunk metadata display, reliable citation-to-chunk navigation, collapsed metadata details, responsive source preview behavior, safer table/image rendering, and clear local setup guidance.
+The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, page-level article search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, visible evidence quality indicators, durable chunk metadata display, reliable citation-to-chunk navigation, collapsed metadata details, responsive source preview behavior, safer table/image rendering, clear local setup guidance, and gradually modularized frontend state.
 
 Do not add production-platform features until the local MVP is stable.
