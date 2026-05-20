@@ -14,6 +14,14 @@ function normalizeChunkRef(ref?: string | null) {
   return ref.replace(/^\[/, '').replace(/\]$/, '');
 }
 
+function chunkRefCandidates(chunk: WikiSourceChunk) {
+  return [chunk.ref, chunk.chunk_ref].filter(Boolean) as string[];
+}
+
+function primaryChunkRef(chunk: WikiSourceChunk) {
+  return chunk.ref || chunk.chunk_ref || '';
+}
+
 function rangeLabel(label: string, start?: number, end?: number) {
   if (start == null && end == null) return null;
   if (start != null && end != null) return `${label} ${start}-${end}`;
@@ -96,8 +104,9 @@ export function WikiSourcePreviewDrawer({
         {chunks.length ? (
           <div className="wiki-source-preview-chunks">
             {chunks.map((chunk) => {
-              const chunkRef = chunk.ref || chunk.chunk_ref || '';
-              const isActive = normalizedActiveChunkRef === chunkRef;
+              const chunkRef = primaryChunkRef(chunk);
+              const candidates = chunkRefCandidates(chunk);
+              const isActive = Boolean(normalizedActiveChunkRef && candidates.includes(normalizedActiveChunkRef));
               const meta = chunkMeta(chunk);
 
               return (
@@ -105,7 +114,11 @@ export function WikiSourcePreviewDrawer({
                   key={chunk.id || chunkRef}
                   className={`wiki-source-preview-chunk${isActive ? ' active' : ''}`}
                   id={`chunk-${chunkRef}`}
-                  ref={(el) => { chunkRefs.current[chunkRef] = el; }}
+                  ref={(el) => {
+                    for (const candidate of candidates) {
+                      chunkRefs.current[candidate] = el;
+                    }
+                  }}
                 >
                   <div className="wiki-source-preview-chunk-top">
                     <strong>{chunkRef}</strong>
