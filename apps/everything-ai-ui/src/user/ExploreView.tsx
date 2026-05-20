@@ -3,6 +3,7 @@ import { FileText, Search, Server } from 'lucide-react';
 import { formatSize } from './userUtils';
 import type { DocumentContext } from './types';
 import type { IndexedFile } from '../api';
+import './localSettingsHelp.css';
 
 type ExploreViewProps = {
   error: string;
