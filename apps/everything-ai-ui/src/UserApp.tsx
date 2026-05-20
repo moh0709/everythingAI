@@ -5,6 +5,7 @@ import type { IndexedFile } from './api';
 import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage } from './user/types';
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useSetupProgress } from './user/useSetupProgress';
+import { useUserActionRunner } from './user/useUserActionRunner';
 import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
@@ -22,6 +23,7 @@ export function UserApp() {
     saveConnectionSettings,
   } = useConnectionSettings();
   const { setupSteps, markStep } = useSetupProgress();
+  const { status, setStatus, error, setError, busy, run } = useUserActionRunner();
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
@@ -33,9 +35,6 @@ export function UserApp() {
   const [selectedWikiPageId, setSelectedWikiPageId] = useState<string | null>(null);
   const [readingMode, setReadingMode] = useState(false);
   const [activeSourceRef, setActiveSourceRef] = useState<string | null>(null);
-  const [status, setStatus] = useState('Ready');
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
   const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
   const sourceCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -45,20 +44,6 @@ export function UserApp() {
   function saveConnection() {
     saveConnectionSettings();
     setStatus('Connection settings saved.');
-  }
-
-  async function run(label: string, task: () => Promise<void>) {
-    setBusy(true);
-    setError('');
-    setStatus(label);
-    try {
-      await task();
-    } catch (err: any) {
-      setError(err.message || String(err));
-      setStatus('Action failed');
-    } finally {
-      setBusy(false);
-    }
   }
 
   async function refreshFiles() {
