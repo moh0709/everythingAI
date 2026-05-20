@@ -61,6 +61,16 @@ export function ExploreView({
         </div>
         <button className="outline" onClick={saveConnection}>Save</button>
       </div>
+      <div className="settings-help-grid">
+        <div>
+          <strong>Use the local defaults</strong>
+          <p>For normal local development, keep API Base URL pointed at <code>localhost:4100</code>.</p>
+        </div>
+        <div>
+          <strong>Token field</strong>
+          <p>Only change the token if the backend token was changed. Saving stores it in this browser only.</p>
+        </div>
+      </div>
       <div className="settings-grid">
         <label>API Base URL<input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></label>
         <label>API Token<input type="password" value={token} onChange={(event) => setToken(event.target.value)} /></label>
