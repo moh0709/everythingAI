@@ -1,8 +1,8 @@
 import React, { MutableRefObject, useMemo, useState } from 'react';
 import type { ApiOptions } from '../api';
-import { BookOpen, Maximize2, Minimize2, Sparkles } from 'lucide-react';
+import { BookOpen, Maximize2, Minimize2, Search, Sparkles, X } from 'lucide-react';
 import { WikiNavigationTree } from './WikiNavigationTree';
-import { MarkdownArticle } from './wikiMarkdown';
+import { countMarkdownMatches, MarkdownArticle } from './wikiMarkdown';
 import { WikiRebuildPanel } from './WikiRebuildPanel';
 import { WikiSourcePreviewDrawer } from './WikiSourcePreviewDrawer';
 import { filePathHref } from './userUtils';
@@ -76,6 +76,7 @@ export function WikiView({
 }: WikiViewProps) {
   const [previewSource, setPreviewSource] = useState<WikiSource | null>(null);
   const [activeChunkRef, setActiveChunkRef] = useState<string | null>(null);
+  const [pageSearchTerm, setPageSearchTerm] = useState('');
 
   const sourcesByRef = useMemo(() => {
     const map = new Map<string, WikiSource>();
@@ -87,6 +88,7 @@ export function WikiView({
 
   const citationCoverageLabel = formatCitationCoverage(selectedWikiPage?.citation_coverage_score);
   const sourceFingerprint = shortHash(selectedWikiPage?.source_fingerprint);
+  const pageSearchMatchCount = selectedWikiPage ? countMarkdownMatches(selectedWikiPage.markdown, pageSearchTerm) : 0;
 
   function openSourcePreview(source?: WikiSource | null, chunkRef?: string | null) {
     if (!source) return;
@@ -167,7 +169,18 @@ export function WikiView({
               <HelpIcon label="Ask about this page help" tooltip="Opens the Ask flow with this exact Wiki article as context, so the answer can reference relevant indexed source documents." />
             </div>
           </div>
-          <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleSourceCitationClick} />
+          <div className="wiki-page-search" role="search" aria-label="Search inside selected Wiki article">
+            <Search size={16} />
+            <input
+              type="search"
+              value={pageSearchTerm}
+              placeholder="Search inside this article..."
+              onChange={(event) => setPageSearchTerm(event.target.value)}
+            />
+            {pageSearchTerm ? <span>{pageSearchMatchCount} match(es)</span> : <span>Article search</span>}
+            {pageSearchTerm ? <button type="button" className="outline" onClick={() => setPageSearchTerm('')} aria-label="Clear article search"><X size={14} /> Clear</button> : null}
+          </div>
+          <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleSourceCitationClick} searchTerm={pageSearchTerm} />
         </> : <p>Select a wiki page.</p>}
       </section>
 
