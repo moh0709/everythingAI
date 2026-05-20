@@ -1,7 +1,8 @@
-import React, { FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
-import type { UserView, ChatMessage, WikiPayload, WikiPage } from './user/types';
+import type { UserView, WikiPayload, WikiPage } from './user/types';
+import { useAskState } from './user/useAskState';
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useFileDocumentState } from './user/useFileDocumentState';
 import { useSetupProgress } from './user/useSetupProgress';
@@ -47,11 +48,19 @@ export function UserApp() {
     loadFiles,
     selectFile,
   } = useFileDocumentState();
+  const {
+    chatInput,
+    setChatInput,
+    clearChatInput,
+    chatMessages,
+    addUserMessage,
+    addAssistantMessage,
+    chatInputRef,
+    focusChatInput,
+    handleChatSubmit,
+  } = useAskState(() => askQuestion());
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   function saveConnection() {
     saveConnectionSettings();
@@ -177,21 +186,17 @@ export function UserApp() {
     if (!question || busy) return;
 
     setView('ask');
-    setChatInput('');
+    clearChatInput();
     setQuery('');
 
     await run('Asking indexed sources...', async () => {
-      setChatMessages((current) => [...current, { role: 'user', text: question }]);
+      addUserMessage(question);
       const payload = await apiRequest<any>(options, '/api/chat', { question, limit: 5 }, 'POST');
-      setChatMessages((current) => [...current, {
-        role: 'assistant',
-        text: payload.answer || 'No answer returned.',
-        sources: payload.sources || [],
-      }]);
+      addAssistantMessage(payload.answer || 'No answer returned.', payload.sources || []);
       setStatus(`Answer prepared from ${payload.sources?.length || 0} referenced source(s).`);
     });
 
-    chatInputRef.current?.focus();
+    focusChatInput();
   }
 
   function askAboutWikiPage(page: WikiPage | undefined = selectedWikiPage) {
@@ -206,7 +211,7 @@ export function UserApp() {
 
   function openAskView() {
     setView('ask');
-    setTimeout(() => chatInputRef.current?.focus(), 0);
+    setTimeout(focusChatInput, 0);
   }
 
   function handleAskFromHero() {
@@ -216,11 +221,6 @@ export function UserApp() {
       return;
     }
     openAskView();
-  }
-
-  function handleChatSubmit(event: FormEvent) {
-    event.preventDefault();
-    askQuestion();
   }
 
   useEffect(() => {
