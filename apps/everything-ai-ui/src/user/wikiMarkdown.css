@@ -242,9 +242,12 @@
   top: 0;
   right: 0;
   z-index: 60;
+  display: flex;
+  flex-direction: column;
   width: min(520px, 94vw);
-  height: 100vh;
+  height: 100dvh;
   overflow-y: auto;
+  overscroll-behavior: contain;
   border-left: 1px solid rgba(99, 102, 241, 0.22);
   background:
     radial-gradient(circle at top left, rgba(99, 102, 241, 0.12), transparent 32%),
@@ -284,12 +287,14 @@
   margin: 0;
   color: #0f172a;
   font-size: 1.15rem;
+  overflow-wrap: anywhere;
 }
 
 .wiki-source-preview-header p {
   margin: 0.35rem 0 0;
   color: #64748b;
   font-size: 0.86rem;
+  overflow-wrap: anywhere;
 }
 
 .wiki-source-preview-actions {
@@ -297,6 +302,10 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1rem;
+}
+
+.wiki-source-preview-actions button {
+  white-space: nowrap;
 }
 
 .wiki-source-preview-path {
@@ -346,6 +355,7 @@
   color: #334155;
   padding: 0.8rem 0.95rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .wiki-source-preview-section-title-row {
@@ -366,6 +376,7 @@
 }
 
 .wiki-source-preview-chunk {
+  min-width: 0;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
   background: #ffffff;
@@ -389,6 +400,7 @@
 }
 
 .wiki-source-preview-chunk-top strong {
+  flex: 0 0 auto;
   border-radius: 999px;
   background: #eef2ff;
   color: #3730a3;
@@ -400,6 +412,8 @@
   color: #64748b;
   font-size: 0.78rem;
   font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .wiki-source-preview-chunk-meta {
@@ -431,6 +445,7 @@
   margin: 0;
   color: #334155;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .wiki-source-preview-chunk pre {
@@ -477,10 +492,45 @@
   }
 
   .wiki-source-preview-drawer {
+    inset: 0;
     width: 100vw;
+    height: 100dvh;
+    border-left: 0;
+    border-radius: 0;
+    padding: 0.85rem;
   }
 
   .wiki-source-preview-header {
     display: grid;
+    margin: -0.85rem -0.85rem 0.85rem;
+    padding: 0.85rem;
+  }
+
+  .wiki-source-preview-header button,
+  .wiki-source-preview-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wiki-source-preview-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .wiki-source-preview-section,
+  .wiki-source-preview-path,
+  .wiki-source-preview-chunk {
+    border-radius: 12px;
+    padding: 0.8rem;
+  }
+
+  .wiki-source-preview-section-title-row,
+  .wiki-source-preview-chunk-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wiki-source-preview-chunk-top span {
+    text-align: left;
   }
 }
