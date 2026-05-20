@@ -37,7 +37,7 @@ The local MVP is focused on:
 - intelligent wiki search
 - reading mode
 - source reveal/open context actions
-- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, evidence quality badges, and durable chunk metadata display
+- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, evidence quality badges, durable chunk metadata display, and hardened active chunk matching
 
 ## Not part of local MVP finalization
 
@@ -169,11 +169,11 @@ Completed:
 - [x] Add frontend types/API helpers for durable Wiki page, evidence, and chunk endpoints
 - [x] Add Wiki evidence quality badges for source count, section count, citation coverage, weak-source warning, and source fingerprint
 - [x] Add durable source/chunk metadata display in source preview drawer
+- [x] Harden `[S1:Cx]` drawer matching by mapping both `ref` and durable `chunk_ref` to the same chunk element
 
 Remaining:
 
 - [ ] Complete source preview drawer responsive layout validation
-- [ ] Make `[S1:C3]` chunk clicks scroll directly to the matching chunk inside the preview drawer
 - [ ] Add page-level search inside selected wiki article
 - [ ] Add better table/image extraction and rendering in wiki pages
 - [ ] Reduce metadata further in reading surfaces
@@ -196,6 +196,7 @@ Tasks:
 - [x] Update documentation with frontend typecheck/build validation result after durable Wiki types/API helpers
 - [x] Update documentation with frontend typecheck/build validation result after Wiki evidence quality badges
 - [x] Update documentation with frontend typecheck/build validation result after source drawer metadata display
+- [x] Update documentation with frontend typecheck/build validation result after active chunk matching hardening
 - [ ] Update Windows smoke test after local tests
 
 ## Latest validation results
@@ -252,6 +253,6 @@ The local MVP is finalized when:
 
 The local MVP should be boring, safe, and reliable before adding more intelligence.
 
-The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, visible evidence quality indicators, and durable chunk metadata display.
+The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, visible evidence quality indicators, durable chunk metadata display, and reliable citation-to-chunk navigation.
 
 Do not add production-platform features until the local MVP is stable.
