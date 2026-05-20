@@ -1,0 +1,40 @@
+.settings-help-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0 0 1rem;
+}
+
+.settings-help-grid div {
+  border: 1px solid #dbe4f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 0.85rem;
+}
+
+.settings-help-grid strong {
+  display: block;
+  color: #0f172a;
+  margin-bottom: 0.35rem;
+}
+
+.settings-help-grid p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.settings-help-grid code {
+  border-radius: 6px;
+  background: #e2e8f0;
+  color: #0f172a;
+  padding: 0.08rem 0.28rem;
+  font-size: 0.84rem;
+}
+
+@media (max-width: 1100px) {
+  .settings-help-grid {
+    grid-template-columns: 1fr;
+  }
+}
