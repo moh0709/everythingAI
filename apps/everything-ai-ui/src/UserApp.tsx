@@ -6,6 +6,7 @@ import type { UserView, DocumentContext, ChatMessage, WikiPayload, WikiPage } fr
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
+import { useWikiState } from './user/useWikiState';
 import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
@@ -24,6 +25,19 @@ export function UserApp() {
   } = useConnectionSettings();
   const { setupSteps, markStep } = useSetupProgress();
   const { status, setStatus, error, setError, busy, run } = useUserActionRunner();
+  const {
+    wiki,
+    setWiki,
+    selectedWikiPageId,
+    selectedWikiPage,
+    readingMode,
+    setReadingMode,
+    activeSourceRef,
+    sourceCardRefs,
+    selectFirstWikiPage,
+    openWikiPage: selectWikiPage,
+    handleCitationClick,
+  } = useWikiState();
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
   const [chatInput, setChatInput] = useState('');
@@ -31,15 +45,9 @@ export function UserApp() {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [documentContext, setDocumentContext] = useState<DocumentContext | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [wiki, setWiki] = useState<WikiPayload | null>(null);
-  const [selectedWikiPageId, setSelectedWikiPageId] = useState<string | null>(null);
-  const [readingMode, setReadingMode] = useState(false);
-  const [activeSourceRef, setActiveSourceRef] = useState<string | null>(null);
   const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
-  const sourceCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
-  const selectedWikiPage = wiki?.pages.find((page) => page.id === selectedWikiPageId) || wiki?.pages[0];
 
   function saveConnection() {
     saveConnectionSettings();
@@ -60,7 +68,7 @@ export function UserApp() {
     await run('Loading source-backed wiki pages...', async () => {
       const payload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki?limit=500&filePageLimit=50');
       setWiki(payload.wiki);
-      if (!selectedWikiPageId && payload.wiki.pages[0]) setSelectedWikiPageId(payload.wiki.pages[0].id);
+      if (!selectedWikiPageId && payload.wiki.pages[0]) selectFirstWikiPage(payload.wiki);
       setStatus(`Loaded ${payload.wiki.page_count || 0} wiki page(s).`);
     });
   }
@@ -69,7 +77,7 @@ export function UserApp() {
     await run('Building source-backed wiki pages...', async () => {
       const payload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki/build', { limit: 500, filePageLimit: 50, useProvider: true }, 'POST');
       setWiki(payload.wiki);
-      if (payload.wiki.pages[0]) setSelectedWikiPageId(payload.wiki.pages[0].id);
+      selectFirstWikiPage(payload.wiki);
       setView('wiki');
       setStatus(`Built ${payload.wiki.page_count || 0} source-backed wiki page(s).`);
     });
@@ -116,7 +124,7 @@ export function UserApp() {
 
       const wikiPayload = await apiRequest<{ wiki: WikiPayload }>(options, '/api/wiki?limit=500&filePageLimit=50');
       setWiki(wikiPayload.wiki);
-      if (wikiPayload.wiki.pages[0]) setSelectedWikiPageId(wikiPayload.wiki.pages[0].id);
+      selectFirstWikiPage(wikiPayload.wiki);
 
       const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
       setFiles(payload.files || []);
@@ -195,14 +203,8 @@ export function UserApp() {
   }
 
   function openWikiPage(pageId: string) {
-    setSelectedWikiPageId(pageId);
-    setActiveSourceRef(null);
+    selectWikiPage(pageId);
     setView('wiki');
-  }
-
-  function handleCitationClick(ref: string) {
-    setActiveSourceRef(ref);
-    sourceCardRefs.current[ref]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function openAskView() {
