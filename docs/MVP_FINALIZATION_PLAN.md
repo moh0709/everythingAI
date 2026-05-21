@@ -80,7 +80,7 @@ Validation result:
 Date: 2026-05-21
 Windows local UI smoke test: PASS
 Backend command: cd E:\01PROJEKTER\EverythingAI\services\api && npm test
-Backend result: 80 tests / 80 passed / 0 failed
+Backend result: 81 tests / 81 passed / 0 failed
 Frontend typecheck: PASS
 Frontend production build: PASS
 ```
@@ -92,6 +92,7 @@ docs/VALIDATION_2026-05-21_WINDOWS_SCHEMA_DRIFT_REPAIR.md
 docs/VALIDATION_2026-05-21_WINDOWS_LOCAL_UI_SMOKE_PASS.md
 docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_SCHEMA_REPAIR.md
 docs/VALIDATION_2026-05-21_FULL_LOCAL_MVP_BASELINE.md
+docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_NESTED_UNDO.md
 ```
 
 ### Phase 2 — Scanner optimization
@@ -144,7 +145,7 @@ Tasks:
 
 ### Phase 5 — Safety hardening
 
-Status: in progress / failed-execution regression coverage validated
+Status: complete / validated
 
 Tasks:
 
@@ -153,15 +154,16 @@ Tasks:
 - [x] Add stronger filesystem execution validation
 - [x] Audit failed execution attempts
 - [x] Add backend reveal-source-file route for local source opening
-- [ ] Add nested undo regression test
+- [x] Add nested undo regression test
 - [x] Add failed execution regression test
 
 Validation note:
 
 ```text
 Date: 2026-05-21
-Backend tests passed 80/80 after schema repair.
+Backend tests passed 81/81 after adding nested undo regression coverage.
 Failed execution coverage includes blocked preview rejection, missing source rejection, target-exists rejection, and active trashed file rejection with failed audit/no unsafe mutation behavior.
+Nested undo coverage confirms original nested relative paths are restored after approved cross-folder move and approved undo.
 ```
 
 ### Phase 6 — UI polish and Wiki/Knowledge UX
@@ -237,6 +239,7 @@ Tasks:
 - [x] Update documentation with frontend typecheck/build validation result after connection settings hook extraction
 - [x] Update Windows smoke test after local tests
 - [x] Add validation notes for Windows schema-drift repair, Windows local UI smoke pass, backend tests, and full local MVP baseline
+- [x] Add validation note for nested undo regression test pass
 
 ## Latest validation results
 
@@ -252,7 +255,7 @@ Result: PASS
 Backend:
 cd E:\01PROJEKTER\EverythingAI\services\api
 npm test
-Result: 80 tests / 80 passed / 0 failed
+Result: 81 tests / 81 passed / 0 failed
 
 Frontend:
 cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
@@ -312,7 +315,7 @@ EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT=4000
 
 The local MVP is finalized when:
 
-1. `npm test` passes locally after latest changes. Current result: PASS, 80/80.
+1. `npm test` passes locally after latest changes. Current result: PASS, 81/81.
 2. `npm run typecheck` passes in `apps/everything-ai-ui`. Current result: PASS.
 3. `npm run build` passes in `apps/everything-ai-ui`. Current result: PASS.
 4. A safe Windows folder can be indexed without errors. Current result: smoke-tested through user UI.
@@ -324,7 +327,7 @@ The local MVP is finalized when:
 10. Wiki source citations are precise enough for user trust.
 11. Move/rename actions require preview and approval.
 12. Failed action attempts are audited.
-13. Undo works for nested files and is audited.
+13. Undo works for nested files and is audited. Current result: PASS.
 14. Watch mode does not overload the app during normal file changes.
 15. README and smoke-test documentation match the tested behavior.
 
