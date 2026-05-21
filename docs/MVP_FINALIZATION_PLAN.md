@@ -57,7 +57,7 @@ The following items are intentionally deferred to the production-platform phase:
 
 ### Phase 1 — Stabilization
 
-Status: complete / validated locally
+Status: complete / validated locally on Windows
 
 Tasks:
 
@@ -69,14 +69,29 @@ Tasks:
 - [x] Backend automated test baseline previously validated: 78 passed / 0 failed
 - [x] Re-run `npm test` after latest Wiki/source precision changes and watcher database-path fix
 - [x] Fix new test failures found during validation
+- [x] Repair local SQLite Wiki schema drift found during Windows runtime smoke testing
+- [x] Add backend startup schema repair before API dev/start commands
+- [x] Validate Windows local UI flow after schema repair
+- [x] Reconfirm backend automated tests after schema repair
 
 Validation result:
 
 ```text
-Date: 2026-05-19
-Command: cd E:\01PROJEKTER\EverythingAI\services\api && npm test
-Result: 80 tests / 80 passed / 0 failed
-Issue #20: closed as completed
+Date: 2026-05-21
+Windows local UI smoke test: PASS
+Backend command: cd E:\01PROJEKTER\EverythingAI\services\api && npm test
+Backend result: 80 tests / 80 passed / 0 failed
+Frontend typecheck: PASS
+Frontend production build: PASS
+```
+
+Related validation notes:
+
+```text
+docs/VALIDATION_2026-05-21_WINDOWS_SCHEMA_DRIFT_REPAIR.md
+docs/VALIDATION_2026-05-21_WINDOWS_LOCAL_UI_SMOKE_PASS.md
+docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_SCHEMA_REPAIR.md
+docs/VALIDATION_2026-05-21_FULL_LOCAL_MVP_BASELINE.md
 ```
 
 ### Phase 2 — Scanner optimization
@@ -181,6 +196,14 @@ Remaining:
 
 - [ ] Continue splitting remaining large `UserApp.tsx` workflow responsibilities into smaller state/controller modules
 
+Important current instruction:
+
+```text
+Pause broad UserApp refactoring until the next runtime-priority task is chosen.
+Do not move buildKnowledgeWorkspace() yet.
+Do not combine UX work and workflow extraction in the same commit.
+```
+
 ### Phase 7 — Documentation finalization
 
 Status: active / in progress
@@ -204,11 +227,20 @@ Tasks:
 - [x] Update documentation with frontend typecheck/build validation result after table/image rendering polish
 - [x] Update documentation with frontend typecheck/build validation result after local settings guidance polish
 - [x] Update documentation with frontend typecheck/build validation result after connection settings hook extraction
-- [ ] Update Windows smoke test after local tests
+- [x] Update Windows smoke test after local tests
+- [x] Add validation notes for Windows schema-drift repair, Windows local UI smoke pass, backend tests, and full local MVP baseline
 
 ## Latest validation results
 
 ```text
+Date: 2026-05-21
+
+Windows local UI smoke test:
+Command: cd E:\01PROJEKTER\EverythingAI && .\start_all_debug.bat
+User UI: http://localhost:5151
+Flow: Start -> Explore -> Wiki -> Ask
+Result: PASS
+
 Backend:
 cd E:\01PROJEKTER\EverythingAI\services\api
 npm test
@@ -222,6 +254,39 @@ Result: passed
 cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
 npm run build
 Result: passed
+Observed: 1533 modules transformed, built in 1.16s
+```
+
+## Runtime repair added during validation
+
+The Windows smoke test exposed schema drift in an older local SQLite database.
+
+Observed missing-column failures:
+
+```text
+no such column: status
+no such column: source_ref
+no such column: page_source_id
+```
+
+Repair utility:
+
+```text
+services/api/src/db/repairWikiSchema.js
+```
+
+Manual repair command:
+
+```text
+cd E:\01PROJEKTER\EverythingAI\services\api
+npm run repair:wiki-schema
+```
+
+Startup hardening:
+
+```text
+services/api/package.json
+npm run dev and npm start now run Wiki schema repair before API startup.
 ```
 
 ## Environment variables for MVP optimization
@@ -239,10 +304,10 @@ EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT=4000
 
 The local MVP is finalized when:
 
-1. `npm test` passes locally after latest changes.
-2. `npm run typecheck` passes in `apps/everything-ai-ui`.
-3. `npm run build` passes in `apps/everything-ai-ui`.
-4. A safe Windows folder can be indexed without errors.
+1. `npm test` passes locally after latest changes. Current result: PASS, 80/80.
+2. `npm run typecheck` passes in `apps/everything-ai-ui`. Current result: PASS.
+3. `npm run build` passes in `apps/everything-ai-ui`. Current result: PASS.
+4. A safe Windows folder can be indexed without errors. Current result: smoke-tested through user UI.
 5. Extraction works for supported file types.
 6. Search and semantic-style search work.
 7. Insights and suggestions are generated.
