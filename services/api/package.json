@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
+    "dev": "node src/db/repairWikiSchema.js && node --watch src/server.js",
     "extract": "node src/index.js extract",
     "index": "node src/index.js index",
     "files:list": "node src/index.js list",
@@ -22,7 +22,7 @@
     "sync:anythingllm": "node src/index.js sync-anythingllm",
     "repair:wiki-schema": "node src/db/repairWikiSchema.js",
     "test": "node --test",
-    "start": "node src/server.js"
+    "start": "node src/db/repairWikiSchema.js && node src/server.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
