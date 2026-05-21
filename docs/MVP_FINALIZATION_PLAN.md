@@ -144,7 +144,7 @@ Tasks:
 
 ### Phase 5 — Safety hardening
 
-Status: in progress
+Status: in progress / failed-execution regression coverage validated
 
 Tasks:
 
@@ -154,7 +154,15 @@ Tasks:
 - [x] Audit failed execution attempts
 - [x] Add backend reveal-source-file route for local source opening
 - [ ] Add nested undo regression test
-- [ ] Add failed execution regression test
+- [x] Add failed execution regression test
+
+Validation note:
+
+```text
+Date: 2026-05-21
+Backend tests passed 80/80 after schema repair.
+Failed execution coverage includes blocked preview rejection, missing source rejection, target-exists rejection, and active trashed file rejection with failed audit/no unsafe mutation behavior.
+```
 
 ### Phase 6 — UI polish and Wiki/Knowledge UX
 
