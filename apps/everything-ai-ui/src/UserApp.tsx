@@ -16,6 +16,19 @@ import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
 import { OnboardingView } from './user/OnboardingView';
 
+export type ScanReport = {
+  rootPath?: string;
+  scanned?: number;
+  indexed?: number;
+  failed?: number;
+  skipped?: number;
+  skipped_unchanged?: number;
+  skipped_large?: number;
+  skipped_excluded?: number;
+  skippedReasons?: Array<{ reason: string; path: string; message?: string | null }>;
+  failedItems?: Array<{ type?: string; path: string; message?: string | null }>;
+};
+
 export function UserApp() {
   const {
     baseUrl,
@@ -64,6 +77,7 @@ export function UserApp() {
   } = useAskState(() => askQuestion());
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
+  const [scanReport, setScanReport] = useState<ScanReport | null>(null);
 
   const { refreshFiles, searchEverything, loadDocumentContext, revealSourceFile } = useFileDocumentWorkflows({
     options,
@@ -118,9 +132,11 @@ export function UserApp() {
     await run('Building local knowledge workspace...', async () => {
       localStorage.setItem('everythingai.ui.folderPath', normalized);
       markStep('folder', 'done');
+      setScanReport(null);
 
       markStep('index', 'working');
-      await apiRequest(options, '/api/index', { folderPath: normalized, auto: true, limit: 1000, useOllama: false }, 'POST');
+      const indexPayload = await apiRequest<ScanReport>(options, '/api/index', { folderPath: normalized, auto: true, limit: 1000, useOllama: false }, 'POST');
+      setScanReport(indexPayload);
       markStep('index', 'done');
 
       markStep('extract', 'working');
@@ -141,7 +157,7 @@ export function UserApp() {
 
       markStep('ready', 'done');
       setView('wiki');
-      setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s) and ${wikiPayload.wiki.page_count || 0} wiki page(s).`);
+      setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s), ${wikiPayload.wiki.page_count || 0} wiki page(s), and ${indexPayload.skipped || 0} skipped scan item(s).`);
     });
   }
 
@@ -209,6 +225,7 @@ export function UserApp() {
       {view === 'onboarding' && <OnboardingView
         error={error} busy={busy} status={status}
         setupSteps={setupSteps}
+        scanReport={scanReport}
         folderPath={folderPath} setFolderPath={setFolderPath}
         baseUrl={baseUrl} setBaseUrl={setBaseUrl}
         token={token} setToken={setToken}
