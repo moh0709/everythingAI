@@ -1,4 +1,5 @@
-import { listExtractedFiles, listFileEmbeddings, upsertFileEmbedding } from '../db/client.js';
+import crypto from 'node:crypto';
+import { listExtractedFiles, listFileEmbeddings } from '../db/client.js';
 
 const MODEL_NAME = 'everythingai-local-token-v1';
 const DIMENSIONS = 256;
@@ -17,6 +18,55 @@ function hashToken(token) {
     hash = Math.imul(hash, 16777619);
   }
   return Math.abs(hash) % DIMENSIONS;
+}
+
+function hashEmbeddingSource(text) {
+  return crypto.createHash('sha256').update(text || '').digest('hex');
+}
+
+function columnExists(db, tableName, columnName) {
+  return db.prepare(`PRAGMA table_info(${tableName})`).all().some((column) => column.name === columnName);
+}
+
+function ensureEmbeddingSourceHashColumn(db) {
+  if (!columnExists(db, 'file_embeddings', 'source_hash')) {
+    db.exec('ALTER TABLE file_embeddings ADD COLUMN source_hash TEXT');
+  }
+}
+
+function getExistingEmbedding(db, fileId) {
+  return db.prepare(`
+    SELECT file_id, embedding_model, source_hash
+    FROM file_embeddings
+    WHERE file_id = ?
+  `).get(fileId);
+}
+
+function upsertFileEmbeddingWithSourceHash(db, embedding) {
+  db.prepare(`
+    INSERT INTO file_embeddings (
+      file_id,
+      embedding_model,
+      vector_json,
+      token_count,
+      generated_at,
+      source_hash
+    )
+    VALUES (
+      @file_id,
+      @embedding_model,
+      @vector_json,
+      @token_count,
+      @generated_at,
+      @source_hash
+    )
+    ON CONFLICT(file_id) DO UPDATE SET
+      embedding_model = excluded.embedding_model,
+      vector_json = excluded.vector_json,
+      token_count = excluded.token_count,
+      generated_at = excluded.generated_at,
+      source_hash = excluded.source_hash
+  `).run(embedding);
 }
 
 export function embedText(text) {
@@ -45,29 +95,44 @@ export function cosineSimilarity(a, b) {
   return dot;
 }
 
-export function generateEmbeddings(db, { fileId, limit = 1000 } = {}) {
+export function generateEmbeddings(db, { fileId, limit = 1000, force = false } = {}) {
+  ensureEmbeddingSourceHashColumn(db);
+
   const files = listExtractedFiles(db, { fileId, limit });
   const generatedAt = new Date().toISOString();
   const results = [];
+  const skipped = [];
 
   for (const file of files) {
-    const embedding = embedText(`${file.filename}\n${file.extracted_text || ''}`);
+    const sourceText = `${file.filename}\n${file.extracted_text || ''}`;
+    const sourceHash = hashEmbeddingSource(sourceText);
+    const existing = getExistingEmbedding(db, file.id);
+
+    if (!force && existing?.embedding_model === MODEL_NAME && existing.source_hash === sourceHash) {
+      skipped.push({ fileId: file.id, filename: file.filename, reason: 'unchanged' });
+      continue;
+    }
+
+    const embedding = embedText(sourceText);
     const record = {
       file_id: file.id,
       embedding_model: embedding.model,
       vector_json: JSON.stringify(embedding.vector),
       token_count: embedding.tokenCount,
       generated_at: generatedAt,
+      source_hash: sourceHash,
     };
 
-    upsertFileEmbedding(db, record);
+    upsertFileEmbeddingWithSourceHash(db, record);
     results.push({ fileId: file.id, filename: file.filename, tokenCount: embedding.tokenCount });
   }
 
   return {
     embedding_model: MODEL_NAME,
     generated: results.length,
+    skipped_unchanged: skipped.length,
     results,
+    skipped,
   };
 }
 
