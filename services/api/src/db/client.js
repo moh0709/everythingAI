@@ -878,6 +878,33 @@ export function listFileInsights(db, { limit = 100, fileId } = {}) {
   `).all(params);
 }
 
+export function listDuplicateGroups(db) {
+  return db.prepare(`
+    SELECT
+      content_hash,
+      COUNT(*) AS file_count,
+      SUM(COALESCE(size_bytes, 0)) AS total_size_bytes,
+      json_group_array(json_object(
+        'id', id,
+        'filename', filename,
+        'absolute_path', absolute_path,
+        'relative_path', relative_path,
+        'size_bytes', size_bytes,
+        'modified_at', modified_at
+      )) AS files_json
+    FROM indexed_files
+    WHERE
+      index_status = 'indexed'
+      AND content_hash IS NOT NULL
+    GROUP BY content_hash
+    HAVING COUNT(*) > 1
+    ORDER BY file_count DESC, total_size_bytes DESC
+  `).all().map((group) => ({
+    ...group,
+    files: JSON.parse(group.files_json),
+  }));
+}
+
 export function upsertWatchRoot(db, watchRoot) {
   db.prepare(`
     INSERT INTO watch_roots (
