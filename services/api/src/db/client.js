@@ -44,35 +44,13 @@ function ensureLegacyColumnsBeforeSchema(db) {
   );
 }
 
-function ensurePlanningSessionSchema(db) {
-  ensureLegacyColumnsBeforeSchema(db);
-
-  db.exec(`
-    CREATE INDEX IF NOT EXISTS idx_organization_suggestions_planning_session_id
-    ON organization_suggestions(planning_session_id)
-  `);
-
-  db.exec(`
-    CREATE INDEX IF NOT EXISTS idx_action_executions_execution_batch_id
-    ON action_executions(execution_batch_id)
-  `);
-}
-
-export function resolveDatabasePath(dbPath = process.env.EVERYTHINGAI_DB_PATH) {
-  return path.resolve(dbPath || DEFAULT_DB_PATH);
-}
-
-export function openDatabase(dbPath) {
-  const resolvedPath = resolveDatabasePath(dbPath);
-  fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-
-  const db = new Database(resolvedPath);
+export function openDatabase(dbPath = process.env.EVERYTHINGAI_DB_PATH || DEFAULT_DB_PATH) {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+  const db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   ensureLegacyColumnsBeforeSchema(db);
   db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
-  ensurePlanningSessionSchema(db);
-
   return db;
 }
 
@@ -92,8 +70,7 @@ export function upsertIndexedFile(db, fileRecord) {
       index_status,
       last_indexed_at,
       error_message
-    )
-    VALUES (
+    ) VALUES (
       @id,
       @filename,
       @absolute_path,
@@ -109,7 +86,6 @@ export function upsertIndexedFile(db, fileRecord) {
       @error_message
     )
     ON CONFLICT(absolute_path) DO UPDATE SET
-      id = excluded.id,
       filename = excluded.filename,
       relative_path = excluded.relative_path,
       extension = excluded.extension,
@@ -259,7 +235,7 @@ export function listIndexedFiles(db, { limit = 100, status, query } = {}) {
       error_message
     FROM indexed_files
     ${where}
-    ORDER BY last_indexed_at DESC, filename ASC
+    ORDER BY last_indexed_at DESC
     LIMIT @limit
   `);
 
@@ -268,33 +244,32 @@ export function listIndexedFiles(db, { limit = 100, status, query } = {}) {
 
 export function getIndexedFileById(db, fileId) {
   return db.prepare(`
-    SELECT
-      f.*,
-      e.extracted_text,
-      e.extraction_status,
-      e.extractor_name,
-      e.extracted_at,
-      e.error_message AS extraction_error_message,
-      e.metadata_json
-    FROM indexed_files f
-    LEFT JOIN file_extractions e ON e.file_id = f.id
-    WHERE f.id = ?
+    SELECT *
+    FROM indexed_files
+    WHERE id = ?
   `).get(fileId);
 }
 
-export function listFilesForExtraction(db, { limit = 1000, fileId } = {}) {
+export function listFilesForExtraction(db, { limit = 100, fileId } = {}) {
+  const clauses = ['f.index_status = \'indexed\''];
+  const params = { limit };
+
   if (fileId) {
-    const file = getIndexedFileById(db, fileId);
-    return file ? [file] : [];
+    clauses.push('f.id = @fileId');
+    params.fileId = fileId;
   }
 
   return db.prepare(`
-    SELECT f.*
+    SELECT
+      f.*,
+      e.extraction_status,
+      e.extracted_at
     FROM indexed_files f
-    WHERE f.index_status = 'indexed'
+    LEFT JOIN file_extractions e ON e.file_id = f.id
+    WHERE ${clauses.join(' AND ')}
     ORDER BY f.last_indexed_at DESC
-    LIMIT ?
-  `).all(limit);
+    LIMIT @limit
+  `).all(params);
 }
 
 export function listExtractedFiles(db, { limit = 100, fileId } = {}) {
@@ -317,7 +292,8 @@ export function listExtractedFiles(db, { limit = 100, fileId } = {}) {
       f.size_bytes,
       f.modified_at,
       e.extracted_text,
-      e.extracted_at
+      e.extracted_at,
+      e.metadata_json
     FROM indexed_files f
     JOIN file_extractions e ON e.file_id = f.id
     WHERE ${clauses.join(' AND ')}
@@ -434,25 +410,89 @@ export function searchIndexedFiles(db, { query, limit = 20 } = {}) {
       f.mime_type,
       f.size_bytes,
       f.modified_at,
+      f.content_hash,
       f.index_status,
-      e.extraction_status,
-      e.error_message AS extraction_error_message,
-      m.snippet,
-      CASE
-        WHEN f.filename LIKE @likeQuery OR f.absolute_path LIKE @likeQuery OR f.extension LIKE @likeQuery THEN 0
-        ELSE 1
-      END AS result_rank
-    FROM indexed_files f
-    LEFT JOIN file_extractions e ON e.file_id = f.id
-    LEFT JOIN fts_matches m ON m.file_id = f.id
-    WHERE
-      f.filename LIKE @likeQuery
-      OR f.absolute_path LIKE @likeQuery
-      OR f.extension LIKE @likeQuery
-      OR m.file_id IS NOT NULL
-    ORDER BY result_rank ASC, m.fts_rank ASC, f.modified_at DESC
+      f.error_message,
+      COALESCE(t.status, '') AS trash_status,
+      fts_matches.snippet,
+      fts_matches.fts_rank
+    FROM fts_matches
+    JOIN indexed_files f ON f.id = fts_matches.file_id
+    LEFT JOIN trash_records t ON t.file_id = f.id AND t.status = 'trashed'
+    WHERE t.id IS NULL
+    ORDER BY fts_matches.fts_rank
     LIMIT @limit
-  `).all({ query, likeQuery, ftsQuery, limit });
+  `).all({ ftsQuery, likeQuery, limit });
+}
+
+export function searchIndexedFilesIncludingTrashed(db, { query, limit = 20 } = {}) {
+  if (!query || !query.toString().trim()) {
+    return [];
+  }
+
+  const likeQuery = `%${query}%`;
+  const ftsQuery = toFtsQuery(query);
+
+  if (!ftsQuery) {
+    return [];
+  }
+
+  return db.prepare(`
+    WITH fts_matches AS (
+      SELECT
+        file_id,
+        bm25(file_search_fts) AS fts_rank,
+        snippet(file_search_fts, 5, '[', ']', '...', 24) AS snippet
+      FROM file_search_fts
+      WHERE file_search_fts MATCH @ftsQuery
+    )
+    SELECT
+      f.id,
+      f.filename,
+      f.absolute_path,
+      f.relative_path,
+      f.extension,
+      f.mime_type,
+      f.size_bytes,
+      f.modified_at,
+      f.content_hash,
+      f.index_status,
+      f.error_message,
+      COALESCE(t.status, '') AS trash_status,
+      fts_matches.snippet,
+      fts_matches.fts_rank
+    FROM fts_matches
+    JOIN indexed_files f ON f.id = fts_matches.file_id
+    LEFT JOIN trash_records t ON t.file_id = f.id AND t.status = 'trashed'
+    ORDER BY
+      CASE WHEN t.status = 'trashed' THEN 1 ELSE 0 END,
+      fts_matches.fts_rank
+    LIMIT @limit
+  `).all({ ftsQuery, likeQuery, limit });
+}
+
+export function listOrganizationSuggestions(db, { fileId, limit = 100 } = {}) {
+  const clauses = [];
+  const params = { limit };
+
+  if (fileId) {
+    clauses.push('s.file_id = @fileId');
+    params.fileId = fileId;
+  }
+
+  const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
+
+  return db.prepare(`
+    SELECT
+      s.*,
+      f.filename,
+      f.absolute_path
+    FROM organization_suggestions s
+    JOIN indexed_files f ON f.id = s.file_id
+    ${where}
+    ORDER BY s.created_at DESC
+    LIMIT @limit
+  `).all(params);
 }
 
 export function insertOrganizationSuggestion(db, suggestion) {
@@ -483,55 +523,26 @@ export function insertOrganizationSuggestion(db, suggestion) {
       @requires_approval,
       @created_at
     )
+    ON CONFLICT(id) DO NOTHING
   `).run({ planning_session_id: null, ...suggestion });
 }
 
-export function listOrganizationSuggestions(db, { fileId, planningSessionId, limit = 50 } = {}) {
-  const clauses = [];
-  const params = { limit };
+export function listOrganizationSuggestionsByIds(db, previewIds) {
+  if (!previewIds.length) return [];
 
-  if (fileId) {
-    clauses.push('file_id = @fileId');
-    params.fileId = fileId;
-  }
-
-  if (planningSessionId) {
-    clauses.push('planning_session_id = @planningSessionId');
-    params.planningSessionId = planningSessionId;
-  }
-
-  const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
-
+  const placeholders = previewIds.map(() => '?').join(',');
   return db.prepare(`
     SELECT
       s.*,
       f.filename,
-      f.absolute_path,
-      f.relative_path,
-      f.extension
+      f.absolute_path
     FROM organization_suggestions s
     JOIN indexed_files f ON f.id = s.file_id
-    ${where}
-    ORDER BY s.created_at DESC
-    LIMIT @limit
-  `).all(params);
+    WHERE s.id IN (${placeholders})
+  `).all(previewIds);
 }
 
-export function getOrganizationSuggestionById(db, suggestionId) {
-  return db.prepare(`
-    SELECT
-      s.*,
-      f.filename,
-      f.absolute_path,
-      f.relative_path,
-      f.extension
-    FROM organization_suggestions s
-    JOIN indexed_files f ON f.id = s.file_id
-    WHERE s.id = ?
-  `).get(suggestionId);
-}
-
-export function insertActionPreview(db, preview) {
+export function createActionPreviewRecord(db, preview) {
   db.prepare(`
     INSERT INTO action_previews (
       id,
@@ -568,31 +579,6 @@ export function insertActionPreview(db, preview) {
   `).run(preview);
 }
 
-export function listActionPreviews(db, { fileId, suggestionId, limit = 50 } = {}) {
-  const clauses = [];
-  const params = { limit };
-
-  if (fileId) {
-    clauses.push('file_id = @fileId');
-    params.fileId = fileId;
-  }
-
-  if (suggestionId) {
-    clauses.push('suggestion_id = @suggestionId');
-    params.suggestionId = suggestionId;
-  }
-
-  const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
-
-  return db.prepare(`
-    SELECT *
-    FROM action_previews
-    ${where}
-    ORDER BY created_at DESC
-    LIMIT @limit
-  `).all(params);
-}
-
 export function getActionPreviewById(db, previewId) {
   return db.prepare(`
     SELECT
@@ -600,52 +586,47 @@ export function getActionPreviewById(db, previewId) {
       f.filename,
       f.absolute_path,
       f.relative_path,
-      f.extension
+      f.index_status,
+      tr.status AS trash_status
     FROM action_previews p
     JOIN indexed_files f ON f.id = p.file_id
+    LEFT JOIN trash_records tr ON tr.file_id = f.id AND tr.status = 'trashed'
     WHERE p.id = ?
   `).get(previewId);
 }
 
-export function updateActionPreviewExecutability(db, { previewId, canExecute }) {
+export function updateActionPreviewStatus(db, previewId, { canExecute, status, blockedReason }) {
   db.prepare(`
     UPDATE action_previews
-    SET can_execute = @canExecute
+    SET can_execute = @canExecute,
+        preview_status = @status,
+        blocked_reason = @blockedReason
     WHERE id = @previewId
-  `).run({ previewId, canExecute });
+  `).run({ previewId, canExecute: canExecute ? 1 : 0, status, blockedReason: blockedReason || null });
 }
 
-export function updateIndexedFileLocation(db, { fileId, filename, absolutePath, relativePath }) {
-  db.prepare(`
-    UPDATE indexed_files
-    SET
-      filename = @filename,
-      absolute_path = @absolutePath,
-      relative_path = @relativePath
-    WHERE id = @fileId
-  `).run({ fileId, filename, absolutePath, relativePath });
+export function listActionPreviews(db, { fileId, limit = 100 } = {}) {
+  const clauses = [];
+  const params = { limit };
 
-  syncSearchIndexForFile(db, fileId);
-}
+  if (fileId) {
+    clauses.push('p.file_id = @fileId');
+    params.fileId = fileId;
+  }
 
-export function upsertFileLabel(db, { fileId, tag, category }) {
-  const existing = db.prepare('SELECT * FROM file_labels WHERE file_id = ?').get(fileId);
-  const tags = new Set(existing ? JSON.parse(existing.tags_json) : []);
-  if (tag) tags.add(tag);
+  const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
 
-  db.prepare(`
-    INSERT INTO file_labels (file_id, tags_json, category, updated_at)
-    VALUES (@fileId, @tagsJson, @category, @updatedAt)
-    ON CONFLICT(file_id) DO UPDATE SET
-      tags_json = excluded.tags_json,
-      category = COALESCE(excluded.category, file_labels.category),
-      updated_at = excluded.updated_at
-  `).run({
-    fileId,
-    tagsJson: JSON.stringify(Array.from(tags).sort()),
-    category: category || existing?.category || null,
-    updatedAt: new Date().toISOString(),
-  });
+  return db.prepare(`
+    SELECT
+      p.*,
+      f.filename,
+      f.absolute_path
+    FROM action_previews p
+    JOIN indexed_files f ON f.id = p.file_id
+    ${where}
+    ORDER BY p.created_at DESC
+    LIMIT @limit
+  `).all(params);
 }
 
 export function insertActionExecution(db, execution) {
@@ -859,32 +840,6 @@ export function listFileInsights(db, { limit = 100, fileId } = {}) {
   `).all(params);
 }
 
-export function listDuplicateGroups(db) {
-  return db.prepare(`
-    SELECT
-      content_hash,
-      COUNT(*) AS file_count,
-      SUM(COALESCE(size_bytes, 0)) AS total_size_bytes,
-      json_group_array(json_object(
-        'id', id,
-        'filename', filename,
-        'absolute_path', absolute_path,
-        'size_bytes', size_bytes,
-        'modified_at', modified_at
-      )) AS files_json
-    FROM indexed_files
-    WHERE
-      index_status = 'indexed'
-      AND content_hash IS NOT NULL
-    GROUP BY content_hash
-    HAVING COUNT(*) > 1
-    ORDER BY file_count DESC, total_size_bytes DESC
-  `).all().map((group) => ({
-    ...group,
-    files: JSON.parse(group.files_json),
-  }));
-}
-
 export function upsertWatchRoot(db, watchRoot) {
   db.prepare(`
     INSERT INTO watch_roots (
@@ -982,21 +937,8 @@ export function getSystemStatus(db) {
       (SELECT COUNT(*) FROM file_embeddings) AS embedded_files,
       (SELECT COUNT(*) FROM file_insights WHERE status = 'generated') AS insight_files,
       (SELECT COUNT(*) FROM organization_suggestions) AS suggestions,
-      (SELECT COUNT(*) FROM planning_sessions) AS planning_sessions,
-      (SELECT COUNT(*) FROM action_previews) AS previews,
-      (SELECT COUNT(*) FROM action_executions) AS executions,
-      (SELECT COUNT(*) FROM action_executions WHERE status = 'undone') AS undone_executions,
-      (SELECT COUNT(*) FROM file_labels) AS labeled_files,
-      (SELECT COUNT(*) FROM watch_roots WHERE status = 'active') AS active_watch_roots
+      (SELECT MAX(last_indexed_at) FROM indexed_files) AS last_indexed_at
   `).get();
 
-  const recent = db.prepare(`
-    SELECT MAX(last_indexed_at) AS last_indexed_at
-    FROM indexed_files
-  `).get();
-
-  return {
-    ...counts,
-    last_indexed_at: recent.last_indexed_at,
-  };
+  return counts;
 }
