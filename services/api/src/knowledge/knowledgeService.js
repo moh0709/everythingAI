@@ -1,5 +1,11 @@
 import { getSystemStatus, listExtractedFiles, listFileInsights, listIndexedFiles } from '../db/client.js';
 import { enrichChunksWithPageMetadata } from './sourcePageMetadata.js';
+import {
+  NO_SOURCE_CONTENT_MESSAGE,
+  controlledSourceContentSections,
+  contentControlMetadata,
+  sourceBackedSummary,
+} from './contentControl.js';
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg']);
 const SPREADSHEET_EXTENSIONS = new Set(['.xlsx', '.xls', '.csv']);
@@ -195,12 +201,6 @@ function renderChunkText(chunk) {
   return `${text} **[${chunk.ref}]**`;
 }
 
-function normalizeDocumentContent(text = '', { limit = DEFAULT_FILE_CONTENT_LIMIT, sourceRef = 'S1' } = {}) {
-  const chunks = createSourceChunks(text, sourceRef, { limit });
-  if (!chunks.length) return 'No extracted document content is available yet.';
-  return chunks.map(renderChunkText).join('\n\n');
-}
-
 function sourceFootnotes(sources) {
   if (!sources.length) return '';
   const sourceLines = sources.map((source) => `- [${source.ref}] **${source.filename}** — ${source.location}`);
@@ -214,7 +214,7 @@ function sourceFootnotes(sources) {
     '',
     '## Evidence Snippets',
     '',
-    ...sources.map((source) => `### [${source.ref}] ${source.filename}\n\n> ${source.evidence || 'No evidence snippet available yet.'}`),
+    ...sources.map((source) => `### [${source.ref}] ${source.filename}\n\n> ${source.evidence || NO_SOURCE_CONTENT_MESSAGE}`),
   ].join('\n');
 }
 
@@ -237,11 +237,11 @@ function contentOverviewFromInsights(insights, sources) {
     const firstChunk = source?.chunks?.[0];
     return [
       insight.filename,
-      firstSentence(insight.summary) || 'No summary available yet.',
+      sourceBackedSummary(source),
       firstChunk ? `[${firstChunk.ref}]` : source ? `[${source.ref}]` : '',
     ];
   });
-  return rows.length ? markdownTable(['Document', 'Content summary', 'Source'], rows) : 'No document summaries are available yet.';
+  return rows.length ? markdownTable(['Document', 'Source-backed content', 'Source'], rows) : 'No source-backed document content is available yet.';
 }
 
 function buildMediaBlock(files) {
@@ -259,10 +259,10 @@ function buildMediaBlock(files) {
 
 function makeSourceForInsight(insight, index, extractedByFileId, { limit = DEFAULT_FILE_CONTENT_LIMIT, maxChunks = 80 } = {}) {
   const extractedRecord = extractedByFileId.get(insight.file_id);
-  const extractedText = extractedRecord?.extracted_text || insight.summary || '';
+  const extractedText = extractedRecord?.extracted_text || '';
   const sourceRef = `S${index + 1}`;
   const chunks = createDocumentSourceChunks(extractedText, sourceRef, extractedRecord, { limit, maxChunks });
-  return fileSource(insight, index, evidenceSnippet(extractedText, insight.summary), chunks);
+  return fileSource(insight, index, evidenceSnippet(extractedText, NO_SOURCE_CONTENT_MESSAGE), chunks);
 }
 
 function buildWorkspaceMarkdown({ status, files, insights, sources }) {
@@ -274,7 +274,7 @@ function buildWorkspaceMarkdown({ status, files, insights, sources }) {
 
   const recentDocuments = insights.slice(0, 10).map((insight, index) => {
     const firstChunk = sources[index]?.chunks?.[0];
-    return [insight.filename, insight.category || 'General Knowledge', firstChunk ? `[${firstChunk.ref}]` : sources[index] ? `[${sources[index].ref}]` : ''];
+    return [insight.filename, insight.category || 'General Knowledge', sourceBackedSummary(sources[index]), firstChunk ? `[${firstChunk.ref}]` : sources[index] ? `[${sources[index].ref}]` : ''];
   });
 
   return [
@@ -290,11 +290,11 @@ function buildWorkspaceMarkdown({ status, files, insights, sources }) {
     '',
     '## Document Overview',
     '',
-    recentDocuments.length ? markdownTable(['Document', 'Category', 'Source'], recentDocuments) : 'No document overview is available yet.',
+    recentDocuments.length ? markdownTable(['Document', 'Category', 'Source-backed content', 'Source'], recentDocuments) : 'No document overview is available yet.',
     '',
     '## How to Use This Wiki',
     '',
-    'Open a category, then a topic, then a source-backed file page. File pages prioritize the extracted content from the original document. Source markers such as **[S1:C3]** connect text back to a specific generated source chunk.',
+    'Open a category, then a topic, then a source-backed file page. File pages prioritize extracted document content. Source markers such as **[S1:C3]** connect text back to a specific generated source chunk. Metadata is separated from document body content.',
     '',
     sourceFootnotes(sources),
   ].join('\n');
@@ -333,20 +333,17 @@ function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPage
     return [source.ref, source.filename, firstChunk ? firstChunk.location : source.location];
   });
   const relatedFiles = allFiles.filter((file) => topicInsights.some((insight) => insight.file_id === file.id));
-  const contentSections = topicInsights.slice(0, 6).map((insight, index) => {
-    const source = sources[index];
-    const chunks = source.chunks?.slice(0, 8) || [];
-    return [
-      `### ${insight.filename} **[${source.ref}]**`,
-      '',
-      chunks.length ? chunks.map(renderChunkText).join('\n\n') : 'No extracted source content is available yet.',
-    ].join('\n');
-  }).join('\n\n');
+  const sections = controlledSourceContentSections(topicInsights, sources, { maxDocuments: 6, maxChunks: 8 });
+  const contentSections = sections.map(({ insight, source, chunks, hasContent }) => [
+    `### ${insight.filename} **[${source?.ref || 'S?'}]**`,
+    '',
+    hasContent ? chunks.map(renderChunkText).join('\n\n') : NO_SOURCE_CONTENT_MESSAGE,
+  ].join('\n')).join('\n\n');
 
   return [
     buildPageHeader({
       title: topic,
-      summary: `This topic combines content from ${topicInsights.length} related document(s) in ${category}.`,
+      summary: `This topic combines source-backed content from ${topicInsights.length} related document(s) in ${category}.`,
     }),
     buildTableOfContents(['Topic Overview', 'Source Content', 'Source Document Table', 'Media References', 'Related Pages', 'Sources']),
     '',
@@ -356,7 +353,7 @@ function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPage
     '',
     '## Source Content',
     '',
-    contentSections || 'No extracted source content is available yet.',
+    contentSections || NO_SOURCE_CONTENT_MESSAGE,
     '',
     '## Source Document Table',
     '',
@@ -370,14 +367,15 @@ function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPage
 
 function buildFileMarkdown(insight, extractedFile, relatedPages) {
   const extractedContent = extractedFile?.extracted_text || '';
-  const chunks = createDocumentSourceChunks(extractedContent || insight.summary || '', 'S1', extractedFile, { limit: DEFAULT_FILE_CONTENT_LIMIT, maxChunks: 160 });
-  const source = fileSource(insight, 0, evidenceSnippet(extractedContent, insight.summary), chunks);
+  const chunks = createDocumentSourceChunks(extractedContent, 'S1', extractedFile, { limit: DEFAULT_FILE_CONTENT_LIMIT, maxChunks: 160 });
+  const source = fileSource(insight, 0, evidenceSnippet(extractedContent, NO_SOURCE_CONTENT_MESSAGE), chunks);
   const entities = parseEntities(insight.entities_json);
   const entityRows = Object.entries(entities).filter(([, values]) => Array.isArray(values) && values.length).flatMap(([group, values]) => values.slice(0, 12).map((value) => [group, value]));
   const category = insight.category || categoryFor(insight);
   const subcategory = insight.subcategory || subcategoryFor(insight);
   const updatedAt = insight.generated_at || new Date().toISOString();
-  const documentContent = chunks.length ? chunks.map(renderChunkText).join('\n\n') : 'No extracted document content is available yet.';
+  const documentContent = chunks.length ? chunks.map(renderChunkText).join('\n\n') : NO_SOURCE_CONTENT_MESSAGE;
+  const control = contentControlMetadata({ sources: [source] });
 
   return {
     id: `file-${insight.file_id}`,
@@ -386,7 +384,7 @@ function buildFileMarkdown(insight, extractedFile, relatedPages) {
     page_type: 'file',
     category,
     subcategory,
-    summary: insight.summary || `Source-backed page for ${insight.filename}.`,
+    summary: control.source_backed ? sourceBackedSummary(source) : NO_SOURCE_CONTENT_MESSAGE,
     source_file_ids: [insight.file_id],
     related_topics: [insight.classification || 'Unclassified', category],
     related_pages: relatedPages,
@@ -394,7 +392,7 @@ function buildFileMarkdown(insight, extractedFile, relatedPages) {
     markdown: [
       buildPageHeader({
         title: insight.filename,
-        summary: insight.summary || `Extracted content from ${insight.filename}.`,
+        summary: control.source_backed ? sourceBackedSummary(source) : NO_SOURCE_CONTENT_MESSAGE,
       }),
       buildTableOfContents(['Document Content', 'About This Document', 'Extracted Entities', 'Related Pages', 'Sources']),
       '',
@@ -408,6 +406,7 @@ function buildFileMarkdown(insight, extractedFile, relatedPages) {
         ['Category', category],
         ['Subcategory', subcategory],
         ['AI classification', insight.classification || 'Unclassified'],
+        ['Content control', control.source_backed ? 'source-backed extracted content' : 'no extracted source content'],
         ['Generated', updatedAt],
       ]),
       '',
@@ -473,7 +472,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
     page_type: 'system',
     category: 'Filebase Intelligence',
     subcategory: 'Workspace Summary',
-    summary: `Overview of ${status.total_files || files.length || 0} indexed file(s), focused on content discovery.`,
+    summary: `Overview of ${status.total_files || files.length || 0} indexed file(s), focused on source-backed content discovery.`,
     source_file_ids: workspaceSources.map((source) => source.file_id).filter(Boolean),
     related_topics: ['Filebase Intelligence', 'Content Discovery'],
     related_pages: [],
@@ -500,7 +499,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
       page_type: 'category',
       category,
       subcategory: 'Category Landing Page',
-      summary: `Category page for ${categoryInsights.length} related document(s).`,
+      summary: `Category page for ${categoryInsights.length} related source document(s).`,
       source_file_ids: categorySources.map((source) => source.file_id).filter(Boolean),
       related_topics: categoryInsights.map((insight) => insight.subcategory).filter(Boolean).slice(0, 12),
       related_pages: relatedPages,
@@ -533,7 +532,7 @@ export function buildWikiPages(db, { limit = 500, filePageLimit = 50 } = {}) {
       page_type: 'topic',
       category,
       subcategory: topic,
-      summary: `Topic page built from ${topicInsights.length} related document(s).`,
+      summary: `Topic page built from ${topicInsights.length} related source-backed document(s).`,
       source_file_ids: topicSources.map((source) => source.file_id).filter(Boolean),
       related_topics: relatedPages.map((page) => page.title),
       related_pages: relatedPages,
