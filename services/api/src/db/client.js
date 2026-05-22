@@ -244,9 +244,17 @@ export function listIndexedFiles(db, { limit = 100, status, query } = {}) {
 
 export function getIndexedFileById(db, fileId) {
   return db.prepare(`
-    SELECT *
-    FROM indexed_files
-    WHERE id = ?
+    SELECT
+      f.*,
+      e.extracted_text,
+      e.extraction_status,
+      e.extractor_name,
+      e.extracted_at,
+      e.error_message AS extraction_error_message,
+      e.metadata_json
+    FROM indexed_files f
+    LEFT JOIN file_extractions e ON e.file_id = f.id
+    WHERE f.id = ?
   `).get(fileId);
 }
 
@@ -380,17 +388,15 @@ function toFtsQuery(query) {
     .join(' OR ') || '';
 }
 
-export function searchIndexedFiles(db, { query, limit = 20 } = {}) {
-  if (!query || !query.toString().trim()) {
-    return [];
-  }
+function searchRows(db, { query, limit = 20, includeTrashed = false } = {}) {
+  if (!query || !query.toString().trim()) return [];
 
   const likeQuery = `%${query}%`;
   const ftsQuery = toFtsQuery(query);
+  if (!ftsQuery) return [];
 
-  if (!ftsQuery) {
-    return [];
-  }
+  const trashFilter = includeTrashed ? '' : 'AND t.id IS NULL';
+  const trashOrder = includeTrashed ? "CASE WHEN t.status = 'trashed' THEN 1 ELSE 0 END," : '';
 
   return db.prepare(`
     WITH fts_matches AS (
@@ -413,62 +419,37 @@ export function searchIndexedFiles(db, { query, limit = 20 } = {}) {
       f.content_hash,
       f.index_status,
       f.error_message,
+      e.extraction_status,
+      e.error_message AS extraction_error_message,
       COALESCE(t.status, '') AS trash_status,
-      fts_matches.snippet,
-      fts_matches.fts_rank
-    FROM fts_matches
-    JOIN indexed_files f ON f.id = fts_matches.file_id
+      m.snippet,
+      CASE
+        WHEN f.filename LIKE @likeQuery OR f.absolute_path LIKE @likeQuery OR f.extension LIKE @likeQuery THEN 0
+        ELSE 1
+      END AS result_rank,
+      m.fts_rank
+    FROM indexed_files f
+    LEFT JOIN file_extractions e ON e.file_id = f.id
     LEFT JOIN trash_records t ON t.file_id = f.id AND t.status = 'trashed'
-    WHERE t.id IS NULL
-    ORDER BY fts_matches.fts_rank
+    LEFT JOIN fts_matches m ON m.file_id = f.id
+    WHERE (
+      f.filename LIKE @likeQuery
+      OR f.absolute_path LIKE @likeQuery
+      OR f.extension LIKE @likeQuery
+      OR m.file_id IS NOT NULL
+    )
+    ${trashFilter}
+    ORDER BY ${trashOrder} result_rank ASC, m.fts_rank ASC, f.modified_at DESC
     LIMIT @limit
-  `).all({ ftsQuery, likeQuery, limit });
+  `).all({ likeQuery, ftsQuery, limit });
+}
+
+export function searchIndexedFiles(db, { query, limit = 20 } = {}) {
+  return searchRows(db, { query, limit, includeTrashed: false });
 }
 
 export function searchIndexedFilesIncludingTrashed(db, { query, limit = 20 } = {}) {
-  if (!query || !query.toString().trim()) {
-    return [];
-  }
-
-  const likeQuery = `%${query}%`;
-  const ftsQuery = toFtsQuery(query);
-
-  if (!ftsQuery) {
-    return [];
-  }
-
-  return db.prepare(`
-    WITH fts_matches AS (
-      SELECT
-        file_id,
-        bm25(file_search_fts) AS fts_rank,
-        snippet(file_search_fts, 5, '[', ']', '...', 24) AS snippet
-      FROM file_search_fts
-      WHERE file_search_fts MATCH @ftsQuery
-    )
-    SELECT
-      f.id,
-      f.filename,
-      f.absolute_path,
-      f.relative_path,
-      f.extension,
-      f.mime_type,
-      f.size_bytes,
-      f.modified_at,
-      f.content_hash,
-      f.index_status,
-      f.error_message,
-      COALESCE(t.status, '') AS trash_status,
-      fts_matches.snippet,
-      fts_matches.fts_rank
-    FROM fts_matches
-    JOIN indexed_files f ON f.id = fts_matches.file_id
-    LEFT JOIN trash_records t ON t.file_id = f.id AND t.status = 'trashed'
-    ORDER BY
-      CASE WHEN t.status = 'trashed' THEN 1 ELSE 0 END,
-      fts_matches.fts_rank
-    LIMIT @limit
-  `).all({ ftsQuery, likeQuery, limit });
+  return searchRows(db, { query, limit, includeTrashed: true });
 }
 
 export function listOrganizationSuggestions(db, { fileId, limit = 100 } = {}) {
@@ -542,6 +523,20 @@ export function listOrganizationSuggestionsByIds(db, previewIds) {
   `).all(previewIds);
 }
 
+export function getOrganizationSuggestionById(db, suggestionId) {
+  return db.prepare(`
+    SELECT
+      s.*,
+      f.filename,
+      f.absolute_path,
+      f.relative_path,
+      f.extension
+    FROM organization_suggestions s
+    JOIN indexed_files f ON f.id = s.file_id
+    WHERE s.id = ?
+  `).get(suggestionId);
+}
+
 export function createActionPreviewRecord(db, preview) {
   db.prepare(`
     INSERT INTO action_previews (
@@ -579,6 +574,8 @@ export function createActionPreviewRecord(db, preview) {
   `).run(preview);
 }
 
+export const insertActionPreview = createActionPreviewRecord;
+
 export function getActionPreviewById(db, previewId) {
   return db.prepare(`
     SELECT
@@ -605,6 +602,14 @@ export function updateActionPreviewStatus(db, previewId, { canExecute, status, b
   `).run({ previewId, canExecute: canExecute ? 1 : 0, status, blockedReason: blockedReason || null });
 }
 
+export function updateActionPreviewExecutability(db, { previewId, canExecute }) {
+  db.prepare(`
+    UPDATE action_previews
+    SET can_execute = @canExecute
+    WHERE id = @previewId
+  `).run({ previewId, canExecute: canExecute ? 1 : 0 });
+}
+
 export function listActionPreviews(db, { fileId, limit = 100 } = {}) {
   const clauses = [];
   const params = { limit };
@@ -627,6 +632,19 @@ export function listActionPreviews(db, { fileId, limit = 100 } = {}) {
     ORDER BY p.created_at DESC
     LIMIT @limit
   `).all(params);
+}
+
+export function updateIndexedFileLocation(db, { fileId, filename, absolutePath, relativePath }) {
+  db.prepare(`
+    UPDATE indexed_files
+    SET
+      filename = @filename,
+      absolute_path = @absolutePath,
+      relative_path = @relativePath
+    WHERE id = @fileId
+  `).run({ fileId, filename, absolutePath, relativePath });
+
+  syncSearchIndexForFile(db, fileId);
 }
 
 export function insertActionExecution(db, execution) {
@@ -754,6 +772,26 @@ export function listAuditLog(db, { entityType, entityId, limit = 100 } = {}) {
     ...event,
     payload: JSON.parse(event.payload_json),
   }));
+}
+
+export function upsertFileLabel(db, { fileId, tag, category }) {
+  const existing = db.prepare('SELECT * FROM file_labels WHERE file_id = ?').get(fileId);
+  const tags = new Set(existing ? JSON.parse(existing.tags_json) : []);
+  if (tag) tags.add(tag);
+
+  db.prepare(`
+    INSERT INTO file_labels (file_id, tags_json, category, updated_at)
+    VALUES (@fileId, @tagsJson, @category, @updatedAt)
+    ON CONFLICT(file_id) DO UPDATE SET
+      tags_json = excluded.tags_json,
+      category = COALESCE(excluded.category, file_labels.category),
+      updated_at = excluded.updated_at
+  `).run({
+    fileId,
+    tagsJson: JSON.stringify(Array.from(tags).sort()),
+    category: category || existing?.category || null,
+    updatedAt: new Date().toISOString(),
+  });
 }
 
 export function listFileLabels(db, { fileId, limit = 100 } = {}) {
