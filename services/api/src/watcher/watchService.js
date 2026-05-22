@@ -91,6 +91,24 @@ function markWatchRootFailed({ id, absoluteRoot, databasePath, error }) {
   }
 }
 
+function snapshotRuntimeState(id, state) {
+  return {
+    id,
+    rootPath: state.absoluteRoot,
+    status: 'active',
+    running: Boolean(state.running),
+    pending: Boolean(state.pending),
+    scheduled: Boolean(state.timer),
+    debounceMs: state.debounceMs,
+    lastJob: state.lastJob,
+    lastCycleAt: state.lastCycleAt,
+  };
+}
+
+export function listActiveWatcherStatuses() {
+  return Array.from(activeWatchers.entries()).map(([id, state]) => snapshotRuntimeState(id, state));
+}
+
 export async function startFolderWatcher(db, {
   rootPath,
   extract = true,
@@ -105,55 +123,61 @@ export async function startFolderWatcher(db, {
   const databasePath = resolveWatcherDatabasePath(db);
 
   if (activeWatchers.has(id)) {
-    return { id, rootPath: absoluteRoot, status: 'active', already_running: true };
+    return { ...snapshotRuntimeState(id, activeWatchers.get(id)), already_running: true };
   }
 
-  let timer = null;
-  let running = false;
-  let pending = false;
-  let lastJob = null;
+  const state = {
+    absoluteRoot,
+    debounceMs,
+    timer: null,
+    running: false,
+    pending: false,
+    lastJob: null,
+    lastCycleAt: null,
+    close: null,
+  };
 
   async function runQueuedCycle() {
-    if (running) {
-      pending = true;
+    if (state.running) {
+      state.pending = true;
       return;
     }
 
-    running = true;
+    state.running = true;
     try {
       do {
-        pending = false;
+        state.pending = false;
         const jobResult = await runWatchCycle({ id, absoluteRoot, databasePath, extract, auto, logger });
-        lastJob = jobResult.job;
-      } while (pending);
+        state.lastJob = jobResult.job;
+        state.lastCycleAt = new Date().toISOString();
+      } while (state.pending);
     } catch (error) {
       logger.error(`Watcher failed for ${absoluteRoot}: ${error.message}`);
       markWatchRootFailed({ id, absoluteRoot, databasePath, error });
     } finally {
-      running = false;
+      state.running = false;
     }
   }
 
   function scheduleCycle() {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      timer = null;
+    if (state.timer) clearTimeout(state.timer);
+    state.timer = setTimeout(() => {
+      state.timer = null;
       runQueuedCycle();
     }, debounceMs);
   }
 
+  activeWatchers.set(id, state);
   await runQueuedCycle();
 
   const watcher = fs.watch(absoluteRoot, { recursive: true }, () => {
     scheduleCycle();
   });
 
-  activeWatchers.set(id, {
-    close() {
-      if (timer) clearTimeout(timer);
-      watcher.close();
-    },
-  });
+  state.close = () => {
+    if (state.timer) clearTimeout(state.timer);
+    watcher.close();
+  };
 
   upsertWatchRoot(db, {
     id,
@@ -164,7 +188,7 @@ export async function startFolderWatcher(db, {
     created_at: new Date().toISOString(),
   });
 
-  return { id, rootPath: absoluteRoot, status: 'active', already_running: false, debounceMs, job: lastJob };
+  return { ...snapshotRuntimeState(id, state), already_running: false, job: state.lastJob };
 }
 
 export function stopFolderWatcher(db, { rootPath }) {
@@ -173,7 +197,7 @@ export function stopFolderWatcher(db, { rootPath }) {
   const watcher = activeWatchers.get(id);
 
   if (watcher) {
-    watcher.close();
+    watcher.close?.();
     activeWatchers.delete(id);
   }
 
