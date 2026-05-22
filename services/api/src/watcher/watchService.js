@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { scanFolder } from '../indexer/fileScanner.js';
+import { createSkipUnchanged } from '../indexer/skipUnchanged.js';
 import { openDatabase, upsertIndexedFile, upsertWatchRoot } from '../db/client.js';
 import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
 import { runJob } from '../jobs/jobRunner.js';
@@ -44,7 +45,11 @@ async function runWatchCycle({
         message: 'Running watcher scan and knowledge ingestion cycle.',
       },
     }, async () => {
-      const scan = await scanFolder(absoluteRoot, { onRecord: (record) => insert(record), logger });
+      const scan = await scanFolder(absoluteRoot, {
+        onRecord: (record) => insert(record),
+        shouldSkipUnchanged: createSkipUnchanged(cycleDb),
+        logger,
+      });
       let knowledge = null;
 
       if (auto) {
