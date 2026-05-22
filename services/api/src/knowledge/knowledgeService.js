@@ -1,4 +1,5 @@
 import { getSystemStatus, listExtractedFiles, listFileInsights, listIndexedFiles } from '../db/client.js';
+import { enrichChunksWithPageMetadata } from './sourcePageMetadata.js';
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg']);
 const SPREADSHEET_EXTENSIONS = new Set(['.xlsx', '.xls', '.csv']);
@@ -179,6 +180,10 @@ function createSourceChunks(text = '', sourceRef = 'S1', { limit = DEFAULT_FILE_
   return chunks;
 }
 
+function createDocumentSourceChunks(text = '', sourceRef = 'S1', extractionRecord = {}, options = {}) {
+  return enrichChunksWithPageMetadata(createSourceChunks(text, sourceRef, options), extractionRecord);
+}
+
 function renderChunkText(chunk) {
   const text = chunk.text.trim();
   if (!text) return '';
@@ -253,9 +258,10 @@ function buildMediaBlock(files) {
 }
 
 function makeSourceForInsight(insight, index, extractedByFileId, { limit = DEFAULT_FILE_CONTENT_LIMIT, maxChunks = 80 } = {}) {
-  const extractedText = extractedByFileId.get(insight.file_id)?.extracted_text || insight.summary || '';
+  const extractedRecord = extractedByFileId.get(insight.file_id);
+  const extractedText = extractedRecord?.extracted_text || insight.summary || '';
   const sourceRef = `S${index + 1}`;
-  const chunks = createSourceChunks(extractedText, sourceRef, { limit, maxChunks });
+  const chunks = createDocumentSourceChunks(extractedText, sourceRef, extractedRecord, { limit, maxChunks });
   return fileSource(insight, index, evidenceSnippet(extractedText, insight.summary), chunks);
 }
 
@@ -364,7 +370,7 @@ function buildTopicMarkdown(topic, category, topicInsights, sources, relatedPage
 
 function buildFileMarkdown(insight, extractedFile, relatedPages) {
   const extractedContent = extractedFile?.extracted_text || '';
-  const chunks = createSourceChunks(extractedContent || insight.summary || '', 'S1', { limit: DEFAULT_FILE_CONTENT_LIMIT, maxChunks: 160 });
+  const chunks = createDocumentSourceChunks(extractedContent || insight.summary || '', 'S1', extractedFile, { limit: DEFAULT_FILE_CONTENT_LIMIT, maxChunks: 160 });
   const source = fileSource(insight, 0, evidenceSnippet(extractedContent, insight.summary), chunks);
   const entities = parseEntities(insight.entities_json);
   const entityRows = Object.entries(entities).filter(([, values]) => Array.isArray(values) && values.length).flatMap(([group, values]) => values.slice(0, 12).map((value) => [group, value]));
