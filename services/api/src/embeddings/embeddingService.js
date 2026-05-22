@@ -1,24 +1,13 @@
 import crypto from 'node:crypto';
 import { listExtractedFiles, listFileEmbeddings } from '../db/client.js';
+import {
+  DEFAULT_EMBEDDING_MODEL,
+  createEmbeddingProvider,
+  createLocalTokenEmbeddingProvider,
+  tokenizeForEmbedding,
+} from './embeddingProviders.js';
 
-const MODEL_NAME = 'everythingai-local-token-v1';
-const DIMENSIONS = 256;
-
-export function tokenizeForEmbedding(text) {
-  return (text || '')
-    .toLowerCase()
-    .match(/[a-z0-9]+/g)
-    ?.filter((token) => token.length > 2) || [];
-}
-
-function hashToken(token) {
-  let hash = 2166136261;
-  for (let i = 0; i < token.length; i += 1) {
-    hash ^= token.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return Math.abs(hash) % DIMENSIONS;
-}
+const MODEL_NAME = DEFAULT_EMBEDDING_MODEL;
 
 function hashEmbeddingSource(text) {
   return crypto.createHash('sha256').update(text || '').digest('hex');
@@ -69,22 +58,36 @@ function upsertFileEmbeddingWithSourceHash(db, embedding) {
   `).run(embedding);
 }
 
-export function embedText(text) {
-  const vector = new Array(DIMENSIONS).fill(0);
-  const tokens = tokenizeForEmbedding(text);
+export { tokenizeForEmbedding };
 
-  for (const token of tokens) {
-    vector[hashToken(token)] += 1;
+export async function embedText(text, { provider } = {}) {
+  const embeddingProvider = createEmbeddingProvider(provider);
+  return embeddingProvider.embed(text);
+}
+
+export function embedTextSync(text) {
+  const provider = createLocalTokenEmbeddingProvider();
+  let result;
+  provider.embed(text).then((embedding) => { result = embedding; });
+  if (!result) {
+    const tokens = tokenizeForEmbedding(text);
+    const vector = new Array(provider.dimensions).fill(0);
+    for (const token of tokens) {
+      let hash = 2166136261;
+      for (let i = 0; i < token.length; i += 1) {
+        hash ^= token.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      vector[Math.abs(hash) % provider.dimensions] += 1;
+    }
+    const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
+    return {
+      model: provider.model,
+      vector: magnitude ? vector.map((value) => value / magnitude) : vector,
+      tokenCount: tokens.length,
+    };
   }
-
-  const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
-  const normalized = magnitude ? vector.map((value) => value / magnitude) : vector;
-
-  return {
-    model: MODEL_NAME,
-    vector: normalized,
-    tokenCount: tokens.length,
-  };
+  return result;
 }
 
 export function cosineSimilarity(a, b) {
@@ -95,9 +98,10 @@ export function cosineSimilarity(a, b) {
   return dot;
 }
 
-export function generateEmbeddings(db, { fileId, limit = 1000, force = false } = {}) {
+export async function generateEmbeddings(db, { fileId, limit = 1000, force = false, provider } = {}) {
   ensureEmbeddingSourceHashColumn(db);
 
+  const embeddingProvider = createEmbeddingProvider(provider);
   const files = listExtractedFiles(db, { fileId, limit });
   const generatedAt = new Date().toISOString();
   const results = [];
@@ -108,12 +112,12 @@ export function generateEmbeddings(db, { fileId, limit = 1000, force = false } =
     const sourceHash = hashEmbeddingSource(sourceText);
     const existing = getExistingEmbedding(db, file.id);
 
-    if (!force && existing?.embedding_model === MODEL_NAME && existing.source_hash === sourceHash) {
+    if (!force && existing?.embedding_model === embeddingProvider.model && existing.source_hash === sourceHash) {
       skipped.push({ fileId: file.id, filename: file.filename, reason: 'unchanged' });
       continue;
     }
 
-    const embedding = embedText(sourceText);
+    const embedding = await embeddingProvider.embed(sourceText);
     const record = {
       file_id: file.id,
       embedding_model: embedding.model,
@@ -128,7 +132,7 @@ export function generateEmbeddings(db, { fileId, limit = 1000, force = false } =
   }
 
   return {
-    embedding_model: MODEL_NAME,
+    embedding_model: embeddingProvider.model,
     generated: results.length,
     skipped_unchanged: skipped.length,
     results,
@@ -137,7 +141,7 @@ export function generateEmbeddings(db, { fileId, limit = 1000, force = false } =
 }
 
 export function searchEmbeddings(db, { query, limit = 10 } = {}) {
-  const queryEmbedding = embedText(query);
+  const queryEmbedding = embedTextSync(query);
   const embeddings = listFileEmbeddings(db, { limit: 1000 });
 
   return embeddings
@@ -154,3 +158,5 @@ export function searchEmbeddings(db, { query, limit = 10 } = {}) {
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 }
+
+export { MODEL_NAME };
