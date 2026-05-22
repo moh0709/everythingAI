@@ -251,7 +251,7 @@ export function getIndexedFileById(db, fileId) {
 }
 
 export function listFilesForExtraction(db, { limit = 100, fileId } = {}) {
-  const clauses = ['f.index_status = \'indexed\''];
+  const clauses = ["f.index_status = 'indexed'"];
   const params = { limit };
 
   if (fileId) {
