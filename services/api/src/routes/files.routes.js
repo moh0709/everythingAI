@@ -10,6 +10,7 @@ import {
   getIndexedFileById,
 } from '../db/client.js';
 import { scanFolder } from '../indexer/fileScanner.js';
+import { createSkipUnchanged } from '../indexer/skipUnchanged.js';
 import { extractIndexedFiles } from '../extractors/extractionRunner.js';
 import { runKnowledgeIngestionPipeline } from '../automation/localPipeline.js';
 import { runJob } from '../jobs/jobRunner.js';
@@ -136,6 +137,7 @@ export function createFilesRouter() {
       const insertRecord = db.transaction((record) => upsertIndexedFile(db, record));
       const result = await scanFolder(folderPath, {
         onRecord: (record) => insertRecord(record),
+        shouldSkipUnchanged: createSkipUnchanged(db),
       });
       const automation = {
         enabled: req.body?.auto !== false,
