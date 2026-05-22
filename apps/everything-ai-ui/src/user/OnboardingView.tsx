@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, FolderOpen, Server, Sparkles } from 'lucide-react';
 import type { SetupStep } from './types';
-import type { ScanReport } from '../UserApp';
+import type { ScanReport, WatcherStatusPayload } from '../UserApp';
 import './localSettingsHelp.css';
 
 type OnboardingViewProps = {
@@ -10,6 +10,7 @@ type OnboardingViewProps = {
   status: string;
   setupSteps: SetupStep[];
   scanReport: ScanReport | null;
+  watcherStatus: WatcherStatusPayload | null;
   folderPath: string;
   setFolderPath: React.Dispatch<React.SetStateAction<string>>;
   baseUrl: string;
@@ -18,6 +19,9 @@ type OnboardingViewProps = {
   setToken: React.Dispatch<React.SetStateAction<string>>;
   selectFolder: () => void;
   buildKnowledgeWorkspace: (pathOverride?: string) => void;
+  startWatcher: (pathOverride?: string) => void;
+  stopWatcher: (pathOverride?: string) => void;
+  refreshWatcherStatus: () => void;
   saveConnection: () => void;
 };
 
@@ -25,13 +29,18 @@ function count(value: number | undefined) {
   return Number.isFinite(value) ? value : 0;
 }
 
+function yesNo(value: boolean | undefined) {
+  return value ? 'Yes' : 'No';
+}
+
 export function OnboardingView({
-  error, busy, status, setupSteps, scanReport, folderPath, setFolderPath,
+  error, busy, status, setupSteps, scanReport, watcherStatus, folderPath, setFolderPath,
   baseUrl, setBaseUrl, token, setToken,
-  selectFolder, buildKnowledgeWorkspace, saveConnection,
+  selectFolder, buildKnowledgeWorkspace, startWatcher, stopWatcher, refreshWatcherStatus, saveConnection,
 }: OnboardingViewProps) {
   const skippedPreview = scanReport?.skippedReasons?.slice(0, 5) || [];
   const failedPreview = scanReport?.failedItems?.slice(0, 5) || [];
+  const watchers = watcherStatus?.watchers || [];
 
   return <>
     <section className="hero-row">
@@ -90,6 +99,34 @@ export function OnboardingView({
         </div>}
       </div>}
     </section>}
+
+    <section className="panel">
+      <div className="panel-title">
+        <div>
+          <h2>Watcher Status</h2>
+          <p>Monitor the selected folder for changes and keep the local knowledge workspace updated.</p>
+        </div>
+        <div className="hero-actions">
+          <button className="outline" onClick={() => refreshWatcherStatus()} disabled={busy}>Refresh</button>
+          <button className="outline" onClick={() => stopWatcher()} disabled={busy || !folderPath.trim()}>Stop</button>
+          <button className="purple" onClick={() => startWatcher()} disabled={busy || !folderPath.trim()}>Start Watcher</button>
+        </div>
+      </div>
+      <div className="source-list compact-source-list">
+        <div className="source-card"><strong>{watcherStatus?.active || 0}</strong><p>Active watchers</p></div>
+        <div className="source-card"><strong>{watchers.some((watcher) => watcher.running) ? 'Yes' : 'No'}</strong><p>Running now</p></div>
+        <div className="source-card"><strong>{watchers.some((watcher) => watcher.pending) ? 'Yes' : 'No'}</strong><p>Pending rerun</p></div>
+        <div className="source-card"><strong>{watchers.some((watcher) => watcher.scheduled) ? 'Yes' : 'No'}</strong><p>Scheduled</p></div>
+      </div>
+      {watchers.length > 0 && <div className="settings-help-grid">
+        {watchers.map((watcher) => <div key={watcher.id}>
+          <strong>{watcher.status} watcher</strong>
+          <p><code>{watcher.rootPath}</code></p>
+          <p>Running: {yesNo(watcher.running)} · Pending: {yesNo(watcher.pending)} · Scheduled: {yesNo(watcher.scheduled)}</p>
+          <p>Debounce: {watcher.debounceMs || 0} ms · Last cycle: {watcher.lastCycleAt || 'Not yet'}</p>
+        </div>)}
+      </div>}
+    </section>
 
     <section className="panel">
       <div className="panel-title">
