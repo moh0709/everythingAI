@@ -60,34 +60,19 @@ function upsertFileEmbeddingWithSourceHash(db, embedding) {
 
 export { tokenizeForEmbedding };
 
-export async function embedText(text, { provider } = {}) {
+export function embedText(text, { provider } = {}) {
   const embeddingProvider = createEmbeddingProvider(provider);
-  return embeddingProvider.embed(text);
+  const embedding = embeddingProvider.embed(text);
+
+  if (embedding?.then) {
+    throw new Error('Asynchronous embedding providers are not supported by generateEmbeddings yet. Use a synchronous provider adapter for the local MVP.');
+  }
+
+  return embedding;
 }
 
 export function embedTextSync(text) {
-  const provider = createLocalTokenEmbeddingProvider();
-  let result;
-  provider.embed(text).then((embedding) => { result = embedding; });
-  if (!result) {
-    const tokens = tokenizeForEmbedding(text);
-    const vector = new Array(provider.dimensions).fill(0);
-    for (const token of tokens) {
-      let hash = 2166136261;
-      for (let i = 0; i < token.length; i += 1) {
-        hash ^= token.charCodeAt(i);
-        hash = Math.imul(hash, 16777619);
-      }
-      vector[Math.abs(hash) % provider.dimensions] += 1;
-    }
-    const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
-    return {
-      model: provider.model,
-      vector: magnitude ? vector.map((value) => value / magnitude) : vector,
-      tokenCount: tokens.length,
-    };
-  }
-  return result;
+  return createLocalTokenEmbeddingProvider().embed(text);
 }
 
 export function cosineSimilarity(a, b) {
@@ -98,7 +83,7 @@ export function cosineSimilarity(a, b) {
   return dot;
 }
 
-export async function generateEmbeddings(db, { fileId, limit = 1000, force = false, provider } = {}) {
+export function generateEmbeddings(db, { fileId, limit = 1000, force = false, provider } = {}) {
   ensureEmbeddingSourceHashColumn(db);
 
   const embeddingProvider = createEmbeddingProvider(provider);
@@ -117,7 +102,12 @@ export async function generateEmbeddings(db, { fileId, limit = 1000, force = fal
       continue;
     }
 
-    const embedding = await embeddingProvider.embed(sourceText);
+    const embedding = embeddingProvider.embed(sourceText);
+
+    if (embedding?.then) {
+      throw new Error('Asynchronous embedding providers are not supported by generateEmbeddings yet. Use a synchronous provider adapter for the local MVP.');
+    }
+
     const record = {
       file_id: file.id,
       embedding_model: embedding.model,
