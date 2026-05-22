@@ -22,7 +22,7 @@ export function createLocalTokenEmbeddingProvider() {
     id: 'local-token',
     model: LOCAL_MODEL_NAME,
     dimensions: LOCAL_DIMENSIONS,
-    async embed(text) {
+    embed(text) {
       const vector = new Array(LOCAL_DIMENSIONS).fill(0);
       const tokens = tokenizeForEmbedding(text);
 
