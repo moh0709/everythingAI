@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, FolderOpen, Server, Sparkles } from 'lucide-react';
 import type { SetupStep } from './types';
+import type { ScanReport } from '../UserApp';
 import './localSettingsHelp.css';
 
 type OnboardingViewProps = {
@@ -8,6 +9,7 @@ type OnboardingViewProps = {
   busy: boolean;
   status: string;
   setupSteps: SetupStep[];
+  scanReport: ScanReport | null;
   folderPath: string;
   setFolderPath: React.Dispatch<React.SetStateAction<string>>;
   baseUrl: string;
@@ -19,11 +21,18 @@ type OnboardingViewProps = {
   saveConnection: () => void;
 };
 
+function count(value: number | undefined) {
+  return Number.isFinite(value) ? value : 0;
+}
+
 export function OnboardingView({
-  error, busy, status, setupSteps, folderPath, setFolderPath,
+  error, busy, status, setupSteps, scanReport, folderPath, setFolderPath,
   baseUrl, setBaseUrl, token, setToken,
   selectFolder, buildKnowledgeWorkspace, saveConnection,
 }: OnboardingViewProps) {
+  const skippedPreview = scanReport?.skippedReasons?.slice(0, 5) || [];
+  const failedPreview = scanReport?.failedItems?.slice(0, 5) || [];
+
   return <>
     <section className="hero-row">
       <div>
@@ -53,6 +62,34 @@ export function OnboardingView({
         </div>)}
       </div>
     </section>
+
+    {scanReport && <section className="panel">
+      <div className="panel-title">
+        <div>
+          <h2>Scan Report</h2>
+          <p>{scanReport.rootPath ? `Latest scan: ${scanReport.rootPath}` : 'Latest scan result from the selected folder.'}</p>
+        </div>
+      </div>
+      <div className="source-list compact-source-list">
+        <div className="source-card"><strong>{count(scanReport.indexed)}</strong><p>Indexed</p></div>
+        <div className="source-card"><strong>{count(scanReport.skipped)}</strong><p>Skipped</p></div>
+        <div className="source-card"><strong>{count(scanReport.skipped_unchanged)}</strong><p>Unchanged</p></div>
+        <div className="source-card"><strong>{count(scanReport.skipped_large)}</strong><p>Too large</p></div>
+        <div className="source-card"><strong>{count(scanReport.skipped_excluded)}</strong><p>Excluded</p></div>
+        <div className="source-card"><strong>{count(scanReport.failed)}</strong><p>Failed</p></div>
+      </div>
+
+      {(skippedPreview.length > 0 || failedPreview.length > 0) && <div className="settings-help-grid">
+        {skippedPreview.length > 0 && <div>
+          <strong>Skipped examples</strong>
+          {skippedPreview.map((item, index) => <p key={`${item.path}-${index}`}><code>{item.reason}</code> {item.message || item.path}</p>)}
+        </div>}
+        {failedPreview.length > 0 && <div>
+          <strong>Failed examples</strong>
+          {failedPreview.map((item, index) => <p key={`${item.path}-${index}`}><code>{item.type || 'file'}</code> {item.message || item.path}</p>)}
+        </div>}
+      </div>}
+    </section>}
 
     <section className="panel">
       <div className="panel-title">
