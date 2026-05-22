@@ -80,7 +80,7 @@ Validation result:
 Date: 2026-05-21
 Windows local UI smoke test: PASS
 Backend command: cd E:\01PROJEKTER\EverythingAI\services\api && npm test
-Backend result: 81 tests / 81 passed / 0 failed
+Backend result: 82 tests / 82 passed / 0 failed
 Frontend typecheck: PASS
 Frontend production build: PASS
 ```
@@ -93,11 +93,12 @@ docs/VALIDATION_2026-05-21_WINDOWS_LOCAL_UI_SMOKE_PASS.md
 docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_SCHEMA_REPAIR.md
 docs/VALIDATION_2026-05-21_FULL_LOCAL_MVP_BASELINE.md
 docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_NESTED_UNDO.md
+docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_SKIP_UNCHANGED.md
 ```
 
 ### Phase 2 — Scanner optimization
 
-Status: in progress
+Status: in progress / persisted unchanged-file skip validated
 
 Tasks:
 
@@ -106,8 +107,17 @@ Tasks:
 - [x] Add configurable exclude extensions
 - [x] Track skipped reasons
 - [x] Add progress callback support
-- [ ] Add persisted unchanged-file skip strategy
+- [x] Add persisted unchanged-file skip strategy
 - [ ] Add clearer scan report in UI
+
+Validation note:
+
+```text
+Date: 2026-05-21
+Backend tests passed 82/82 after adding persisted unchanged-file scan skip coverage.
+The scanner now skips files when persisted size and modified_at are unchanged and re-indexes changed files.
+The API index route and watcher scan cycle both use the persisted unchanged-file skip strategy.
+```
 
 ### Phase 3 — Watcher optimization
 
@@ -240,6 +250,7 @@ Tasks:
 - [x] Update Windows smoke test after local tests
 - [x] Add validation notes for Windows schema-drift repair, Windows local UI smoke pass, backend tests, and full local MVP baseline
 - [x] Add validation note for nested undo regression test pass
+- [x] Add validation note for persisted unchanged-file scan skip pass
 
 ## Latest validation results
 
@@ -255,7 +266,7 @@ Result: PASS
 Backend:
 cd E:\01PROJEKTER\EverythingAI\services\api
 npm test
-Result: 81 tests / 81 passed / 0 failed
+Result: 82 tests / 82 passed / 0 failed
 
 Frontend:
 cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
@@ -315,7 +326,7 @@ EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT=4000
 
 The local MVP is finalized when:
 
-1. `npm test` passes locally after latest changes. Current result: PASS, 81/81.
+1. `npm test` passes locally after latest changes. Current result: PASS, 82/82.
 2. `npm run typecheck` passes in `apps/everything-ai-ui`. Current result: PASS.
 3. `npm run build` passes in `apps/everything-ai-ui`. Current result: PASS.
 4. A safe Windows folder can be indexed without errors. Current result: smoke-tested through user UI.
