@@ -9,6 +9,7 @@ import { useFileDocumentState } from './user/useFileDocumentState';
 import { useFileDocumentWorkflows } from './user/useFileDocumentWorkflows';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
+import { useWatcherControls } from './user/useWatcherControls';
 import { useWikiState } from './user/useWikiState';
 import { useWikiWorkflows } from './user/useWikiWorkflows';
 import { WikiView } from './user/WikiView';
@@ -27,23 +28,6 @@ export type ScanReport = {
   skipped_excluded?: number;
   skippedReasons?: Array<{ reason: string; path: string; message?: string | null }>;
   failedItems?: Array<{ type?: string; path: string; message?: string | null }>;
-};
-
-export type WatcherStatus = {
-  id: string;
-  rootPath: string;
-  status: string;
-  running?: boolean;
-  pending?: boolean;
-  scheduled?: boolean;
-  debounceMs?: number;
-  lastCycleAt?: string | null;
-  lastJob?: { id?: string; status?: string; type?: string } | null;
-};
-
-export type WatcherStatusPayload = {
-  active: number;
-  watchers: WatcherStatus[];
 };
 
 export function UserApp() {
@@ -95,7 +79,6 @@ export function UserApp() {
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
   const [scanReport, setScanReport] = useState<ScanReport | null>(null);
-  const [watcherStatus, setWatcherStatus] = useState<WatcherStatusPayload | null>(null);
 
   const { refreshFiles, searchEverything, loadDocumentContext, revealSourceFile } = useFileDocumentWorkflows({
     options,
@@ -119,44 +102,17 @@ export function UserApp() {
     setView,
   });
 
+  const { watcherStatus, refreshWatcherStatus, startWatcher, stopWatcher } = useWatcherControls({
+    options,
+    folderPath,
+    run,
+    setStatus,
+    setError,
+  });
+
   function saveConnection() {
     saveConnectionSettings();
     setStatus('Connection settings saved.');
-  }
-
-  async function refreshWatcherStatus(showStatus = true) {
-    const payload = await apiRequest<WatcherStatusPayload>(options, '/api/watch/status');
-    setWatcherStatus(payload);
-    if (showStatus) setStatus(`Watcher status refreshed: ${payload.active} active watcher(s).`);
-    return payload;
-  }
-
-  async function startWatcher(pathOverride = folderPath) {
-    const normalized = pathOverride.trim();
-    if (!normalized) {
-      setError('Select or enter a folder path first.');
-      return;
-    }
-
-    await run('Starting folder watcher...', async () => {
-      await apiRequest(options, '/api/watch', { folderPath: normalized, extract: true, auto: true }, 'POST');
-      await refreshWatcherStatus(false);
-      setStatus(`Watcher started for: ${normalized}`);
-    });
-  }
-
-  async function stopWatcher(pathOverride = folderPath) {
-    const normalized = pathOverride.trim();
-    if (!normalized) {
-      setError('Select or enter a folder path first.');
-      return;
-    }
-
-    await run('Stopping folder watcher...', async () => {
-      await apiRequest(options, '/api/unwatch', { folderPath: normalized }, 'POST');
-      await refreshWatcherStatus(false);
-      setStatus(`Watcher stopped for: ${normalized}`);
-    });
   }
 
   async function selectFolder() {
