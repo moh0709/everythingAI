@@ -1,0 +1,159 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Local MVP 88-Test Baseline Handover",
+    "version": "2026-05-21.1",
+    "date": "2026-05-21",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "executive_summary": {
+      "current_identity": "EverythingAI is a local-first, source-backed AI knowledge workspace for indexing local files, extracting document text, searching, chatting, generating controlled Wiki pages, and safely preparing file organization workflows.",
+      "current_baseline": "The local MVP is green at 88 backend tests passed, with frontend typecheck/build validated after the latest UI additions before the Wiki content-control pass.",
+      "strategic_shift": "The Wiki/knowledge layer is now explicitly content-controlled: document body content must come from extracted source text, not from AI summaries or weak metadata.",
+      "pm_status": "Phases 1, 2, 3, 4, and 5 are complete/validated for the local MVP baseline. Remaining work is mainly Phase 6 controlled frontend modularization and Phase 7 final documentation polish."
+    },
+    "validated_baseline": {
+      "backend": {
+        "command": "cd E:\\01PROJEKTER\\EverythingAI\\services\\api && npm test",
+        "result": {
+          "tests": 88,
+          "pass": 88,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "latest_duration_ms": 3096.902
+      },
+      "frontend": {
+        "latest_validated_commands": [
+          "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && npm run typecheck",
+          "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && npm run build"
+        ],
+        "latest_build_observation": "1533 modules transformed; build passed after watcher status UI changes."
+      },
+      "runtime_smoke": {
+        "windows_local_ui": "PASS from previous local smoke validation",
+        "official_user_ui": "http://localhost:5151",
+        "admin_operator_ui": "http://localhost:5152/admin.html",
+        "start_script": "E:\\01PROJEKTER\\EverythingAI\\start_all_debug.bat"
+      }
+    },
+    "completed_phases": {
+      "phase_1_stabilization": {
+        "status": "complete / validated",
+        "highlights": [
+          "Route modularization",
+          "Request helper validation",
+          "Local MVP vs central platform documentation",
+          "Windows smoke test guide",
+          "Wiki schema drift repair",
+          "Startup schema repair before dev/start"
+        ]
+      },
+      "phase_2_scanner_optimization": {
+        "status": "complete / validated",
+        "highlights": [
+          "Configurable max file size",
+          "Configurable exclude names/extensions",
+          "Skipped reasons",
+          "Progress callback support",
+          "Persisted unchanged-file skip strategy",
+          "Start screen scan report UI"
+        ]
+      },
+      "phase_3_watcher_optimization": {
+        "status": "complete / validated",
+        "highlights": [
+          "Debounce",
+          "Prevent overlapping rescans",
+          "Queued pending rerun handling",
+          "Correct watcher database path handling",
+          "Rapid-change watcher stress test",
+          "Watcher status route and Start screen status panel"
+        ]
+      },
+      "phase_4_extraction_embedding_optimization": {
+        "status": "complete / validated",
+        "highlights": [
+          "Skip unchanged extractions by default",
+          "Force extraction option internally",
+          "Embedding skip for unchanged extracted text",
+          "Future embedding provider interface",
+          "PDF/page metadata support in Wiki source chunks",
+          "Content-controlled Wiki generation"
+        ]
+      },
+      "phase_5_safety_hardening": {
+        "status": "complete / validated",
+        "highlights": [
+          "Delete actions disabled",
+          "Move/rename behind preview and approval",
+          "Filesystem execution validation",
+          "Failed execution audit",
+          "Reveal-source-file route",
+          "Nested undo regression",
+          "Recovery/trash/restore visibility protection"
+        ]
+      }
+    },
+    "latest_content_control_rule": {
+      "rule": "Document body content in Wiki pages must come from extracted source text, not AI summaries.",
+      "fallback_message": "No source-backed extracted document content is available yet.",
+      "validated_tests": [
+        "wiki file pages do not use AI summaries as source-backed document body",
+        "wiki file pages populate document body from extracted source text when available"
+      ],
+      "implementation_files": [
+        "services/api/src/knowledge/contentControl.js",
+        "services/api/src/knowledge/knowledgeService.js",
+        "services/api/test/wikiContentControl.test.js"
+      ]
+    },
+    "important_recent_repair": {
+      "context": "While wiring PDF/page metadata, services/api/src/db/client.js was temporarily replaced with a version that dropped compatibility exports and broke tests.",
+      "repair_commits": [
+        "96a5fcd Restore DB client compatibility exports",
+        "05a77f5 Respect includeTrashed in keyword search service",
+        "9453e5a Restore duplicate group listing export"
+      ],
+      "current_result": "Backend is green again at 88/88."
+    },
+    "future_product_track": {
+      "title": "AI Organization Workspace / Managed Knowledge Archive",
+      "issue": "#21",
+      "design_doc": "docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md",
+      "status": "captured as future track; not part of current local MVP finalization",
+      "principle": "Source folder is read-only intake; organized archive is a generated copy; originals remain untouched unless explicitly approved."
+    },
+    "remaining_work": {
+      "phase_6_ui_polish_modularization": {
+        "status": "remaining",
+        "recommendation": "Only perform small controlled UserApp responsibility extraction. Do not combine UX changes and workflow extraction in the same commit. Avoid broad refactor while MVP is green."
+      },
+      "phase_7_documentation_finalization": {
+        "status": "remaining / current PM priority",
+        "recommendation": "Finalize README, MVP plan, known limitations, and final validation summary around the 88-test baseline."
+      }
+    },
+    "recommended_next_action": {
+      "pm_decision": "Do not add more runtime features immediately. Preserve the 88/88 baseline and finish final MVP documentation/handover.",
+      "next_steps": [
+        "Record final 88-test validation summary",
+        "Update/open ticket comments with current baseline",
+        "Update README or final local MVP status doc",
+        "Optionally run frontend typecheck/build one final time after docs-only work is complete"
+      ]
+    },
+    "do_not_do_next": [
+      "Do not start full enterprise governance tickets as MVP work.",
+      "Do not implement the AI Organization Workspace yet unless explicitly selected as the next product track.",
+      "Do not perform broad UserApp refactoring while the runtime baseline is green.",
+      "Do not let AI summaries populate source-backed document body content."
+    ]
+  }
+}
