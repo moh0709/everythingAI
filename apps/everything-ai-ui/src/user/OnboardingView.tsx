@@ -1,7 +1,8 @@
 import React from 'react';
 import { CheckCircle2, FolderOpen, Server, Sparkles } from 'lucide-react';
 import type { SetupStep } from './types';
-import type { ScanReport, WatcherStatusPayload } from '../UserApp';
+import type { ScanReport } from '../UserApp';
+import type { WatcherStatusPayload } from './useWatcherControls';
 import './localSettingsHelp.css';
 
 type OnboardingViewProps = {
