@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
 import type { IndexedFile } from './api';
+import type { ScanReport } from './user/scanReportTypes';
 import type { UserView, WikiPayload, WikiPage } from './user/types';
 import { useAskState } from './user/useAskState';
 import { useConnectionSettings } from './user/useConnectionSettings';
@@ -16,19 +17,6 @@ import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
 import { OnboardingView } from './user/OnboardingView';
-
-export type ScanReport = {
-  rootPath?: string;
-  scanned?: number;
-  indexed?: number;
-  failed?: number;
-  skipped?: number;
-  skipped_unchanged?: number;
-  skipped_large?: number;
-  skipped_excluded?: number;
-  skippedReasons?: Array<{ reason: string; path: string; message?: string | null }>;
-  failedItems?: Array<{ type?: string; path: string; message?: string | null }>;
-};
 
 export function UserApp() {
   const {
