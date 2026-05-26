@@ -73,7 +73,7 @@ export function UserApp() {
   const [query, setQuery] = useState('');
   const [scanReport, setScanReport] = useState<ScanReport | null>(null);
 
-  const { refreshFiles, searchEverything, loadDocumentContext, revealSourceFile } = useFileDocumentWorkflows({
+  const { refreshFiles, searchEverything, loadDocumentContext: loadDocumentContextWorkflow, revealSourceFile } = useFileDocumentWorkflows({
     options,
     query,
     selectedFileId,
@@ -149,7 +149,7 @@ export function UserApp() {
 
       const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
       loadFiles(payload.files || []);
-      if (payload.files?.[0]) await loadDocumentContext(payload.files[0].id, false);
+      if (payload.files?.[0]) await loadDocumentContextWorkflow(payload.files[0].id, false);
 
       markStep('ready', 'done');
       setView('wiki');
@@ -177,12 +177,13 @@ export function UserApp() {
 
   const { askAboutWikiPage } = useWikiPageActions({ selectedWikiPage, askQuestion });
 
-  const { openWikiPage, openAskView, handleAskFromHero } = useUserNavigation({
+  const { openWikiPage, openAskView, handleAskFromHero, openSourceContext } = useUserNavigation({
     query,
     setView,
     selectWikiPage,
     focusChatInput,
     askQuestion,
+    loadDocumentContext: loadDocumentContextWorkflow,
   });
 
   return <div className={`app ${readingMode ? 'wiki-reading-mode-active' : ''}`}>
@@ -215,7 +216,7 @@ export function UserApp() {
         refreshFiles={refreshFiles}
         searchEverything={searchEverything}
         handleAskFromHero={handleAskFromHero}
-        loadDocumentContext={(fileId) => loadDocumentContext(fileId)}
+        loadDocumentContext={(fileId) => loadDocumentContextWorkflow(fileId)}
         saveConnection={saveConnection}
       />}
 
@@ -230,7 +231,7 @@ export function UserApp() {
         openWikiPage={openWikiPage}
         askAboutWikiPage={askAboutWikiPage}
         revealSourceFile={revealSourceFile}
-        openSourceContext={(fileId) => { setView('explore'); loadDocumentContext(fileId); }}
+        openSourceContext={openSourceContext}
         handleCitationClick={handleCitationClick}
       />}
 
