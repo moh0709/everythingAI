@@ -5,6 +5,7 @@ import type { IndexedFile } from './api';
 import type { ScanReport } from './user/scanReportTypes';
 import type { UserView, WikiPayload, WikiPage } from './user/types';
 import { useAskState } from './user/useAskState';
+import { useConnectionActions } from './user/useConnectionActions';
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useFileDocumentState } from './user/useFileDocumentState';
 import { useFileDocumentWorkflows } from './user/useFileDocumentWorkflows';
@@ -107,10 +108,10 @@ export function UserApp() {
     setStatus,
   });
 
-  function saveConnection() {
-    saveConnectionSettings();
-    setStatus('Connection settings saved.');
-  }
+  const { saveConnection } = useConnectionActions({
+    saveConnectionSettings,
+    setStatus,
+  });
 
   async function buildKnowledgeWorkspace(pathOverride = folderPath) {
     const normalized = pathOverride.trim();
