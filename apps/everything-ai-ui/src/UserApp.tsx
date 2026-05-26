@@ -12,6 +12,7 @@ import { useFolderSelection } from './user/useFolderSelection';
 import { useInitialUserAppRefresh } from './user/useInitialUserAppRefresh';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
+import { useUserNavigation } from './user/useUserNavigation';
 import { useWatcherControls } from './user/useWatcherControls';
 import { useWikiState } from './user/useWikiState';
 import { useWikiWorkflows } from './user/useWikiWorkflows';
@@ -178,24 +179,13 @@ export function UserApp() {
     askQuestion(`Explain the wiki page "${page.title}" and cite the relevant source documents.`);
   }
 
-  function openWikiPage(pageId: string) {
-    selectWikiPage(pageId);
-    setView('wiki');
-  }
-
-  function openAskView() {
-    setView('ask');
-    setTimeout(focusChatInput, 0);
-  }
-
-  function handleAskFromHero() {
-    const question = query.trim();
-    if (question) {
-      askQuestion(question);
-      return;
-    }
-    openAskView();
-  }
+  const { openWikiPage, openAskView, handleAskFromHero } = useUserNavigation({
+    query,
+    setView,
+    selectWikiPage,
+    focusChatInput,
+    askQuestion,
+  });
 
   return <div className={`app ${readingMode ? 'wiki-reading-mode-active' : ''}`}>
     <UserTopNav view={view} setView={setView} openAskView={openAskView} />
