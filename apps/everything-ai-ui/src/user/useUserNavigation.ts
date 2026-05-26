@@ -6,9 +6,10 @@ type UseUserNavigationArgs = {
   selectWikiPage: (pageId: string) => void;
   focusChatInput: () => void;
   askQuestion: (questionText?: string) => void | Promise<void>;
+  loadDocumentContext: (fileId: string) => void | Promise<void>;
 };
 
-export function useUserNavigation({ query, setView, selectWikiPage, focusChatInput, askQuestion }: UseUserNavigationArgs) {
+export function useUserNavigation({ query, setView, selectWikiPage, focusChatInput, askQuestion, loadDocumentContext }: UseUserNavigationArgs) {
   function openWikiPage(pageId: string) {
     selectWikiPage(pageId);
     setView('wiki');
@@ -28,9 +29,15 @@ export function useUserNavigation({ query, setView, selectWikiPage, focusChatInp
     openAskView();
   }
 
+  function openSourceContext(fileId: string) {
+    setView('explore');
+    loadDocumentContext(fileId);
+  }
+
   return {
     openWikiPage,
     openAskView,
     handleAskFromHero,
+    openSourceContext,
   };
 }
