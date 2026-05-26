@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { apiRequest } from './api';
 import type { IndexedFile } from './api';
 import type { ScanReport } from './user/scanReportTypes';
-import type { UserView, WikiPayload, WikiPage } from './user/types';
+import type { UserView, WikiPayload } from './user/types';
 import { useAskState } from './user/useAskState';
 import { useConnectionActions } from './user/useConnectionActions';
 import { useConnectionSettings } from './user/useConnectionSettings';
@@ -14,6 +14,7 @@ import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
 import { useUserNavigation } from './user/useUserNavigation';
 import { useWatcherControls } from './user/useWatcherControls';
+import { useWikiPageActions } from './user/useWikiPageActions';
 import { useWikiState } from './user/useWikiState';
 import { useWikiWorkflows } from './user/useWikiWorkflows';
 import { UserTopNav } from './user/UserTopNav';
@@ -174,10 +175,7 @@ export function UserApp() {
     focusChatInput();
   }
 
-  function askAboutWikiPage(page: WikiPage | undefined = selectedWikiPage) {
-    if (!page) return;
-    askQuestion(`Explain the wiki page "${page.title}" and cite the relevant source documents.`);
-  }
+  const { askAboutWikiPage } = useWikiPageActions({ selectedWikiPage, askQuestion });
 
   const { openWikiPage, openAskView, handleAskFromHero } = useUserNavigation({
     query,
