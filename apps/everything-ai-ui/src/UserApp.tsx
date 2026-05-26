@@ -8,6 +8,7 @@ import { useAskState } from './user/useAskState';
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useFileDocumentState } from './user/useFileDocumentState';
 import { useFileDocumentWorkflows } from './user/useFileDocumentWorkflows';
+import { useFolderSelection } from './user/useFolderSelection';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
 import { useWatcherControls } from './user/useWatcherControls';
@@ -98,25 +99,17 @@ export function UserApp() {
     setError,
   });
 
+  const { selectFolder } = useFolderSelection({
+    options,
+    run,
+    markStep,
+    setFolderPath,
+    setStatus,
+  });
+
   function saveConnection() {
     saveConnectionSettings();
     setStatus('Connection settings saved.');
-  }
-
-  async function selectFolder() {
-    await run('Opening folder picker...', async () => {
-      markStep('folder', 'working');
-      const result = await apiRequest<{ folderPath?: string; cancelled?: boolean }>(options, '/api/select-folder', {}, 'POST');
-      if (result.cancelled || !result.folderPath) {
-        markStep('folder', 'waiting');
-        setStatus('Folder selection cancelled.');
-        return;
-      }
-      setFolderPath(result.folderPath);
-      localStorage.setItem('everythingai.ui.folderPath', result.folderPath);
-      markStep('folder', 'done');
-      setStatus(`Folder selected: ${result.folderPath}`);
-    });
   }
 
   async function buildKnowledgeWorkspace(pathOverride = folderPath) {
