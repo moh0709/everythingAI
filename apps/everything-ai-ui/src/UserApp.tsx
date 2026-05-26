@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
 import type { IndexedFile } from './api';
@@ -10,6 +10,7 @@ import { useConnectionSettings } from './user/useConnectionSettings';
 import { useFileDocumentState } from './user/useFileDocumentState';
 import { useFileDocumentWorkflows } from './user/useFileDocumentWorkflows';
 import { useFolderSelection } from './user/useFolderSelection';
+import { useInitialUserAppRefresh } from './user/useInitialUserAppRefresh';
 import { useSetupProgress } from './user/useSetupProgress';
 import { useUserActionRunner } from './user/useUserActionRunner';
 import { useWatcherControls } from './user/useWatcherControls';
@@ -113,6 +114,8 @@ export function UserApp() {
     setStatus,
   });
 
+  useInitialUserAppRefresh({ refreshFiles, refreshWiki, refreshWatcherStatus });
+
   async function buildKnowledgeWorkspace(pathOverride = folderPath) {
     const normalized = pathOverride.trim();
     if (!normalized) {
@@ -193,13 +196,6 @@ export function UserApp() {
     }
     openAskView();
   }
-
-  useEffect(() => {
-    refreshFiles().catch(() => undefined);
-    refreshWiki().catch(() => undefined);
-    refreshWatcherStatus(false).catch(() => undefined);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return <div className={`app ${readingMode ? 'wiki-reading-mode-active' : ''}`}>
     <header className="top-nav">
