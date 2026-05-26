@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Brain } from 'lucide-react';
 import { apiRequest } from './api';
 import type { IndexedFile } from './api';
 import type { ScanReport } from './user/scanReportTypes';
@@ -16,6 +15,7 @@ import { useUserActionRunner } from './user/useUserActionRunner';
 import { useWatcherControls } from './user/useWatcherControls';
 import { useWikiState } from './user/useWikiState';
 import { useWikiWorkflows } from './user/useWikiWorkflows';
+import { UserTopNav } from './user/UserTopNav';
 import { WikiView } from './user/WikiView';
 import { AskView } from './user/AskView';
 import { ExploreView } from './user/ExploreView';
@@ -198,16 +198,7 @@ export function UserApp() {
   }
 
   return <div className={`app ${readingMode ? 'wiki-reading-mode-active' : ''}`}>
-    <header className="top-nav">
-      <div className="brand"><Brain size={28} /><strong>EverythingAI</strong></div>
-      <nav>
-        <button className={view === 'onboarding' ? 'active' : ''} onClick={() => setView('onboarding')}>Start</button>
-        <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore</button>
-        <button className={view === 'wiki' ? 'active' : ''} onClick={() => setView('wiki')}>Wiki</button>
-        <button className={view === 'ask' ? 'active' : ''} onClick={openAskView}>Ask</button>
-      </nav>
-      <div className="provider-pill"><span />User MVP • Safe mode</div>
-    </header>
+    <UserTopNav view={view} setView={setView} openAskView={openAskView} />
 
     <main className="page">
       {view === 'onboarding' && <OnboardingView
