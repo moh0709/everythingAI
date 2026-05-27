@@ -13,6 +13,54 @@ export type WikiJob = {
   updated_at?: string;
 };
 
+export type WikiDiagnostics = {
+  generated_at: string;
+  page_stats: {
+    total_pages: number;
+    active_pages: number;
+    stale_pages: number;
+    failed_pages: number;
+    archived_pages: number;
+  };
+  evidence_stats: {
+    section_count: number;
+    source_count: number;
+    chunk_count: number;
+    relation_count: number;
+  };
+  build_state: Array<{
+    key: string;
+    value: string;
+    updated_at: string;
+  }>;
+  fingerprints: Array<{
+    file_id: string;
+    absolute_path?: string | null;
+    content_hash?: string | null;
+    content_length?: number | null;
+    extracted_at?: string | null;
+    updated_at: string;
+  }>;
+  dependencies: Array<{
+    id: string;
+    page_id: string;
+    file_id: string;
+    source_ref?: string | null;
+    updated_at: string;
+  }>;
+  rebuilds: Array<{
+    id: string;
+    mode: string;
+    status: string;
+    input?: Record<string, unknown>;
+    summary?: Record<string, unknown>;
+    started_at?: string | null;
+    completed_at?: string | null;
+    created_at: string;
+    error_message?: string | null;
+  }>;
+};
+
 export async function startWikiRebuildJob(options: ApiOptions, payload = {}) {
   return apiRequest<{ accepted: boolean; job: WikiJob }>(
     options,
@@ -37,4 +85,8 @@ export async function fetchWikiJobs(options: ApiOptions) {
 
 export async function fetchWikiJob(options: ApiOptions, jobId: string) {
   return apiRequest<{ job: WikiJob }>(options, `/api/wiki/jobs/${jobId}`);
+}
+
+export async function fetchWikiDiagnostics(options: ApiOptions) {
+  return apiRequest<{ diagnostics: WikiDiagnostics }>(options, '/api/wiki/diagnostics');
 }
