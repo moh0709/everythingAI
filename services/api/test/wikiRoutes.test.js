@@ -30,6 +30,40 @@ function insertSourceFile(db) {
   });
 }
 
+function upsertExtraction(db, text) {
+  db.prepare(`
+    INSERT INTO file_extractions (
+      file_id,
+      extracted_text,
+      extraction_status,
+      extractor_name,
+      extracted_at,
+      error_message,
+      metadata_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(file_id) DO UPDATE SET
+      extracted_text = excluded.extracted_text,
+      extraction_status = excluded.extraction_status,
+      extractor_name = excluded.extractor_name,
+      extracted_at = excluded.extracted_at,
+      error_message = excluded.error_message,
+      metadata_json = excluded.metadata_json
+  `).run(
+    'file-alpha',
+    text,
+    'extracted',
+    'test-extractor',
+    new Date().toISOString(),
+    null,
+    '{}'
+  );
+}
+
+function seedExtractedSourceFile(db, text = 'Supplier agreement alpha renewal project') {
+  insertSourceFile(db);
+  upsertExtraction(db, text);
+}
+
 function seedWiki(db) {
   insertSourceFile(db);
 
@@ -115,6 +149,13 @@ async function postJson(url, payload = {}) {
   return { response, body };
 }
 
+async function buildWiki(baseUrl) {
+  return postJson(`${baseUrl}/api/wiki/build`, {
+    limit: 25,
+    filePageLimit: 25,
+  });
+}
+
 test('durable wiki evidence routes expose pages, evidence, and source chunks', async () => {
   const dbPath = tempDbPath();
   const seedDb = openDatabase(dbPath);
@@ -154,35 +195,11 @@ test('durable wiki evidence routes expose pages, evidence, and source chunks', a
 test('wiki build persists generated wiki on first build when no persisted wiki exists', async () => {
   const dbPath = tempDbPath();
   const db = openDatabase(dbPath);
-  insertSourceFile(db);
-
-  db.prepare(`
-    INSERT INTO file_extractions (
-      file_id,
-      extracted_text,
-      extraction_status,
-      extractor_name,
-      extracted_at,
-      error_message,
-      metadata_json
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    'file-alpha',
-    'Supplier agreement alpha renewal project',
-    'extracted',
-    'test-extractor',
-    '2026-05-19T12:00:00.000Z',
-    null,
-    '{}'
-  );
-
+  seedExtractedSourceFile(db);
   db.close();
 
   await withTestServer(dbPath, async (baseUrl) => {
-    const result = await postJson(`${baseUrl}/api/wiki/build`, {
-      limit: 25,
-      filePageLimit: 25,
-    });
+    const result = await buildWiki(baseUrl);
 
     assert.equal(result.response.status, 200);
     assert.equal(result.body.wiki.page_count > 0, true);
@@ -198,27 +215,28 @@ test('wiki build persists generated wiki on first build when no persisted wiki e
   });
 });
 
-test('wiki build no-op preserves persisted wiki pages instead of replacing them', async () => {
+test('wiki build no-op preserves persisted wiki pages after a real prior build', async () => {
   const dbPath = tempDbPath();
-  const seedDb = openDatabase(dbPath);
-  seedWiki(seedDb);
-  seedDb.close();
+  const db = openDatabase(dbPath);
+  seedExtractedSourceFile(db);
+  db.close();
 
   await withTestServer(dbPath, async (baseUrl) => {
+    const first = await buildWiki(baseUrl);
+    assert.equal(first.response.status, 200);
+    assert.equal(first.body.rebuild.mode, 'full');
+
     const beforeDb = openDatabase(dbPath);
     const beforePage = beforeDb.prepare(
       'SELECT updated_at FROM wiki_pages WHERE id = ?'
     ).get('workspace-overview');
     beforeDb.close();
 
-    const result = await postJson(`${baseUrl}/api/wiki/build`, {
-      limit: 25,
-      filePageLimit: 25,
-    });
+    const second = await buildWiki(baseUrl);
 
-    assert.equal(result.response.status, 200);
-    assert.equal(result.body.rebuild.mode, 'incremental');
-    assert.equal(result.body.replacement_plan.strategy, 'no-op');
+    assert.equal(second.response.status, 200);
+    assert.equal(second.body.rebuild.mode, 'incremental');
+    assert.equal(second.body.replacement_plan.strategy, 'no-op');
 
     const afterDb = openDatabase(dbPath);
     const afterPage = afterDb.prepare(
@@ -227,5 +245,31 @@ test('wiki build no-op preserves persisted wiki pages instead of replacing them'
     afterDb.close();
 
     assert.equal(afterPage.updated_at, beforePage.updated_at);
+  });
+});
+
+test('wiki build detects changed extraction dependencies and selectively replaces affected pages', async () => {
+  const dbPath = tempDbPath();
+  const db = openDatabase(dbPath);
+  seedExtractedSourceFile(db, 'Supplier agreement alpha renewal project');
+  db.close();
+
+  await withTestServer(dbPath, async (baseUrl) => {
+    const first = await buildWiki(baseUrl);
+    assert.equal(first.response.status, 200);
+    assert.equal(first.body.rebuild.mode, 'full');
+
+    const updateDb = openDatabase(dbPath);
+    upsertExtraction(updateDb, 'Supplier agreement alpha renewal project with updated compliance clause');
+    updateDb.close();
+
+    const second = await buildWiki(baseUrl);
+
+    assert.equal(second.response.status, 200);
+    assert.equal(second.body.rebuild.mode, 'selective');
+    assert.equal(second.body.replacement_plan.strategy, 'selective-replacement');
+    assert.equal(second.body.replacement_plan.changed_file_count, 1);
+    assert.equal(second.body.replacement_plan.affected_page_count > 0, true);
+    assert.equal(second.body.replacement_plan.pages_to_replace.some((page) => page.id === 'workspace-overview'), true);
   });
 });
