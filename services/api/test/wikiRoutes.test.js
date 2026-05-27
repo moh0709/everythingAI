@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import express from 'express';
 import { openDatabase, upsertIndexedFile } from '../src/db/client.js';
-import { persistWikiPages } from '../src/db/wikiRepository.js';
+import { listPersistedWikiPages, persistWikiPages } from '../src/db/wikiRepository.js';
 import { createWikiRouter } from '../src/routes/wiki.routes.js';
 
 function tempDbPath() {
@@ -102,6 +102,19 @@ async function getJson(url) {
   return { response, body };
 }
 
+async function postJson(url, payload = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const body = await response.json();
+  return { response, body };
+}
+
 test('durable wiki evidence routes expose pages, evidence, and source chunks', async () => {
   const dbPath = tempDbPath();
   const seedDb = openDatabase(dbPath);
@@ -135,5 +148,84 @@ test('durable wiki evidence routes expose pages, evidence, and source chunks', a
     const missingResult = await getJson(`${baseUrl}/api/wiki/pages/missing-page`);
     assert.equal(missingResult.response.status, 404);
     assert.equal(missingResult.body.error, 'Wiki page not found');
+  });
+});
+
+test('wiki build persists generated wiki on first build when no persisted wiki exists', async () => {
+  const dbPath = tempDbPath();
+  const db = openDatabase(dbPath);
+  insertSourceFile(db);
+
+  db.prepare(`
+    INSERT INTO file_extractions (
+      file_id,
+      extracted_text,
+      extraction_status,
+      extractor_name,
+      extracted_at,
+      error_message,
+      metadata_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    'file-alpha',
+    'Supplier agreement alpha renewal project',
+    'extracted',
+    'test-extractor',
+    '2026-05-19T12:00:00.000Z',
+    null,
+    '{}'
+  );
+
+  db.close();
+
+  await withTestServer(dbPath, async (baseUrl) => {
+    const result = await postJson(`${baseUrl}/api/wiki/build`, {
+      limit: 25,
+      filePageLimit: 25,
+    });
+
+    assert.equal(result.response.status, 200);
+    assert.equal(result.body.wiki.page_count > 0, true);
+    assert.equal(result.body.rebuild.mode, 'full');
+
+    const verifyDb = openDatabase(dbPath);
+    const persisted = listPersistedWikiPages(verifyDb);
+
+    assert.equal(Boolean(persisted), true);
+    assert.equal(persisted.page_count > 0, true);
+
+    verifyDb.close();
+  });
+});
+
+test('wiki build no-op preserves persisted wiki pages instead of replacing them', async () => {
+  const dbPath = tempDbPath();
+  const seedDb = openDatabase(dbPath);
+  seedWiki(seedDb);
+  seedDb.close();
+
+  await withTestServer(dbPath, async (baseUrl) => {
+    const beforeDb = openDatabase(dbPath);
+    const beforePage = beforeDb.prepare(
+      'SELECT updated_at FROM wiki_pages WHERE id = ?'
+    ).get('workspace-overview');
+    beforeDb.close();
+
+    const result = await postJson(`${baseUrl}/api/wiki/build`, {
+      limit: 25,
+      filePageLimit: 25,
+    });
+
+    assert.equal(result.response.status, 200);
+    assert.equal(result.body.rebuild.mode, 'incremental');
+    assert.equal(result.body.replacement_plan.strategy, 'no-op');
+
+    const afterDb = openDatabase(dbPath);
+    const afterPage = afterDb.prepare(
+      'SELECT updated_at FROM wiki_pages WHERE id = ?'
+    ).get('workspace-overview');
+    afterDb.close();
+
+    assert.equal(afterPage.updated_at, beforePage.updated_at);
   });
 });
