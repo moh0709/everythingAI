@@ -146,12 +146,17 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
       });
 
       const generatedWiki = buildWikiPages(db, { limit, filePageLimit });
-
+      const existingWiki = listPersistedWikiPages(db, { limit });
       const replacementPlan = buildSelectiveReplacementPlan(db, generatedWiki);
 
       let wiki;
+      let rebuildMode = 'full';
 
-      if (replacementPlan.strategy === 'selective-replacement') {
+      if (
+        replacementPlan.strategy === 'selective-replacement'
+        && existingWiki
+        && replacementPlan.affected_page_count > 0
+      ) {
         const affectedPageIds = new Set(
           replacementPlan.pages_to_replace.map((page) => page.id)
         );
@@ -171,6 +176,16 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
           'last_incremental_build_at',
           new Date().toISOString()
         );
+        rebuildMode = 'selective';
+      } else if (replacementPlan.strategy === 'no-op' && existingWiki) {
+        wiki = existingWiki;
+
+        updateWikiBuildState(
+          db,
+          'last_incremental_build_at',
+          new Date().toISOString()
+        );
+        rebuildMode = 'incremental';
       } else {
         wiki = persistWikiPages(db, generatedWiki);
 
@@ -179,6 +194,7 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
           'last_full_build_at',
           new Date().toISOString()
         );
+        rebuildMode = 'full';
       }
 
       saveWikiPageDependencies(db, generatedWiki.pages || []);
@@ -188,7 +204,7 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
 
       const rebuild = recordWikiRebuild(db, {
         id: rebuildId,
-        mode: replacementPlan.strategy === 'selective-replacement' ? 'selective' : 'full',
+        mode: rebuildMode,
         status: 'completed',
         input: { limit, filePageLimit },
         summary: {
