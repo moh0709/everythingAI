@@ -1,0 +1,225 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Phase 6 UserApp Modularization Handover",
+    "version": "2026-05-27.1",
+    "date": "2026-05-27",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "executive_summary": {
+      "current_identity": "EverythingAI is a local-first, source-backed AI knowledge workspace for indexing local files, extracting document text, searching, chatting, generating controlled Wiki pages, watching folders, and safely preparing file-organization workflows.",
+      "current_phase": "Phase 6 — Controlled UserApp modularization",
+      "current_status": "Phase 6 is progressing safely through small frontend-only extractions from apps/everything-ai-ui/src/UserApp.tsx.",
+      "important_baseline": "The local MVP backend baseline remains 88/88 PASS from the previous MVP validation checkpoint. Frontend typecheck/build have passed after each Phase 6 extraction step.",
+      "active_ticket": "GitHub Issue #22 — Phase 6: Controlled UserApp modularization after 88-test MVP baseline"
+    },
+    "latest_validation": {
+      "frontend_validation_command": "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui && npm run typecheck && npm run build",
+      "latest_frontend_result": {
+        "typecheck": "PASS",
+        "build": "PASS",
+        "vite_modules_transformed": 1540,
+        "build_time_seconds": 2.30,
+        "latest_user_bundle": "dist/assets/user-DtVDYtbp.js"
+      },
+      "backend_baseline_from_previous_checkpoint": {
+        "command": "cd E:\\01PROJEKTER\\EverythingAI\\services\\api && npm test",
+        "tests": 88,
+        "pass": 88,
+        "fail": 0,
+        "note": "Backend was not changed during the latest Phase 6 frontend-only extraction steps. Run backend tests again only if backend-facing API shapes or backend files are touched."
+      }
+    },
+    "phase_6_work_completed_in_this_continuation": {
+      "scope": "Small controlled frontend modularization only. No backend behavior changes. No UI redesign. No Wiki content-control changes.",
+      "extracted_files": [
+        {
+          "path": "apps/everything-ai-ui/src/user/useWatcherControls.ts",
+          "purpose": "Extracted watcherStatus state and watcher start/stop/refresh actions from UserApp.tsx.",
+          "validation": "Frontend typecheck/build PASS."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/scanReportTypes.ts",
+          "purpose": "Moved ScanReport type out of UserApp.tsx for reuse by UserApp and OnboardingView.",
+          "validation": "Frontend typecheck/build PASS."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useFolderSelection.ts",
+          "purpose": "Extracted selectFolder workflow from UserApp.tsx.",
+          "validation": "Frontend typecheck/build PASS."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useConnectionActions.ts",
+          "purpose": "Extracted saveConnection action from UserApp.tsx.",
+          "validation": "Frontend typecheck/build PASS."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useInitialUserAppRefresh.ts",
+          "purpose": "Extracted startup refresh effect for files, Wiki, and watcher status from UserApp.tsx.",
+          "validation": "Frontend typecheck/build PASS."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/UserTopNav.tsx",
+          "purpose": "Extracted top navigation/header markup from UserApp.tsx into a presentational component.",
+          "validation": "Frontend typecheck/build PASS."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useUserNavigation.ts",
+          "purpose": "Extracted simple user navigation helpers: openWikiPage, openAskView, handleAskFromHero, and later openSourceContext.",
+          "validation": "Frontend typecheck/build PASS after latest openSourceContext extraction."
+        },
+        {
+          "path": "apps/everything-ai-ui/src/user/useWikiPageActions.ts",
+          "purpose": "Extracted askAboutWikiPage helper from UserApp.tsx.",
+          "validation": "Frontend typecheck/build PASS."
+        }
+      ]
+    },
+    "latest_commits_of_interest": [
+      {
+        "commit": "b3147af",
+        "message": "Extract watcher controls hook"
+      },
+      {
+        "commit": "bba27dc",
+        "message": "Use watcher controls hook in UserApp"
+      },
+      {
+        "commit": "49328f9",
+        "message": "Fix watcher type import after hook extraction"
+      },
+      {
+        "commit": "d6669e5",
+        "message": "Extract scan report type"
+      },
+      {
+        "commit": "57d4e53",
+        "message": "Use extracted scan report type in UserApp"
+      },
+      {
+        "commit": "8d8ae55",
+        "message": "Use extracted scan report type in onboarding view"
+      },
+      {
+        "commit": "ad49e51",
+        "message": "Extract folder selection hook"
+      },
+      {
+        "commit": "8788c36",
+        "message": "Use folder selection hook in UserApp"
+      },
+      {
+        "commit": "1ad1a32",
+        "message": "Extract connection actions hook"
+      },
+      {
+        "commit": "5b74285",
+        "message": "Use connection actions hook in UserApp"
+      },
+      {
+        "commit": "d6d2ecf",
+        "message": "Extract initial user app refresh hook"
+      },
+      {
+        "commit": "a8bce14",
+        "message": "Use initial refresh hook in UserApp"
+      },
+      {
+        "commit": "c7c6431",
+        "message": "Extract user top navigation component"
+      },
+      {
+        "commit": "dc35c18",
+        "message": "Use user top navigation component"
+      },
+      {
+        "commit": "1bb927d",
+        "message": "Extract user navigation hook"
+      },
+      {
+        "commit": "5ecafbb",
+        "message": "Use user navigation hook in UserApp"
+      },
+      {
+        "commit": "dc0a53e",
+        "message": "Extract wiki page actions hook"
+      },
+      {
+        "commit": "ebb5743",
+        "message": "Use wiki page actions hook in UserApp"
+      },
+      {
+        "commit": "3fb83b0",
+        "message": "Add source context navigation helper"
+      },
+      {
+        "commit": "22033fc",
+        "message": "Use source context navigation helper in UserApp"
+      }
+    ],
+    "current_key_files": {
+      "main_user_app": "apps/everything-ai-ui/src/UserApp.tsx",
+      "phase_6_active_ticket": "GitHub Issue #22",
+      "related_docs": [
+        "docs/LOCAL_MVP_STATUS_2026-05-21.md",
+        "docs/HANDOVER_2026-05-21_EVERYTHINGAI_LOCAL_MVP_88_TEST_BASELINE.json",
+        "docs/VALIDATION_2026-05-21_WIKI_CONTENT_CONTROL.md",
+        "docs/HANDOVER_2026-05-27_EVERYTHINGAI_PHASE6_USERAPP_MODULARIZATION.json"
+      ]
+    },
+    "important_rules_for_next_agent": [
+      "Continue working directly on main unless the user explicitly changes this rule.",
+      "Do not perform broad UserApp refactors.",
+      "Do not combine UI redesign with modularization.",
+      "Do not change backend behavior under Phase 6 unless explicitly requested.",
+      "Do not change Wiki content-control behavior under Phase 6.",
+      "After each small frontend extraction, run npm run typecheck and npm run build from apps/everything-ai-ui.",
+      "Only run backend npm test if backend files or backend-facing API shapes are touched.",
+      "Preserve the 88/88 backend MVP baseline.",
+      "Do not let AI summaries populate source-backed document body content.",
+      "Do not add destructive file actions. Delete and permanent purge must remain blocked in the local MVP."
+    ],
+    "recommended_next_action": {
+      "pm_recommendation": "Stop and reassess before more extractions. UserApp is now much more modular. The next safe step is either to record a final Phase 6 validation doc or inspect UserApp.tsx for one remaining obvious low-risk extraction.",
+      "next_validation_commands": [
+        "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "optional_backend_validation": [
+        "cd C:\\temp\\EverythingAI\\services\\api",
+        "npm test"
+      ]
+    },
+    "suggested_next_small_extractions_if_continuing": [
+      {
+        "candidate": "buildKnowledgeWorkspace workflow",
+        "risk": "medium",
+        "reason": "This is larger than the previous helpers because it coordinates index, extract, insights, Wiki loading, file loading, and setup progress. Do not extract unless prepared to validate carefully."
+      },
+      {
+        "candidate": "askQuestion workflow",
+        "risk": "medium",
+        "reason": "This coordinates chat state, ask view switching, chat API call, assistant response, and focus behavior. Extract only if done as a dedicated small hook with immediate validation."
+      },
+      {
+        "candidate": "remaining JSX view routing",
+        "risk": "low-to-medium",
+        "reason": "Could become a UserMainViews component, but be careful not to hide too many props or make debugging harder."
+      }
+    ],
+    "do_not_do_next": [
+      "Do not start AI Organization Workspace implementation as part of Phase 6.",
+      "Do not start enterprise governance tickets as local MVP work.",
+      "Do not rewrite UserApp.tsx wholesale.",
+      "Do not change APIs or DB schemas during frontend modularization.",
+      "Do not skip frontend typecheck after another extraction."
+    ],
+    "known_note": "During one earlier attempt to comment on GitHub Issue #22, the connector safety check blocked the issue comment. The code changes and local validations were still completed. Later issue comment posting worked again for the ninth extraction."
+  }
+}
