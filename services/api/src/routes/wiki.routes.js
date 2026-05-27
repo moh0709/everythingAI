@@ -9,6 +9,7 @@ import {
   persistWikiPages,
   recordWikiRebuild,
 } from '../db/wikiRepository.js';
+import { getWikiDiagnostics } from '../db/wikiDiagnosticsRepository.js';
 import { replacePersistedWikiPages } from '../db/wikiSelectivePersistence.js';
 import {
   saveWikiFileFingerprints,
@@ -71,6 +72,18 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
     db.close();
 
     res.json({ wiki });
+  });
+
+  router.get('/wiki/diagnostics', (req, res) => {
+    const db = openDb();
+
+    const diagnostics = getWikiDiagnostics(db, {
+      limit: parseLimit(req.query.limit, 250),
+    });
+
+    db.close();
+
+    res.json({ diagnostics });
   });
 
   router.get('/wiki/pages/:slug', (req, res) => {
