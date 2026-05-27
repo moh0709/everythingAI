@@ -192,6 +192,41 @@ test('durable wiki evidence routes expose pages, evidence, and source chunks', a
   });
 });
 
+test('wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history', async () => {
+  const dbPath = tempDbPath();
+  const db = openDatabase(dbPath);
+  seedExtractedSourceFile(db, 'Supplier agreement alpha renewal project');
+  db.close();
+
+  await withTestServer(dbPath, async (baseUrl) => {
+    const buildResult = await buildWiki(baseUrl);
+    assert.equal(buildResult.response.status, 200);
+
+    const diagnosticsResult = await getJson(`${baseUrl}/api/wiki/diagnostics`);
+
+    assert.equal(diagnosticsResult.response.status, 200);
+
+    const diagnostics = diagnosticsResult.body.diagnostics;
+
+    assert.equal(diagnostics.page_stats.total_pages > 0, true);
+    assert.equal(diagnostics.evidence_stats.chunk_count > 0, true);
+    assert.equal(diagnostics.build_state.length > 0, true);
+    assert.equal(diagnostics.fingerprints.length > 0, true);
+    assert.equal(diagnostics.dependencies.length > 0, true);
+    assert.equal(diagnostics.rebuilds.length > 0, true);
+
+    assert.equal(
+      diagnostics.dependencies.some((dependency) => dependency.page_id === 'workspace-overview'),
+      true
+    );
+
+    assert.equal(
+      diagnostics.rebuilds.some((rebuild) => rebuild.mode === 'full'),
+      true
+    );
+  });
+});
+
 test('wiki build persists generated wiki on first build when no persisted wiki exists', async () => {
   const dbPath = tempDbPath();
   const db = openDatabase(dbPath);
