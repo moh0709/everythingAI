@@ -66,6 +66,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const recentRebuilds = diagnostics?.rebuilds.slice(0, 3) || [];
   const recentFingerprints = diagnostics?.fingerprints.slice(0, 3) || [];
   const recentDependencies = diagnostics?.dependencies.slice(0, 4) || [];
+  const latestCompletedRebuild = diagnostics?.rebuilds.find((rebuild) => rebuild.status === 'completed');
+  const latestProblemRebuild = diagnostics?.rebuilds.find((rebuild) => rebuild.status === 'failed');
   const hasOperationalData = Boolean(
     diagnostics
     && (
@@ -132,6 +134,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
             <div><span>Sources</span><strong>{formatNumber(diagnostics?.evidence_stats.source_count)}</strong></div>
             <div><span>Relations</span><strong>{formatNumber(diagnostics?.evidence_stats.relation_count)}</strong></div>
             <div><span>Stale</span><strong>{formatNumber(diagnostics?.page_stats.stale_pages)}</strong></div>
+            <div><span>Latest Completed</span><strong>{formatTimestamp(latestCompletedRebuild?.completed_at || latestCompletedRebuild?.created_at)}</strong></div>
+            <div><span>Latest Problem</span><strong>{formatTimestamp(latestProblemRebuild?.completed_at || latestProblemRebuild?.created_at)}</strong></div>
           </div>
         </article>
 
