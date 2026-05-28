@@ -32,6 +32,14 @@ function shortHash(value?: string | null) {
   return value.slice(0, 10);
 }
 
+function formatDiagnosticValue(value: unknown) {
+  if (value === null || value === undefined || value === '') return '—';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  return JSON.stringify(value);
+}
+
 function isExpanded(expanded: ExpandedDiagnostic, type: ExpandedDiagnosticType, id: string) {
   return expanded !== null && expanded.type === type && expanded.id === id;
 }
@@ -226,6 +234,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
                       <div><dt>Status</dt><dd>{rebuild.status}</dd></div>
                       <div><dt>Started</dt><dd>{formatTimestamp(rebuild.started_at)}</dd></div>
                       <div><dt>Completed</dt><dd>{formatTimestamp(rebuild.completed_at)}</dd></div>
+                      <div><dt>Input</dt><dd>{formatDiagnosticValue(rebuild.input)}</dd></div>
+                      <div><dt>Summary</dt><dd>{formatDiagnosticValue(rebuild.summary)}</dd></div>
                     </dl>
                   </div>
                 ) : null}
