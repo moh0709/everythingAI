@@ -66,6 +66,16 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const recentRebuilds = diagnostics?.rebuilds.slice(0, 3) || [];
   const recentFingerprints = diagnostics?.fingerprints.slice(0, 3) || [];
   const recentDependencies = diagnostics?.dependencies.slice(0, 4) || [];
+  const hasOperationalData = Boolean(
+    diagnostics
+    && (
+      diagnostics.page_stats.total_pages > 0
+      || diagnostics.evidence_stats.chunk_count > 0
+      || diagnostics.dependencies.length > 0
+      || diagnostics.fingerprints.length > 0
+      || diagnostics.rebuilds.length > 0
+    )
+  );
   const lastBuildState = useMemo(() => (
     diagnostics?.build_state.find((item) => item.key === 'last_incremental_build_at')
     || diagnostics?.build_state.find((item) => item.key === 'last_full_build_at')
@@ -84,6 +94,13 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
       </div>
 
       {error ? <div className="wiki-rebuild-error">{error}</div> : null}
+
+      {diagnostics && !hasOperationalData ? (
+        <div className="wiki-diagnostics-guidance">
+          <strong>No diagnostics data yet</strong>
+          <p>Build the Wiki once to create persisted pages, evidence chunks, fingerprints, dependencies, and rebuild records. After that, this panel explains what changed and why rebuilds happen.</p>
+        </div>
+      ) : null}
 
       <div className="wiki-rebuild-summary-grid wiki-rebuild-summary-grid-wide">
         <div className="wiki-rebuild-summary-card">
