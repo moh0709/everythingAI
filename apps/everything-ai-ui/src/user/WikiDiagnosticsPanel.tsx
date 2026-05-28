@@ -6,8 +6,10 @@ type WikiDiagnosticsPanelProps = {
   options: ApiOptions;
 };
 
+type ExpandedDiagnosticType = 'dependency' | 'fingerprint' | 'rebuild';
+
 type ExpandedDiagnostic = {
-  type: 'dependency' | 'fingerprint' | 'rebuild';
+  type: ExpandedDiagnosticType;
   id: string;
 } | null;
 
@@ -30,8 +32,8 @@ function shortHash(value?: string | null) {
   return value.slice(0, 10);
 }
 
-function isExpanded(expanded: ExpandedDiagnostic, type: ExpandedDiagnostic['type'], id: string) {
-  return expanded?.type === type && expanded.id === id;
+function isExpanded(expanded: ExpandedDiagnostic, type: ExpandedDiagnosticType, id: string) {
+  return expanded !== null && expanded.type === type && expanded.id === id;
 }
 
 export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
@@ -53,7 +55,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
     }
   }
 
-  function toggleExpanded(type: Exclude<ExpandedDiagnostic, null>['type'], id: string) {
+  function toggleExpanded(type: ExpandedDiagnosticType, id: string) {
     setExpanded((current) => (isExpanded(current, type, id) ? null : { type, id }));
   }
 
