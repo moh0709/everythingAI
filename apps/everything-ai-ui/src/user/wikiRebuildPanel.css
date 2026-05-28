@@ -119,6 +119,10 @@
   margin-bottom: 1rem;
 }
 
+.wiki-rebuild-summary-grid-wide {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .wiki-rebuild-summary-card {
   border: 1px solid rgba(148, 163, 184, 0.24);
   border-radius: 14px;
@@ -142,6 +146,113 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.wiki-diagnostics-panel {
+  margin: 1rem 0;
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  border-radius: 18px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.wiki-diagnostics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.wiki-diagnostics-header h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.98rem;
+}
+
+.wiki-diagnostics-header p {
+  margin: 0.2rem 0 0;
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.wiki-diagnostics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.wiki-diagnostics-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.wiki-diagnostics-card-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.wiki-diagnostics-card-title strong {
+  color: #0f172a;
+}
+
+.wiki-diagnostics-card-title span {
+  color: #94a3b8;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.wiki-diagnostics-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.wiki-diagnostics-mini-grid div,
+.wiki-diagnostics-row {
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 0.62rem;
+}
+
+.wiki-diagnostics-mini-grid span,
+.wiki-diagnostics-row span {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.wiki-diagnostics-mini-grid strong,
+.wiki-diagnostics-row strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: #334155;
+  font-size: 0.78rem;
+  word-break: break-word;
+}
+
+.wiki-diagnostics-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.wiki-diagnostics-empty {
+  border: 1px dashed #c4b5fd;
+  border-radius: 10px;
+  padding: 0.7rem;
+  color: #6366f1;
+  background: #eef2ff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: center;
 }
 
 .wiki-rebuild-loading,
@@ -292,9 +403,17 @@
   font-size: 0.78rem;
 }
 
+@media (max-width: 920px) {
+  .wiki-rebuild-summary-grid-wide,
+  .wiki-diagnostics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 720px) {
   .wiki-rebuild-panel-header,
-  .wiki-rebuild-job-top {
+  .wiki-rebuild-job-top,
+  .wiki-diagnostics-header {
     display: grid;
   }
 
@@ -303,7 +422,8 @@
   }
 
   .wiki-rebuild-summary-grid,
-  .wiki-rebuild-meta-grid {
+  .wiki-rebuild-meta-grid,
+  .wiki-diagnostics-mini-grid {
     grid-template-columns: 1fr;
   }
 }
