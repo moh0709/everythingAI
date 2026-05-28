@@ -6,6 +6,11 @@ type WikiDiagnosticsPanelProps = {
   options: ApiOptions;
 };
 
+type ExpandedDiagnostic = {
+  type: 'dependency' | 'fingerprint' | 'rebuild';
+  id: string;
+} | null;
+
 function formatTimestamp(value?: string | null) {
   if (!value) return '—';
 
@@ -25,8 +30,13 @@ function shortHash(value?: string | null) {
   return value.slice(0, 10);
 }
 
+function isExpanded(expanded: ExpandedDiagnostic, type: ExpandedDiagnostic['type'], id: string) {
+  return expanded?.type === type && expanded.id === id;
+}
+
 export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const [diagnostics, setDiagnostics] = useState<WikiDiagnostics | null>(null);
+  const [expanded, setExpanded] = useState<ExpandedDiagnostic>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,6 +51,10 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function toggleExpanded(type: Exclude<ExpandedDiagnostic, null>['type'], id: string) {
+    setExpanded((current) => (isExpanded(current, type, id) ? null : { type, id }));
   }
 
   useEffect(() => {
@@ -109,10 +123,26 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
           </div>
           <div className="wiki-diagnostics-list">
             {recentDependencies.map((dependency) => (
-              <div key={dependency.id} className="wiki-diagnostics-row">
+              <button
+                key={dependency.id}
+                type="button"
+                className="wiki-diagnostics-row wiki-diagnostics-row-button"
+                onClick={() => toggleExpanded('dependency', dependency.id)}
+              >
                 <span>{dependency.page_id}</span>
                 <strong>{dependency.source_ref || 'source'} → {dependency.file_id}</strong>
-              </div>
+                {isExpanded(expanded, 'dependency', dependency.id) ? (
+                  <div className="wiki-diagnostics-detail">
+                    <p><b>Why it matters:</b> this Wiki page depends on this source file. If the file fingerprint changes, this page can be targeted for selective rebuild.</p>
+                    <dl>
+                      <div><dt>Page</dt><dd>{dependency.page_id}</dd></div>
+                      <div><dt>File</dt><dd>{dependency.file_id}</dd></div>
+                      <div><dt>Source ref</dt><dd>{dependency.source_ref || 'source'}</dd></div>
+                      <div><dt>Updated</dt><dd>{formatTimestamp(dependency.updated_at)}</dd></div>
+                    </dl>
+                  </div>
+                ) : null}
+              </button>
             ))}
             {!recentDependencies.length ? <div className="wiki-diagnostics-empty">No dependencies recorded yet.</div> : null}
           </div>
@@ -125,10 +155,26 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
           </div>
           <div className="wiki-diagnostics-list">
             {recentFingerprints.map((fingerprint) => (
-              <div key={fingerprint.file_id} className="wiki-diagnostics-row">
+              <button
+                key={fingerprint.file_id}
+                type="button"
+                className="wiki-diagnostics-row wiki-diagnostics-row-button"
+                onClick={() => toggleExpanded('fingerprint', fingerprint.file_id)}
+              >
                 <span>{fingerprint.file_id}</span>
                 <strong>{shortHash(fingerprint.content_hash)} · {formatNumber(fingerprint.content_length)} chars</strong>
-              </div>
+                {isExpanded(expanded, 'fingerprint', fingerprint.file_id) ? (
+                  <div className="wiki-diagnostics-detail">
+                    <p><b>Why it matters:</b> this fingerprint represents the source content state used to detect whether a Wiki page needs rebuilding.</p>
+                    <dl>
+                      <div><dt>File</dt><dd>{fingerprint.file_id}</dd></div>
+                      <div><dt>Hash</dt><dd>{fingerprint.content_hash || '—'}</dd></div>
+                      <div><dt>Length</dt><dd>{formatNumber(fingerprint.content_length)} chars</dd></div>
+                      <div><dt>Updated</dt><dd>{formatTimestamp(fingerprint.updated_at)}</dd></div>
+                    </dl>
+                  </div>
+                ) : null}
+              </button>
             ))}
             {!recentFingerprints.length ? <div className="wiki-diagnostics-empty">No fingerprints recorded yet.</div> : null}
           </div>
@@ -141,10 +187,26 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
           </div>
           <div className="wiki-diagnostics-list">
             {recentRebuilds.map((rebuild) => (
-              <div key={rebuild.id} className="wiki-diagnostics-row">
+              <button
+                key={rebuild.id}
+                type="button"
+                className="wiki-diagnostics-row wiki-diagnostics-row-button"
+                onClick={() => toggleExpanded('rebuild', rebuild.id)}
+              >
                 <span>{rebuild.mode} · {rebuild.status}</span>
                 <strong>{formatTimestamp(rebuild.created_at)}</strong>
-              </div>
+                {isExpanded(expanded, 'rebuild', rebuild.id) ? (
+                  <div className="wiki-diagnostics-detail">
+                    <p><b>Why it matters:</b> this record explains how the Wiki was rebuilt and whether the operation was full, incremental, selective, or failed.</p>
+                    <dl>
+                      <div><dt>Mode</dt><dd>{rebuild.mode}</dd></div>
+                      <div><dt>Status</dt><dd>{rebuild.status}</dd></div>
+                      <div><dt>Started</dt><dd>{formatTimestamp(rebuild.started_at)}</dd></div>
+                      <div><dt>Completed</dt><dd>{formatTimestamp(rebuild.completed_at)}</dd></div>
+                    </dl>
+                  </div>
+                ) : null}
+              </button>
             ))}
             {!recentRebuilds.length ? <div className="wiki-diagnostics-empty">No persisted rebuilds recorded yet.</div> : null}
           </div>
