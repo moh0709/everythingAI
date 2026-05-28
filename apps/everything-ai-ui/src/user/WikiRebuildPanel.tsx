@@ -6,6 +6,7 @@ import {
   startWikiRebuildJob,
   type WikiJob,
 } from './wikiJobsApi';
+import { WikiDiagnosticsPanel } from './WikiDiagnosticsPanel';
 import './wikiRebuildPanel.css';
 
 function formatTimestamp(value?: string) {
@@ -143,6 +144,8 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
           <span>Active Jobs</span>
         </div>
       </div>
+
+      <WikiDiagnosticsPanel options={options} />
 
       {loading ? (
         <div className="wiki-rebuild-loading">Loading rebuild jobs…</div>
