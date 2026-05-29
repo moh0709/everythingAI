@@ -6,7 +6,7 @@ type WikiDiagnosticsPanelProps = {
   options: ApiOptions;
 };
 
-type ExpandedDiagnosticType = 'dependency' | 'fingerprint' | 'rebuild';
+type ExpandedDiagnosticType = 'dependency' | 'fingerprint' | 'rebuild' | 'quality';
 
 type ExpandedDiagnostic = {
   type: ExpandedDiagnosticType;
@@ -74,6 +74,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const recentRebuilds = diagnostics?.rebuilds.slice(0, 3) || [];
   const recentFingerprints = diagnostics?.fingerprints.slice(0, 3) || [];
   const recentDependencies = diagnostics?.dependencies.slice(0, 4) || [];
+  const recentQuality = diagnostics?.quality_summary?.slice(0, 4) || [];
   const latestCompletedRebuild = diagnostics?.rebuilds.find((rebuild) => rebuild.status === 'completed');
   const latestProblemRebuild = diagnostics?.rebuilds.find((rebuild) => rebuild.status === 'failed');
   const hasOperationalData = Boolean(
@@ -84,6 +85,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
       || diagnostics.dependencies.length > 0
       || diagnostics.fingerprints.length > 0
       || diagnostics.rebuilds.length > 0
+      || (diagnostics.quality_summary?.length || 0) > 0
     )
   );
   const lastBuildState = useMemo(() => (
@@ -96,7 +98,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
       <div className="wiki-diagnostics-header">
         <div>
           <h4>Knowledge Diagnostics</h4>
-          <p>Read-only rebuild, evidence, dependency, and fingerprint visibility.</p>
+          <p>Read-only rebuild, evidence, dependency, fingerprint, and quality visibility.</p>
         </div>
         <button type="button" className="outline" onClick={loadDiagnostics} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh Diagnostics'}
@@ -108,7 +110,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
       {diagnostics && !hasOperationalData ? (
         <div className="wiki-diagnostics-guidance">
           <strong>No diagnostics data yet</strong>
-          <p>Build the Wiki once to create persisted pages, evidence chunks, fingerprints, dependencies, and rebuild records. After that, this panel explains what changed and why rebuilds happen.</p>
+          <p>Build the Wiki once to create persisted pages, evidence chunks, fingerprints, dependencies, rebuild records, and computed quality signals. After that, this panel explains what changed and why rebuilds happen.</p>
         </div>
       ) : null}
 
@@ -126,8 +128,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
           <span>Dependencies</span>
         </div>
         <div className="wiki-rebuild-summary-card">
-          <strong>{formatNumber(diagnostics?.fingerprints.length)}</strong>
-          <span>Fingerprints</span>
+          <strong>{formatNumber(diagnostics?.quality_summary?.length)}</strong>
+          <span>Quality Signals</span>
         </div>
       </div>
 
@@ -144,6 +146,45 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
             <div><span>Stale</span><strong>{formatNumber(diagnostics?.page_stats.stale_pages)}</strong></div>
             <div><span>Latest Completed</span><strong>{formatTimestamp(latestCompletedRebuild?.completed_at || latestCompletedRebuild?.created_at)}</strong></div>
             <div><span>Latest Problem</span><strong>{formatTimestamp(latestProblemRebuild?.completed_at || latestProblemRebuild?.created_at)}</strong></div>
+          </div>
+        </article>
+
+        <article className="wiki-diagnostics-card">
+          <div className="wiki-diagnostics-card-title">
+            <strong>Knowledge Quality</strong>
+            <span>Computed page-level trust signals</span>
+          </div>
+          <div className="wiki-diagnostics-list">
+            {recentQuality.map((quality) => (
+              <button
+                key={quality.page_id}
+                type="button"
+                className="wiki-diagnostics-row wiki-diagnostics-row-button"
+                onClick={() => toggleExpanded('quality', quality.page_id)}
+              >
+                <span>{quality.title}</span>
+                <strong>Grade {quality.quality_grade} · {quality.quality_score}/100 · {quality.status}</strong>
+                {isExpanded(expanded, 'quality', quality.page_id) ? (
+                  <div className="wiki-diagnostics-detail">
+                    <p><b>Why it matters:</b> this computed quality signal estimates how trustworthy the page is based on evidence, runtime health, dependencies, and citation coverage. AI and human validation are intentionally marked separately.</p>
+                    <dl>
+                      <div><dt>Source</dt><dd>{quality.validation_state.source_validation}</dd></div>
+                      <div><dt>Runtime</dt><dd>{quality.validation_state.runtime_validation}</dd></div>
+                      <div><dt>AI</dt><dd>{quality.validation_state.ai_validation}</dd></div>
+                      <div><dt>Human</dt><dd>{quality.validation_state.human_validation}</dd></div>
+                      <div><dt>Sources</dt><dd>{formatNumber(quality.source_count)}</dd></div>
+                      <div><dt>Chunks</dt><dd>{formatNumber(quality.chunk_count)}</dd></div>
+                      <div><dt>Dependencies</dt><dd>{formatNumber(quality.dependency_count)}</dd></div>
+                      <div><dt>Coverage</dt><dd>{quality.citation_coverage_score}</dd></div>
+                    </dl>
+                    <ul className="wiki-diagnostics-reasons">
+                      {quality.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                    </ul>
+                  </div>
+                ) : null}
+              </button>
+            ))}
+            {!recentQuality.length ? <div className="wiki-diagnostics-empty">No quality signals computed yet.</div> : null}
           </div>
         </article>
 
