@@ -1,6 +1,83 @@
 import { ensureWikiIncrementalSchema } from './wikiIncrementalRepository.js';
 import { ensureWikiPersistenceSchema } from './wikiRepository.js';
 
+function gradeForScore(score) {
+  if (score >= 90) return 'A';
+  if (score >= 75) return 'B';
+  if (score >= 55) return 'C';
+  if (score >= 35) return 'D';
+  return 'F';
+}
+
+function computePageQuality(page) {
+  const reasons = [];
+  let score = 100;
+
+  if (page.status !== 'active') {
+    score -= 35;
+    reasons.push(`Page status is ${page.status}.`);
+  } else {
+    reasons.push('Page is active.');
+  }
+
+  if (page.source_count <= 0) {
+    score -= 30;
+    reasons.push('No source records are attached.');
+  } else {
+    reasons.push(`${page.source_count} source record(s) attached.`);
+  }
+
+  if (page.chunk_count <= 0) {
+    score -= 25;
+    reasons.push('No persisted evidence chunks are attached.');
+  } else {
+    reasons.push(`${page.chunk_count} persisted evidence chunk(s) attached.`);
+  }
+
+  if (page.dependency_count <= 0) {
+    score -= 15;
+    reasons.push('No dependency records are attached.');
+  } else {
+    reasons.push(`${page.dependency_count} dependency record(s) attached.`);
+  }
+
+  if (Number(page.citation_coverage_score || 0) < 0.5) {
+    score -= 15;
+    reasons.push('Citation coverage score is weak.');
+  } else {
+    reasons.push('Citation coverage score is acceptable.');
+  }
+
+  if (page.weak_source_warning) {
+    score -= 10;
+    reasons.push('Weak source warning is present.');
+  }
+
+  const normalizedScore = Math.max(0, Math.min(100, score));
+
+  return {
+    page_id: page.id,
+    slug: page.slug,
+    title: page.title,
+    page_type: page.page_type,
+    status: page.status,
+    quality_score: normalizedScore,
+    quality_grade: gradeForScore(normalizedScore),
+    source_count: Number(page.source_count || 0),
+    chunk_count: Number(page.chunk_count || 0),
+    dependency_count: Number(page.dependency_count || 0),
+    citation_coverage_score: Number(page.citation_coverage_score || 0),
+    weak_source_warning: Boolean(page.weak_source_warning),
+    validation_state: {
+      source_validation: page.source_count > 0 && page.chunk_count > 0 ? 'supported' : 'weak',
+      runtime_validation: page.status === 'active' ? 'healthy' : 'degraded',
+      ai_validation: 'not_started',
+      human_validation: 'not_started',
+    },
+    reasons,
+  };
+}
+
 export function getWikiDiagnostics(db, { limit = 250 } = {}) {
   ensureWikiPersistenceSchema(db);
   ensureWikiIncrementalSchema(db);
@@ -50,6 +127,27 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
       (SELECT COUNT(*) FROM wiki_page_relations) AS relation_count
   `).get();
 
+  const pageQualityRows = db.prepare(`
+    SELECT
+      page.id,
+      page.slug,
+      page.title,
+      page.page_type,
+      page.status,
+      page.citation_coverage_score,
+      page.weak_source_warning,
+      COUNT(DISTINCT source.id) AS source_count,
+      COUNT(DISTINCT chunk.id) AS chunk_count,
+      COUNT(DISTINCT dependency.id) AS dependency_count
+    FROM wiki_pages page
+    LEFT JOIN wiki_page_sources source ON source.page_id = page.id
+    LEFT JOIN wiki_source_chunks chunk ON chunk.page_id = page.id
+    LEFT JOIN wiki_page_dependencies dependency ON dependency.page_id = page.id
+    GROUP BY page.id
+    ORDER BY page.title ASC
+    LIMIT @limit
+  `).all({ limit });
+
   return {
     generated_at: new Date().toISOString(),
     page_stats: {
@@ -65,6 +163,7 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
       chunk_count: Number(evidenceStats.chunk_count || 0),
       relation_count: Number(evidenceStats.relation_count || 0),
     },
+    quality_summary: pageQualityRows.map(computePageQuality),
     build_state: buildState,
     fingerprints,
     dependencies,
