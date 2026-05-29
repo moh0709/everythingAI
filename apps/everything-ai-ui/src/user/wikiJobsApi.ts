@@ -13,6 +13,28 @@ export type WikiJob = {
   updated_at?: string;
 };
 
+export type WikiQualitySummary = {
+  page_id: string;
+  slug: string;
+  title: string;
+  page_type: string;
+  status: string;
+  quality_score: number;
+  quality_grade: string;
+  source_count: number;
+  chunk_count: number;
+  dependency_count: number;
+  citation_coverage_score: number;
+  weak_source_warning: boolean;
+  validation_state: {
+    source_validation: string;
+    runtime_validation: string;
+    ai_validation: string;
+    human_validation: string;
+  };
+  reasons: string[];
+};
+
 export type WikiDiagnostics = {
   generated_at: string;
   page_stats: {
@@ -28,6 +50,7 @@ export type WikiDiagnostics = {
     chunk_count: number;
     relation_count: number;
   };
+  quality_summary?: WikiQualitySummary[];
   build_state: Array<{
     key: string;
     value: string;
