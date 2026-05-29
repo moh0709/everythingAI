@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ApiOptions } from '../api';
+import { AutomatedReviewAdvisoryCard } from './AutomatedReviewAdvisoryCard';
 import { fetchWikiDiagnostics, type WikiDiagnostics } from './wikiJobsApi';
 
 type WikiDiagnosticsPanelProps = {
@@ -178,6 +179,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
           )}
         </article>
 
+        <AutomatedReviewAdvisoryCard />
+
         <article className="wiki-diagnostics-card">
           <div className="wiki-diagnostics-card-title">
             <strong>Knowledge Health</strong>
@@ -214,12 +217,12 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
                 </strong>
                 {isExpanded(expanded, 'quality', quality.page_id) ? (
                   <div className="wiki-diagnostics-detail">
-                    <p><b>Why it matters:</b> this computed quality signal estimates how trustworthy the page is based on evidence, runtime health, dependencies, and citation coverage. AI and human validation are intentionally marked separately.</p>
+                    <p><b>Why it matters:</b> this computed quality signal estimates how trustworthy the page is based on evidence, runtime health, dependencies, and citation coverage. Review states are intentionally separate.</p>
                     <dl>
                       <div><dt>Source</dt><dd>{quality.validation_state.source_validation}</dd></div>
                       <div><dt>Runtime</dt><dd>{quality.validation_state.runtime_validation}</dd></div>
-                      <div><dt>AI</dt><dd>{quality.validation_state.ai_validation}</dd></div>
-                      <div><dt>Human</dt><dd>{quality.validation_state.human_validation}</dd></div>
+                      <div><dt>Auto</dt><dd>{quality.validation_state.ai_validation}</dd></div>
+                      <div><dt>Operator</dt><dd>{quality.validation_state.human_validation}</dd></div>
                       <div><dt>Sources</dt><dd>{formatNumber(quality.source_count)}</dd></div>
                       <div><dt>Chunks</dt><dd>{formatNumber(quality.chunk_count)}</dd></div>
                       <div><dt>Dependencies</dt><dd>{formatNumber(quality.dependency_count)}</dd></div>
