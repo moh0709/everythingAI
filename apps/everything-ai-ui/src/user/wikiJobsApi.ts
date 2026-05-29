@@ -35,6 +35,21 @@ export type WikiQualitySummary = {
   reasons: string[];
 };
 
+export type WikiWorkspaceTrustHealth = {
+  status: string;
+  quality_score: number;
+  quality_grade: string;
+  page_count: number;
+  grade_counts: {
+    A: number;
+    B: number;
+    C: number;
+    D: number;
+    F: number;
+  };
+  reasons: string[];
+};
+
 export type WikiDiagnostics = {
   generated_at: string;
   page_stats: {
@@ -50,6 +65,7 @@ export type WikiDiagnostics = {
     chunk_count: number;
     relation_count: number;
   };
+  workspace_trust_health?: WikiWorkspaceTrustHealth;
   quality_summary?: WikiQualitySummary[];
   build_state: Array<{
     key: string;
