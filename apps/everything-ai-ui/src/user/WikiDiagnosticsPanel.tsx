@@ -50,6 +50,12 @@ function qualityGradeClass(grade: string) {
   return 'wiki-quality-danger';
 }
 
+function trustHealthClass(status?: string) {
+  if (status === 'healthy') return 'wiki-quality-good';
+  if (status === 'warning' || status === 'unknown') return 'wiki-quality-warning';
+  return 'wiki-quality-danger';
+}
+
 export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const [diagnostics, setDiagnostics] = useState<WikiDiagnostics | null>(null);
   const [expanded, setExpanded] = useState<ExpandedDiagnostic>(null);
@@ -77,6 +83,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
     loadDiagnostics();
   }, [options]);
 
+  const workspaceTrust = diagnostics?.workspace_trust_health;
   const recentRebuilds = diagnostics?.rebuilds.slice(0, 3) || [];
   const recentFingerprints = diagnostics?.fingerprints.slice(0, 3) || [];
   const recentDependencies = diagnostics?.dependencies.slice(0, 4) || [];
@@ -140,6 +147,37 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
       </div>
 
       <div className="wiki-diagnostics-grid">
+        <article className="wiki-diagnostics-card">
+          <div className="wiki-diagnostics-card-title">
+            <strong>Workspace Trust Health</strong>
+            <span>Aggregate knowledge quality</span>
+          </div>
+          {workspaceTrust ? (
+            <>
+              <div className="wiki-diagnostics-mini-grid">
+                <div><span>Status</span><strong className={`wiki-quality-grade ${trustHealthClass(workspaceTrust.status)}`}>{workspaceTrust.status}</strong></div>
+                <div><span>Grade</span><strong className={`wiki-quality-grade ${qualityGradeClass(workspaceTrust.quality_grade)}`}>Grade {workspaceTrust.quality_grade}</strong></div>
+                <div><span>Score</span><strong>{workspaceTrust.quality_score}/100</strong></div>
+                <div><span>Pages</span><strong>{formatNumber(workspaceTrust.page_count)}</strong></div>
+              </div>
+              <div className="wiki-diagnostics-detail wiki-diagnostics-detail-static">
+                <dl>
+                  <div><dt>A</dt><dd>{formatNumber(workspaceTrust.grade_counts.A)}</dd></div>
+                  <div><dt>B</dt><dd>{formatNumber(workspaceTrust.grade_counts.B)}</dd></div>
+                  <div><dt>C</dt><dd>{formatNumber(workspaceTrust.grade_counts.C)}</dd></div>
+                  <div><dt>D</dt><dd>{formatNumber(workspaceTrust.grade_counts.D)}</dd></div>
+                  <div><dt>F</dt><dd>{formatNumber(workspaceTrust.grade_counts.F)}</dd></div>
+                </dl>
+                <ul className="wiki-diagnostics-reasons">
+                  {workspaceTrust.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                </ul>
+              </div>
+            </>
+          ) : (
+            <div className="wiki-diagnostics-empty">No workspace trust health available yet.</div>
+          )}
+        </article>
+
         <article className="wiki-diagnostics-card">
           <div className="wiki-diagnostics-card-title">
             <strong>Knowledge Health</strong>
