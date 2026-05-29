@@ -44,6 +44,12 @@ function isExpanded(expanded: ExpandedDiagnostic, type: ExpandedDiagnosticType, 
   return expanded !== null && expanded.type === type && expanded.id === id;
 }
 
+function qualityGradeClass(grade: string) {
+  if (grade === 'A' || grade === 'B') return 'wiki-quality-good';
+  if (grade === 'C') return 'wiki-quality-warning';
+  return 'wiki-quality-danger';
+}
+
 export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const [diagnostics, setDiagnostics] = useState<WikiDiagnostics | null>(null);
   const [expanded, setExpanded] = useState<ExpandedDiagnostic>(null);
@@ -163,7 +169,11 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
                 onClick={() => toggleExpanded('quality', quality.page_id)}
               >
                 <span>{quality.title}</span>
-                <strong>Grade {quality.quality_grade} · {quality.quality_score}/100 · {quality.status}</strong>
+                <strong className="wiki-quality-line">
+                  <span className={`wiki-quality-grade ${qualityGradeClass(quality.quality_grade)}`}>Grade {quality.quality_grade}</span>
+                  <span>{quality.quality_score}/100</span>
+                  <span>{quality.status}</span>
+                </strong>
                 {isExpanded(expanded, 'quality', quality.page_id) ? (
                   <div className="wiki-diagnostics-detail">
                     <p><b>Why it matters:</b> this computed quality signal estimates how trustworthy the page is based on evidence, runtime health, dependencies, and citation coverage. AI and human validation are intentionally marked separately.</p>
