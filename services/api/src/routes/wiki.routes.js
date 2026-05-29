@@ -16,40 +16,15 @@ import {
   saveWikiPageDependencies,
   updateWikiBuildState,
 } from '../db/wikiIncrementalRepository.js';
-import { buildIncrementalWikiPlan } from '../knowledge/wikiIncrementalService.js';
+import {
+  buildIncrementalWikiPlan,
+  collectCurrentWikiFingerprints,
+} from '../knowledge/wikiIncrementalService.js';
 import { buildSelectiveReplacementPlan } from '../knowledge/wikiSelectiveRebuildService.js';
 import { generateFileInsights } from '../insights/insightService.js';
 import { buildWikiPages } from '../knowledge/knowledgeService.js';
 import { parseLimit } from '../utils/request.js';
 import { createWikiJobsRouter } from './wikiJobs.routes.js';
-
-function buildFingerprintsFromWiki(wiki) {
-  const fingerprints = new Map();
-
-  for (const page of wiki?.pages || []) {
-    for (const source of page.sources || []) {
-      if (!source.file_id) continue;
-
-      const combinedText = [
-        source.evidence || '',
-        ...(source.chunks || []).map((chunk) => chunk.text || chunk.evidence || ''),
-      ].join('\n');
-
-      fingerprints.set(source.file_id, {
-        file_id: source.file_id,
-        absolute_path: source.absolute_path || null,
-        content_hash: crypto
-          .createHash('sha1')
-          .update(combinedText)
-          .digest('hex'),
-        content_length: combinedText.length,
-        extracted_at: new Date().toISOString(),
-      });
-    }
-  }
-
-  return [...fingerprints.values()];
-}
 
 function closeAndSend(db, res, payload, status = 200) {
   db.close();
@@ -211,7 +186,7 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
       }
 
       saveWikiPageDependencies(db, generatedWiki.pages || []);
-      saveWikiFileFingerprints(db, buildFingerprintsFromWiki(generatedWiki));
+      saveWikiFileFingerprints(db, collectCurrentWikiFingerprints(db));
 
       updateWikiBuildState(db, 'last_page_count', String(wiki.page_count || 0));
 
