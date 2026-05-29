@@ -78,6 +78,62 @@ function computePageQuality(page) {
   };
 }
 
+function computeWorkspaceTrustHealth(qualitySummary) {
+  if (!qualitySummary.length) {
+    return {
+      status: 'unknown',
+      quality_score: 0,
+      quality_grade: 'F',
+      page_count: 0,
+      grade_counts: { A: 0, B: 0, C: 0, D: 0, F: 0 },
+      reasons: ['No page quality signals are available yet.'],
+    };
+  }
+
+  const gradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+  let totalScore = 0;
+
+  for (const pageQuality of qualitySummary) {
+    gradeCounts[pageQuality.quality_grade] = (gradeCounts[pageQuality.quality_grade] || 0) + 1;
+    totalScore += pageQuality.quality_score;
+  }
+
+  const averageScore = Math.round(totalScore / qualitySummary.length);
+  const problemCount = gradeCounts.D + gradeCounts.F;
+  const warningCount = gradeCounts.C;
+  const status = problemCount > 0
+    ? 'degraded'
+    : warningCount > 0
+      ? 'warning'
+      : 'healthy';
+
+  const reasons = [
+    `${qualitySummary.length} page quality signal(s) evaluated.`,
+    `Average page quality score is ${averageScore}/100.`,
+  ];
+
+  if (problemCount > 0) {
+    reasons.push(`${problemCount} page(s) are in D/F trust range.`);
+  }
+
+  if (warningCount > 0) {
+    reasons.push(`${warningCount} page(s) are in C warning range.`);
+  }
+
+  if (status === 'healthy') {
+    reasons.push('All evaluated pages are currently in A/B trust range.');
+  }
+
+  return {
+    status,
+    quality_score: averageScore,
+    quality_grade: gradeForScore(averageScore),
+    page_count: qualitySummary.length,
+    grade_counts: gradeCounts,
+    reasons,
+  };
+}
+
 export function getWikiDiagnostics(db, { limit = 250 } = {}) {
   ensureWikiPersistenceSchema(db);
   ensureWikiIncrementalSchema(db);
@@ -148,6 +204,8 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
     LIMIT @limit
   `).all({ limit });
 
+  const qualitySummary = pageQualityRows.map(computePageQuality);
+
   return {
     generated_at: new Date().toISOString(),
     page_stats: {
@@ -163,7 +221,8 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
       chunk_count: Number(evidenceStats.chunk_count || 0),
       relation_count: Number(evidenceStats.relation_count || 0),
     },
-    quality_summary: pageQualityRows.map(computePageQuality),
+    workspace_trust_health: computeWorkspaceTrustHealth(qualitySummary),
+    quality_summary: qualitySummary,
     build_state: buildState,
     fingerprints,
     dependencies,
