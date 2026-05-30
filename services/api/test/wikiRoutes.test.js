@@ -192,6 +192,45 @@ test('durable wiki evidence routes expose pages, evidence, and source chunks', a
   });
 });
 
+test('wiki validation preview route returns advisory read-only preview for persisted page', async () => {
+  const dbPath = tempDbPath();
+  const seedDb = openDatabase(dbPath);
+  seedWiki(seedDb);
+  seedDb.close();
+
+  await withTestServer(dbPath, async (baseUrl) => {
+    const beforeDb = openDatabase(dbPath);
+    const beforeRebuildCount = beforeDb.prepare('SELECT COUNT(*) AS count FROM wiki_rebuilds').get().count;
+    const beforePage = beforeDb.prepare('SELECT updated_at FROM wiki_pages WHERE id = ?').get('workspace-overview');
+    beforeDb.close();
+
+    const previewResult = await postJson(`${baseUrl}/api/wiki/pages/workspace-overview/validation-preview`);
+
+    assert.equal(previewResult.response.status, 200);
+    assert.equal(previewResult.body.preview.page_id, 'workspace-overview');
+    assert.equal(previewResult.body.preview.mode, 'structural');
+    assert.equal(previewResult.body.preview.authority, 'advisory');
+    assert.equal(previewResult.body.preview.persisted, false);
+    assert.equal(previewResult.body.preview.confidence_score, 0);
+    assert.equal(previewResult.body.preview.support_score, 1);
+    assert.equal(previewResult.body.preview.risk_score, 0);
+    assert.equal(previewResult.body.preview.recommendation, 'pass');
+    assert.equal(Array.isArray(previewResult.body.preview.issues), true);
+
+    const afterDb = openDatabase(dbPath);
+    const afterRebuildCount = afterDb.prepare('SELECT COUNT(*) AS count FROM wiki_rebuilds').get().count;
+    const afterPage = afterDb.prepare('SELECT updated_at FROM wiki_pages WHERE id = ?').get('workspace-overview');
+    afterDb.close();
+
+    assert.equal(afterRebuildCount, beforeRebuildCount);
+    assert.equal(afterPage.updated_at, beforePage.updated_at);
+
+    const missingResult = await postJson(`${baseUrl}/api/wiki/pages/missing-page/validation-preview`);
+    assert.equal(missingResult.response.status, 404);
+    assert.equal(missingResult.body.error, 'Wiki page validation preview not found');
+  });
+});
+
 test('wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history', async () => {
   const dbPath = tempDbPath();
   const db = openDatabase(dbPath);
