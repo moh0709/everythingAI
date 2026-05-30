@@ -21,6 +21,7 @@ import {
   collectCurrentWikiFingerprints,
 } from '../knowledge/wikiIncrementalService.js';
 import { buildSelectiveReplacementPlan } from '../knowledge/wikiSelectiveRebuildService.js';
+import { buildWikiValidationPreview } from '../knowledge/wikiValidationPreviewService.js';
 import { generateFileInsights } from '../insights/insightService.js';
 import { buildWikiPages } from '../knowledge/knowledgeService.js';
 import { parseLimit } from '../utils/request.js';
@@ -87,6 +88,20 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
     }
 
     return closeAndSend(db, res, { evidence });
+  });
+
+  router.post('/wiki/pages/:pageId/validation-preview', (req, res) => {
+    const db = openDb();
+    const preview = buildWikiValidationPreview(db, req.params.pageId);
+
+    if (!preview) {
+      return closeAndSend(db, res, {
+        error: 'Wiki page validation preview not found',
+        pageId: req.params.pageId,
+      }, 404);
+    }
+
+    return closeAndSend(db, res, { preview });
   });
 
   router.get('/wiki/pages/:pageId/chunks/:chunkRef', (req, res) => {
