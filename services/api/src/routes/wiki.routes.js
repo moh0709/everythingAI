@@ -10,6 +10,10 @@ import {
   recordWikiRebuild,
 } from '../db/wikiRepository.js';
 import { getWikiDiagnostics } from '../db/wikiDiagnosticsRepository.js';
+import {
+  getWikiHumanValidation,
+  upsertWikiHumanValidation,
+} from '../db/wikiHumanValidationRepository.js';
 import { replacePersistedWikiPages } from '../db/wikiSelectivePersistence.js';
 import {
   saveWikiFileFingerprints,
@@ -102,6 +106,52 @@ export function createWikiRouter({ openDb = openDatabase } = {}) {
     }
 
     return closeAndSend(db, res, { preview });
+  });
+
+  router.get('/wiki/pages/:pageId/human-validation', (req, res) => {
+    const db = openDb();
+    const validation = getWikiHumanValidation(db, req.params.pageId);
+
+    if (!validation) {
+      return closeAndSend(db, res, {
+        error: 'Wiki page human validation not found',
+        pageId: req.params.pageId,
+      }, 404);
+    }
+
+    return closeAndSend(db, res, { validation });
+  });
+
+  router.post('/wiki/pages/:pageId/human-validation', (req, res) => {
+    const db = openDb();
+
+    try {
+      const validation = upsertWikiHumanValidation(db, {
+        pageId: req.params.pageId,
+        status: req.body?.status,
+        reviewedBy: req.body?.reviewed_by,
+        notes: req.body?.notes,
+      });
+
+      if (!validation) {
+        return closeAndSend(db, res, {
+          error: 'Wiki page human validation not found',
+          pageId: req.params.pageId,
+        }, 404);
+      }
+
+      return closeAndSend(db, res, { validation });
+    } catch (error) {
+      if (error.code === 'INVALID_HUMAN_VALIDATION_STATUS') {
+        return closeAndSend(db, res, {
+          error: 'Invalid human validation status',
+          allowed_statuses: ['reviewed', 'approved', 'needs_attention', 'rejected'],
+        }, 400);
+      }
+
+      db.close();
+      throw error;
+    }
   });
 
   router.get('/wiki/pages/:pageId/chunks/:chunkRef', (req, res) => {
