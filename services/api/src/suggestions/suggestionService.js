@@ -1,11 +1,27 @@
 import crypto from 'node:crypto';
 import path from 'node:path';
-import { getIndexedFileById, insertOrganizationSuggestion, listOrganizationSuggestions } from '../db/client.js';
+import {
+  getAppSetting,
+  getIndexedFileById,
+  insertOrganizationSuggestion,
+  listOrganizationSuggestions,
+} from '../db/client.js';
 import { analyzeFileForOrganization } from '../integrations/organizor/organizationRules.js';
 import { createConfiguredPlanningAnswer } from '../ai/providerRuntime.js';
+import { getDefaultAiProviderSettings, mergeAiProviderSettings } from '../settings/aiProviderSettings.js';
 
+const SETTINGS_KEY = 'ai_provider_settings';
 const ALLOWED_ACTION_TYPES = new Set(['tag', 'category', 'rename', 'move']);
 const ALLOWED_RISK_LEVELS = new Set(['low', 'medium', 'high']);
+const DEFAULT_PLANNING_RULES = Object.freeze({
+  confidenceThreshold: 0,
+  allowRename: true,
+  allowMove: true,
+  allowTag: true,
+  allowCategory: true,
+  requireApproval: true,
+  dryRunOnly: false,
+});
 
 function createSuggestionId(fileId, actionType, suggestedValue, planningSessionId = null) {
   return crypto
@@ -72,6 +88,50 @@ function normalizeRenameValue(value, originalFilename) {
   }
 
   return normalizedName;
+}
+
+function loadPlanningRules(db, explicitRules = null) {
+  const configuredRules = (() => {
+    try {
+      const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
+      return settings.planning || {};
+    } catch {
+      return {};
+    }
+  })();
+  const merged = {
+    ...DEFAULT_PLANNING_RULES,
+    ...configuredRules,
+    ...(explicitRules || {}),
+  };
+
+  return {
+    confidenceThreshold: Math.max(0, Math.min(1, Number(merged.confidenceThreshold) || 0)),
+    allowRename: merged.allowRename !== false,
+    allowMove: merged.allowMove !== false,
+    allowTag: merged.allowTag !== false,
+    allowCategory: merged.allowCategory !== false,
+    requireApproval: merged.requireApproval !== false,
+    dryRunOnly: merged.dryRunOnly === true,
+  };
+}
+
+function isActionAllowed(actionType, rules) {
+  if (actionType === 'rename') return rules.allowRename;
+  if (actionType === 'move') return rules.allowMove;
+  if (actionType === 'tag') return rules.allowTag;
+  if (actionType === 'category') return rules.allowCategory;
+  return false;
+}
+
+function applyPlanningRules(suggestions, rules) {
+  return suggestions
+    .filter((suggestion) => isActionAllowed(suggestion.action_type, rules))
+    .filter((suggestion) => Number(suggestion.confidence) >= rules.confidenceThreshold)
+    .map((suggestion) => ({
+      ...suggestion,
+      requires_approval: rules.requireApproval ? 1 : 0,
+    }));
 }
 
 function buildDeterministicSuggestions(file, analysis, { planningSessionId = null, createdAt = new Date().toISOString() } = {}) {
@@ -249,6 +309,7 @@ export async function generateConfiguredPreviewSuggestions(db, {
   planningSessionId = null,
   mode = 'hybrid',
   overrideProvider,
+  planningRules = null,
 } = {}) {
   const file = getIndexedFileById(db, fileId);
 
@@ -257,9 +318,13 @@ export async function generateConfiguredPreviewSuggestions(db, {
   }
 
   const normalizedMode = ['deterministic', 'provider', 'hybrid'].includes(mode) ? mode : 'hybrid';
+  const rules = loadPlanningRules(db, planningRules);
   const now = new Date().toISOString();
   const analysis = analyzeFileForOrganization(file);
-  const deterministicSuggestions = buildDeterministicSuggestions(file, analysis, { planningSessionId, createdAt: now });
+  const deterministicSuggestions = applyPlanningRules(
+    buildDeterministicSuggestions(file, analysis, { planningSessionId, createdAt: now }),
+    rules,
+  );
 
   if (normalizedMode === 'deterministic') {
     return persistNewSuggestions(db, deterministicSuggestions, { fileId: file.id, planningSessionId });
@@ -278,11 +343,14 @@ export async function generateConfiguredPreviewSuggestions(db, {
     }
 
     const providerPayload = parseProviderSuggestionPayload(providerResult.answer);
-    const providerSuggestions = normalizeProviderSuggestions(file, providerPayload, {
-      planningSessionId,
-      createdAt: now,
-      provider: providerResult.provider,
-    });
+    const providerSuggestions = applyPlanningRules(
+      normalizeProviderSuggestions(file, providerPayload, {
+        planningSessionId,
+        createdAt: now,
+        provider: providerResult.provider,
+      }),
+      rules,
+    );
     const suggestions = normalizedMode === 'provider'
       ? providerSuggestions.length ? providerSuggestions : deterministicSuggestions
       : combineSuggestions(providerSuggestions, deterministicSuggestions);
