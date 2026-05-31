@@ -1,0 +1,28 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Provider-Aware Planning Session Route Validated",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "repository": "moh0709/everythingAI",
+    "status": "complete_and_backend_validated",
+    "changed_files": ["services/api/src/routes/planning.routes.js"],
+    "commits": ["e9068894bcd98fe09a996bb1881e6f2cf0689814"],
+    "completed_scope": [
+      "POST /api/planning/sessions/:sessionId/run is now async.",
+      "Provider and hybrid planning sessions use runConfiguredPlanningSession.",
+      "Deterministic planning sessions preserve the legacy runPlanningSession path.",
+      "Missing planning sessions return 404 before execution."
+    ],
+    "validation": {
+      "backend_result": "passed",
+      "commands": ["npm test"],
+      "evidence": "User reported tests 99, pass 99, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 6807.1285.",
+      "frontend_result": "not_required_no_frontend_files_changed"
+    },
+    "next_candidates": [
+      "Add UI control for creating and running provider/hybrid planning sessions.",
+      "Polish Knowledge page wiki detail view.",
+      "Verify source path behavior after backend restart."
+    ]
+  }
+}
