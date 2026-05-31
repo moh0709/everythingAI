@@ -86,6 +86,12 @@ export type WikiDiagnostics = {
     relation_count: number;
   };
   workspace_trust_health?: WikiWorkspaceTrustHealth;
+  validation_summary?: {
+    status: string;
+    page_count: number;
+    counts: Record<string, number>;
+    reasons: string[];
+  };
   quality_summary?: WikiQualitySummary[];
   build_state: Array<{
     key: string;
