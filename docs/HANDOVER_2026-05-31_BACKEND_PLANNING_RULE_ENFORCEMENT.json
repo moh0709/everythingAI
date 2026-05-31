@@ -1,0 +1,48 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Backend Planning Rule Enforcement",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "repository": "moh0709/everythingAI",
+    "branch_policy": "main only unless explicitly changed by the user",
+    "source_of_truth_before_work": "docs/HANDOVER_2026-05-31_PROVIDER_BACKED_PLANNING_SUGGESTIONS.json",
+    "status": "complete_and_backend_validated",
+    "completed_scope": [
+      "Configured suggestion generation enforces confidenceThreshold.",
+      "Configured suggestion generation enforces allowRename, allowMove, allowTag, and allowCategory.",
+      "Configured suggestion generation carries requireApproval into persisted suggestions.",
+      "Action preview creation enforces dryRunOnly by blocking execution-ready previews.",
+      "Action execution respects preview.requires_approval instead of always forcing approval."
+    ],
+    "changed_files": [
+      "services/api/src/suggestions/suggestionService.js",
+      "services/api/src/previews/actionPreviewService.js",
+      "services/api/src/actions/actionExecutor.js",
+      "services/api/test/planningRulesEnforcement.test.js"
+    ],
+    "commits": [
+      "17d63357d3ae6dd482f8e6444fdf33e9d7debe3b",
+      "ee6516871e6470ff2bcdb3030c7f488b26ae4329",
+      "c1fcd31be741495ee443fc41b9c5cde82e8c1b41",
+      "b825eaf8902e8ac8a5f110503181c624acfccde9"
+    ],
+    "validation": {
+      "backend_command": "npm test",
+      "backend_working_directory": "services/api",
+      "backend_result": "passed",
+      "evidence": "User reported tests 99, pass 99, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 3419.7029.",
+      "frontend_result": "not required because no frontend files changed"
+    },
+    "preserved_invariants": [
+      "Existing deterministic suggestion generation remains backward-compatible.",
+      "Configured suggestions remain preview-oriented and governed by approval/dry-run rules.",
+      "No frontend files were changed."
+    ],
+    "next_candidates": [
+      "Add Undo UI.",
+      "Add Knowledge page.",
+      "Add AnythingLLM sync UI.",
+      "Surface planning-rule feedback in the UI."
+    ]
+  }
+}
