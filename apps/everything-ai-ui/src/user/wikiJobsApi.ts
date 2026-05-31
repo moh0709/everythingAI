@@ -13,6 +13,13 @@ export type WikiJob = {
   updated_at?: string;
 };
 
+export type WikiGovernanceFlags = {
+  high_quality_unreviewed?: boolean;
+  high_quality_rejected?: boolean;
+  high_quality_attention?: boolean;
+  low_quality_approved?: boolean;
+};
+
 export type WikiQualitySummary = {
   page_id: string;
   slug: string;
@@ -32,6 +39,7 @@ export type WikiQualitySummary = {
     ai_validation: string;
     human_validation: string;
   };
+  governance_flags?: WikiGovernanceFlags;
   reasons: string[];
 };
 
@@ -70,6 +78,15 @@ export type WikiHumanValidationUpdate = {
   notes?: string;
 };
 
+export type WikiGovernancePageSignal = {
+  page_id: string;
+  title: string;
+  quality_grade: string;
+  quality_score: number;
+  human_validation: string;
+  flags?: WikiGovernanceFlags;
+};
+
 export type WikiDiagnostics = {
   generated_at: string;
   page_stats: {
@@ -90,6 +107,10 @@ export type WikiDiagnostics = {
     status: string;
     page_count: number;
     counts: Record<string, number>;
+    conflict_count?: number;
+    review_candidate_count?: number;
+    conflicts?: WikiGovernancePageSignal[];
+    review_candidates?: WikiGovernancePageSignal[];
     reasons: string[];
   };
   quality_summary?: WikiQualitySummary[];
