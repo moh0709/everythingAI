@@ -1,3 +1,4 @@
+import { ensureWikiHumanValidationSchema } from './wikiHumanValidationRepository.js';
 import { ensureWikiIncrementalSchema } from './wikiIncrementalRepository.js';
 import { ensureWikiPersistenceSchema } from './wikiRepository.js';
 
@@ -72,7 +73,7 @@ function computePageQuality(page) {
       source_validation: page.source_count > 0 && page.chunk_count > 0 ? 'supported' : 'weak',
       runtime_validation: page.status === 'active' ? 'healthy' : 'degraded',
       ai_validation: 'not_started',
-      human_validation: 'not_started',
+      human_validation: page.human_validation_status || 'unreviewed',
     },
     reasons,
   };
@@ -134,9 +135,60 @@ function computeWorkspaceTrustHealth(qualitySummary) {
   };
 }
 
+function computeValidationSummary({ qualitySummary, validationRows }) {
+  const counts = {
+    unreviewed: qualitySummary.length,
+    reviewed: 0,
+    approved: 0,
+    needs_attention: 0,
+    rejected: 0,
+  };
+
+  for (const row of validationRows) {
+    if (!Object.prototype.hasOwnProperty.call(counts, row.status)) continue;
+    counts[row.status] += Number(row.count || 0);
+    counts.unreviewed -= Number(row.count || 0);
+  }
+
+  counts.unreviewed = Math.max(0, counts.unreviewed);
+
+  const reviewedTotal = counts.reviewed + counts.approved + counts.needs_attention + counts.rejected;
+  const attentionTotal = counts.needs_attention + counts.rejected;
+  const status = attentionTotal > 0
+    ? 'attention_required'
+    : counts.unreviewed > 0
+      ? 'incomplete'
+      : 'complete';
+
+  const reasons = [
+    `${qualitySummary.length} page(s) included in validation visibility.`,
+    `${reviewedTotal} page(s) have a stored human validation record.`,
+  ];
+
+  if (counts.unreviewed > 0) {
+    reasons.push(`${counts.unreviewed} page(s) are still unreviewed.`);
+  }
+
+  if (attentionTotal > 0) {
+    reasons.push(`${attentionTotal} page(s) require attention or were rejected.`);
+  }
+
+  if (status === 'complete') {
+    reasons.push('All visible pages have a stored human validation record.');
+  }
+
+  return {
+    status,
+    page_count: qualitySummary.length,
+    counts,
+    reasons,
+  };
+}
+
 export function getWikiDiagnostics(db, { limit = 250 } = {}) {
   ensureWikiPersistenceSchema(db);
   ensureWikiIncrementalSchema(db);
+  ensureWikiHumanValidationSchema(db);
 
   const buildState = db.prepare(`
     SELECT key, value, updated_at
@@ -192,10 +244,12 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
       page.status,
       page.citation_coverage_score,
       page.weak_source_warning,
+      human.status AS human_validation_status,
       COUNT(DISTINCT source.id) AS source_count,
       COUNT(DISTINCT chunk.id) AS chunk_count,
       COUNT(DISTINCT dependency.id) AS dependency_count
     FROM wiki_pages page
+    LEFT JOIN wiki_human_validations human ON human.page_id = page.id
     LEFT JOIN wiki_page_sources source ON source.page_id = page.id
     LEFT JOIN wiki_source_chunks chunk ON chunk.page_id = page.id
     LEFT JOIN wiki_page_dependencies dependency ON dependency.page_id = page.id
@@ -203,6 +257,12 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
     ORDER BY page.title ASC
     LIMIT @limit
   `).all({ limit });
+
+  const validationRows = db.prepare(`
+    SELECT status, COUNT(*) AS count
+    FROM wiki_human_validations
+    GROUP BY status
+  `).all();
 
   const qualitySummary = pageQualityRows.map(computePageQuality);
 
@@ -222,6 +282,7 @@ export function getWikiDiagnostics(db, { limit = 250 } = {}) {
       relation_count: Number(evidenceStats.relation_count || 0),
     },
     workspace_trust_health: computeWorkspaceTrustHealth(qualitySummary),
+    validation_summary: computeValidationSummary({ qualitySummary, validationRows }),
     quality_summary: qualitySummary,
     build_state: buildState,
     fingerprints,
