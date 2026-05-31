@@ -6,7 +6,7 @@ import {
   listAuditLog,
   listFileLabels,
 } from '../db/client.js';
-import { generatePreviewSuggestions } from '../suggestions/suggestionService.js';
+import { generateConfiguredPreviewSuggestions } from '../suggestions/suggestionService.js';
 import { createActionPreview } from '../previews/actionPreviewService.js';
 import { executeActionPreview, undoActionExecution } from '../actions/actionExecutor.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
@@ -14,13 +14,17 @@ import { requireBodyString, parseLimit } from '../utils/request.js';
 export function createActionsRouter() {
   const router = Router();
 
-  router.post('/suggestions', (req, res, next) => {
+  router.post('/suggestions', async (req, res, next) => {
     try {
       const fileId = requireBodyString(req, res, 'fileId');
       if (!fileId) return;
 
       const db = openDatabase();
-      const suggestions = generatePreviewSuggestions(db, { fileId });
+      const suggestions = await generateConfiguredPreviewSuggestions(db, {
+        fileId,
+        mode: req.body?.mode || 'hybrid',
+        overrideProvider: req.body?.provider,
+      });
       db.close();
 
       res.status(201).json({ suggestions });
