@@ -7,7 +7,7 @@ import {
   listPlanningSessions,
   updatePlanningSession,
 } from '../db/client.js';
-import { generatePreviewSuggestions } from '../suggestions/suggestionService.js';
+import { generateConfiguredPreviewSuggestions } from '../suggestions/suggestionService.js';
 
 export const PLANNING_SESSION_STATUSES = Object.freeze({
   DRAFT: 'draft',
@@ -166,7 +166,7 @@ export function listPlanningSessionRecords(db, { limit = 100, status } = {}) {
   return listPlanningSessions(db, { limit, status });
 }
 
-export function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
+export async function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
   const session = getPlanningSessionById(db, sessionId);
 
   if (!session) {
@@ -189,9 +189,11 @@ export function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
 
     for (const file of files) {
       try {
-        const generated = generatePreviewSuggestions(db, {
+        const generated = await generateConfiguredPreviewSuggestions(db, {
           fileId: file.id,
           planningSessionId: session.id,
+          mode: session.mode,
+          overrideProvider: session.settings.provider,
         });
         suggestions.push(...generated.filter((suggestion) => suggestion.planning_session_id === session.id));
       } catch {
