@@ -1,0 +1,37 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Knowledge Wiki Detail View Validated",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "repository": "moh0709/everythingAI",
+    "status": "complete_and_frontend_validated",
+    "changed_files": [
+      "apps/everything-ai-ui/src/AppEnhanced.tsx"
+    ],
+    "commits": [
+      "9ff4efc50ab76eacff637246911aea5420c932da"
+    ],
+    "completed_scope": [
+      "Added selectable wiki page detail panel inside the Knowledge page.",
+      "Added wiki page dropdown selector and clickable wiki page list.",
+      "Selected wiki page shows title, page type, category, subcategory, updated timestamp, and content/markdown/summary fallback.",
+      "Selected wiki page shows source references when present in the wiki payload.",
+      "Existing Knowledge page sections remain available: AnythingLLM sync, classifications, entities, duplicate groups, and wiki pages list."
+    ],
+    "validation": {
+      "frontend_result": "passed",
+      "commands": [
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "evidence": "User reported tsc --noEmit passed and vite build passed with 1544 modules transformed in 1.18s.",
+      "backend_result": "not_required_no_backend_files_changed"
+    },
+    "next_candidates": [
+      "Verify source path add/pause/resume/remove after backend restart.",
+      "Verify watcher behavior for backend-persisted source paths.",
+      "Add clearer provider-specific error messages and UI feedback.",
+      "Generate next consolidated official handover report."
+    ]
+  }
+}
