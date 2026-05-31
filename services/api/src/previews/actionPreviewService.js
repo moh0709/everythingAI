@@ -1,7 +1,10 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { getOrganizationSuggestionById, insertActionPreview, updateActionPreviewExecutability } from '../db/client.js';
+import { getAppSetting, getOrganizationSuggestionById, insertActionPreview, updateActionPreviewExecutability } from '../db/client.js';
+import { getDefaultAiProviderSettings, mergeAiProviderSettings } from '../settings/aiProviderSettings.js';
+
+const SETTINGS_KEY = 'ai_provider_settings';
 
 function createPreviewId(suggestionId) {
   return crypto
@@ -17,6 +20,15 @@ function hasPathSeparators(value) {
 function isInsideDirectory(candidatePath, parentDirectory) {
   const relative = path.relative(parentDirectory, candidatePath);
   return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function isDryRunOnly(db) {
+  try {
+    const settings = mergeAiProviderSettings(getAppSetting(db, SETTINGS_KEY) || getDefaultAiProviderSettings());
+    return settings.planning?.dryRunOnly === true;
+  } catch {
+    return false;
+  }
 }
 
 async function pathExists(filePath) {
@@ -106,6 +118,8 @@ export async function createActionPreview(db, { suggestionId, destinationFolder 
   }
 
   const { targetPath, blockedReason } = await resolveTargetPath(suggestion, destinationFolder);
+  const dryRunBlockedReason = isDryRunOnly(db) ? 'Planning rules are set to dry-run-only mode.' : null;
+  const finalBlockedReason = dryRunBlockedReason || blockedReason;
   const preview = {
     id: createPreviewId(suggestion.id),
     suggestion_id: suggestion.id,
@@ -116,10 +130,10 @@ export async function createActionPreview(db, { suggestionId, destinationFolder 
     current_value: suggestion.current_value,
     suggested_value: suggestion.suggested_value,
     risk_level: suggestion.risk_level,
-    requires_approval: 1,
-    can_execute: blockedReason ? 0 : 1,
-    blocked_reason: blockedReason,
-    preview_status: blockedReason ? 'blocked' : 'ready',
+    requires_approval: suggestion.requires_approval === 1 ? 1 : 0,
+    can_execute: finalBlockedReason ? 0 : 1,
+    blocked_reason: finalBlockedReason,
+    preview_status: finalBlockedReason ? 'blocked' : 'ready',
     created_at: new Date().toISOString(),
   };
 
