@@ -1,0 +1,200 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Consolidated Local MVP Hardening Milestone Handover",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_chain": [
+      "docs/HANDOVER_2026-05-31_PHASE7_6_GOVERNANCE_AND_TRUST_VISIBILITY_COMPLETION.json",
+      "docs/HANDOVER_2026-05-31_PROVIDER_BACKED_PLANNING_SUGGESTIONS.json",
+      "docs/HANDOVER_2026-05-31_BACKEND_PLANNING_RULE_ENFORCEMENT.json",
+      "docs/HANDOVER_2026-05-31_UNDO_UI_VALIDATED.json",
+      "docs/HANDOVER_2026-05-31_KNOWLEDGE_PAGE_VALIDATED.json",
+      "docs/HANDOVER_2026-05-31_PLANNING_RULE_FEEDBACK_UI_VALIDATED.json",
+      "docs/HANDOVER_2026-05-31_PROVIDER_AWARE_PLANNING_SESSION_ROUTE_VALIDATED.json",
+      "docs/HANDOVER_2026-05-31_PROVIDER_HYBRID_PLANNING_SESSION_UI_VALIDATED.json",
+      "docs/HANDOVER_2026-05-31_KNOWLEDGE_WIKI_DETAIL_VIEW_VALIDATED.json",
+      "docs/HANDOVER_2026-05-31_SOURCE_PATH_WATCHER_RESUME_VALIDATED.json"
+    ],
+    "executive_summary": {
+      "project_identity": "EverythingAI is a local-first source-backed AI knowledge workspace and file intelligence platform. It indexes scoped local files, extracts content, generates source-backed wiki/knowledge views, produces governed planning suggestions, and supports safe file organization through preview, approval, execution, audit, and undo workflows.",
+      "current_phase": "Local MVP hardening after Phase 7.6 governance/trust visibility completion.",
+      "milestone_status": "A large local-MVP hardening milestone is now complete and validated across backend and frontend steps.",
+      "current_product_state": "The active enhanced React UI now includes Dashboard, Explorer, Planning, Knowledge, Analytics, Settings, source-path scope controls, provider settings, provider/hybrid planning sessions, Undo UI, Knowledge wiki detail view, and AnythingLLM sync controls. The backend now supports provider-backed planning suggestions, planning-rule enforcement, provider-aware planning-session execution, and automatic watcher resume for persisted source paths after backend restart."
+    },
+    "validated_milestones": [
+      {
+        "name": "Phase 7.6 Governance & Trust Visibility",
+        "status": "complete_before_this_consolidation",
+        "summary": "Workspace Trust Health, Knowledge Quality Scoring, Human Validation, Review Coverage, Governance Conflict Detection, Review Candidate Detection, backend diagnostics support, and frontend diagnostics type support were already completed and validated before this hardening sequence."
+      },
+      {
+        "name": "Provider-backed planning suggestions",
+        "status": "complete_and_backend_validated",
+        "summary": "Selected provider can control planning/suggestion generation through the configured suggestion API path with deterministic fallback."
+      },
+      {
+        "name": "Backend planning-rule enforcement",
+        "status": "complete_and_backend_validated",
+        "summary": "Configured suggestion generation now enforces confidence threshold, allow/disable rename/move/tag/category, requireApproval, and dryRunOnly preview blocking."
+      },
+      {
+        "name": "Undo UI",
+        "status": "complete_and_frontend_validated",
+        "summary": "Planning and Analytics views now expose execution history and guarded Undo actions using existing backend undo APIs."
+      },
+      {
+        "name": "Knowledge page",
+        "status": "complete_and_frontend_validated",
+        "summary": "Knowledge section now shows classifications, extracted entities, duplicate groups, generated wiki pages, and knowledge stats."
+      },
+      {
+        "name": "AnythingLLM sync UI",
+        "status": "complete_and_frontend_validated_in_conversation",
+        "summary": "Knowledge page includes a safe AnythingLLM sync trigger using server-side integration credentials. The code commit exists on main; handover file creation was blocked earlier by connector safety checks, but typecheck/build passed."
+      },
+      {
+        "name": "Planning-rule feedback UI",
+        "status": "complete_and_frontend_validated",
+        "summary": "Planning page surfaces active rules, confidence threshold, disabled action types, blocked preview counts, backend blocked reasons, and approval/dry-run status."
+      },
+      {
+        "name": "Provider-aware planning-session route",
+        "status": "complete_and_backend_validated",
+        "summary": "Planning-session run route now dispatches provider/hybrid modes to runConfiguredPlanningSession while preserving deterministic behavior for deterministic mode."
+      },
+      {
+        "name": "Provider/hybrid planning-session UI",
+        "status": "complete_and_frontend_validated",
+        "summary": "Planning page can create and run deterministic/provider/hybrid planning sessions and display recent session status/results."
+      },
+      {
+        "name": "Knowledge wiki detail view",
+        "status": "complete_and_frontend_validated",
+        "summary": "Knowledge page now includes selectable wiki page detail, content/markdown/summary fallback, and source references when present."
+      },
+      {
+        "name": "Source-path watcher resume after backend restart",
+        "status": "complete_and_backend_validated",
+        "summary": "Backend startup now resumes persisted active watchers, ignores stopped roots, reports failed roots, and marks missing roots as failed instead of silently continuing."
+      }
+    ],
+    "important_changed_files": {
+      "backend": [
+        "services/api/src/ai/providerRuntime.js",
+        "services/api/src/suggestions/suggestionService.js",
+        "services/api/src/routes/actions.routes.js",
+        "services/api/src/planning/planningSessionService.js",
+        "services/api/src/routes/planning.routes.js",
+        "services/api/src/previews/actionPreviewService.js",
+        "services/api/src/actions/actionExecutor.js",
+        "services/api/src/watcher/watchService.js",
+        "services/api/src/server.js",
+        "services/api/test/providerPlanningSuggestions.test.js",
+        "services/api/test/planningRulesEnforcement.test.js",
+        "services/api/test/sourcePathWatcherResume.test.js"
+      ],
+      "frontend": [
+        "apps/everything-ai-ui/src/AppEnhanced.tsx"
+      ],
+      "docs": [
+        "docs/HANDOVER_2026-05-31_PROVIDER_BACKED_PLANNING_SUGGESTIONS.json",
+        "docs/HANDOVER_2026-05-31_BACKEND_PLANNING_RULE_ENFORCEMENT.json",
+        "docs/HANDOVER_2026-05-31_UNDO_UI_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_KNOWLEDGE_PAGE_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_PLANNING_RULE_FEEDBACK_UI_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_PROVIDER_AWARE_PLANNING_SESSION_ROUTE_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_PROVIDER_HYBRID_PLANNING_SESSION_UI_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_KNOWLEDGE_WIKI_DETAIL_VIEW_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_SOURCE_PATH_WATCHER_RESUME_VALIDATED.json",
+        "docs/HANDOVER_2026-05-31_CONSOLIDATED_LOCAL_MVP_HARDENING_MILESTONE.json"
+      ]
+    },
+    "validation_evidence": {
+      "backend_latest": {
+        "command": "npm test",
+        "working_directory": "services/api",
+        "result": "passed",
+        "evidence": "User reported tests 102, pass 102, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 3011.3172."
+      },
+      "frontend_latest": {
+        "commands": [
+          "npm run typecheck",
+          "npm run build"
+        ],
+        "working_directory": "apps/everything-ai-ui",
+        "result": "passed",
+        "evidence": "User repeatedly reported tsc --noEmit passed and vite build passed after each frontend milestone. Latest wiki-detail validation passed with 1544 modules transformed and build completed in 1.18s. Provider/hybrid planning-session UI also passed with build completed in 1.16s."
+      },
+      "overall": "validated"
+    },
+    "governance_and_safety_invariants_preserved": [
+      "Work remained directly on main branch.",
+      "Existing diagnostics were not removed.",
+      "Trust-score calculations were not changed.",
+      "Quality-score calculations were not changed.",
+      "Human validation remains separate from quality scoring.",
+      "AI validation still does not outweigh human validation.",
+      "Diagnostics payload backward compatibility was preserved.",
+      "Provider-backed planning suggestions are normalized and remain safe/reviewable.",
+      "Filesystem mutations still go through preview and execution controls.",
+      "Undo remains explicit and user-confirmed in the UI.",
+      "AnythingLLM credentials remain server-side only and are not exposed in the browser.",
+      "Source-path watcher startup resume handles failure without aborting all remaining source paths."
+    ],
+    "current_capabilities_after_this_milestone": [
+      "Local source-path scope management from the UI.",
+      "Backend-persisted source paths with startup watcher resume.",
+      "Automatic indexing/extraction/knowledge pipeline foundation.",
+      "Explorer with search/filter/content preview.",
+      "Configurable provider settings and model discovery.",
+      "Provider-backed chat/insights/planning suggestion foundation.",
+      "Planning-session runner with deterministic/provider/hybrid modes.",
+      "Planning-rule enforcement and UI feedback.",
+      "Dry-run preview queue and guarded execution.",
+      "Execution history and Undo UI.",
+      "Knowledge page with classifications, entities, duplicates, wiki pages, wiki detail preview, and source references.",
+      "AnythingLLM sync control from the Knowledge page.",
+      "Analytics/audit visibility for actions and undoable executions."
+    ],
+    "known_limitations_or_followups": [
+      "Manual local smoke testing is still recommended for source path add/pause/resume/remove after an actual backend restart on the user's Windows environment.",
+      "Watcher behavior should be manually verified by adding a file into a watched source folder after restart and confirming indexing/knowledge ingestion updates.",
+      "Provider-specific error messages and UI feedback still need refinement.",
+      "ROADMAP.md likely still needs a smaller manual patch to reflect all completed local MVP hardening work if connector safety permits.",
+      "AppEnhanced.tsx is now feature-rich and dense; future frontend work should consider component modularization under apps/everything-ai-ui/src/components or a similar structure.",
+      "The Knowledge wiki detail view currently uses available /api/wiki list payload fields and falls back to content/markdown/summary. A future backend/UI detail endpoint may provide richer full-page rendering.",
+      "AnythingLLM sync UI uses the existing backend route and server env config. End-to-end sync still depends on valid ANYTHINGLLM_BASE_URL, ANYTHINGLLM_API_KEY, and ANYTHINGLLM_WORKSPACE_SLUG settings."
+    ],
+    "recommended_next_actions": [
+      {
+        "priority": 1,
+        "task": "Run manual local smoke test for source path add/pause/resume/remove after backend restart.",
+        "reason": "Automated backend tests now prove restart-resume selection logic, but real OS watcher behavior should be verified on the user's Windows setup."
+      },
+      {
+        "priority": 2,
+        "task": "Add clearer provider-specific error messages and UI feedback.",
+        "reason": "Provider-backed planning/chat/insights now exist, but user-facing errors can be clearer for missing keys, disabled remote providers, missing model, timeout, and unavailable local Ollama."
+      },
+      {
+        "priority": 3,
+        "task": "Patch ROADMAP.md to mark recent hardening milestones complete.",
+        "reason": "Multiple milestone handovers are now present, but the roadmap should be updated when safe to keep high-level project tracking aligned."
+      },
+      {
+        "priority": 4,
+        "task": "Begin frontend modularization of AppEnhanced.tsx.",
+        "reason": "The active UI now carries many validated sections in one file; modularization will reduce future regression risk."
+      }
+    ],
+    "startup_instruction_for_next_agent": "Before making changes, read this consolidated handover first, then inspect the latest specific handover for the area being changed. Work directly on main. Preserve governance invariants. After every backend change run npm test in services/api. After every frontend change run npm run typecheck and npm run build in apps/everything-ai-ui."
+  }
+}

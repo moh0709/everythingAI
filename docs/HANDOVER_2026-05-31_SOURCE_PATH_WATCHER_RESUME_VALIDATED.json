@@ -1,0 +1,42 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Source Path Watcher Resume Validated",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "repository": "moh0709/everythingAI",
+    "status": "complete_and_backend_validated",
+    "changed_files": [
+      "services/api/src/watcher/watchService.js",
+      "services/api/src/server.js",
+      "services/api/test/sourcePathWatcherResume.test.js"
+    ],
+    "commits": [
+      "be4b5a199a26028861dfda9e4ce350757c773d0e",
+      "daef0ca83cffeab8c3e4ddec108c44f7c2f58d1d",
+      "59c62bd85bd24db9660a27aef747af465181613f",
+      "cd968b0e4f4790ff0ee3d1d6a30ecc87262deb9b"
+    ],
+    "completed_scope": [
+      "Added persisted active watch-root discovery.",
+      "Added resumePersistedWatchers for restarting active source-path watchers after backend restart.",
+      "Server startup now bootstraps persisted active watchers after the API starts listening.",
+      "Stopped watch roots are not resumed.",
+      "Failed watcher resumes are reported without blocking remaining active paths.",
+      "Missing watch roots are marked failed instead of silently continuing.",
+      "Fixed test watch-root ID generation to use full SHA-256 path hash and avoid primary-key collisions."
+    ],
+    "validation": {
+      "backend_result": "passed",
+      "commands": [
+        "npm test"
+      ],
+      "evidence": "User reported tests 102, pass 102, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 3011.3172.",
+      "frontend_result": "not_required_no_frontend_files_changed"
+    },
+    "next_candidates": [
+      "Generate next consolidated official handover report.",
+      "Add clearer provider-specific error messages and UI feedback.",
+      "Run a manual local smoke test for source path add/pause/resume/remove in the UI after backend restart."
+    ]
+  }
+}
