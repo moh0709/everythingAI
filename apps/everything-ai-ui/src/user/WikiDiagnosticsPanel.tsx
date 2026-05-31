@@ -59,6 +59,12 @@ function trustHealthClass(status?: string) {
   return 'wiki-quality-danger';
 }
 
+function reviewCoverageClass(status?: string) {
+  if (status === 'complete') return 'wiki-quality-good';
+  if (status === 'attention_required') return 'wiki-quality-danger';
+  return 'wiki-quality-warning';
+}
+
 export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const [diagnostics, setDiagnostics] = useState<WikiDiagnostics | null>(null);
   const [expanded, setExpanded] = useState<ExpandedDiagnostic>(null);
@@ -87,6 +93,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   }, [options]);
 
   const workspaceTrust = diagnostics?.workspace_trust_health;
+  const validationSummary = diagnostics?.validation_summary;
   const recentRebuilds = diagnostics?.rebuilds.slice(0, 3) || [];
   const recentFingerprints = diagnostics?.fingerprints.slice(0, 3) || [];
   const recentDependencies = diagnostics?.dependencies.slice(0, 4) || [];
@@ -178,6 +185,33 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
             </>
           ) : (
             <div className="wiki-diagnostics-empty">No workspace trust health available yet.</div>
+          )}
+        </article>
+
+        <article className="wiki-diagnostics-card">
+          <div className="wiki-diagnostics-card-title">
+            <strong>Review Coverage</strong>
+            <span>Workspace governance visibility</span>
+          </div>
+          {validationSummary ? (
+            <>
+              <div className="wiki-diagnostics-mini-grid">
+                <div><span>Status</span><strong className={`wiki-quality-grade ${reviewCoverageClass(validationSummary.status)}`}>{validationSummary.status}</strong></div>
+                <div><span>Pages</span><strong>{formatNumber(validationSummary.page_count)}</strong></div>
+                <div><span>Unreviewed</span><strong>{formatNumber(validationSummary.counts.unreviewed)}</strong></div>
+                <div><span>Reviewed</span><strong>{formatNumber(validationSummary.counts.reviewed)}</strong></div>
+                <div><span>Approved</span><strong>{formatNumber(validationSummary.counts.approved)}</strong></div>
+                <div><span>Needs attention</span><strong>{formatNumber(validationSummary.counts.needs_attention)}</strong></div>
+                <div><span>Rejected</span><strong>{formatNumber(validationSummary.counts.rejected)}</strong></div>
+              </div>
+              <div className="wiki-diagnostics-detail wiki-diagnostics-detail-static">
+                <ul className="wiki-diagnostics-reasons">
+                  {validationSummary.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+                </ul>
+              </div>
+            </>
+          ) : (
+            <div className="wiki-diagnostics-empty">No review coverage data available yet.</div>
           )}
         </article>
 
