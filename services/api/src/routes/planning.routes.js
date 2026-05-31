@@ -4,6 +4,7 @@ import {
   createPlanningSession,
   getPlanningSessionWithSuggestions,
   listPlanningSessionRecords,
+  runConfiguredPlanningSession,
   runPlanningSession,
 } from '../planning/planningSessionService.js';
 import { parseLimit } from '../utils/request.js';
@@ -61,18 +62,36 @@ export function createPlanningRouter() {
     }
   });
 
-  router.post('/planning/sessions/:sessionId/run', (req, res, next) => {
+  router.post('/planning/sessions/:sessionId/run', async (req, res, next) => {
+    const db = openDatabase();
+
     try {
-      const db = openDatabase();
-      const result = runPlanningSession(db, {
+      const existing = getPlanningSessionWithSuggestions(db, {
         sessionId: req.params.sessionId,
-        limit: parseLimit(req.body?.limit, 1000),
+        limit: 1,
       });
+
+      if (!existing) {
+        db.close();
+        return res.status(404).json({ error: 'planning session not found' });
+      }
+
+      const mode = existing.session.mode;
+      const result = mode === 'provider' || mode === 'hybrid'
+        ? await runConfiguredPlanningSession(db, {
+          sessionId: req.params.sessionId,
+          limit: parseLimit(req.body?.limit, 1000),
+        })
+        : runPlanningSession(db, {
+          sessionId: req.params.sessionId,
+          limit: parseLimit(req.body?.limit, 1000),
+        });
       db.close();
 
-      res.json(result);
+      return res.json(result);
     } catch (error) {
-      next(error);
+      db.close();
+      return next(error);
     }
   });
 
