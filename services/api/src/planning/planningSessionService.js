@@ -7,7 +7,7 @@ import {
   listPlanningSessions,
   updatePlanningSession,
 } from '../db/client.js';
-import { generateConfiguredPreviewSuggestions } from '../suggestions/suggestionService.js';
+import { generatePreviewSuggestions, generateConfiguredPreviewSuggestions } from '../suggestions/suggestionService.js';
 
 export const PLANNING_SESSION_STATUSES = Object.freeze({
   DRAFT: 'draft',
@@ -166,13 +166,7 @@ export function listPlanningSessionRecords(db, { limit = 100, status } = {}) {
   return listPlanningSessions(db, { limit, status });
 }
 
-export async function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
-  const session = getPlanningSessionById(db, sessionId);
-
-  if (!session) {
-    throw new Error(`Planning session not found: ${sessionId}`);
-  }
-
+function startPlanningSession(db, session) {
   const startedAt = now();
   const runningSession = {
     ...session,
@@ -181,6 +175,87 @@ export async function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
     error_message: null,
   };
   updatePlanningSession(db, serializeSession(runningSession));
+}
+
+function completePlanningSession(db, session, { files, suggestions, failedFiles }) {
+  const summary = {
+    ...countSuggestions(suggestions),
+    totalFilesAnalyzed: files.length,
+    failedFiles,
+    skippedFiles: 0,
+  };
+  const completedAt = now();
+  const readySession = {
+    ...session,
+    status: PLANNING_SESSION_STATUSES.READY,
+    summary,
+    error_message: null,
+    updated_at: completedAt,
+    completed_at: completedAt,
+  };
+
+  updatePlanningSession(db, serializeSession(readySession));
+
+  return {
+    session: getPlanningSessionById(db, session.id),
+    suggestions: listOrganizationSuggestions(db, { planningSessionId: session.id, limit: Math.max(files.length * 10, 500) }),
+  };
+}
+
+function failPlanningSession(db, session, error) {
+  const failedAt = now();
+  const failedSession = {
+    ...session,
+    status: PLANNING_SESSION_STATUSES.FAILED,
+    error_message: error.message,
+    updated_at: failedAt,
+    completed_at: failedAt,
+  };
+
+  updatePlanningSession(db, serializeSession(failedSession));
+}
+
+export function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
+  const session = getPlanningSessionById(db, sessionId);
+
+  if (!session) {
+    throw new Error(`Planning session not found: ${sessionId}`);
+  }
+
+  startPlanningSession(db, session);
+
+  try {
+    const files = getFilesForPlanning(db, session.source, { limit });
+    const suggestions = [];
+    let failedFiles = 0;
+
+    for (const file of files) {
+      try {
+        const generated = generatePreviewSuggestions(db, {
+          fileId: file.id,
+          planningSessionId: session.id,
+        });
+        suggestions.push(...generated.filter((suggestion) => suggestion.planning_session_id === session.id));
+      } catch {
+        failedFiles += 1;
+      }
+    }
+
+    return completePlanningSession(db, session, { files, suggestions, failedFiles });
+  } catch (error) {
+    failPlanningSession(db, session, error);
+    throw error;
+  }
+}
+
+export async function runConfiguredPlanningSession(db, { sessionId, limit = 1000 } = {}) {
+  const session = getPlanningSessionById(db, sessionId);
+
+  if (!session) {
+    throw new Error(`Planning session not found: ${sessionId}`);
+  }
+
+  startPlanningSession(db, session);
 
   try {
     const files = getFilesForPlanning(db, session.source, { limit });
@@ -201,39 +276,9 @@ export async function runPlanningSession(db, { sessionId, limit = 1000 } = {}) {
       }
     }
 
-    const summary = {
-      ...countSuggestions(suggestions),
-      totalFilesAnalyzed: files.length,
-      failedFiles,
-      skippedFiles: 0,
-    };
-    const completedAt = now();
-    const readySession = {
-      ...session,
-      status: PLANNING_SESSION_STATUSES.READY,
-      summary,
-      error_message: null,
-      updated_at: completedAt,
-      completed_at: completedAt,
-    };
-
-    updatePlanningSession(db, serializeSession(readySession));
-
-    return {
-      session: getPlanningSessionById(db, session.id),
-      suggestions: listOrganizationSuggestions(db, { planningSessionId: session.id, limit: Math.max(limit * 10, 500) }),
-    };
+    return completePlanningSession(db, session, { files, suggestions, failedFiles });
   } catch (error) {
-    const failedAt = now();
-    const failedSession = {
-      ...session,
-      status: PLANNING_SESSION_STATUSES.FAILED,
-      error_message: error.message,
-      updated_at: failedAt,
-      completed_at: failedAt,
-    };
-
-    updatePlanningSession(db, serializeSession(failedSession));
+    failPlanningSession(db, session, error);
     throw error;
   }
 }
