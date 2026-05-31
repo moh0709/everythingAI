@@ -1,0 +1,102 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Provider-Backed Planning Suggestions Handover",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_before_work": {
+      "latest_prior_handover": "docs/HANDOVER_2026-05-31_PHASE7_6_GOVERNANCE_AND_TRUST_VISIBILITY_COMPLETION.json",
+      "prior_status": "Phase 7.6 Governance & Trust Visibility complete and fully validated"
+    },
+    "roadmap_step_completed": {
+      "area": "AI provider system / Planning and organization workflow",
+      "completed_item": "Selected provider can control planning/suggestion generation through the configured suggestion API path.",
+      "status": "complete_and_backend_validated"
+    },
+    "implemented_work": [
+      {
+        "path": "services/api/src/ai/providerRuntime.js",
+        "summary": "Added createConfiguredPlanningAnswer so the configured provider can generate structured JSON planning suggestions. Provider policy checks remain centralized and remote-provider restrictions are preserved."
+      },
+      {
+        "path": "services/api/src/suggestions/suggestionService.js",
+        "summary": "Kept generatePreviewSuggestions deterministic and synchronous for backward compatibility. Added generateConfiguredPreviewSuggestions with deterministic/provider/hybrid modes, provider JSON parsing, output normalization, approval-required suggestions, and deterministic fallback."
+      },
+      {
+        "path": "services/api/src/routes/actions.routes.js",
+        "summary": "Updated POST /suggestions to use generateConfiguredPreviewSuggestions with default hybrid mode and optional provider override."
+      },
+      {
+        "path": "services/api/src/planning/planningSessionService.js",
+        "summary": "Preserved runPlanningSession as synchronous deterministic behavior for existing route/test compatibility. Added runConfiguredPlanningSession as an async provider-aware planning runner for future route/UI wiring."
+      },
+      {
+        "path": "services/api/test/providerPlanningSuggestions.test.js",
+        "summary": "Added regression tests proving provider-backed suggestions and fallback behavior."
+      }
+    ],
+    "commits": [
+      {
+        "sha": "b050c64ef62a5e15a045c13c06fad74546b261d8",
+        "message": "Add configured provider planning runtime"
+      },
+      {
+        "sha": "f4db2fe5a12ce6e3da18f6be5174a4ba30e3727b",
+        "message": "Add provider-backed suggestion generation"
+      },
+      {
+        "sha": "322be636519aeb98cbf9c34220e5803b7d498355",
+        "message": "Use configured provider for suggestion API"
+      },
+      {
+        "sha": "8c024d9d177f3a547fd1c5f26d4042b567ddf907",
+        "message": "Harden Google planning response parsing"
+      },
+      {
+        "sha": "ad78ce75fac5a2e258dc24961791d17680015aba",
+        "message": "Preserve sync planning sessions and add configured provider runner"
+      },
+      {
+        "sha": "17c435430277eb2547a12f765172b3eb1c423595",
+        "message": "Add provider planning suggestion regression tests"
+      }
+    ],
+    "validation_status": {
+      "backend": {
+        "command": "npm test",
+        "working_directory": "services/api",
+        "status": "passed_user_local_validation",
+        "evidence": "User reported tests 95, pass 95, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 3219.7043 from E:\\01PROJEKTER\\EverythingAI\\services\\api."
+      },
+      "frontend": {
+        "status": "not_required_for_this_backend_only_change",
+        "reason": "No frontend files were changed in this provider-backed planning step."
+      },
+      "overall": "passed"
+    },
+    "governance_and_safety_invariants_preserved": [
+      "Work remained directly on main branch.",
+      "Existing deterministic planning suggestion generation remains available and synchronous for backwards compatibility.",
+      "Provider-backed suggestions are normalized and constrained to tag, category, rename, and move actions.",
+      "Provider-backed suggestions remain preview-only and require approval downstream.",
+      "Provider unavailable or invalid JSON response falls back to deterministic suggestions.",
+      "Remote provider policy checks remain centralized in providerRuntime."
+    ],
+    "known_limitations_or_followups": [
+      "The existing planning session route still uses the deterministic synchronous runner. A future route/UI step can switch selected provider planning sessions to runConfiguredPlanningSession with proper async route handling.",
+      "ROADMAP.md still needs a small manual/update-file pass to mark provider-backed planning as complete; a full roadmap rewrite attempt was blocked by connector safety checks.",
+      "Next roadmap priority is backend planning-rule enforcement: confidence threshold, allow/disable rename, allow/disable move, allow/disable tag, allow/disable category, dry-run-only mode, and require-approval mode."
+    ],
+    "next_approved_actions": [
+      "Implement backend planning-rule enforcement in services/api/src/suggestions/suggestionService.js and related preview/execution paths as needed.",
+      "Add regression tests for planning rule enforcement before changing UI behavior."
+    ]
+  }
+}
