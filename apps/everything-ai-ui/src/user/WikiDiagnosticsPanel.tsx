@@ -3,7 +3,12 @@ import type { ApiOptions } from '../api';
 import { AutomatedReviewAdvisoryCard } from './AutomatedReviewAdvisoryCard';
 import { HumanValidationEditor } from './HumanValidationEditor';
 import { HumanValidationReadOnlyCard } from './HumanValidationReadOnlyCard';
-import { fetchWikiDiagnostics, type WikiDiagnostics } from './wikiJobsApi';
+import {
+  fetchWikiDiagnostics,
+  type WikiDiagnostics,
+  type WikiGovernanceFlags,
+  type WikiGovernancePageSignal,
+} from './wikiJobsApi';
 
 type WikiDiagnosticsPanelProps = {
   options: ApiOptions;
@@ -15,6 +20,11 @@ type ExpandedDiagnostic = {
   type: ExpandedDiagnosticType;
   id: string;
 } | null;
+
+type GovernanceBadge = {
+  label: string;
+  className: string;
+};
 
 function formatTimestamp(value?: string | null) {
   if (!value) return '—';
@@ -65,6 +75,70 @@ function reviewCoverageClass(status?: string) {
   return 'wiki-quality-warning';
 }
 
+function governanceBadges(flags?: WikiGovernanceFlags): GovernanceBadge[] {
+  const badges: GovernanceBadge[] = [];
+
+  if (flags?.high_quality_unreviewed) {
+    badges.push({ label: 'Review candidate', className: 'wiki-quality-warning' });
+  }
+
+  if (flags?.high_quality_rejected) {
+    badges.push({ label: 'Conflict: rejected high quality', className: 'wiki-quality-danger' });
+  }
+
+  if (flags?.high_quality_attention) {
+    badges.push({ label: 'Conflict: attention high quality', className: 'wiki-quality-danger' });
+  }
+
+  if (flags?.low_quality_approved) {
+    badges.push({ label: 'Conflict: approved low quality', className: 'wiki-quality-danger' });
+  }
+
+  return badges;
+}
+
+function GovernanceBadges({ flags }: { flags?: WikiGovernanceFlags }) {
+  const badges = governanceBadges(flags);
+
+  if (!badges.length) return null;
+
+  return (
+    <>
+      {badges.map((badge) => (
+        <span key={badge.label} className={`wiki-quality-grade ${badge.className}`}>{badge.label}</span>
+      ))}
+    </>
+  );
+}
+
+function GovernanceSignalList({
+  signals,
+  emptyLabel,
+}: {
+  signals?: WikiGovernancePageSignal[];
+  emptyLabel: string;
+}) {
+  if (!signals?.length) {
+    return <div className="wiki-diagnostics-empty">{emptyLabel}</div>;
+  }
+
+  return (
+    <div className="wiki-diagnostics-list">
+      {signals.map((signal) => (
+        <div key={signal.page_id} className="wiki-diagnostics-row">
+          <span>{signal.title}</span>
+          <strong className="wiki-quality-line">
+            <span className={`wiki-quality-grade ${qualityGradeClass(signal.quality_grade)}`}>Grade {signal.quality_grade}</span>
+            <span>{signal.quality_score}/100</span>
+            <span>{signal.human_validation}</span>
+            <GovernanceBadges flags={signal.flags} />
+          </strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
   const [diagnostics, setDiagnostics] = useState<WikiDiagnostics | null>(null);
   const [expanded, setExpanded] = useState<ExpandedDiagnostic>(null);
@@ -94,6 +168,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
 
   const workspaceTrust = diagnostics?.workspace_trust_health;
   const validationSummary = diagnostics?.validation_summary;
+  const governanceConflicts = validationSummary?.conflicts || [];
+  const reviewCandidates = validationSummary?.review_candidates || [];
   const recentRebuilds = diagnostics?.rebuilds.slice(0, 3) || [];
   const recentFingerprints = diagnostics?.fingerprints.slice(0, 3) || [];
   const recentDependencies = diagnostics?.dependencies.slice(0, 4) || [];
@@ -215,6 +291,50 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
           )}
         </article>
 
+        <article className="wiki-diagnostics-card">
+          <div className="wiki-diagnostics-card-title">
+            <strong>Governance Conflict Dashboard</strong>
+            <span>Quality/review contradictions</span>
+          </div>
+          {validationSummary ? (
+            <>
+              <div className="wiki-diagnostics-mini-grid">
+                <div><span>Conflicts</span><strong className={`wiki-quality-grade ${validationSummary.conflict_count ? 'wiki-quality-danger' : 'wiki-quality-good'}`}>{formatNumber(validationSummary.conflict_count)}</strong></div>
+                <div><span>Visible</span><strong>{formatNumber(governanceConflicts.length)}</strong></div>
+                <div><span>Status</span><strong className={`wiki-quality-grade ${reviewCoverageClass(validationSummary.status)}`}>{validationSummary.status}</strong></div>
+              </div>
+              <GovernanceSignalList
+                signals={governanceConflicts}
+                emptyLabel="No governance conflicts detected."
+              />
+            </>
+          ) : (
+            <div className="wiki-diagnostics-empty">No governance conflict data available yet.</div>
+          )}
+        </article>
+
+        <article className="wiki-diagnostics-card">
+          <div className="wiki-diagnostics-card-title">
+            <strong>Review Candidate Dashboard</strong>
+            <span>High-quality pages awaiting human review</span>
+          </div>
+          {validationSummary ? (
+            <>
+              <div className="wiki-diagnostics-mini-grid">
+                <div><span>Candidates</span><strong className={`wiki-quality-grade ${validationSummary.review_candidate_count ? 'wiki-quality-warning' : 'wiki-quality-good'}`}>{formatNumber(validationSummary.review_candidate_count)}</strong></div>
+                <div><span>Visible</span><strong>{formatNumber(reviewCandidates.length)}</strong></div>
+                <div><span>Unreviewed</span><strong>{formatNumber(validationSummary.counts.unreviewed)}</strong></div>
+              </div>
+              <GovernanceSignalList
+                signals={reviewCandidates}
+                emptyLabel="No high-quality review candidates detected."
+              />
+            </>
+          ) : (
+            <div className="wiki-diagnostics-empty">No review candidate data available yet.</div>
+          )}
+        </article>
+
         <AutomatedReviewAdvisoryCard />
 
         <HumanValidationReadOnlyCard options={options} page={recentQuality[0]} />
@@ -253,6 +373,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
                   <span className={`wiki-quality-grade ${qualityGradeClass(quality.quality_grade)}`}>Grade {quality.quality_grade}</span>
                   <span>{quality.quality_score}/100</span>
                   <span>{quality.status}</span>
+                  <GovernanceBadges flags={quality.governance_flags} />
                 </strong>
                 {isExpanded(expanded, 'quality', quality.page_id) ? (
                   <div className="wiki-diagnostics-detail">
