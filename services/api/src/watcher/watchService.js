@@ -109,6 +109,15 @@ export function listActiveWatcherStatuses() {
   return Array.from(activeWatchers.entries()).map(([id, state]) => snapshotRuntimeState(id, state));
 }
 
+export function listPersistedActiveWatchRoots(db) {
+  return db.prepare(`
+    SELECT *
+    FROM watch_roots
+    WHERE status = 'active'
+    ORDER BY root_path ASC
+  `).all();
+}
+
 export async function startFolderWatcher(db, {
   rootPath,
   extract = true,
@@ -121,6 +130,12 @@ export async function startFolderWatcher(db, {
   const absoluteRoot = path.resolve(rootPath);
   const id = watchId(absoluteRoot);
   const databasePath = resolveWatcherDatabasePath(db);
+
+  if (!fs.existsSync(absoluteRoot)) {
+    const error = new Error(`Watch root does not exist: ${absoluteRoot}`);
+    markWatchRootFailed({ id, absoluteRoot, databasePath, error });
+    throw error;
+  }
 
   if (activeWatchers.has(id)) {
     return { ...snapshotRuntimeState(id, activeWatchers.get(id)), already_running: true };
@@ -168,16 +183,23 @@ export async function startFolderWatcher(db, {
   }
 
   activeWatchers.set(id, state);
-  await runQueuedCycle();
 
-  const watcher = fs.watch(absoluteRoot, { recursive: true }, () => {
-    scheduleCycle();
-  });
+  try {
+    await runQueuedCycle();
 
-  state.close = () => {
-    if (state.timer) clearTimeout(state.timer);
-    watcher.close();
-  };
+    const watcher = fs.watch(absoluteRoot, { recursive: true }, () => {
+      scheduleCycle();
+    });
+
+    state.close = () => {
+      if (state.timer) clearTimeout(state.timer);
+      watcher.close();
+    };
+  } catch (error) {
+    activeWatchers.delete(id);
+    markWatchRootFailed({ id, absoluteRoot, databasePath, error });
+    throw error;
+  }
 
   upsertWatchRoot(db, {
     id,
@@ -211,4 +233,32 @@ export function stopFolderWatcher(db, { rootPath }) {
   });
 
   return { id, rootPath: absoluteRoot, status: 'stopped' };
+}
+
+export async function resumePersistedWatchers(db, {
+  logger = console,
+  startWatcher = startFolderWatcher,
+} = {}) {
+  const activeRoots = listPersistedActiveWatchRoots(db);
+  const results = [];
+
+  for (const root of activeRoots) {
+    try {
+      const result = await startWatcher(db, {
+        rootPath: root.root_path,
+        extract: true,
+        auto: true,
+        logger,
+      });
+      results.push({ rootPath: root.root_path, status: 'active', result });
+    } catch (error) {
+      results.push({ rootPath: root.root_path, status: 'failed', error: error.message });
+    }
+  }
+
+  return {
+    resumed: results.filter((result) => result.status === 'active').length,
+    failed: results.filter((result) => result.status === 'failed').length,
+    results,
+  };
 }
