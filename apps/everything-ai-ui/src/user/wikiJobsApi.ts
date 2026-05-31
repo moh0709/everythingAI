@@ -50,6 +50,17 @@ export type WikiWorkspaceTrustHealth = {
   reasons: string[];
 };
 
+export type WikiHumanValidation = {
+  id: string | null;
+  page_id: string;
+  status: 'unreviewed' | 'reviewed' | 'approved' | 'needs_attention' | 'rejected';
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
 export type WikiDiagnostics = {
   generated_at: string;
   page_stats: {
@@ -128,4 +139,11 @@ export async function fetchWikiJob(options: ApiOptions, jobId: string) {
 
 export async function fetchWikiDiagnostics(options: ApiOptions) {
   return apiRequest<{ diagnostics: WikiDiagnostics }>(options, '/api/wiki/diagnostics');
+}
+
+export async function fetchWikiHumanValidation(options: ApiOptions, pageId: string) {
+  return apiRequest<{ validation: WikiHumanValidation }>(
+    options,
+    `/api/wiki/pages/${encodeURIComponent(pageId)}/human-validation`
+  );
 }
