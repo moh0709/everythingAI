@@ -289,14 +289,14 @@ export async function executeActionPreview(db, {
   approve = false,
   executionBatchId = null,
 } = {}) {
-  if (!approve) {
-    throw new Error('Explicit approval is required to execute an action preview.');
-  }
-
   const preview = getActionPreviewById(db, previewId);
 
   if (!preview) {
     throw new Error(`Action preview not found: ${previewId}`);
+  }
+
+  if (preview.requires_approval === 1 && !approve) {
+    throw new Error('Explicit approval is required to execute an action preview.');
   }
 
   const validation = validateActionPreview(preview);
