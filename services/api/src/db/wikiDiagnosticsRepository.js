@@ -55,6 +55,8 @@ function computePageQuality(page) {
   }
 
   const normalizedScore = Math.max(0, Math.min(100, score));
+  const qualityGrade = gradeForScore(normalizedScore);
+  const humanValidation = page.human_validation_status || 'unreviewed';
 
   return {
     page_id: page.id,
@@ -63,7 +65,7 @@ function computePageQuality(page) {
     page_type: page.page_type,
     status: page.status,
     quality_score: normalizedScore,
-    quality_grade: gradeForScore(normalizedScore),
+    quality_grade: qualityGrade,
     source_count: Number(page.source_count || 0),
     chunk_count: Number(page.chunk_count || 0),
     dependency_count: Number(page.dependency_count || 0),
@@ -73,7 +75,13 @@ function computePageQuality(page) {
       source_validation: page.source_count > 0 && page.chunk_count > 0 ? 'supported' : 'weak',
       runtime_validation: page.status === 'active' ? 'healthy' : 'degraded',
       ai_validation: 'not_started',
-      human_validation: page.human_validation_status || 'unreviewed',
+      human_validation: humanValidation,
+    },
+    governance_flags: {
+      high_quality_unreviewed: ['A', 'B'].includes(qualityGrade) && humanValidation === 'unreviewed',
+      high_quality_rejected: ['A', 'B'].includes(qualityGrade) && humanValidation === 'rejected',
+      high_quality_attention: ['A', 'B'].includes(qualityGrade) && humanValidation === 'needs_attention',
+      low_quality_approved: ['D', 'F'].includes(qualityGrade) && humanValidation === 'approved',
     },
     reasons,
   };
@@ -152,9 +160,17 @@ function computeValidationSummary({ qualitySummary, validationRows }) {
 
   counts.unreviewed = Math.max(0, counts.unreviewed);
 
+  const conflictPages = qualitySummary.filter((page) => (
+    page.governance_flags.high_quality_rejected
+    || page.governance_flags.high_quality_attention
+    || page.governance_flags.low_quality_approved
+  ));
+
+  const reviewCandidatePages = qualitySummary.filter((page) => page.governance_flags.high_quality_unreviewed);
+
   const reviewedTotal = counts.reviewed + counts.approved + counts.needs_attention + counts.rejected;
   const attentionTotal = counts.needs_attention + counts.rejected;
-  const status = attentionTotal > 0
+  const status = conflictPages.length > 0 || attentionTotal > 0
     ? 'attention_required'
     : counts.unreviewed > 0
       ? 'incomplete'
@@ -169,8 +185,16 @@ function computeValidationSummary({ qualitySummary, validationRows }) {
     reasons.push(`${counts.unreviewed} page(s) are still unreviewed.`);
   }
 
+  if (reviewCandidatePages.length > 0) {
+    reasons.push(`${reviewCandidatePages.length} high-quality page(s) are review candidates.`);
+  }
+
   if (attentionTotal > 0) {
     reasons.push(`${attentionTotal} page(s) require attention or were rejected.`);
+  }
+
+  if (conflictPages.length > 0) {
+    reasons.push(`${conflictPages.length} page(s) have quality/review conflicts.`);
   }
 
   if (status === 'complete') {
@@ -181,6 +205,24 @@ function computeValidationSummary({ qualitySummary, validationRows }) {
     status,
     page_count: qualitySummary.length,
     counts,
+    conflict_count: conflictPages.length,
+    review_candidate_count: reviewCandidatePages.length,
+    conflicts: conflictPages.slice(0, 10).map((page) => ({
+      page_id: page.page_id,
+      title: page.title,
+      quality_grade: page.quality_grade,
+      quality_score: page.quality_score,
+      human_validation: page.validation_state.human_validation,
+      flags: page.governance_flags,
+    })),
+    review_candidates: reviewCandidatePages.slice(0, 10).map((page) => ({
+      page_id: page.page_id,
+      title: page.title,
+      quality_grade: page.quality_grade,
+      quality_score: page.quality_score,
+      human_validation: page.validation_state.human_validation,
+      flags: page.governance_flags,
+    })),
     reasons,
   };
 }
