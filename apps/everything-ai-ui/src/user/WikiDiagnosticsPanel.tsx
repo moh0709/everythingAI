@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ApiOptions } from '../api';
 import { AutomatedReviewAdvisoryCard } from './AutomatedReviewAdvisoryCard';
+import { HumanValidationEditor } from './HumanValidationEditor';
 import { HumanValidationReadOnlyCard } from './HumanValidationReadOnlyCard';
 import { fetchWikiDiagnostics, type WikiDiagnostics } from './wikiJobsApi';
 
@@ -183,6 +184,7 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
         <AutomatedReviewAdvisoryCard />
 
         <HumanValidationReadOnlyCard options={options} page={recentQuality[0]} />
+        <HumanValidationEditor options={options} page={recentQuality[0]} />
 
         <article className="wiki-diagnostics-card">
           <div className="wiki-diagnostics-card-title">
