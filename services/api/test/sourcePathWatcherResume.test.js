@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -15,9 +16,13 @@ function tempDbPath() {
   return path.join(os.tmpdir(), `everythingai-source-watchers-${Date.now()}-${Math.random()}.sqlite`);
 }
 
+function watchRootId(rootPath) {
+  return crypto.createHash('sha256').update(path.resolve(rootPath).toLowerCase()).digest('hex');
+}
+
 function insertWatchRoot(db, { rootPath, status }) {
   upsertWatchRoot(db, {
-    id: `watch-${status}-${Buffer.from(rootPath).toString('hex').slice(0, 12)}`,
+    id: watchRootId(rootPath),
     root_path: path.resolve(rootPath),
     status,
     last_event_at: new Date().toISOString(),
