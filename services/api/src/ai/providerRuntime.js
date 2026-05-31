@@ -205,7 +205,7 @@ async function callGoogle({ settings, messages, prompt, sources }) {
 
     if (!response.ok) throw new Error(`Google AI request failed with HTTP ${response.status}`);
     const payload = await response.json();
-    const answer = payload.candidates?.[0]?.content?.parts?.map((part) => part.text).join('') || 'Google AI returned an empty answer.';
+    const answer = payload.candidates?.[0].content?.parts?.map((part) => part.text).join('') || 'Google AI returned an empty answer.';
     return { answer, provider, provider_status: 'ok', model: settings.model, prompt, sources };
   } catch (error) {
     return unavailable({ provider, reason: error.message, prompt, sources });
@@ -250,6 +250,20 @@ async function callAzureOpenAI({ settings, messages, prompt, sources }) {
   }
 }
 
+async function callConfiguredProvider({ settings, provider, messages, prompt, sources }) {
+  if (REMOTE_PROVIDERS.includes(provider) && !settings.remoteProvidersEnabled) {
+    return unavailable({ provider, reason: 'Remote providers are disabled by policy.', prompt, sources });
+  }
+
+  if (provider === 'ollama') return callOllama({ settings: settings.ollama, messages, prompt, sources });
+  if (provider === 'google') return callGoogle({ settings: settings.google, messages, prompt, sources });
+  if (provider === 'anthropic') return callAnthropic({ settings: settings.anthropic, messages, prompt, sources });
+  if (provider === 'azureOpenAI') return callAzureOpenAI({ settings: settings.azureOpenAI, messages, prompt, sources });
+  if (OPENAI_COMPATIBLE_PROVIDERS.includes(provider)) return callOpenAiCompatible({ provider, settings: settings[provider], messages, prompt, sources });
+
+  return unavailable({ provider, reason: 'Unknown provider.', prompt, sources });
+}
+
 export async function createConfiguredChatAnswer({ db, question, sources, overrideProvider } = {}) {
   const settings = loadAiProviderSettings(db);
   const provider = overrideProvider || settings.activeProvider || 'ollama';
@@ -271,15 +285,66 @@ Behavior:
     { role: 'user', content: prompt },
   ];
 
-  if (REMOTE_PROVIDERS.includes(provider) && !settings.remoteProvidersEnabled) {
-    return unavailable({ provider, reason: 'Remote providers are disabled by policy.', prompt, sources });
-  }
+  return callConfiguredProvider({ settings, provider, messages, prompt, sources });
+}
 
-  if (provider === 'ollama') return callOllama({ settings: settings.ollama, messages, prompt, sources });
-  if (provider === 'google') return callGoogle({ settings: settings.google, messages, prompt, sources });
-  if (provider === 'anthropic') return callAnthropic({ settings: settings.anthropic, messages, prompt, sources });
-  if (provider === 'azureOpenAI') return callAzureOpenAI({ settings: settings.azureOpenAI, messages, prompt, sources });
-  if (OPENAI_COMPATIBLE_PROVIDERS.includes(provider)) return callOpenAiCompatible({ provider, settings: settings[provider], messages, prompt, sources });
+export async function createConfiguredPlanningAnswer({ db, file, deterministicAnalysis, overrideProvider } = {}) {
+  const settings = loadAiProviderSettings(db);
+  const provider = overrideProvider || settings.activeProvider || 'ollama';
+  const extractedText = (file.extracted_text || '').slice(0, 4000);
+  const prompt = JSON.stringify({
+    task: 'Create safe file organization suggestions for EverythingAI.',
+    file: {
+      id: file.id,
+      filename: file.filename,
+      relative_path: file.relative_path,
+      extension: file.extension,
+      mime_type: file.mime_type,
+      size_bytes: file.size_bytes,
+      extracted_text: extractedText,
+    },
+    deterministic_baseline: deterministicAnalysis,
+    allowed_action_types: ['category', 'tag', 'move', 'rename'],
+    output_contract: {
+      suggestions: [
+        {
+          action_type: 'category | tag | move | rename',
+          suggested_value: 'short safe value',
+          reason: 'short factual explanation',
+          confidence: 'number between 0 and 1',
+          risk_level: 'low | medium | high',
+        },
+      ],
+    },
+  });
+  const messages = [
+    {
+      role: 'system',
+      content: `You generate safe, reviewable file organization suggestions for EverythingAI.
 
-  return unavailable({ provider, reason: 'Unknown provider.', prompt, sources });
+Rules:
+- Return JSON only. No markdown. No prose outside JSON.
+- Use only these action_type values: category, tag, move, rename.
+- Do not suggest destructive actions.
+- Move suggestions must be relative folder labels only, not absolute paths.
+- Rename suggestions must be filenames only, not paths.
+- Keep category, tag, and folder labels short and lowercase when possible.
+- Every suggestion must require human approval downstream.
+- Prefer practical suggestions that are grounded in filename, metadata, and extracted text.`,
+    },
+    { role: 'user', content: prompt },
+  ];
+
+  return callConfiguredProvider({
+    settings,
+    provider,
+    messages,
+    prompt,
+    sources: [{
+      id: file.id,
+      filename: file.filename,
+      absolute_path: file.absolute_path,
+      snippet: extractedText.slice(0, 500),
+    }],
+  });
 }
