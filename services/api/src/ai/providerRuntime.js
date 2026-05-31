@@ -205,7 +205,7 @@ async function callGoogle({ settings, messages, prompt, sources }) {
 
     if (!response.ok) throw new Error(`Google AI request failed with HTTP ${response.status}`);
     const payload = await response.json();
-    const answer = payload.candidates?.[0].content?.parts?.map((part) => part.text).join('') || 'Google AI returned an empty answer.';
+    const answer = payload.candidates?.[0]?.content?.parts?.map((part) => part.text).join('') || 'Google AI returned an empty answer.';
     return { answer, provider, provider_status: 'ok', model: settings.model, prompt, sources };
   } catch (error) {
     return unavailable({ provider, reason: error.message, prompt, sources });
