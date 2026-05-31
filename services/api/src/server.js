@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { openDatabase } from './db/client.js';
 import { requireApiToken } from './middleware/auth.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { createFilesRouter } from './routes/files.routes.js';
@@ -22,6 +23,7 @@ import { createAgentBridgeRouter } from './routes/agentBridge.routes.js';
 import { createJobsRouter } from './routes/jobs.routes.js';
 import { createPlanningRouter } from './routes/planning.routes.js';
 import { createExecutionBatchesRouter } from './routes/executionBatches.routes.js';
+import { resumePersistedWatchers } from './watcher/watchService.js';
 
 dotenv.config();
 
@@ -80,9 +82,24 @@ app.use('/api', requireApiToken, createSystemRouter());
 app.use('/api', notFoundHandler);
 app.use(errorHandler);
 
+async function bootstrapPersistedWatchers() {
+  const db = openDatabase();
+  try {
+    const result = await resumePersistedWatchers(db, { logger: console });
+    if (result.resumed || result.failed) {
+      console.log(`Source path watcher bootstrap complete: ${result.resumed} resumed, ${result.failed} failed.`);
+    }
+  } catch (error) {
+    console.error(`Source path watcher bootstrap failed: ${error.message}`);
+  } finally {
+    db.close();
+  }
+}
+
 function startServer(retries = 5) {
   const server = app.listen(PORT, () => {
     console.log(`EverythingAI API listening on port ${PORT}`);
+    bootstrapPersistedWatchers();
   });
 
   server.on('error', (err) => {
