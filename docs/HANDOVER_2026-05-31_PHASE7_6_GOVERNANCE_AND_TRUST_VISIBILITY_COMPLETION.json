@@ -1,0 +1,123 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Phase 7.6 Governance & Trust Visibility Completion Handover",
+    "version": "1.0",
+    "date": "2026-05-31",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "phase_state": {
+      "phase": "7.6 Governance & Trust Visibility",
+      "status": "milestone_complete_from_ui_and_contract_perspective",
+      "completed_commit": "61724a28d12eaa52412229adefd6e538ad303e39",
+      "handover_commit": "pending_at_creation_time",
+      "previous_confirmed_phase_state": {
+        "phase_7_1_durable_knowledge_engine": "complete",
+        "phase_7_2_diagnostics_and_explainability": "complete",
+        "phase_7_3_knowledge_quality": "complete",
+        "phase_7_4_automated_review_foundation": "complete",
+        "phase_7_5_human_validation_layer": "complete",
+        "phase_7_6_governance_and_trust_visibility": "complete"
+      }
+    },
+    "executive_summary": {
+      "project_identity": "EverythingAI is a local-first, source-backed AI knowledge workspace with durable Wiki knowledge, diagnostics, explainability, quality scoring, automated review signals, human validation, and governance trust visibility.",
+      "milestone_result": "Phase 7.6 now exposes governance trust visibility in the user diagnostics UI without altering trust-score calculations, quality-score calculations, or human validation separation.",
+      "current_focus_completed": "The UI layer now renders governance conflict visibility, review candidate visibility, and governance badges inside page-level Knowledge Quality rows.",
+      "next_recommended_focus": "Run full local validation in the repository environment, then proceed to the next roadmap phase only after confirming backend npm test, frontend npm run typecheck, and frontend npm run build all pass."
+    },
+    "implemented_work": {
+      "backend_already_present_before_final_ui_change": [
+        "Governance conflict diagnostics were present in services/api/src/db/wikiDiagnosticsRepository.js.",
+        "Review candidate diagnostics were present in services/api/src/db/wikiDiagnosticsRepository.js.",
+        "Diagnostics payloads already exposed conflict_count, review_candidate_count, conflicts, review_candidates, and governance_flags while preserving backward compatibility with optional fields."
+      ],
+      "frontend_type_layer_already_present_before_final_ui_change": [
+        "apps/everything-ai-ui/src/user/wikiJobsApi.ts already defined WikiGovernanceFlags.",
+        "apps/everything-ai-ui/src/user/wikiJobsApi.ts already attached optional governance_flags to WikiQualitySummary.",
+        "apps/everything-ai-ui/src/user/wikiJobsApi.ts already defined WikiGovernancePageSignal and optional validation_summary conflict/review candidate fields."
+      ],
+      "final_ui_layer_completed": [
+        "Added Governance Conflict Dashboard to apps/everything-ai-ui/src/user/WikiDiagnosticsPanel.tsx.",
+        "Added Review Candidate Dashboard to apps/everything-ai-ui/src/user/WikiDiagnosticsPanel.tsx.",
+        "Added governance badges for review candidates and conflicts in Knowledge Quality rows.",
+        "Added reusable governance badge rendering helpers and reusable governance signal list rendering helpers.",
+        "Kept all diagnostics read-only and did not introduce destructive/operator workflows."
+      ]
+    },
+    "files_changed_for_completion": [
+      {
+        "path": "apps/everything-ai-ui/src/user/WikiDiagnosticsPanel.tsx",
+        "purpose": "Render Phase 7.6 governance trust visibility UI: conflict dashboard, review candidate dashboard, and Knowledge Quality governance badges.",
+        "commit": "61724a28d12eaa52412229adefd6e538ad303e39"
+      },
+      {
+        "path": "docs/HANDOVER_2026-05-31_PHASE7_6_GOVERNANCE_AND_TRUST_VISIBILITY_COMPLETION.json",
+        "purpose": "Official continuity handover for Phase 7.6 completion.",
+        "commit": "created_after_ui_completion"
+      }
+    ],
+    "reviewed_context_files": [
+      {
+        "path": "services/api/src/db/wikiDiagnosticsRepository.js",
+        "observed_state": "Already computes governance_flags and validation_summary conflict/review candidate fields. No change was made."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/user/wikiJobsApi.ts",
+        "observed_state": "Already includes frontend diagnostics type support for governance flags, governance page signals, conflicts, and review candidates. No change was made."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/user/WikiDiagnosticsPanel.tsx",
+        "observed_state": "Updated to complete the Phase 7.6 UI layer."
+      }
+    ],
+    "governance_invariants_preserved": [
+      "Work remained directly on main branch.",
+      "Existing diagnostics were not removed.",
+      "Trust-score calculations were not changed.",
+      "Quality-score calculations were not changed.",
+      "Human validation remains separate from quality scoring.",
+      "AI validation did not gain precedence over human validation.",
+      "Diagnostics payload backward compatibility was preserved by consuming optional governance fields.",
+      "The UI remains read-only for governance visibility and does not introduce destructive workflows."
+    ],
+    "validation_status": {
+      "required_commands": [
+        {
+          "scope": "backend",
+          "command": "npm test",
+          "working_directory": "services/api"
+        },
+        {
+          "scope": "frontend",
+          "command": "npm run typecheck",
+          "working_directory": "apps/everything-ai-ui"
+        },
+        {
+          "scope": "frontend",
+          "command": "npm run build",
+          "working_directory": "apps/everything-ai-ui"
+        }
+      ],
+      "connector_limitation": "The GitHub connector allowed file inspection and commits but did not provide an execution environment for npm commands. The local container could not clone GitHub because external network DNS was unavailable.",
+      "manual_validation_required": true,
+      "post_change_static_inspection": "Completed by re-fetching apps/everything-ai-ui/src/user/WikiDiagnosticsPanel.tsx from main and confirming the expected imports, helpers, dashboards, and badges are present."
+    },
+    "known_limitations_or_followups": [
+      "Run the required npm validation commands in a real repository checkout.",
+      "If any typecheck issue appears, first inspect optional field handling around validationSummary.counts and governance optional fields.",
+      "No CSS file was changed; the UI reuses existing wiki-quality and diagnostics classes. If visual spacing is not ideal, add a small styling-only follow-up after validation."
+    ],
+    "next_approved_actions": [
+      "Run backend npm test in services/api.",
+      "Run frontend npm run typecheck in apps/everything-ai-ui.",
+      "Run frontend npm run build in apps/everything-ai-ui.",
+      "After validation passes, continue to the next roadmap phase with this handover as the new source of truth."
+    ]
+  }
+}
