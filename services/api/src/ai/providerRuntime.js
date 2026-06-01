@@ -39,12 +39,83 @@ function loadAiProviderSettings(db) {
   return settings;
 }
 
+function classifyProviderError(reason = '') {
+  const text = String(reason || '');
+  if (/remote providers are disabled/i.test(text)) {
+    return {
+      code: 'remote_policy_disabled',
+      hint: 'Enable remote providers in Settings before using this provider.',
+    };
+  }
+  if (/api key is missing/i.test(text)) {
+    return {
+      code: 'missing_api_key',
+      hint: 'Add the provider credential in Settings and save the AI provider configuration.',
+    };
+  }
+  if (/no model is selected|deployment is missing|no ollama model/i.test(text)) {
+    return {
+      code: 'missing_model',
+      hint: 'Select a model for this provider or refresh the model list in Settings.',
+    };
+  }
+  if (/endpoint is missing/i.test(text)) {
+    return {
+      code: 'missing_endpoint',
+      hint: 'Add the provider endpoint URL in Settings.',
+    };
+  }
+  if (/HTTP\s+401|HTTP\s+403/i.test(text)) {
+    return {
+      code: 'auth_failed',
+      hint: 'Check that the provider credential is valid and has access to the selected model.',
+    };
+  }
+  if (/HTTP\s+404/i.test(text)) {
+    return {
+      code: 'model_or_endpoint_not_found',
+      hint: 'Check the endpoint URL and selected model name.',
+    };
+  }
+  if (/HTTP\s+429/i.test(text)) {
+    return {
+      code: 'rate_limited',
+      hint: 'The provider is rate-limiting requests. Wait or choose another provider/model.',
+    };
+  }
+  if (/HTTP\s+5\d\d/i.test(text)) {
+    return {
+      code: 'provider_server_error',
+      hint: 'The provider returned a server error. Retry later or choose another provider.',
+    };
+  }
+  if (/abort|timeout|timed out/i.test(text)) {
+    return {
+      code: 'timeout',
+      hint: 'The provider request timed out. Increase timeout or choose a faster/local model.',
+    };
+  }
+  if (/fetch failed|ECONNREFUSED|ENOTFOUND|network/i.test(text)) {
+    return {
+      code: 'network_error',
+      hint: 'Check that the provider endpoint is reachable from the backend machine.',
+    };
+  }
+  return {
+    code: 'provider_unavailable',
+    hint: 'Review the provider settings, endpoint, credential, and selected model.',
+  };
+}
+
 function unavailable({ provider, reason, prompt, sources }) {
+  const classified = classifyProviderError(reason);
   return {
     answer: `${provider} execution is not available: ${reason}`,
     provider,
     provider_status: 'unavailable',
     provider_error: reason,
+    provider_error_code: classified.code,
+    provider_error_hint: classified.hint,
     prompt,
     sources,
   };
