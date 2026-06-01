@@ -1,0 +1,103 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Provider Planning Suggestions Progress Handover",
+    "version": "1.0",
+    "date": "2026-06-01",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_before_this_work": {
+      "handover": "docs/HANDOVER_2026-05-31_PHASE7_6_GOVERNANCE_AND_TRUST_VISIBILITY_COMPLETION.json",
+      "status": "Phase 7.6 Governance & Trust Visibility complete and fully validated",
+      "full_validation_commit": "b1dbe72b63e401f111e8603a2c4c8c80b14e4997"
+    },
+    "roadmap_item_addressed": {
+      "roadmap_file": "docs/ROADMAP.md",
+      "immediate_priority": "Connect selected AI provider to planning/suggestion generation",
+      "status": "implemented_from_backend_contract_perspective_pending_local_validation"
+    },
+    "implemented_work": [
+      {
+        "path": "services/api/src/ai/providerRuntime.js",
+        "commit": "b050c64ef62a5e15a045c13c06fad74546b261d8",
+        "summary": "Added createConfiguredPlanningAnswer(), reusing the configured provider runtime already used for chat/insights. The planning prompt requests strict JSON-only safe organization suggestions and preserves remote-provider policy checks."
+      },
+      {
+        "path": "services/api/src/suggestions/suggestionService.js",
+        "commit": "f4db2fe5a12ce6e3da18f6be5174a4ba30e3727b",
+        "summary": "Added generateConfiguredPreviewSuggestions(), which supports deterministic, provider, and hybrid planning modes. Provider output is JSON-parsed, sanitized, constrained to allowed action types, normalized to safe values, and falls back to deterministic suggestions if provider execution fails or returns invalid output."
+      },
+      {
+        "path": "services/api/src/planning/planningSessionService.js",
+        "commit": "82503bcfd886572b1567d69ba140b604aac485b0",
+        "summary": "Added provider-aware planning-session execution while preserving the original deterministic runPlanningSession() compatibility path. Current main contains runConfiguredPlanningSession() for provider/hybrid sessions."
+      },
+      {
+        "path": "services/api/src/routes/actions.routes.js",
+        "commit": "current_main_state_sha_51adb28f4280faa5fddd4287318655d5b09705aa",
+        "summary": "The POST /suggestions route now calls generateConfiguredPreviewSuggestions() asynchronously and accepts optional mode/provider fields, defaulting to hybrid."
+      },
+      {
+        "path": "services/api/src/routes/planning.routes.js",
+        "commit": "current_main_state_sha_48a1b4df6927fbbac330d88a02cadeba79436fe7",
+        "summary": "The planning session run route dispatches provider/hybrid modes to runConfiguredPlanningSession() and deterministic mode to the original runPlanningSession()."
+      },
+      {
+        "path": "services/api/test/planningSessions.test.js",
+        "commit": "10a6a0a0dabf89228cc87bb5f14d5e6a465beee8",
+        "summary": "Added regression coverage for provider planning sessions using a mocked local OpenAI-compatible provider via lmStudio settings."
+      }
+    ],
+    "safety_and_governance_invariants": [
+      "No destructive action execution was added.",
+      "Provider output only creates reviewable suggestions; execution still requires the existing preview/execution flow.",
+      "Provider suggestions are normalized and constrained to tag, category, rename, and move.",
+      "Move suggestions are relative folder labels only, never absolute paths.",
+      "Rename suggestions are filenames only, never paths.",
+      "Provider failure or invalid JSON falls back to deterministic suggestions.",
+      "The deterministic generatePreviewSuggestions() function remains available for existing callers and tests.",
+      "Existing Phase 7.6 governance diagnostics and scoring logic were not changed."
+    ],
+    "validation_status": {
+      "overall": "pending_user_local_validation",
+      "required_commands": [
+        {
+          "scope": "backend",
+          "command": "npm test",
+          "working_directory": "services/api",
+          "status": "pending"
+        },
+        {
+          "scope": "frontend",
+          "command": "npm run typecheck",
+          "working_directory": "apps/everything-ai-ui",
+          "status": "pending_no_frontend_files_changed_but_required_by_project_rule"
+        },
+        {
+          "scope": "frontend",
+          "command": "npm run build",
+          "working_directory": "apps/everything-ai-ui",
+          "status": "pending_no_frontend_files_changed_but_required_by_project_rule"
+        }
+      ],
+      "connector_limitation": "The GitHub connector supports file inspection and commits but does not provide an npm execution environment. Validation must be run locally by the user."
+    },
+    "known_risks_or_followups": [
+      "Run the backend test suite first. The new test mocks globalThis.fetch and restores it in finally, but full suite validation is still required.",
+      "If provider planning tests fail, inspect services/api/test/planningSessions.test.js and services/api/src/ai/providerRuntime.js first.",
+      "After validation passes, update this handover or create a completion handover marking provider planning suggestions as validated.",
+      "The next roadmap item after this is backend planning-rule enforcement, but this implementation already begins applying planning rules inside configured suggestion generation. A dedicated enforcement milestone should still verify preview/execution blocking semantics separately."
+    ],
+    "next_approved_actions": [
+      "Run npm test in services/api.",
+      "Run npm run typecheck in apps/everything-ai-ui.",
+      "Run npm run build in apps/everything-ai-ui.",
+      "If all validation passes, mark the selected-provider planning/suggestion generation milestone as complete and proceed to backend planning-rule enforcement."
+    ]
+  }
+}
