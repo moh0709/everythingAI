@@ -1,0 +1,90 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Provider Error Feedback Progress Handover",
+    "version": "1.0",
+    "date": "2026-06-01",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_before_this_work": {
+      "validated_provider_planning_addendum": "docs/VALIDATION_2026-06-01_PROVIDER_PLANNING_SUGGESTIONS.md",
+      "latest_completed_candidates_observed": [
+        "Backend planning-rule enforcement already complete and backend-validated on main.",
+        "Undo UI already complete and frontend-validated on main.",
+        "Knowledge page already complete and frontend-validated on main.",
+        "Knowledge wiki detail view already complete and frontend-validated on main.",
+        "Source path watcher resume already complete and backend-validated on main."
+      ]
+    },
+    "roadmap_item_addressed": {
+      "item": "Add clearer provider-specific error messages and UI feedback.",
+      "status": "implemented_backend_contract_pending_local_validation"
+    },
+    "implemented_work": [
+      {
+        "path": "services/api/src/ai/providerRuntime.js",
+        "commit": "9a76aac3611cbf7919891520103e7b4ba24aff00",
+        "summary": "Added provider_error_code and provider_error_hint metadata to provider unavailable responses while preserving existing provider_status and provider_error fields."
+      },
+      {
+        "path": "services/api/test/providerRuntimeErrors.test.js",
+        "commit": "007bb637b0c649abad8de58ab14a2eb2da63fa0e",
+        "summary": "Added regression tests for remote-provider policy blocks, missing API key feedback, and provider HTTP authorization failure classification."
+      }
+    ],
+    "provider_error_codes_added": [
+      "remote_policy_disabled",
+      "missing_api_key",
+      "missing_model",
+      "missing_endpoint",
+      "auth_failed",
+      "model_or_endpoint_not_found",
+      "rate_limited",
+      "provider_server_error",
+      "timeout",
+      "network_error",
+      "provider_unavailable"
+    ],
+    "preserved_invariants": [
+      "Existing provider_status remains backward compatible.",
+      "Existing provider_error remains backward compatible.",
+      "No provider execution policy was relaxed.",
+      "Remote-provider enablement policy remains enforced.",
+      "No frontend file was changed in this step.",
+      "No file action execution behavior was changed."
+    ],
+    "validation_status": {
+      "overall": "pending_user_local_validation",
+      "required_commands": [
+        {
+          "scope": "backend",
+          "command": "npm test",
+          "working_directory": "services/api",
+          "status": "pending"
+        },
+        {
+          "scope": "frontend",
+          "command": "npm run typecheck",
+          "working_directory": "apps/everything-ai-ui",
+          "status": "pending_no_frontend_files_changed_but_required_by_project_rule"
+        },
+        {
+          "scope": "frontend",
+          "command": "npm run build",
+          "working_directory": "apps/everything-ai-ui",
+          "status": "pending_no_frontend_files_changed_but_required_by_project_rule"
+        }
+      ]
+    },
+    "next_approved_actions": [
+      "Run backend npm test in services/api.",
+      "Run frontend npm run typecheck in apps/everything-ai-ui.",
+      "Run frontend npm run build in apps/everything-ai-ui.",
+      "If validation passes, record a validation addendum and proceed to the next consolidated official handover report."
+    ]
+  }
+}
