@@ -1,7 +1,7 @@
 {
   "handover_report": {
     "title": "EverythingAI / EverythingApp — Provider Planning Suggestions Progress Handover",
-    "version": "1.0",
+    "version": "1.1",
     "date": "2026-06-01",
     "prepared_for": "Next AI engineering agent / continuation session",
     "repository": {
@@ -19,7 +19,7 @@
     "roadmap_item_addressed": {
       "roadmap_file": "docs/ROADMAP.md",
       "immediate_priority": "Connect selected AI provider to planning/suggestion generation",
-      "status": "implemented_from_backend_contract_perspective_pending_local_validation"
+      "status": "backend_validated_frontend_validation_pending"
     },
     "implemented_work": [
       {
@@ -64,13 +64,14 @@
       "Existing Phase 7.6 governance diagnostics and scoring logic were not changed."
     ],
     "validation_status": {
-      "overall": "pending_user_local_validation",
+      "overall": "backend_passed_frontend_pending",
       "required_commands": [
         {
           "scope": "backend",
           "command": "npm test",
           "working_directory": "services/api",
-          "status": "pending"
+          "status": "passed_user_local_validation",
+          "evidence": "User reported node --test completed with tests 93, pass 93, fail 0, cancelled 0, skipped 0, todo 0, duration_ms 5059.9788 from C:\\temp\\EverythingAI\\services\\api."
         },
         {
           "scope": "frontend",
@@ -85,19 +86,19 @@
           "status": "pending_no_frontend_files_changed_but_required_by_project_rule"
         }
       ],
-      "connector_limitation": "The GitHub connector supports file inspection and commits but does not provide an npm execution environment. Validation must be run locally by the user."
+      "backend_validation_result": "passed",
+      "frontend_validation_result": "pending",
+      "connector_limitation": "The GitHub connector supports file inspection and commits but does not provide an npm execution environment. Remaining validation must be run locally by the user."
     },
     "known_risks_or_followups": [
-      "Run the backend test suite first. The new test mocks globalThis.fetch and restores it in finally, but full suite validation is still required.",
-      "If provider planning tests fail, inspect services/api/test/planningSessions.test.js and services/api/src/ai/providerRuntime.js first.",
-      "After validation passes, update this handover or create a completion handover marking provider planning suggestions as validated.",
+      "Run frontend typecheck and build to complete project-rule validation, even though no frontend files were changed.",
+      "After frontend validation passes, update this handover or create a completion handover marking provider planning suggestions as validated.",
       "The next roadmap item after this is backend planning-rule enforcement, but this implementation already begins applying planning rules inside configured suggestion generation. A dedicated enforcement milestone should still verify preview/execution blocking semantics separately."
     ],
     "next_approved_actions": [
-      "Run npm test in services/api.",
       "Run npm run typecheck in apps/everything-ai-ui.",
       "Run npm run build in apps/everything-ai-ui.",
-      "If all validation passes, mark the selected-provider planning/suggestion generation milestone as complete and proceed to backend planning-rule enforcement."
+      "If frontend validation passes, mark the selected-provider planning/suggestion generation milestone as complete and proceed to backend planning-rule enforcement."
     ]
   }
 }
