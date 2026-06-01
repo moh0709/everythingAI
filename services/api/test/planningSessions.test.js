@@ -7,6 +7,7 @@ import {
   getPlanningSessionById,
   listOrganizationSuggestions,
   openDatabase,
+  setAppSetting,
   upsertIndexedFile,
 } from '../src/db/client.js';
 import { scanFolder } from '../src/indexer/fileScanner.js';
@@ -15,11 +16,14 @@ import {
   createPlanningSession,
   getPlanningSessionWithSuggestions,
   listPlanningSessionRecords,
+  runConfiguredPlanningSession,
   runPlanningSession,
 } from '../src/planning/planningSessionService.js';
 import { generatePreviewSuggestions } from '../src/suggestions/suggestionService.js';
 import { createActionPreview } from '../src/previews/actionPreviewService.js';
 import { executeActionPreview } from '../src/actions/actionExecutor.js';
+
+const SETTINGS_KEY = 'ai_provider_settings';
 
 function tempDbPath() {
   return path.join(os.tmpdir(), `everythingai-planning-test-${Date.now()}-${Math.random()}.sqlite`);
@@ -143,4 +147,83 @@ test('previews and execution still work from session-linked suggestions', async 
   assert.equal(execution.status, 'executed');
 
   db.close();
+});
+
+test('provider planning sessions use the configured provider for suggestions', async () => {
+  const { db } = await prepareDb();
+  const calls = [];
+  const originalFetch = globalThis.fetch;
+
+  setAppSetting(db, SETTINGS_KEY, {
+    activeProvider: 'lmStudio',
+    lmStudio: {
+      endpoint: 'http://provider.test/v1',
+      model: 'planning-model',
+      apiKey: '',
+      temperature: 0.1,
+      maxTokens: 512,
+    },
+  });
+
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url, options });
+    return {
+      ok: true,
+      status: 200,
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  suggestions: [
+                    {
+                      action_type: 'category',
+                      suggested_value: 'supplier-contracts',
+                      reason: 'The file describes supplier contract renewal.',
+                      confidence: 0.91,
+                      risk_level: 'low',
+                    },
+                    {
+                      action_type: 'tag',
+                      suggested_value: 'renewal',
+                      reason: 'The content references renewal follow-up.',
+                      confidence: 0.84,
+                      risk_level: 'low',
+                    },
+                  ],
+                }),
+              },
+            },
+          ],
+        };
+      },
+    };
+  };
+
+  try {
+    const file = db.prepare('SELECT * FROM indexed_files WHERE filename = ?').get('Alpha Contract.md');
+    const session = createPlanningSession(db, {
+      mode: 'provider',
+      source: { type: 'file_ids', fileIds: [file.id] },
+      settings: { provider: 'lmStudio' },
+    });
+    const result = await runConfiguredPlanningSession(db, { sessionId: session.id, limit: 10 });
+
+    assert.equal(result.session.status, 'ready');
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, 'http://provider.test/v1/chat/completions');
+    assert.equal(result.suggestions.some((suggestion) => (
+      suggestion.action_type === 'category'
+      && suggestion.suggested_value === 'supplier-contracts'
+      && suggestion.reason.startsWith('Provider lmStudio:')
+    )), true);
+    assert.equal(result.suggestions.some((suggestion) => (
+      suggestion.action_type === 'tag'
+      && suggestion.suggested_value === 'renewal'
+    )), true);
+  } finally {
+    globalThis.fetch = originalFetch;
+    db.close();
+  }
 });
