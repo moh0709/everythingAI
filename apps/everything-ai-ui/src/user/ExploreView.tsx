@@ -33,8 +33,9 @@ export function ExploreView({
   return <>
     <section className="hero-row">
       <div>
-        <h1><Search /> Explore your indexed knowledge</h1>
-        <p>Search, ask questions, and inspect source-backed file context. Planning, moving, recovery, and audit controls are reserved for the admin/operator interface.</p>
+        <span className="chip blue">CLIENT SOURCES & FILE CONTENT</span>
+        <h1><Search /> Sources & Files</h1>
+        <p>This page is for exploring indexed files, extracted file text, and source context. The Knowledge Base is separate: it is the saved database of organized knowledge generated from these files.</p>
       </div>
       <div className="hero-actions">
         <div className="search-box">
@@ -43,10 +44,10 @@ export function ExploreView({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onKeyDown={(event) => { if (event.key === 'Enter') searchEverything(); }}
-            placeholder="Search or ask about your files..."
+            placeholder="Search filenames, paths, or extracted file content..."
           />
         </div>
-        <button className="purple" onClick={searchEverything} disabled={busy}>Search</button>
+        <button className="purple" onClick={searchEverything} disabled={busy}>Search Files</button>
         <button className="outline" onClick={handleAskFromHero} disabled={busy}>Ask AI</button>
       </div>
     </section>
@@ -58,14 +59,14 @@ export function ExploreView({
       <div className="panel-title">
         <div>
           <h2><Server /> Connection</h2>
-          <p>Official user UI runs on port 5151. Backend API stays on port 4100.</p>
+          <p>Official client workspace runs on port 5151. Backend API stays on port 4100.</p>
         </div>
         <button className="outline" onClick={saveConnection}>Save</button>
       </div>
       <div className="settings-help-grid">
         <div>
-          <strong>Use the local defaults</strong>
-          <p>For normal local development, keep API Base URL pointed at <code>localhost:4100</code>.</p>
+          <strong>Files vs Knowledge Base</strong>
+          <p>Sources & Files shows original indexed files and extracted content. Knowledge Base shows generated, saved knowledge pages built from those sources.</p>
         </div>
         <div>
           <strong>Token field</strong>
@@ -82,8 +83,8 @@ export function ExploreView({
       <div className="panel">
         <div className="panel-title">
           <div>
-            <h2><FileText /> Files</h2>
-            <p>{files.length} visible file(s). This UI only reads and searches indexed knowledge.</p>
+            <h2><FileText /> Indexed File List</h2>
+            <p>{files.length} visible file(s). Click a file to inspect extracted file content and source metadata.</p>
           </div>
           <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
         </div>
@@ -101,14 +102,15 @@ export function ExploreView({
       <aside className="details">
         <h2>{documentContext?.file?.filename || selectedFile?.filename || 'Select a file'}</h2>
         {documentContext ? <>
+          <p><strong>View type:</strong> File content / source context</p>
           <p><strong>Path:</strong> {documentContext.file?.absolute_path}</p>
           <p><strong>Recovery:</strong> {(documentContext.file as any)?.recovery_status || 'active'}</p>
           <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'unknown'}</p>
           <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
-          {documentContext.insight?.summary && <><h3>Insight</h3><p>{documentContext.insight.summary}</p></>}
-          <h3>Preview Text</h3>
+          {documentContext.insight?.summary && <><h3>File Insight</h3><p>{documentContext.insight.summary}</p></>}
+          <h3>Extracted File Text</h3>
           <div className="preview-box text-preview">{documentContext.previewText || 'No preview text available.'}</div>
-        </> : <p>Select a file to inspect source-backed context.</p>}
+        </> : <p>Select a file to inspect extracted file content. To read saved knowledge pages, open Knowledge Base.</p>}
       </aside>
     </section>
   </>;
