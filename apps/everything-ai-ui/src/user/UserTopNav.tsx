@@ -9,13 +9,13 @@ type UserTopNavProps = {
 
 export function UserTopNav({ view, setView, openAskView }: UserTopNavProps) {
   return <header className="top-nav">
-    <div className="brand"><Brain size={28} /><strong>EverythingAI</strong></div>
+    <div className="brand"><Brain size={28} /><strong>EverythingAI</strong><span className="chip blue">CLIENT WORKSPACE</span></div>
     <nav>
-      <button className={view === 'onboarding' ? 'active' : ''} onClick={() => setView('onboarding')}>Start</button>
-      <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore</button>
-      <button className={view === 'wiki' ? 'active' : ''} onClick={() => setView('wiki')}>Wiki</button>
-      <button className={view === 'ask' ? 'active' : ''} onClick={openAskView}>Ask</button>
+      <button className={view === 'onboarding' ? 'active' : ''} onClick={() => setView('onboarding')}>Home</button>
+      <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Sources & Files</button>
+      <button className={view === 'wiki' ? 'active' : ''} onClick={() => setView('wiki')}>Knowledge Base</button>
+      <button className={view === 'ask' ? 'active' : ''} onClick={openAskView}>Ask AI</button>
     </nav>
-    <div className="provider-pill"><span />User MVP • Safe mode</div>
+    <div className="provider-pill"><span />Client • Safe mode</div>
   </header>;
 }
