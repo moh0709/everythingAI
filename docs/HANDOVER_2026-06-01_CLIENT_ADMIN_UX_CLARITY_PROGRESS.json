@@ -1,0 +1,79 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Client/Admin UX Clarity Progress Handover",
+    "version": "1.0",
+    "date": "2026-06-01",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_before_this_work": {
+      "latest_consolidated_handover": "docs/HANDOVER_2026-06-01_CONSOLIDATED_LOCAL_MVP_HARDENING_VALIDATED.json",
+      "status": "Local MVP hardening validated; manual UI smoke test in progress."
+    },
+    "problem_observed_by_user": [
+      "Client and Admin UI were visually too similar and did not clearly identify the current workspace type.",
+      "It was unclear when the user was exploring raw files/file content versus the saved Knowledge Base.",
+      "The chat view did not auto-scroll to the latest sent/received message.",
+      "Admin UI needed to clearly identify itself as the operator/admin control surface."
+    ],
+    "implemented_work": [
+      {
+        "path": "apps/everything-ai-ui/src/user/UserTopNav.tsx",
+        "summary": "Added CLIENT WORKSPACE badge, renamed navigation labels to Home, Sources & Files, Knowledge Base, and Ask AI, and clarified safe client mode."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/user/AskView.tsx",
+        "summary": "Added chat auto-scroll using a bottom ref and clarified that Ask AI is for the Knowledge Base and indexed source context."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/user/WikiView.tsx",
+        "summary": "Renamed user-facing Wiki language to Knowledge Base, clarified that this is a saved database generated from indexed file content, and renamed source labels to File Sources."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/user/ExploreView.tsx",
+        "summary": "Clarified Sources & Files as the raw indexed files/extracted file content view, distinct from the generated Knowledge Base."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/admin/components/AdminHeader.tsx",
+        "summary": "Added ADMIN DASHBOARD badge, changed Explorer nav label to Files & Content, and clarified provider pill wording."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/admin/components/AdminHero.tsx",
+        "summary": "Added ADMIN DASHBOARD hero label and clarified the admin page as the operator control center for source paths, indexing, extracted content, providers, planning rules, execution safety, analytics, and knowledge operations."
+      }
+    ],
+    "preserved_invariants": [
+      "No backend behavior changed.",
+      "No provider runtime behavior changed.",
+      "No trust-score or quality-score calculations changed.",
+      "Provider/API-key configuration remains admin-side.",
+      "Client UI remains a safe user workspace and does not expose provider/API-key configuration."
+    ],
+    "validation_status": {
+      "overall": "pending_user_local_validation",
+      "backend_required": false,
+      "frontend_required": true,
+      "required_commands": [
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npm run typecheck",
+          "status": "pending"
+        },
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npm run build",
+          "status": "pending"
+        }
+      ]
+    },
+    "next_approved_actions": [
+      "Run frontend typecheck and build.",
+      "Review Client Workspace and Admin Dashboard screenshots after the patch.",
+      "If validation passes, record a validation addendum and continue the manual smoke test."
+    ]
+  }
+}
