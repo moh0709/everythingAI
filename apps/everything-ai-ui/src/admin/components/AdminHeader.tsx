@@ -12,7 +12,7 @@ type AdminHeaderProps = {
 
 const NAV_ITEMS: Array<{ id: AdminSection; label: string }> = [
   { id: 'dashboard', label: 'Dashboard' },
-  { id: 'explorer', label: 'Explorer' },
+  { id: 'explorer', label: 'Files & Content' },
   { id: 'planning', label: 'Planning' },
   { id: 'askai', label: 'Ask AI' },
   { id: 'analytics', label: 'Analytics' },
@@ -21,7 +21,7 @@ const NAV_ITEMS: Array<{ id: AdminSection; label: string }> = [
 
 export function AdminHeader({ section, setSection, loadAudit, activeProvider }: AdminHeaderProps) {
   return <header className="top-nav">
-    <div className="brand"><FolderOpen size={28} /><strong>EverythingAI</strong></div>
+    <div className="brand"><FolderOpen size={28} /><strong>EverythingAI</strong><span className="chip orange">ADMIN DASHBOARD</span></div>
     <nav>
       {NAV_ITEMS.map((item) => <button
         key={item.id}
@@ -31,7 +31,7 @@ export function AdminHeader({ section, setSection, loadAudit, activeProvider }: 
         {item.label}
       </button>)}
     </nav>
-    <div className="provider-pill"><span />{providerLabel(activeProvider)}</div>
+    <div className="provider-pill"><span />Provider: {providerLabel(activeProvider)}</div>
   </header>;
 }
 
