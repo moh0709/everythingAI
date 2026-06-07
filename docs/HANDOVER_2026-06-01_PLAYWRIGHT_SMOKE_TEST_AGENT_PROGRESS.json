@@ -1,0 +1,62 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Playwright Smoke Test Agent Progress Handover",
+    "version": "1.0",
+    "date": "2026-06-01",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_before_this_work": {
+      "latest_consolidated_handover": "docs/HANDOVER_2026-06-01_CONSOLIDATED_LOCAL_MVP_HARDENING_VALIDATED.json",
+      "ux_clarity_handover": "docs/HANDOVER_2026-06-01_CLIENT_ADMIN_UX_CLARITY_PROGRESS.json"
+    },
+    "implemented_work": [
+      {
+        "path": "apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts",
+        "summary": "Added a Playwright smoke-test agent that opens the Client Workspace and Admin Dashboard, verifies UX clarity labels, checks Sources & Files vs Knowledge Base distinction, verifies Ask AI latest-message visibility, and checks backend /api/status reachability."
+      },
+      {
+        "path": "docs/PLAYWRIGHT_SMOKE_TEST_AGENT.md",
+        "summary": "Added local run instructions, first-time Playwright setup, expected screenshots, and failure interpretation guidance."
+      }
+    ],
+    "agent_capability": [
+      "Runs locally using Playwright, not ChatGPT desktop control.",
+      "Can be run headed or headless.",
+      "Captures screenshots under test-results/everythingai-smoke.",
+      "Validates client/admin separation and knowledge/files terminology.",
+      "Validates chat auto-scroll by asserting the submitted message is in viewport."
+    ],
+    "validation_status": {
+      "overall": "pending_user_local_validation",
+      "required_commands": [
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npm run typecheck",
+          "status": "pending"
+        },
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npm run build",
+          "status": "pending"
+        },
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed",
+          "status": "pending"
+        }
+      ]
+    },
+    "next_approved_actions": [
+      "Pull latest main locally.",
+      "Run frontend typecheck and build.",
+      "Start backend and frontend.",
+      "Run the Playwright smoke-test agent.",
+      "Review generated screenshots and failures if any."
+    ]
+  }
+}
