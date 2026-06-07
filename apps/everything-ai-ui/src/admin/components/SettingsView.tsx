@@ -26,14 +26,16 @@ type SettingsViewProps = {
   connectionMessage: string;
   connectionStatus: 'idle' | 'ok' | 'error';
   saveSettingsFeedback: string;
-  agentBridgeStatus: AgentBridgeStatus | null;
-  agentDetectionResults: Record<string, AgentDetectionResult>;
-  refreshAgentBridgeStatus: () => void;
-  detectAgent: (agentId: string) => void;
-  detectAllAgents: () => void;
-  probeAgent: (agentId: string) => void;
-  busy: boolean;
+  agentBridgeStatus?: AgentBridgeStatus | null;
+  agentDetectionResults?: Record<string, AgentDetectionResult>;
+  refreshAgentBridgeStatus?: () => void;
+  detectAgent?: (agentId: string) => void;
+  detectAllAgents?: () => void;
+  probeAgent?: (agentId: string) => void;
+  busy?: boolean;
 };
+
+function noop() {}
 
 export function SettingsView({
   baseUrl,
@@ -54,13 +56,13 @@ export function SettingsView({
   connectionMessage,
   connectionStatus,
   saveSettingsFeedback,
-  agentBridgeStatus,
-  agentDetectionResults,
-  refreshAgentBridgeStatus,
-  detectAgent,
-  detectAllAgents,
-  probeAgent,
-  busy,
+  agentBridgeStatus = null,
+  agentDetectionResults = {},
+  refreshAgentBridgeStatus = noop,
+  detectAgent = noop,
+  detectAllAgents = noop,
+  probeAgent = noop,
+  busy = false,
 }: SettingsViewProps) {
   const [draft, setDraft] = useState<ProviderSettings | null>(providerSettings);
   const [filter, setFilter] = useState('');
