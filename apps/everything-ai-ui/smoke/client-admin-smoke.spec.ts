@@ -74,9 +74,9 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('AI Provider Configuration')).toBeVisible();
     await expect(page.getByText('Enable remote providers through server policy')).toBeVisible();
     await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
-    await expect(page.getByText('Codex')).toBeVisible();
-    await expect(page.getByText('Claude Code')).toBeVisible();
-    await expect(page.getByText('OpenCode')).toBeVisible();
+    await expect(page.locator('.source-card strong').filter({ hasText: /^Codex$/ })).toBeVisible();
+    await expect(page.locator('.source-card strong').filter({ hasText: /^Claude Code$/ })).toBeVisible();
+    await expect(page.locator('.source-card strong').filter({ hasText: /^OpenCode$/ })).toBeVisible();
     await expect(page.getByText('Client Workspace users continue to chat only through the AI provider selected in Admin Settings', { exact: false })).toBeVisible();
     await saveScreenshot(page, '08-admin-settings-providers-agents');
   });
