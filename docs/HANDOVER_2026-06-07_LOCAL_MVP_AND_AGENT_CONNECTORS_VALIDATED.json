@@ -1,0 +1,193 @@
+{
+  "handover_report": {
+    "title": "EverythingAI / EverythingApp — Local MVP and Admin Agent Connectors Validated Handover",
+    "version": "1.0",
+    "date": "2026-06-07",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_status": {
+      "this_file_is_now_the_latest_consolidated_source_of_truth": true,
+      "previous_consolidated_handover": "docs/HANDOVER_2026-06-01_CONSOLIDATED_LOCAL_MVP_HARDENING_VALIDATED.json",
+      "latest_validation_artifacts": [
+        "docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md",
+        "docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md"
+      ]
+    },
+    "executive_summary": {
+      "project_identity": "EverythingAI is a local-first, source-backed AI knowledge workspace and file intelligence platform. It indexes scoped local files, extracts content, builds durable knowledge/wiki views, generates governed planning suggestions, supports safe file organization, and separates normal Client Workspace usage from Admin Dashboard operations.",
+      "current_state": "The Local MVP is technically validated, smoke-tested in the running Windows environment, and now includes admin-only Agent Connectors plus client chat provider hardening. Client users chat through the backend/admin-selected AI provider only. Provider keys, remote-provider policy, planning rules, and agent connector configuration remain Admin Dashboard responsibilities.",
+      "latest_validated_result": "Backend npm test passed with 106 tests and 0 failures. Frontend npm run typecheck passed. Frontend npm run build passed with 1545 modules transformed. Playwright smoke test passed with 4 tests and 0 failures.",
+      "recommended_next_focus": "Proceed to controlled connector-specific setup/testing for Codex, Claude Code, and OpenCode, or add CI smoke-test integration to run Playwright automatically and archive screenshots/reports."
+    },
+    "validated_source_of_truth_chain": [
+      "docs/HANDOVER_2026-05-31_PHASE7_6_GOVERNANCE_AND_TRUST_VISIBILITY_COMPLETION.json",
+      "docs/HANDOVER_2026-06-01_CONSOLIDATED_LOCAL_MVP_HARDENING_VALIDATED.json",
+      "docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md",
+      "docs/HANDOVER_2026-06-07_ADMIN_AGENT_CONNECTORS_PROGRESS.json",
+      "docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md",
+      "docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json"
+    ],
+    "validated_milestones": [
+      {
+        "name": "Local MVP hardening",
+        "status": "validated",
+        "summary": "The Local MVP passed backend tests, frontend typecheck/build, service startup, and Playwright smoke testing in the user's Windows environment."
+      },
+      {
+        "name": "Client/Admin UX separation",
+        "status": "validated",
+        "summary": "Client Workspace and Admin Dashboard are visually and functionally distinct. Client UI clearly separates Sources & Files from Knowledge Base and Ask AI. Admin UI is clearly the operator control center."
+      },
+      {
+        "name": "Provider configuration admin-only",
+        "status": "validated",
+        "summary": "Client Workspace does not expose AI Provider Configuration. Admin Dashboard Settings expose AI Provider Configuration and remote-provider policy."
+      },
+      {
+        "name": "Client chat provider hardening",
+        "status": "validated",
+        "summary": "The public /api/chat route no longer accepts request-body provider override. Client chat follows the admin/backend-selected provider through the configured provider runtime."
+      },
+      {
+        "name": "Admin Agent Connectors",
+        "status": "validated",
+        "summary": "Admin Settings now include Admin Agent Connectors for Codex, Claude Code, OpenCode, and other cataloged local agent connectors. Connector visibility is admin-only and validated by Playwright smoke test."
+      }
+    ],
+    "latest_validation_evidence": {
+      "backend": {
+        "working_directory": "services/api",
+        "command": "npm test",
+        "result": "passed",
+        "tests": 106,
+        "pass": 106,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 5135.4197
+      },
+      "frontend_typecheck": {
+        "working_directory": "apps/everything-ai-ui",
+        "command": "npm run typecheck",
+        "result": "passed",
+        "evidence": "tsc --noEmit completed without errors."
+      },
+      "frontend_build": {
+        "working_directory": "apps/everything-ai-ui",
+        "command": "npm run build",
+        "result": "passed",
+        "modules_transformed": 1545,
+        "duration_seconds": 2.11
+      },
+      "playwright_smoke": {
+        "working_directory": "apps/everything-ai-ui",
+        "command": "npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed",
+        "result": "passed",
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "duration_seconds": 8.9
+      },
+      "overall": "passed"
+    },
+    "important_changed_files_since_previous_consolidated_handover": {
+      "backend": [
+        "services/api/src/routes/search.routes.js"
+      ],
+      "frontend": [
+        "apps/everything-ai-ui/src/providerSettingsApi.ts",
+        "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
+        "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx",
+        "apps/everything-ai-ui/src/admin/components/SettingsView.tsx",
+        "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx",
+        "apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts"
+      ],
+      "docs": [
+        "docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md",
+        "docs/HANDOVER_2026-06-07_ADMIN_AGENT_CONNECTORS_PROGRESS.json",
+        "docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md",
+        "docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json"
+      ]
+    },
+    "current_architecture_rules": [
+      "Normal users use Client Workspace only.",
+      "Admins/operators use Admin Dashboard for configuration and control.",
+      "Client Workspace can chat with AI, but only through the backend/admin-selected active provider.",
+      "Client Workspace must not expose provider selection, API keys, remote-provider policy, planning policy, or agent connector configuration.",
+      "Admin Dashboard owns provider selection, provider keys, remote-provider policy, planning rules, and Agent Connectors.",
+      "Agent Connectors are admin-only and local-machine oriented.",
+      "Agent bridge execution is disabled by default and requires explicit backend environment flags.",
+      "Browser clients cannot submit arbitrary shell commands.",
+      "EverythingAI remains the primary user interface; external tools/providers/connectors are backend/admin-selected engines, not replacement product UIs."
+    ],
+    "security_and_governance_invariants_preserved": [
+      "Work remains on main branch.",
+      "Existing diagnostics were not removed.",
+      "Trust-score calculations were not changed.",
+      "Quality-score calculations were not changed.",
+      "Human validation remains separate from quality scoring.",
+      "AI validation does not outweigh human validation.",
+      "Diagnostics payload backward compatibility remains preserved.",
+      "Provider/API-key configuration remains admin-side only.",
+      "Client chat provider override is blocked by route behavior.",
+      "Agent connector execution remains disabled by default.",
+      "No file execution behavior was changed.",
+      "No destructive automation was added."
+    ],
+    "current_capabilities": [
+      "Client Workspace with Home, Sources & Files, Knowledge Base, and Ask AI.",
+      "Client-side clear distinction between raw indexed files/extracted content and generated Knowledge Base.",
+      "Ask AI auto-scroll validated.",
+      "Admin Dashboard with Dashboard, Files & Content, Planning, Ask AI, Analytics, and Settings.",
+      "Admin AI Provider Configuration with broad provider catalog including Ollama, OpenAI, Anthropic/Claude, OpenRouter, Cerebras, Mistral, Google AI, DeepSeek, Groq, xAI/Grok, Moonshot/Kimi, Together AI, Fireworks, Perplexity, Azure OpenAI, LM Studio, and Custom OpenAI-compatible.",
+      "Admin-only Agent Connectors panel covering Codex, Claude Code, OpenCode, Kilo Code, Aider, Continue, and Cline catalog entries.",
+      "Agent bridge status refresh, detect, detect-all, and version probe actions in Admin Settings.",
+      "Backend agent bridge routes for status, integrations, detection, probes, and chat remain guarded by API token and disabled-by-default execution flags.",
+      "Playwright smoke test covering Client/Admin separation, Knowledge Base vs Sources & Files clarity, Ask AI auto-scroll, provider settings admin-only, agent connectors admin-only, and backend reachability."
+    ],
+    "known_limitations_and_followups": [
+      "Agent connector commands have not yet been connector-specifically tested against real local Codex, Claude Code, or OpenCode installations.",
+      "Agent bridge chat remains disabled unless EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true and EVERYTHINGAI_AGENT_CHAT_ENABLED=true are intentionally set in the backend environment.",
+      "CI smoke-test integration is not yet configured. Playwright currently runs locally.",
+      "Frontend admin files still include a legacy AdminAppV2 path. SettingsView props were made backward-compatible, but longer-term modular cleanup is recommended.",
+      "AnythingLLM remains optional/not configured unless the user intentionally installs and connects it.",
+      "OpenDataLoader PDF remains a future optional extraction connector candidate only if it adds clear new extraction functionality beyond the current extractor."
+    ],
+    "recommended_next_actions": [
+      {
+        "priority": 1,
+        "task": "Controlled connector-specific setup/testing for Codex, Claude Code, and OpenCode.",
+        "validation": "Verify command detection, version probe, safety flags, and disabled-by-default behavior before enabling chat. Do not expose connectors to Client Workspace."
+      },
+      {
+        "priority": 2,
+        "task": "CI smoke-test integration.",
+        "validation": "Add GitHub Actions workflow or equivalent to run backend tests, frontend typecheck/build, and Playwright smoke tests. Archive smoke screenshots/reports as artifacts."
+      },
+      {
+        "priority": 3,
+        "task": "Frontend modularization and cleanup.",
+        "validation": "Reduce legacy/duplicate admin paths carefully. After each extraction/refactor, run frontend typecheck/build and smoke test."
+      }
+    ],
+    "startup_instructions_for_next_agent": [
+      "Read this handover first before making changes.",
+      "Confirm repo is on main and clean with git status.",
+      "Use docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md and docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md as validation evidence.",
+      "Preserve Client/Admin separation.",
+      "Do not expose provider/API-key settings or Agent Connectors in Client Workspace.",
+      "Do not change trust-score or quality-score calculations.",
+      "Do not enable agent bridge execution by default.",
+      "After backend changes, run npm test in services/api.",
+      "After frontend changes, run npm run typecheck and npm run build in apps/everything-ai-ui.",
+      "For UI changes, run npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed from apps/everything-ai-ui."
+    ]
+  }
+}

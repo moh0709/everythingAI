@@ -2,13 +2,33 @@
 
 ## Current roadmap position
 
-EverythingAI is currently in the **local MVP hardening phase**.
+EverythingAI is now in the **validated local MVP + admin connector hardening phase**.
 
-The project has moved beyond concept/prototype planning. The current implementation now contains a local backend engine, an Organizor-style React UI, backend-persisted source paths, automatic knowledge consumption, safe organization previews/execution, AI provider settings, live provider model discovery, and initial configured-provider execution for chat and insights.
+The project has moved beyond concept/prototype planning and beyond an unverified local MVP. The current implementation contains a working local backend engine, separated Client Workspace and Admin Dashboard UIs, backend-persisted source paths, automatic knowledge consumption, durable Knowledge Base/Wiki pages, safe planning previews/execution, undo/recovery, broad AI provider configuration, provider-backed planning, and admin-only Agent Connectors.
 
-This roadmap reflects the known work completed in the repository and in the current implementation session up to this update.
+Latest consolidated source of truth:
 
-The project is **not production ready yet**. The next milestone is to complete local MVP hardening, verify builds/tests, and then move toward production-platform architecture.
+```text
+docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+```
+
+Latest validation artifacts:
+
+```text
+docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
+docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
+```
+
+Current validated baseline:
+
+```text
+Backend npm test:        106/106 passed
+Frontend typecheck:      passed
+Frontend build:          passed
+Playwright smoke test:   4/4 passed
+```
+
+The project is **not production ready yet**, but the local MVP is now product-reviewable and smoke-tested in the running Windows environment.
 
 ---
 
@@ -28,20 +48,21 @@ Complete
 
 - [x] Define EverythingAI / EverythingApp product vision.
 - [x] Define EverythingAI as a local-first AI file brain.
-- [x] Select Organizor-style UI as the main product experience.
+- [x] Define EverythingAI as a source-backed AI knowledge workspace, not only file search/chat.
+- [x] Select separated Client Workspace and Admin Dashboard as the main product experience.
 - [x] Keep product name as EverythingAI.
-- [x] Downgrade old static UI to technical/debug role.
-- [x] Define Source Paths as the central scope model.
+- [x] Define Source Paths as the central local scope model.
 - [x] Define automatic knowledge consumption from scoped folders.
-- [x] Define safe execution principle: AI suggests, user approves.
+- [x] Define safe execution principle: AI suggests, user/admin approves.
 - [x] Define local MVP before central production platform.
 
 ### Product principle
 
 ```text
-User manages scope.
+Admin controls scope and engines.
 EverythingAI consumes knowledge.
-User approves actions.
+Client users ask and explore safely.
+Admin approves high-risk actions.
 ```
 
 ---
@@ -55,7 +76,7 @@ Build a working local backend that indexes folders, stores file intelligence, ex
 ### Status
 
 ```text
-Mostly implemented — needs local verification and hardening
+Validated local MVP backend
 ```
 
 ### Finished
@@ -65,7 +86,7 @@ Mostly implemented — needs local verification and hardening
 - [x] SHA-256 content hashing.
 - [x] Document text extraction.
 - [x] SQLite FTS keyword search.
-- [x] Deterministic vector-style semantic search foundation.
+- [x] Deterministic semantic-style search foundation.
 - [x] File embeddings table.
 - [x] File insights table.
 - [x] Organization suggestions table.
@@ -76,21 +97,23 @@ Mostly implemented — needs local verification and hardening
 - [x] App settings table.
 - [x] Source Paths API.
 - [x] Provider settings API.
+- [x] Agent bridge API foundation.
 - [x] Folder watcher foundation.
+- [x] Persisted watcher resume on backend startup.
 - [x] Safe action preview flow.
 - [x] Approved rename/move execution.
-- [x] Undo foundation.
+- [x] Execution batches.
+- [x] Undo/recovery snapshots.
+- [x] Trash/restore and permanent purge blocking.
 - [x] AnythingLLM sync backend endpoint.
+- [x] Backend test suite validated at 106/106 passing.
 
 ### Still to finalize
 
-- [ ] Run backend tests locally.
-- [ ] Verify source path add/pause/resume/remove after backend restart.
-- [ ] Verify watcher behavior for backend-persisted source paths.
-- [ ] Add cleanup behavior when removing source paths from scope.
-- [ ] Improve failed file and failed extraction reporting.
-- [ ] Add regression tests for failed execution and nested undo.
+- [ ] Controlled connector-specific testing for real local Codex / Claude Code / OpenCode installs.
+- [ ] Add CI job to run backend tests automatically.
 - [ ] Add real background job queue later for production.
+- [ ] Add production-grade secure credential storage later.
 
 ---
 
@@ -98,50 +121,47 @@ Mostly implemented — needs local verification and hardening
 
 ### Goal
 
-Use the Organizor-style UI as the main user-facing app while keeping the EverythingAI name and backend.
+Provide a clear, safe user-facing Client Workspace and a separate Admin Dashboard for operator configuration and control.
 
 ### Status
 
 ```text
-Implemented as active enhanced UI — needs build verification and cleanup
+Validated local MVP UI
 ```
 
 ### Finished
 
 - [x] Create `apps/everything-ai-ui` React/Vite app.
 - [x] Keep product name as EverythingAI.
-- [x] Add Organizor-style Dashboard.
-- [x] Add Explorer.
-- [x] Add Planning.
-- [x] Add Analytics.
-- [x] Add Settings.
+- [x] Add Client Workspace.
+- [x] Add Admin Dashboard.
+- [x] Add clear `CLIENT WORKSPACE` and `ADMIN DASHBOARD` labels.
+- [x] Separate client navigation into Home, Sources & Files, Knowledge Base, and Ask AI.
+- [x] Add admin navigation for Dashboard, Files & Content, Planning, Ask AI, Analytics, and Settings.
+- [x] Clearly separate raw file/source exploration from the generated Knowledge Base.
 - [x] Add Source Paths section.
 - [x] Load backend-persisted source paths.
 - [x] Add source path add/re-scan/pause/resume/remove controls.
-- [x] Add AI provider settings UI.
-- [x] Add provider cards.
-- [x] Add model selector.
-- [x] Add model refresh.
-- [x] Add provider test connection.
+- [x] Add AI provider settings UI in Admin Settings only.
+- [x] Add provider cards and model selector.
+- [x] Add model refresh and provider connection test.
 - [x] Add planning rules UI.
 - [x] Add real Explorer filters.
-- [x] Replace static tags with dynamic file tags.
 - [x] Wire content preview to `GET /api/files/:fileId/preview`.
-- [x] Replace static AI Confidence with calculated average suggestion confidence.
-- [x] Replace static destination folder with editable planning label.
 - [x] Add dry-run preview queue.
 - [x] Wire execute approved previews.
-- [x] Activate enhanced UI through `AppEnhanced.tsx`.
-- [x] Add styling for real filter panel, visible/total file count, and scrollable preview text.
+- [x] Add Undo UI.
+- [x] Add Ask AI auto-scroll.
+- [x] Add Playwright smoke test for client/admin separation and key flows.
+- [x] Frontend typecheck/build validated.
+- [x] Playwright smoke test validated at 4/4 passing.
 
 ### Still to finalize
 
-- [ ] Run `npm install` and `npm run build` in `apps/everything-ai-ui`.
-- [ ] Fix TypeScript/build errors if any.
-- [ ] Rename `AppEnhanced.tsx` to `App.tsx` after build is stable.
-- [ ] Remove or archive old/deprecated `App.tsx`.
-- [ ] Improve UI layout after real local testing.
-- [ ] Add clearer loading/progress indicators for long scans.
+- [ ] Add CI job for frontend typecheck/build and Playwright smoke test.
+- [ ] Continue controlled frontend modularization and cleanup of legacy admin paths.
+- [ ] Improve UI layout after broader product review.
+- [ ] Add clearer progress indicators for long scans/builds where still needed.
 
 ---
 
@@ -149,43 +169,54 @@ Implemented as active enhanced UI — needs build verification and cleanup
 
 ### Goal
 
-Allow EverythingAI to use configurable local and remote AI providers for chat, insights, planning, and future reasoning.
+Allow EverythingAI to use configurable local and remote AI providers for chat, insights, planning, and future reasoning while keeping provider control Admin-only.
 
 ### Status
 
 ```text
-Provider settings, live model discovery, and initial execution integration implemented — planning execution still incomplete
+Validated provider runtime and admin-only configuration
 ```
 
 ### Finished
 
 - [x] Backend-persisted provider settings.
 - [x] Local Ollama settings.
+- [x] OpenAI settings.
+- [x] Anthropic / Claude settings.
 - [x] OpenRouter settings.
 - [x] Cerebras settings.
 - [x] Mistral settings.
 - [x] Google AI settings.
+- [x] DeepSeek settings.
+- [x] Groq settings.
+- [x] xAI / Grok settings.
+- [x] Moonshot / Kimi settings.
+- [x] Together AI settings.
+- [x] Fireworks AI settings.
+- [x] Perplexity settings.
+- [x] Azure OpenAI settings.
+- [x] LM Studio settings.
+- [x] Custom OpenAI-compatible settings.
 - [x] Remote provider enable/disable policy.
 - [x] API key masking/preservation logic.
 - [x] Static fallback model lists.
-- [x] Live Ollama model discovery.
-- [x] Live OpenRouter model discovery.
-- [x] Live Cerebras model discovery.
-- [x] Live Mistral model discovery.
-- [x] Live Google AI model discovery.
+- [x] Live model discovery where implemented.
 - [x] Provider model refresh endpoint.
 - [x] Provider connection test endpoint.
 - [x] Server-side configured provider runtime for chat/completions.
 - [x] Selected provider can control `/api/chat`.
+- [x] Public `/api/chat` route no longer accepts request-body provider override.
 - [x] Selected provider can control `/api/insights` when provider execution is requested.
+- [x] Selected provider can control planning/suggestion generation.
+- [x] Provider-specific error codes and hints.
+- [x] Provider/API-key configuration remains Admin-only.
 
 ### Still to finalize
 
-- [ ] Selected provider must control planning/suggestion generation.
-- [ ] Add deeper provider-specific error messages and UI feedback.
+- [ ] Controlled real-provider testing with actual API credentials where desired.
 - [ ] Improve API key UX: saved / replace / clear.
 - [ ] Decide how embeddings provider selection should work.
-- [ ] Add tests for Ollama/OpenRouter/Cerebras/Mistral/Google execution fallbacks.
+- [ ] Add CI-safe mocked provider route tests where gaps remain.
 
 ---
 
@@ -193,40 +224,41 @@ Provider settings, live model discovery, and initial execution integration imple
 
 ### Goal
 
-Let AI generate a safe organization plan, allow the user to review it, dry-run it, and approve execution.
+Let AI generate a safe organization plan, allow the user/admin to review it, dry-run it, approve execution, and undo where supported.
 
 ### Status
 
 ```text
-Functional MVP foundation — backend rules need enforcement
+Validated governed local MVP workflow
 ```
 
 ### Finished
 
 - [x] Organization suggestions.
+- [x] Provider-backed organization suggestions.
+- [x] Deterministic/provider/hybrid planning modes.
 - [x] Confidence scoring.
+- [x] Backend confidence threshold enforcement.
+- [x] Backend allow/disable enforcement for rename/move/tag/category.
+- [x] Backend dry-run-only enforcement.
+- [x] Backend require-approval enforcement.
 - [x] Selectable suggestions.
 - [x] Dry-run action previews.
 - [x] Preview ready/blocked states.
 - [x] Individual action preview execution.
 - [x] Execute Plan button wired to executable previews.
 - [x] Confirmation before execution.
-- [x] Audit trail foundation.
-- [x] Editable destination/planning label replaces static `/Documents/Organized` placeholder.
+- [x] Audit trail.
+- [x] Execution batches.
+- [x] Undo UI.
+- [x] Recovery snapshots.
+- [x] Clearer blocked-action explanations.
 
 ### Still to finalize
 
-- [ ] Backend must enforce confidence threshold.
-- [ ] Backend must enforce allow/disable rename.
-- [ ] Backend must enforce allow/disable move.
-- [ ] Backend must enforce allow/disable tag.
-- [ ] Backend must enforce allow/disable category.
-- [ ] Backend must enforce dry-run-only mode.
-- [ ] Backend must enforce require-approval mode.
 - [ ] Add better grouped folder-structure planning view.
 - [ ] Add better bulk select controls.
-- [ ] Add Undo UI.
-- [ ] Add clearer blocked-action explanations.
+- [ ] Add richer manual product QA around move/rename on disposable test folders.
 
 ---
 
@@ -234,12 +266,12 @@ Functional MVP foundation — backend rules need enforcement
 
 ### Goal
 
-Turn indexed files and extracted content into a searchable and explainable knowledge base.
+Turn indexed files and extracted content into a searchable, explainable, source-backed Knowledge Base.
 
 ### Status
 
 ```text
-Backend foundation exists — dedicated UI still missing
+Validated local MVP knowledge layer
 ```
 
 ### Finished
@@ -251,62 +283,90 @@ Backend foundation exists — dedicated UI still missing
 - [x] Basic entity extraction.
 - [x] File preview endpoint.
 - [x] Explorer content preview wired to backend preview endpoint.
-- [x] Dynamic file tags use extension, index status, extraction status, insight classification, and file size.
+- [x] Dynamic file/source labels.
 - [x] Related/searchable file references foundation.
 - [x] Selected AI provider can be used for knowledge chat through `/api/chat`.
+- [x] Durable Wiki / Knowledge Base storage.
+- [x] Knowledge page in Client Workspace.
+- [x] Knowledge Base detail view.
+- [x] Knowledge map/navigation.
+- [x] Source-backed reading mode foundation.
+- [x] File Sources rail.
+- [x] Evidence/citation diagnostics.
+- [x] Knowledge Quality scoring.
+- [x] Human Validation layer.
+- [x] Governance Conflict Dashboard.
+- [x] Review Candidate Dashboard.
 
 ### Still to finalize
 
-- [ ] Add dedicated Knowledge page in React UI.
-- [ ] Show summaries.
-- [ ] Show classifications.
-- [ ] Show extracted entities.
-- [ ] Show duplicate groups.
-- [ ] Show source map.
-- [ ] Show knowledge build status.
-- [ ] Add Ask EverythingAI / knowledge chat page.
+- [ ] Improve rich citation rendering and source highlighting where needed.
+- [ ] Improve extracted document formatting for books/blogs/tables/media.
+- [ ] Evaluate optional OpenDataLoader PDF connector only if it clearly adds new extraction capabilities.
 
 ---
 
-## Phase 7 — Integrations
+## Phase 7 — Integrations and Admin Agent Connectors
 
 ### Goal
 
-Connect EverythingAI to external knowledge systems and future enterprise data sources.
+Connect EverythingAI to optional external knowledge systems and admin-only local agent tools without replacing EverythingAI as the main product interface.
 
 ### Status
 
 ```text
-Backend foundation started — UI missing
+AnythingLLM sync UI exists; Admin Agent Connectors validated; connector-specific setup still pending
 ```
 
 ### Finished
 
 - [x] AnythingLLM sync backend endpoint.
 - [x] AnythingLLM extracted-document upload bridge.
+- [x] AnythingLLM sync UI in Knowledge page.
+- [x] Admin Agent Connectors panel.
+- [x] Codex connector catalog entry.
+- [x] Claude Code connector catalog entry.
+- [x] OpenCode connector catalog entry.
+- [x] Kilo Code, Aider, Continue, and Cline catalog entries.
+- [x] Agent bridge status refresh.
+- [x] Agent detect and detect-all actions.
+- [x] Agent version probe action.
+- [x] Disabled-by-default local agent bridge safety model.
+- [x] Client Workspace does not expose Agent Connectors.
 
 ### Still to finalize
 
-- [ ] Add AnythingLLM sync UI.
-- [ ] Show sync status.
-- [ ] Configure workspace slug in UI.
-- [ ] Show sync errors.
+- [ ] Controlled connector-specific setup/testing for real local Codex install.
+- [ ] Controlled connector-specific setup/testing for real local Claude Code install.
+- [ ] Controlled connector-specific setup/testing for real local OpenCode install.
+- [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true` locally.
+- [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_CHAT_ENABLED=true` locally.
+- [ ] AnythingLLM remains optional/not configured unless intentionally installed and connected.
 - [ ] Add cloud storage connector strategy.
 - [ ] Add future SharePoint / OneDrive / Google Drive connector strategy.
 
 ---
 
-## Phase 8 — Production platform readiness
+## Phase 8 — CI, launch hardening, and production platform readiness
 
 ### Goal
 
-Move from local MVP into a real production-ready platform with users, workspaces, devices, central database, and client agents.
+Move from validated local MVP into repeatable CI validation, release hardening, and later production-ready platform architecture.
 
 ### Status
 
 ```text
-Not started — future production phase
+Next recommended phase
 ```
+
+### Required next
+
+- [ ] Add GitHub Actions / CI workflow for backend `npm test`.
+- [ ] Add CI workflow for frontend `npm run typecheck` and `npm run build`.
+- [ ] Add CI workflow for Playwright smoke test.
+- [ ] Archive Playwright screenshots/reports as CI artifacts.
+- [ ] Update release checklist.
+- [ ] Continue frontend modularization.
 
 ### Required later
 
@@ -323,7 +383,6 @@ Not started — future production phase
 - [ ] Enterprise permission model.
 - [ ] File access control model.
 - [ ] Production logging and monitoring.
-- [ ] CI/build pipeline.
 - [ ] Backup and migration strategy.
 - [ ] Deployment strategy.
 
@@ -332,28 +391,27 @@ Not started — future production phase
 ## Current production-readiness assessment
 
 ```text
-Concept:                 Complete
-Architecture:            Complete for local MVP
-Backend MVP foundation:  70–80%
-React UI MVP foundation: 65–75%
-AI provider UI:          75–85%
-AI provider execution:   45–55%
-Planning workflow:       60–70%
-Knowledge UI:            20–30%
-Production readiness:    20–30%
+Concept:                    Complete
+Architecture:               Complete for validated local MVP
+Backend local MVP:          90–95%
+Client Workspace MVP:       85–90%
+Admin Dashboard MVP:        85–90%
+AI provider system:         85–90%
+Planning workflow:          85–90%
+Knowledge Base UI:          80–85%
+Admin Agent Connectors:     70–80% implemented, connector-specific setup pending
+Production readiness:       30–40%
 ```
 
 ## Immediate next priorities
 
-1. Run backend tests.
-2. Run frontend build.
-3. Fix build/runtime errors.
-4. Connect selected AI provider to planning/suggestion generation.
-5. Enforce planning rules in backend suggestion logic.
-6. Add Undo UI.
-7. Add Knowledge page.
-8. Add AnythingLLM sync UI.
+1. Controlled connector-specific setup/testing for Codex, Claude Code, and OpenCode.
+2. Add CI smoke-test integration for backend, frontend, and Playwright.
+3. Continue controlled frontend modularization and cleanup of legacy admin paths.
+4. Improve API key lifecycle UX.
+5. Improve rich citation/source highlighting and extracted document formatting.
+6. Keep AnythingLLM and OpenDataLoader PDF as optional future connectors only when they add clear new value.
 
 ## One-sentence status
 
-EverythingAI is now a serious local MVP foundation with backend-persisted source paths, automatic knowledge consumption, Organizor-style UI, provider settings, live model discovery, configured provider execution for chat/insights, and safe planning workflow — but it still needs backend planning-rule enforcement, provider-driven planning generation, knowledge UI, undo/sync UI, testing, and production hardening before it is fully production ready.
+EverythingAI is now a validated local-first, source-backed AI knowledge workspace with a safe Client Workspace, Admin Dashboard, durable Knowledge Base, governed planning/execution/undo, admin-selected AI providers, and admin-only Agent Connectors — ready for connector-specific testing and CI hardening, but not yet production platform ready.

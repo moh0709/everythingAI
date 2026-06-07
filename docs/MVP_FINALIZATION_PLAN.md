@@ -2,43 +2,78 @@
 
 ## Objective
 
-Finalize the current EverythingAI local MVP so it is stable, optimized, safe, and ready for serious local testing before moving to the full central platform architecture.
+Finalize and preserve the current EverythingAI local MVP so it remains stable, optimized, safe, smoke-tested, and ready for serious product review before moving to full central platform architecture.
+
+## Current source of truth
+
+Latest consolidated handover:
+
+```text
+docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+```
+
+Latest validation artifacts:
+
+```text
+docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
+docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
+```
+
+Current validated baseline:
+
+```text
+Date: 2026-06-07
+Backend npm test:        106/106 passed
+Frontend typecheck:      passed
+Frontend build:          passed
+Playwright smoke test:   4/4 passed
+```
 
 ## Current MVP scope
 
 The current MVP is split into:
 
 ```text
-services/api                 Backend API, SQLite persistence, indexing, extraction, search, AI/knowledge services, safe actions, recovery, audit
-apps/everything-ai-ui         React user/admin frontend
-http://localhost:5151         Official safe user UI
-http://localhost:5152/admin.html  Admin/operator UI during local development
+services/api                    Backend API, SQLite persistence, indexing, extraction, search, AI/knowledge services, safe actions, recovery, audit, provider runtime, agent bridge
+apps/everything-ai-ui            React Client Workspace and Admin Dashboard frontend
+http://localhost:5151            Official Client Workspace
+http://localhost:5151/admin.html Admin Dashboard on the same dev server
+http://localhost:5152/admin.html Optional dedicated Admin Dashboard dev server via npm run dev:admin
 ```
 
 The local MVP is focused on:
 
 - local folder indexing
+- backend-persisted source paths
+- source path add / pause / resume / remove
+- watcher resume on backend startup
 - SQLite metadata storage
 - document text extraction
 - SQLite FTS search
-- deterministic vector-style local semantic search
-- Ollama/provider-based local chat when configured
+- deterministic semantic-style local search
+- admin-selected provider-based chat
 - deterministic and provider-assisted insights/classifications
 - duplicate detection
 - folder watching
+- durable Knowledge Base / Wiki pages
+- category/topic knowledge navigation
+- intelligent knowledge search
+- page-level article search
+- reading mode
+- source reveal/open context actions
+- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, evidence quality badges, durable chunk metadata display, hardened active chunk matching, collapsed metadata details, responsive source preview drawer behavior, safer table/image rendering, clearer local settings guidance, and extracted frontend connection-settings state
 - organization suggestions
+- provider-backed planning suggestions
+- planning-rule enforcement
 - safe action previews
 - approved move/rename execution
 - undo
 - audit log
 - recovery/trash/restore
-- source-backed content-first wiki pages
-- category/topic knowledge navigation
-- intelligent wiki search
-- page-level article search
-- reading mode
-- source reveal/open context actions
-- source verification UX with citations, source cards, copy citation/path actions, preview drawer foundation, durable evidence routes, persisted source chunks, evidence quality badges, durable chunk metadata display, hardened active chunk matching, collapsed metadata details, responsive source preview drawer behavior, safer table/image rendering, clearer local settings guidance, and extracted frontend connection-settings state
+- Client Workspace / Admin Dashboard separation
+- admin-only AI Provider Configuration
+- admin-only Agent Connectors
+- Playwright smoke-test agent
 
 ## Not part of local MVP finalization
 
@@ -52,55 +87,27 @@ The following items are intentionally deferred to the production-platform phase:
 - SaaS deployment
 - Windows installer
 - enterprise permission model
+- production-grade secure credential storage
 
 ## Finalization phases
 
 ### Phase 1 — Stabilization
 
-Status: complete / validated locally on Windows
+Status: complete / historically validated
 
-Tasks:
-
-- [x] Remove legacy in-memory API routes
-- [x] Modularize Express routes
-- [x] Add request helper validation
-- [x] Add local MVP vs central platform documentation
-- [x] Add Windows smoke test guide
-- [x] Backend automated test baseline previously validated: 78 passed / 0 failed
-- [x] Re-run `npm test` after latest Wiki/source precision changes and watcher database-path fix
-- [x] Fix new test failures found during validation
-- [x] Repair local SQLite Wiki schema drift found during Windows runtime smoke testing
-- [x] Add backend startup schema repair before API dev/start commands
-- [x] Validate Windows local UI flow after schema repair
-- [x] Reconfirm backend automated tests after schema repair
-
-Validation result:
+Key historical validation:
 
 ```text
-Date: 2026-05-21
-Windows local UI smoke test: PASS
-Backend command: cd E:\01PROJEKTER\EverythingAI\services\api && npm test
-Backend result: 82 tests / 82 passed / 0 failed
-Frontend typecheck: PASS
-Frontend production build: PASS
-```
-
-Related validation notes:
-
-```text
-docs/VALIDATION_2026-05-21_WINDOWS_SCHEMA_DRIFT_REPAIR.md
-docs/VALIDATION_2026-05-21_WINDOWS_LOCAL_UI_SMOKE_PASS.md
-docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_SCHEMA_REPAIR.md
-docs/VALIDATION_2026-05-21_FULL_LOCAL_MVP_BASELINE.md
-docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_NESTED_UNDO.md
-docs/VALIDATION_2026-05-21_BACKEND_TESTS_AFTER_SKIP_UNCHANGED.md
+2026-05-21: Windows local UI smoke test passed.
+2026-05-21: Backend test baseline passed at 82/82.
+2026-06-07: Current backend test baseline passed at 106/106.
 ```
 
 ### Phase 2 — Scanner optimization
 
-Status: in progress / persisted unchanged-file skip validated
+Status: complete for local MVP / validated
 
-Tasks:
+Completed:
 
 - [x] Add configurable max file size
 - [x] Add configurable exclude names
@@ -108,36 +115,36 @@ Tasks:
 - [x] Track skipped reasons
 - [x] Add progress callback support
 - [x] Add persisted unchanged-file skip strategy
-- [ ] Add clearer scan report in UI
+- [x] Validate scanner regression coverage through backend tests
 
-Validation note:
+Remaining:
 
-```text
-Date: 2026-05-21
-Backend tests passed 82/82 after adding persisted unchanged-file scan skip coverage.
-The scanner now skips files when persisted size and modified_at are unchanged and re-indexes changed files.
-The API index route and watcher scan cycle both use the persisted unchanged-file skip strategy.
-```
+- [ ] Add clearer scan report in UI if needed after product review
 
 ### Phase 3 — Watcher optimization
 
-Status: in progress / watcher regression fixed
+Status: complete for local MVP / validated
 
-Tasks:
+Completed:
 
 - [x] Add debounce
 - [x] Prevent overlapping rescans
 - [x] Add queued pending rerun handling
 - [x] Fix watcher cycles to use the caller database path instead of the default database path
-- [x] Validate watcher test fix on desktop through Issue #20
-- [ ] Add watcher stress test on Windows
-- [ ] Add UI status for watcher queue/running state
+- [x] Persisted active source paths selected for restart resume
+- [x] Resume persisted watchers on backend startup
+- [x] Report failed persisted source paths without aborting remaining resumes
+- [x] Validate watcher behavior through backend tests
 
-### Phase 4 — Extraction and embedding optimization
+Remaining:
 
-Status: in progress
+- [ ] Add richer UI status for watcher queue/running state if needed
 
-Tasks:
+### Phase 4 — Extraction, embeddings, and durable Knowledge Base
+
+Status: complete for local MVP / validated
+
+Completed:
 
 - [x] Skip unchanged already-extracted files by default
 - [x] Add force extraction option internally
@@ -149,15 +156,20 @@ Tasks:
 - [x] Add durable Wiki evidence API routes
 - [x] Add backend tests for durable Wiki persistence and evidence routes
 - [x] Add frontend TypeScript contracts and API helpers for durable Wiki evidence
-- [ ] Avoid regenerating embeddings for unchanged extracted text
+- [x] Avoid regenerating embeddings for unchanged extracted text
+- [x] Add PDF page-level source references where extractor can provide page metadata
+
+Remaining:
+
 - [ ] Add future provider interface for real neural embeddings
-- [ ] Add PDF page-level source references where extractor can provide page metadata
+- [ ] Improve rich media/table/OCR extraction where useful
+- [ ] Evaluate OpenDataLoader PDF only as an optional connector if it clearly adds new extraction value
 
 ### Phase 5 — Safety hardening
 
 Status: complete / validated
 
-Tasks:
+Completed:
 
 - [x] Keep delete actions disabled
 - [x] Keep move/rename behind preview + explicit approval
@@ -166,35 +178,31 @@ Tasks:
 - [x] Add backend reveal-source-file route for local source opening
 - [x] Add nested undo regression test
 - [x] Add failed execution regression test
+- [x] Add trash/restore behavior
+- [x] Block permanent purge in local MVP
+- [x] Add execution batches with approval and audit
+- [x] Add Undo UI
 
-Validation note:
+### Phase 6 — Client/Admin UI polish and Knowledge UX
 
-```text
-Date: 2026-05-21
-Backend tests passed 81/81 after adding nested undo regression coverage.
-Failed execution coverage includes blocked preview rejection, missing source rejection, target-exists rejection, and active trashed file rejection with failed audit/no unsafe mutation behavior.
-Nested undo coverage confirms original nested relative paths are restored after approved cross-folder move and approved undo.
-```
-
-### Phase 6 — UI polish and Wiki/Knowledge UX
-
-Status: active / nearly complete
+Status: complete for local MVP / smoke-tested
 
 Completed:
 
-- [x] Split user-facing safe UI from admin/operator UI
+- [x] Split user-facing safe Client Workspace from Admin Dashboard
 - [x] Keep official user UI on `apps/everything-ai-ui` / `UserApp.tsx`
-- [x] Add Start / Explore / Wiki / Ask navigation
-- [x] Add source-backed Wiki view
+- [x] Add Client Workspace navigation: Home / Sources & Files / Knowledge Base / Ask AI
+- [x] Add Admin Dashboard navigation: Dashboard / Files & Content / Planning / Ask AI / Analytics / Settings
+- [x] Add clear `CLIENT WORKSPACE` and `ADMIN DASHBOARD` labels
+- [x] Add source-backed Knowledge Base view
 - [x] Add content-first file wiki pages
 - [x] Add category/topic/source-file tree navigation
-- [x] Add intelligent Wiki search across titles, topics, page content, sources, and snippets
-- [x] Add page-level search inside selected wiki article with match count and highlighted matches
+- [x] Add intelligent Knowledge Base search across titles, topics, page content, sources, and snippets
+- [x] Add page-level search inside selected knowledge article with match count and highlighted matches
 - [x] Add Reading Mode for cleaner article reading
 - [x] Add clickable `[[Related Page]]` navigation
 - [x] Add source rail with file path, source context, and reveal-in-folder action
 - [x] Add toast notification system for important user-triggered actions
-- [x] Add `start_all_debug.bat` to validate/build UI and start backend/user/admin dev servers
 - [x] Render chunk-level citation badges such as `[S1:C3]`
 - [x] Make citations clickable and highlight matching source cards
 - [x] Add source card actions: preview source, copy citation, copy path, reveal in folder, and open source context
@@ -209,79 +217,96 @@ Completed:
 - [x] Harden `[S1:Cx]` drawer matching by mapping both `ref` and durable `chunk_ref` to the same chunk element
 - [x] Improve source preview drawer responsive layout for narrow screens
 - [x] Add safer table/image rendering in wiki pages
-- [x] Add clearer local settings instructions in Start and Explore views
+- [x] Add clearer local settings instructions in Client Workspace views
 - [x] Extract connection/folder settings state from `UserApp.tsx` into `useConnectionSettings`
+- [x] Add Ask AI auto-scroll
+- [x] Validate Client/Admin clarity with Playwright smoke test
 
 Remaining:
 
-- [ ] Continue splitting remaining large `UserApp.tsx` workflow responsibilities into smaller state/controller modules
+- [ ] Continue controlled frontend modularization and cleanup of legacy admin paths
+- [ ] Do not mix UX changes and workflow extraction in the same commit
 
-Important current instruction:
+### Phase 7 — Provider runtime and Admin Agent Connectors
 
-```text
-Pause broad UserApp refactoring until the next runtime-priority task is chosen.
-Do not move buildKnowledgeWorkspace() yet.
-Do not combine UX work and workflow extraction in the same commit.
-```
+Status: implemented and validated for local MVP configuration surface
 
-### Phase 7 — Documentation finalization
+Completed:
 
-Status: active / in progress
+- [x] Admin-only AI Provider Configuration
+- [x] Broad provider catalog: Ollama, OpenAI, Anthropic/Claude, OpenRouter, Cerebras, Mistral, Google AI, DeepSeek, Groq, xAI/Grok, Moonshot/Kimi, Together AI, Fireworks, Perplexity, Azure OpenAI, LM Studio, Custom OpenAI-compatible
+- [x] Remote-provider enable/disable policy
+- [x] Provider-specific error metadata
+- [x] Client chat uses backend/admin-selected provider only
+- [x] Public `/api/chat` no longer accepts request-body provider override
+- [x] Admin Agent Connectors panel
+- [x] Codex / Claude Code / OpenCode connector catalog entries
+- [x] Kilo Code / Aider / Continue / Cline connector catalog entries
+- [x] Agent bridge status, detect, detect-all, and version probe actions
+- [x] Disabled-by-default bridge safety model
+- [x] Browser cannot submit arbitrary shell commands
+- [x] Playwright smoke test confirms Agent Connectors are Admin-only
 
-Tasks:
+Remaining:
+
+- [ ] Controlled connector-specific setup/testing for real local Codex install
+- [ ] Controlled connector-specific setup/testing for real local Claude Code install
+- [ ] Controlled connector-specific setup/testing for real local OpenCode install
+- [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true`
+- [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_CHAT_ENABLED=true`
+
+### Phase 8 — Documentation finalization and CI smoke automation
+
+Status: documentation refreshed; CI smoke automation pending
+
+Completed:
 
 - [x] Add MVP finalization plan
 - [x] Add known limitations document
 - [x] Add current handover JSON for next AI agent
-- [x] Update MVP finalization plan with Phase 1 evidence-inspection progress
 - [x] Add dedicated Wiki/Knowledge Base technical design doc
 - [x] Link dedicated Wiki/Knowledge Base technical design doc from README
-- [x] Update documentation with backend validation result after durable Wiki changes
-- [x] Update documentation with frontend typecheck/build validation result after durable Wiki types/API helpers
-- [x] Update documentation with frontend typecheck/build validation result after Wiki evidence quality badges
-- [x] Update documentation with frontend typecheck/build validation result after source drawer metadata display
-- [x] Update documentation with frontend typecheck/build validation result after active chunk matching hardening
-- [x] Update documentation with frontend typecheck/build validation result after page-level article search
-- [x] Update documentation with frontend typecheck/build validation result after collapsed metadata details
-- [x] Update documentation with frontend typecheck/build validation result after responsive source drawer polish
-- [x] Update documentation with frontend typecheck/build validation result after table/image rendering polish
-- [x] Update documentation with frontend typecheck/build validation result after local settings guidance polish
-- [x] Update documentation with frontend typecheck/build validation result after connection settings hook extraction
-- [x] Update Windows smoke test after local tests
-- [x] Add validation notes for Windows schema-drift repair, Windows local UI smoke pass, backend tests, and full local MVP baseline
-- [x] Add validation note for nested undo regression test pass
-- [x] Add validation note for persisted unchanged-file scan skip pass
+- [x] Add Playwright smoke-test agent documentation
+- [x] Add validation notes for local smoke test and Admin Agent Connectors
+- [x] Create consolidated June 7 source-of-truth handover
+- [x] Update README, ROADMAP, IMPLEMENTATION_ROADMAP, UI README, Windows smoke test, and MVP finalization docs to the June 7 validated baseline
+
+Remaining:
+
+- [ ] Add GitHub Actions / CI workflow for backend tests
+- [ ] Add CI workflow for frontend typecheck/build
+- [ ] Add CI workflow for Playwright smoke test
+- [ ] Archive smoke screenshots/reports as CI artifacts
 
 ## Latest validation results
 
 ```text
-Date: 2026-05-21
-
-Windows local UI smoke test:
-Command: cd E:\01PROJEKTER\EverythingAI && .\start_all_debug.bat
-User UI: http://localhost:5151
-Flow: Start -> Explore -> Wiki -> Ask
-Result: PASS
+Date: 2026-06-07
 
 Backend:
-cd E:\01PROJEKTER\EverythingAI\services\api
+cd C:\temp\EverythingAI\services\api
 npm test
-Result: 82 tests / 82 passed / 0 failed
+Result: 106 tests / 106 passed / 0 failed
 
 Frontend:
-cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
+cd C:\temp\EverythingAI\apps\everything-ai-ui
 npm run typecheck
 Result: passed
 
-cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
+cd C:\temp\EverythingAI\apps\everything-ai-ui
 npm run build
 Result: passed
-Observed: 1533 modules transformed, built in 1.16s
+Observed: 1545 modules transformed, built in 2.11s
+
+Playwright smoke test:
+cd C:\temp\EverythingAI\apps\everything-ai-ui
+npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed
+Result: 4 tests / 4 passed / 0 failed
 ```
 
-## Runtime repair added during validation
+## Runtime repair added during earlier validation
 
-The Windows smoke test exposed schema drift in an older local SQLite database.
+The May 21 Windows smoke test exposed schema drift in an older local SQLite database.
 
 Observed missing-column failures:
 
@@ -300,7 +325,7 @@ services/api/src/db/repairWikiSchema.js
 Manual repair command:
 
 ```text
-cd E:\01PROJEKTER\EverythingAI\services\api
+cd C:\temp\EverythingAI\services\api
 npm run repair:wiki-schema
 ```
 
@@ -308,7 +333,7 @@ Startup hardening:
 
 ```text
 services/api/package.json
-npm run dev and npm start now run Wiki schema repair before API startup.
+npm run dev and npm start run Wiki schema repair before API startup where configured.
 ```
 
 ## Environment variables for MVP optimization
@@ -324,28 +349,26 @@ EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT=4000
 
 ## Definition of done
 
-The local MVP is finalized when:
+The local MVP finalization baseline is currently met when:
 
-1. `npm test` passes locally after latest changes. Current result: PASS, 82/82.
+1. `npm test` passes locally in `services/api`. Current result: PASS, 106/106.
 2. `npm run typecheck` passes in `apps/everything-ai-ui`. Current result: PASS.
 3. `npm run build` passes in `apps/everything-ai-ui`. Current result: PASS.
-4. A safe Windows folder can be indexed without errors. Current result: smoke-tested through user UI.
-5. Extraction works for supported file types.
-6. Search and semantic-style search work.
-7. Insights and suggestions are generated.
-8. User can build and browse source-backed wiki pages.
-9. Wiki pages prioritize real document content over metadata.
-10. Wiki source citations are precise enough for user trust.
-11. Move/rename actions require preview and approval.
-12. Failed action attempts are audited.
-13. Undo works for nested files and is audited. Current result: PASS.
-14. Watch mode does not overload the app during normal file changes.
-15. README and smoke-test documentation match the tested behavior.
+4. Playwright smoke test passes. Current result: PASS, 4/4.
+5. Client Workspace and Admin Dashboard remain clearly separated.
+6. Sources & Files and Knowledge Base remain clearly distinguished.
+7. Client Workspace does not expose provider/API-key configuration.
+8. Client Workspace does not expose Agent Connectors.
+9. Client Ask AI uses the backend/admin-selected provider only.
+10. Move/rename actions require preview and approval.
+11. Failed action attempts are audited.
+12. Undo works for supported filesystem actions and is audited.
+13. README and smoke-test documentation match the tested behavior.
 
 ## Final MVP principle
 
 The local MVP should be boring, safe, and reliable before adding more intelligence.
 
-The Wiki/Knowledge Base direction is now confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, page-level article search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, visible evidence quality indicators, durable chunk metadata display, reliable citation-to-chunk navigation, collapsed metadata details, responsive source preview behavior, safer table/image rendering, clear local setup guidance, and gradually modularized frontend state.
+The Knowledge Base direction is confirmed: it should feel like a source-backed encyclopedia / book-reading layer over the user's local files, with content-first pages, strong navigation, intelligent search, page-level article search, source preview, evidence inspection, traceable citations, durable source chunks, rebuild history, visible evidence quality indicators, reliable citation-to-chunk navigation, collapsed metadata details, responsive source preview behavior, safer table/image rendering, clear local setup guidance, and gradually modularized frontend state.
 
-Do not add production-platform features until the local MVP is stable.
+Do not add production-platform features until the validated local MVP remains stable under automated tests and smoke tests.
