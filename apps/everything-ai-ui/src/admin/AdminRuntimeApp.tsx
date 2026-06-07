@@ -1,6 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { apiRequest, type ApiOptions, type Suggestion } from '../api';
-import { saveProviderSettings, testProviderConnection, getProviderModels, type ProviderName, type ProviderSettings } from '../providerSettingsApi';
+import {
+  detectAgentIntegration,
+  detectAllAgentIntegrations,
+  getAgentBridgeStatus,
+  getProviderModels,
+  saveProviderSettings,
+  runAgentProbe,
+  testProviderConnection,
+  type AgentBridgeStatus,
+  type AgentDetectionResult,
+  type ProviderName,
+  type ProviderSettings,
+} from '../providerSettingsApi';
 import type { SourcePathRecord } from '../sourcePathsApi';
 import { AdminShell, AdminViewRouter, type PreviewRecord } from './components';
 import {
@@ -17,6 +29,8 @@ import type { AdminSection } from './types';
 
 export function AdminRuntimeApp() {
   const [section, setSection] = useState<AdminSection>('dashboard');
+  const [agentBridgeStatus, setAgentBridgeStatus] = useState<AgentBridgeStatus | null>(null);
+  const [agentDetectionResults, setAgentDetectionResults] = useState<Record<string, AgentDetectionResult>>({});
   const localSettings = useAdminLocalSettings();
   const task = useAdminTaskRunner();
   const workspace = useAdminWorkspaceData();
@@ -41,6 +55,8 @@ export function AdminRuntimeApp() {
       ]);
 
       await providers.refreshProviderData(options);
+      const bridgeStatus = await getAgentBridgeStatus(options);
+      setAgentBridgeStatus(bridgeStatus);
       workspace.setStatus(status);
       workspace.setFiles(files);
       workspace.setSuggestions(suggestions);
@@ -197,10 +213,12 @@ export function AdminRuntimeApp() {
   }
 
   async function saveAiSettings(next: ProviderSettings) {
-    await task.run('Saving AI provider settings...', async () => {
+    await task.run('Saving AI provider and agent connector settings...', async () => {
       const payload = await saveProviderSettings(options, next);
       providers.setProviderSettings(payload.settings);
-      task.setMessage('AI provider settings saved.');
+      const bridgeStatus = await getAgentBridgeStatus(options);
+      setAgentBridgeStatus(bridgeStatus);
+      task.setMessage('AI provider and agent connector settings saved.');
     });
   }
 
@@ -216,6 +234,38 @@ export function AdminRuntimeApp() {
       const payload = await getProviderModels(options);
       providers.setProviderModels(payload.models);
       task.setMessage('Model list refreshed.');
+    });
+  }
+
+  async function refreshAgentBridgeStatus() {
+    await task.run('Refreshing agent bridge status...', async () => {
+      const payload = await getAgentBridgeStatus(options);
+      setAgentBridgeStatus(payload);
+      task.setMessage(`Agent bridge is ${payload.bridgeEnabled ? 'enabled' : 'disabled'}; chat is ${payload.chatEnabled ? 'enabled' : 'disabled'}.`);
+    });
+  }
+
+  async function detectAgent(agentId: string) {
+    await task.run(`Detecting ${agentId} connector...`, async () => {
+      const payload = await detectAgentIntegration(options, agentId);
+      setAgentDetectionResults((current) => ({ ...current, [agentId]: payload }));
+      task.setMessage(payload.message);
+    });
+  }
+
+  async function detectAllAgents() {
+    await task.run('Detecting all configured agent connectors...', async () => {
+      const payload = await detectAllAgentIntegrations(options);
+      const next = Object.fromEntries((payload.results || []).map((result) => [result.agentId, result]));
+      setAgentDetectionResults(next);
+      task.setMessage(`Detected ${payload.results?.filter((result) => result.found).length || 0} agent connector command(s).`);
+    });
+  }
+
+  async function probeAgent(agentId: string) {
+    await task.run(`Probing ${agentId} connector...`, async () => {
+      const payload = await runAgentProbe(options, agentId, 'version');
+      task.setMessage(payload.message || (payload.ok ? `${agentId} probe succeeded.` : `${agentId} probe failed.`));
     });
   }
 
@@ -299,6 +349,12 @@ export function AdminRuntimeApp() {
       connectionMessage={task.message}
       connectionStatus={task.error ? 'error' : 'idle'}
       saveSettingsFeedback=""
+      agentBridgeStatus={agentBridgeStatus}
+      agentDetectionResults={agentDetectionResults}
+      refreshAgentBridgeStatus={refreshAgentBridgeStatus}
+      detectAgent={detectAgent}
+      detectAllAgents={detectAllAgents}
+      probeAgent={probeAgent}
       chatMessages={chat.chatMessages}
       setChatMessages={chat.setChatMessages}
     />
