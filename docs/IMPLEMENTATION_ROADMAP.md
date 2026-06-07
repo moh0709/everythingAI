@@ -2,13 +2,35 @@
 
 ## Purpose
 
-This roadmap converts the enterprise architecture into an executable MVP build sequence.
+This roadmap converts the enterprise architecture into an executable build sequence while preserving the current validated local MVP as the proving ground.
 
 The project should prioritize disciplined implementation over more conceptual expansion.
 
 ## Current execution reality
 
-As of the latest local MVP work, the project is not starting from Sprint 1 anymore. The backend local MVP foundation is already strong, and the active bottleneck is the **user-facing product experience**, especially the source-backed Wiki / Knowledge Base layer.
+As of 2026-06-07, EverythingAI is not starting from Sprint 1 anymore and is not merely an unvalidated prototype. The local MVP has been validated through backend tests, frontend typecheck/build, and Playwright smoke testing.
+
+Latest consolidated source of truth:
+
+```text
+docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+```
+
+Latest validation artifacts:
+
+```text
+docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
+docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
+```
+
+Current validated baseline:
+
+```text
+Backend npm test:        106/106 passed
+Frontend typecheck:      passed
+Frontend build:          passed
+Playwright smoke test:   4/4 passed
+```
 
 Current confirmed direction:
 
@@ -16,44 +38,45 @@ Current confirmed direction:
 local files
   -> indexing
   -> extraction
-  -> content-first wiki generation
-  -> category/topic knowledge navigation
-  -> intelligent wiki search
-  -> source-backed reading mode
-  -> safe source inspection
+  -> source-backed Knowledge Base
+  -> Client Workspace for safe exploration/chat
+  -> Admin Dashboard for providers, planning, source paths, and connectors
+  -> governed planning preview/execution/undo
+  -> admin-only agent connector configuration
 ```
 
 Current active priority:
 
 ```text
-finish the local user MVP experience before expanding into enterprise production-platform architecture
+harden the validated local MVP with connector-specific testing and CI smoke automation before expanding into enterprise production-platform architecture
 ```
 
-The enterprise roadmap below remains the strategic target, but the immediate execution path is now focused on the local MVP user experience and Wiki/Knowledge Base quality.
+The enterprise roadmap below remains the strategic target, but the immediate execution path is now focused on validated local MVP hardening, connector testing, CI automation, and controlled frontend cleanup.
 
 ## Core implementation principle
 
-Build one end-to-end loop before expanding.
+Build and preserve one end-to-end loop before expanding.
 
-The first working system must support:
+The current working local system supports:
 
 ```text
-upload/index files
+index local files
   -> extract content
-  -> search them
-  -> generate source-backed knowledge pages
+  -> search Sources & Files
+  -> generate source-backed Knowledge Base pages
   -> inspect source references
-  -> optionally generate plan
-  -> simulate plan
+  -> chat through admin-selected AI provider
+  -> generate governed organization plan
+  -> simulate/dry-run plan
   -> approve plan
   -> execute safely
-  -> restore if needed
-  -> monitor health
+  -> undo/restore where supported
+  -> monitor health and diagnostics
 ```
 
 ## Sprint 1 — Repository, auth, storage, and upload foundation
 
-Goals:
+Strategic enterprise target:
 
 ```text
 monorepo foundation
@@ -65,29 +88,17 @@ file registry
 basic audit events
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-apps/web shell
-apps/api shell
-PostgreSQL schema baseline
-MinIO storage integration
-admin/user role baseline
-file upload API
-file registry package
+Partially superseded by local-first source-path model
 ```
 
-Acceptance criteria:
-
-- User can log in.
-- Admin can create workspace.
-- User can upload file.
-- File is stored and registered.
-- Audit event is created.
+Local MVP already validates file registry, source paths, audit events, and local SQLite storage. Production auth, tenant/workspace model, and object storage remain future enterprise work.
 
 ## Sprint 2 — Ingestion, extraction, and CIIF baseline
 
-Goals:
+Strategic enterprise target:
 
 ```text
 file type detection
@@ -97,26 +108,32 @@ normalized document contract
 chunk creation
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-ingestion service
-extraction service
-CIIF package
-worker skeleton
-extraction status UI
+Mostly implemented and validated for supported local MVP extraction paths
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- Uploaded/indexed files are extracted.
-- Extracted content is stored.
-- Failed extractions create visible status.
-- Source file references are preserved.
+- [x] Local folder scanning.
+- [x] File metadata registry.
+- [x] Content hashing.
+- [x] Extraction status tracking.
+- [x] Text extraction for supported readable file types.
+- [x] Failed extraction reporting.
+- [x] Source references.
+- [x] Wiki source chunks with page numbers when extraction metadata provides a page map.
 
-## Sprint 3 — Search & Explore wiki knowledge base
+Remaining:
 
-Goals:
+- [ ] Richer media/table/OCR extraction.
+- [ ] Optional OpenDataLoader PDF connector only if it adds clear new extraction value.
+- [ ] Production-grade normalized CIIF contract later.
+
+## Sprint 3 — Search & Explore Knowledge Base
+
+Strategic enterprise target:
 
 ```text
 keyword search
@@ -130,37 +147,35 @@ category/topic navigation
 source-backed reading mode
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-retrieval service
-Search & Explore page
-Knowledge Area page
-Document Context panel
-Source-backed Wiki view
-Reading Mode
-Wiki search
+Implemented and smoke-tested in Client Workspace
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- User can search indexed files.
-- Results show filename, source location, summary, and trust indicators.
-- User can open document context.
-- User can build and browse source-backed Wiki pages.
-- Wiki pages prioritize the actual extracted document content over system metadata.
-- User can navigate category -> topic -> source file pages.
-- User can search inside the generated knowledge base.
+- [x] Client Workspace.
+- [x] Sources & Files page.
+- [x] Knowledge Base page.
+- [x] Ask AI page.
+- [x] Clear distinction between raw indexed file content and saved/generated Knowledge Base.
+- [x] Search indexed files.
+- [x] Document context / preview.
+- [x] Durable Knowledge Base / Wiki pages.
+- [x] Knowledge map/navigation.
+- [x] Source references and source chunks.
+- [x] Ask AI auto-scroll.
+- [x] Playwright smoke test covers Client Workspace clarity.
 
-Current local status:
+Remaining:
 
-```text
-implemented in local MVP user UI, still needs deeper citation rendering, persistent wiki storage, better AI topic generation, and richer media/table extraction
-```
+- [ ] Improve rich citation rendering and source highlighting where needed.
+- [ ] Improve extracted document formatting for book/blog-like reading.
 
 ## Sprint 4 — Planning Center and simulation
 
-Goals:
+Strategic enterprise target:
 
 ```text
 organization plans
@@ -171,25 +186,34 @@ blast-radius panel
 before/after preview
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-planning contracts
-planning service
-simulation service
-Planning Center UI
-Plan Detail page
+Implemented and validated as governed local planning workflow
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- AI/system can generate a plan.
-- Plan actions explain why they exist.
-- Simulation shows affected files, risk, confidence, and rollback readiness.
+- [x] Deterministic organization suggestions.
+- [x] Provider-backed planning suggestions.
+- [x] Deterministic/provider/hybrid planning sessions.
+- [x] Backend planning-rule enforcement.
+- [x] Confidence threshold enforcement.
+- [x] Allow/disable action-type enforcement.
+- [x] Dry-run preview queue.
+- [x] Blocked preview explanations.
+- [x] Approval-gated execution.
+- [x] Planning UI smoke coverage.
+
+Remaining:
+
+- [ ] Better grouped folder-structure planning view.
+- [ ] Better bulk select controls.
+- [ ] More manual QA for move/rename flows on disposable folders.
 
 ## Sprint 5 — Governed execution and recovery
 
-Goals:
+Strategic enterprise target:
 
 ```text
 approval workflow
@@ -201,27 +225,31 @@ restore
 rollback simulation
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-execution service
-recovery service
-trashbin service
-Recovery Center page
-Execution Detail page
+Implemented and backend validated
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- Approved plan can execute safely.
-- Execution creates recovery snapshot.
-- File can move to trash.
-- File can be restored.
-- Audit and replay events are created.
+- [x] Approval-gated execution.
+- [x] Recovery snapshots for filesystem mutations.
+- [x] Undo for supported filesystem actions.
+- [x] Undo UI.
+- [x] Trash/restore behavior.
+- [x] Permanent purge blocking.
+- [x] Failed execution auditing.
+- [x] Execution batches.
 
-## Sprint 6 — Operations Center and ticket intelligence
+Remaining:
 
-Goals:
+- [ ] More user-facing Recovery Center polish later.
+- [ ] Production execution locks and permissions later.
+
+## Sprint 6 — Operations Center, diagnostics, and governance visibility
+
+Strategic enterprise target:
 
 ```text
 manual tickets
@@ -232,25 +260,34 @@ health signal panels
 improvement proposals
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-ticket service
-operations service
-Operations Center page
-Ticket Detail page
-AI assessment contract
+Diagnostics and governance visibility implemented through Phase 7.6 work
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- User can create ticket.
-- System can create ticket from extraction failure.
-- Operations Center shows active issues and health signals.
+- [x] Workspace Trust Health.
+- [x] Knowledge Quality Scoring.
+- [x] Human Validation Layer.
+- [x] Review Coverage.
+- [x] Governance Conflict Detection Engine.
+- [x] Review Candidate Detection Engine.
+- [x] Governance Conflict Dashboard.
+- [x] Review Candidate Dashboard.
+- [x] Conflict/review badges in Knowledge Quality list.
+- [x] Backend diagnostics support.
+- [x] Frontend diagnostics type support.
 
-## Sprint 7 — Stats & Insights and admin console
+Remaining:
 
-Goals:
+- [ ] Production-grade ticketing/operations center later.
+- [ ] CI alerts/reporting later.
+
+## Sprint 7 — Admin Console, providers, and Agent Connectors
+
+Strategic enterprise target:
 
 ```text
 core KPIs
@@ -259,28 +296,41 @@ insight recommendations
 role/page/capability control
 AI permissions
 retention/source mode settings
+admin-controlled engines/connectors
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-insights service
-Stats & Insights page
-Admin Console
-Role Access Matrix
-AI Authority Settings
-Retention Settings
+Admin Dashboard implemented; Agent Connectors validated as admin-only configuration surface
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- Admin controls page access.
-- Admin controls capabilities.
-- Stats page shows indexed files, extraction success, failed searches, tickets, recovery readiness.
+- [x] Admin Dashboard.
+- [x] Admin-only AI Provider Configuration.
+- [x] Remote-provider policy.
+- [x] Broad provider catalog: Ollama, OpenAI, Anthropic/Claude, OpenRouter, Cerebras, Mistral, Google AI, DeepSeek, Groq, xAI/Grok, Moonshot/Kimi, Together AI, Fireworks, Perplexity, Azure OpenAI, LM Studio, Custom OpenAI-compatible.
+- [x] Client chat uses backend/admin-selected provider only.
+- [x] Public `/api/chat` route no longer accepts provider override.
+- [x] Admin Agent Connectors panel.
+- [x] Codex, Claude Code, OpenCode connector entries.
+- [x] Agent bridge status, detect, detect-all, and version probe actions.
+- [x] Disabled-by-default bridge safety model.
+- [x] Browser cannot submit arbitrary shell commands.
+- [x] Client Workspace does not expose Agent Connectors.
+
+Remaining:
+
+- [ ] Controlled connector-specific setup/testing for real local Codex.
+- [ ] Controlled connector-specific setup/testing for real local Claude Code.
+- [ ] Controlled connector-specific setup/testing for real local OpenCode.
+- [ ] Decide when/if to enable bridge/chat environment flags locally.
+- [ ] Production role/page/capability control later.
 
 ## Sprint 8 — UX polish, launch hardening, and documentation
 
-Goals:
+Strategic enterprise target:
 
 ```text
 Apple-style UI refinement
@@ -292,48 +342,56 @@ release checklist
 smoke tests
 ```
 
-Deliverables:
+Current local MVP status:
 
 ```text
-final onboarding flow
-launch gate checklist
-smoke test scripts
-updated README
-deployment guide
+Smoke-tested and documentation refreshed
 ```
 
-Acceptance criteria:
+Validated / implemented:
 
-- MVP launch gate passes.
-- Product feels calm, structured, and safe.
-- Docs match shipped functionality.
+- [x] Client/Admin labeling.
+- [x] Sources & Files vs Knowledge Base clarity.
+- [x] Ask AI auto-scroll.
+- [x] Playwright smoke-test agent.
+- [x] Local smoke-test report.
+- [x] Validation addenda.
+- [x] Consolidated handover.
+
+Remaining:
+
+- [ ] Add CI smoke-test integration.
+- [ ] Archive smoke screenshots/reports as CI artifacts.
+- [ ] Continue UI polish after broader product review.
+- [ ] Update release checklist.
 
 ## Engineering rules
 
 Every sprint must preserve:
 
 ```text
-tenant isolation when production mode exists
+safe user/admin separation
+admin-only provider/API-key configuration
+admin-only Agent Connectors
 backend permission enforcement
 audit events
 recovery path for destructive actions
 source references
 clear UX feedback
-safe user/admin separation
-no destructive workflows in the ordinary user UI
+no destructive workflows in the ordinary Client Workspace
+no trust-score or quality-score changes without explicit governance approval
+no arbitrary browser-submitted shell commands
 ```
 
 ## Immediate next implementation priorities
 
 ```text
-1. Finish frontend rendering for chunk citations like [S1:C3]
-2. Make citations clickable and linked to source locations / source preview
-3. Persist wiki pages and source chunks in SQLite
-4. Improve AI category/topic generation beyond rule-based grouping
-5. Improve extracted document formatting for book/blog-like reading
-6. Add page-level search and table of contents in Reading Mode
-7. Split UserApp.tsx into smaller maintainable components
-8. Add progress stages for Build Knowledge / Build Wiki
+1. Controlled connector-specific setup/testing for Codex, Claude Code, and OpenCode
+2. Add CI smoke-test integration for backend, frontend, and Playwright
+3. Continue frontend modularization / cleanup of legacy admin paths
+4. Improve API key lifecycle UX: saved / replace / clear
+5. Improve rich citations, source highlighting, and extracted document formatting
+6. Keep AnythingLLM and OpenDataLoader PDF optional unless they add clear new value
 ```
 
 ## Strategic outcome
@@ -344,8 +402,8 @@ This roadmap converts EverythingAI from architecture into a buildable enterprise
 Governed Enterprise Cognitive Workspace
 ```
 
-The local MVP currently acts as the proving ground for the most important product principle:
+The validated local MVP currently proves the most important product principle:
 
 ```text
-A safe, source-backed AI file brain that turns local files into searchable, readable, trusted knowledge.
+A safe, source-backed AI file brain that turns local files into searchable, readable, trusted knowledge while keeping engine/provider/agent control in the Admin Dashboard.
 ```
