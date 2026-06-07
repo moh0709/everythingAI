@@ -1,0 +1,96 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Admin Agent Connectors Progress Handover",
+    "version": "1.0",
+    "date": "2026-06-07",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_before_this_work": {
+      "latest_smoke_validation": "docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md",
+      "latest_commit_before_work": "5aaddd2 Add smoke test report for EverythingAI on 2026-06-07",
+      "status": "Local MVP hardening smoke-tested and validated."
+    },
+    "user_requirement": [
+      "Client Workspace users should only chat through the AI provider selected by Admin/backend.",
+      "Provider and agent configuration should remain Admin Dashboard only.",
+      "Proceed in larger implementation steps when safe."
+    ],
+    "implemented_work": [
+      {
+        "path": "services/api/src/routes/search.routes.js",
+        "summary": "Hardened public /api/chat route by removing request-body provider override. Client chat now follows the admin-selected backend provider only."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/providerSettingsApi.ts",
+        "summary": "Expanded frontend agent integration types and added agent bridge status, detect, detect-all, probe, get, and save API helpers for /api/agent-bridge endpoints."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx",
+        "summary": "Added Admin Agent Connectors panel for Codex, Claude Code, OpenCode, and other configured local agent connectors. Includes enable toggles, command/auth/chat settings, bridge status, detect, detect-all, and version probe actions."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/admin/components/SettingsView.tsx",
+        "summary": "Wired AgentConnectorsPanel into Admin Settings below AI provider configuration and above planning policy."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx",
+        "summary": "Passed agent bridge status/detection/probe actions through the admin view router."
+      },
+      {
+        "path": "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
+        "summary": "Added admin runtime state/actions for agent bridge status refresh, individual detection, detect-all, and version probe. Agent connector settings are saved together with AI provider settings."
+      },
+      {
+        "path": "apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts",
+        "summary": "Extended smoke test to confirm Client Workspace does not expose provider/agent settings and Admin Settings exposes Agent Connectors for Codex, Claude Code, and OpenCode."
+      }
+    ],
+    "security_and_product_invariants": [
+      "Client Workspace cannot select provider from UI.",
+      "Public /api/chat route no longer accepts request-body provider override.",
+      "Client chat uses admin/backend-selected provider through createConfiguredChatAnswer.",
+      "Agent connectors are admin-only UI configuration.",
+      "Agent bridge execution remains disabled by default unless backend environment flags explicitly enable it.",
+      "The browser still cannot submit arbitrary shell commands; only saved connector commands can be detected/probed/chat-enabled through backend rules.",
+      "No trust-score or quality-score logic changed.",
+      "No file execution behavior changed."
+    ],
+    "validation_status": {
+      "overall": "pending_user_local_validation",
+      "required_commands": [
+        {
+          "working_directory": "services/api",
+          "command": "npm test",
+          "status": "pending"
+        },
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npm run typecheck",
+          "status": "pending"
+        },
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npm run build",
+          "status": "pending"
+        },
+        {
+          "working_directory": "apps/everything-ai-ui",
+          "command": "npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed",
+          "status": "pending"
+        }
+      ]
+    },
+    "next_approved_actions": [
+      "Pull latest main locally.",
+      "Run backend npm test.",
+      "Run frontend typecheck/build.",
+      "Run Playwright smoke test.",
+      "If validation passes, create validation addendum and proceed to controlled connector-specific setup/testing."
+    ]
+  }
+}
