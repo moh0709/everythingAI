@@ -19,6 +19,8 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByRole('button', { name: 'Sources & Files' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Knowledge Base' })).toBeVisible();
     await expect(page.getByRole('navigation').getByRole('button', { name: 'Ask AI' })).toBeVisible();
+    await expect(page.getByText('Admin Agent Connectors')).toHaveCount(0);
+    await expect(page.getByText('AI Provider Configuration')).toHaveCount(0);
     await saveScreenshot(page, '01-client-home');
 
     await page.getByRole('button', { name: 'Sources & Files' }).click();
@@ -71,7 +73,12 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByRole('heading', { name: 'Advanced Settings' })).toBeVisible();
     await expect(page.getByText('AI Provider Configuration')).toBeVisible();
     await expect(page.getByText('Enable remote providers through server policy')).toBeVisible();
-    await saveScreenshot(page, '08-admin-settings-providers');
+    await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
+    await expect(page.getByText('Codex')).toBeVisible();
+    await expect(page.getByText('Claude Code')).toBeVisible();
+    await expect(page.getByText('OpenCode')).toBeVisible();
+    await expect(page.getByText('Client Workspace users continue to chat only through the AI provider selected in Admin Settings', { exact: false })).toBeVisible();
+    await saveScreenshot(page, '08-admin-settings-providers-agents');
   });
 
   test('backend API is reachable for real smoke testing', async ({ request }) => {
