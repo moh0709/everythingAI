@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Settings } from 'lucide-react';
-import type { ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
+import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings, ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
 import type { SourcePathRecord } from '../../sourcePathsApi';
+import { AgentConnectorsPanel } from './AgentConnectorsPanel';
 import { PlanningPolicyPanel } from './PlanningPolicyPanel';
 import { ProviderConfigurationPanel } from './ProviderConfigurationPanel';
 import { ProviderSelectorPanel } from './ProviderSelectorPanel';
@@ -25,6 +26,13 @@ type SettingsViewProps = {
   connectionMessage: string;
   connectionStatus: 'idle' | 'ok' | 'error';
   saveSettingsFeedback: string;
+  agentBridgeStatus: AgentBridgeStatus | null;
+  agentDetectionResults: Record<string, AgentDetectionResult>;
+  refreshAgentBridgeStatus: () => void;
+  detectAgent: (agentId: string) => void;
+  detectAllAgents: () => void;
+  probeAgent: (agentId: string) => void;
+  busy: boolean;
 };
 
 export function SettingsView({
@@ -46,6 +54,13 @@ export function SettingsView({
   connectionMessage,
   connectionStatus,
   saveSettingsFeedback,
+  agentBridgeStatus,
+  agentDetectionResults,
+  refreshAgentBridgeStatus,
+  detectAgent,
+  detectAllAgents,
+  probeAgent,
+  busy,
 }: SettingsViewProps) {
   const [draft, setDraft] = useState<ProviderSettings | null>(providerSettings);
   const [filter, setFilter] = useState('');
@@ -71,6 +86,31 @@ export function SettingsView({
     setDraft(copy);
   }
 
+  function updateAgentIntegration(agentId: string, patch: Partial<AgentIntegrationSettings>) {
+    const current = activeDraft.agentIntegrations?.[agentId] || {
+      enabled: false,
+      mode: 'local-cli',
+      command: '',
+      authStrategy: 'external-app',
+      chatEnabled: false,
+      chatMode: 'stdin',
+      chatArgs: [],
+      allowWorkspaceContext: false,
+      maxInputChars: 12000,
+      timeoutMs: 120000,
+    };
+    setDraft({
+      ...activeDraft,
+      agentIntegrations: {
+        ...(activeDraft.agentIntegrations || {}),
+        [agentId]: {
+          ...current,
+          ...patch,
+        },
+      },
+    });
+  }
+
   async function handleTest() {
     setTesting(true);
     await testAiProvider(activeDraft.activeProvider);
@@ -83,7 +123,7 @@ export function SettingsView({
     <div className="settings-header">
       <div>
         <h1><Settings /> Advanced Settings</h1>
-        <p>Configure local API connection, AI providers, planning policy, and admin/operator scope.</p>
+        <p>Configure local API connection, AI providers, admin-only agent connectors, planning policy, and operator scope.</p>
       </div>
       <div className="button-row">
         <button className="outline" onClick={refreshModels}>Refresh Models</button>
@@ -135,6 +175,18 @@ export function SettingsView({
       draft={activeDraft}
       providerModels={providerModels}
       update={update}
+    />
+
+    <AgentConnectorsPanel
+      agentIntegrations={activeDraft.agentIntegrations || {}}
+      bridgeStatus={agentBridgeStatus}
+      detectionResults={agentDetectionResults}
+      updateAgentIntegration={updateAgentIntegration}
+      refreshAgentBridgeStatus={refreshAgentBridgeStatus}
+      detectAgent={detectAgent}
+      detectAllAgents={detectAllAgents}
+      probeAgent={probeAgent}
+      busy={busy}
     />
 
     <PlanningPolicyPanel
