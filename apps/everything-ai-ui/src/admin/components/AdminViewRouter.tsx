@@ -1,5 +1,5 @@
 import type { AppStatus, IndexedFile, Suggestion } from '../../api';
-import type { ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
+import type { AgentBridgeStatus, AgentDetectionResult, ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
 import type { SourcePathRecord } from '../../sourcePathsApi';
 import type { AdminSection } from '../types';
 import { AnalyticsView } from './AnalyticsView';
@@ -95,6 +95,12 @@ type AdminViewRouterProps = {
   connectionMessage: string;
   connectionStatus: 'idle' | 'ok' | 'error';
   saveSettingsFeedback: string;
+  agentBridgeStatus: AgentBridgeStatus | null;
+  agentDetectionResults: Record<string, AgentDetectionResult>;
+  refreshAgentBridgeStatus: () => void;
+  detectAgent: (agentId: string) => void;
+  detectAllAgents: () => void;
+  probeAgent: (agentId: string) => void;
   chatMessages: ChatMessage[];
   setChatMessages: (updater: ChatMessage[] | ((current: ChatMessage[]) => ChatMessage[])) => void;
 };
@@ -181,6 +187,13 @@ export function AdminViewRouter(props: AdminViewRouterProps) {
         connectionMessage={props.connectionMessage}
         connectionStatus={props.connectionStatus}
         saveSettingsFeedback={props.saveSettingsFeedback}
+        agentBridgeStatus={props.agentBridgeStatus}
+        agentDetectionResults={props.agentDetectionResults}
+        refreshAgentBridgeStatus={props.refreshAgentBridgeStatus}
+        detectAgent={props.detectAgent}
+        detectAllAgents={props.detectAllAgents}
+        probeAgent={props.probeAgent}
+        busy={props.busy}
       />;
 
     case 'askai':
