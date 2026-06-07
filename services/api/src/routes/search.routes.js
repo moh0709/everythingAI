@@ -79,7 +79,6 @@ export function createSearchRouter() {
       const result = await answerFromLocalFiles(db, {
         question,
         limit: parseLimit(req.body?.limit, 5),
-        provider: req.body?.provider,
       });
       db.close();
 
