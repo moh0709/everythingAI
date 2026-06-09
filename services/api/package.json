@@ -20,6 +20,7 @@
     "execute": "node src/index.js execute",
     "undo": "node src/index.js undo",
     "sync:anythingllm": "node src/index.js sync-anythingllm",
+    "agents:detect": "node src/scripts/detectAgentConnectors.js",
     "repair:wiki-schema": "node src/db/repairWikiSchema.js",
     "test": "node --test",
     "start": "node src/db/repairWikiSchema.js && node src/server.js"
