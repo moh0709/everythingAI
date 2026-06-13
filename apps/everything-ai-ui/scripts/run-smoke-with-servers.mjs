@@ -24,19 +24,22 @@ function log(prefix, message) {
   }
 }
 
+function quoteWindowsArg(value) {
+  const text = String(value);
+  if (!text) return '""';
+  if (!/[\s&()^|<>"%]/.test(text)) return text;
+  return `"${text.replace(/"/g, '\\"')}"`;
+}
+
 function shellCommand(command, args) {
   if (!isWindows) {
     return { command, args };
   }
 
-  const escaped = [command, ...args]
-    .map((part) => String(part).replace(/"/g, '\\"'))
-    .map((part) => `"${part}"`)
-    .join(' ');
-
+  const commandLine = [command, ...args].map(quoteWindowsArg).join(' ');
   return {
     command: 'cmd.exe',
-    args: ['/d', '/s', '/c', escaped],
+    args: ['/d', '/c', commandLine],
   };
 }
 
