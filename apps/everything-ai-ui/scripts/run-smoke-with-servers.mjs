@@ -12,8 +12,6 @@ const apiDir = path.join(repoRoot, 'services', 'api');
 const API_URL = process.env.EVERYTHINGAI_API_URL || 'http://127.0.0.1:4100';
 const UI_URL = process.env.EVERYTHINGAI_UI_URL || 'http://127.0.0.1:5151';
 const isWindows = process.platform === 'win32';
-const npmCommand = isWindows ? 'npm.cmd' : 'npm';
-const npxCommand = isWindows ? 'npx.cmd' : 'npx';
 
 const children = [];
 let shuttingDown = false;
@@ -26,17 +24,46 @@ function log(prefix, message) {
   }
 }
 
-function spawnProcess(prefix, command, args, cwd, env = {}) {
-  const child = spawn(command, args, {
+function shellCommand(command, args) {
+  if (!isWindows) {
+    return { command, args };
+  }
+
+  const escaped = [command, ...args]
+    .map((part) => String(part).replace(/"/g, '\\"'))
+    .map((part) => `"${part}"`)
+    .join(' ');
+
+  return {
+    command: 'cmd.exe',
+    args: ['/d', '/s', '/c', escaped],
+  };
+}
+
+function spawnProcess(prefix, command, args, cwd, env = {}, stdio = ['ignore', 'pipe', 'pipe']) {
+  const launch = shellCommand(command, args);
+  const child = spawn(launch.command, launch.args, {
     cwd,
     env: { ...process.env, ...env },
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio,
     windowsHide: true,
   });
 
   children.push(child);
-  child.stdout.on('data', (chunk) => log(prefix, chunk));
-  child.stderr.on('data', (chunk) => log(prefix, chunk));
+
+  if (child.stdout) {
+    child.stdout.on('data', (chunk) => log(prefix, chunk));
+  }
+  if (child.stderr) {
+    child.stderr.on('data', (chunk) => log(prefix, chunk));
+  }
+
+  child.on('error', (error) => {
+    if (!shuttingDown) {
+      console.error(`[${prefix}] failed to start: ${error.message}`);
+    }
+  });
+
   child.on('exit', (code, signal) => {
     if (!shuttingDown && code !== 0) {
       console.error(`[${prefix}] exited with code ${code ?? 'null'} signal ${signal ?? 'none'}`);
@@ -78,16 +105,17 @@ async function waitForUrl(name, url, acceptedStatuses, timeoutMs = 60000) {
 
 function stopChildren() {
   shuttingDown = true;
-  for (const child of children.reverse()) {
+  for (const child of [...children].reverse()) {
     if (!child.killed && child.exitCode === null) {
-      child.kill(isWindows ? undefined : 'SIGTERM');
+      child.kill();
     }
   }
 }
 
 function runPlaywright() {
   return new Promise((resolve) => {
-    const child = spawn(npxCommand, ['playwright', 'test', 'smoke/client-admin-smoke.spec.ts', '--browser=chromium', '--headed'], {
+    const launch = shellCommand('npx', ['playwright', 'test', 'smoke/client-admin-smoke.spec.ts', '--browser=chromium', '--headed']);
+    const child = spawn(launch.command, launch.args, {
       cwd: uiDir,
       env: {
         ...process.env,
@@ -98,6 +126,10 @@ function runPlaywright() {
       windowsHide: true,
     });
 
+    child.on('error', (error) => {
+      console.error(`[playwright] failed to start: ${error.message}`);
+      resolve(1);
+    });
     child.on('exit', (code) => resolve(code || 0));
   });
 }
@@ -114,10 +146,10 @@ process.on('SIGTERM', () => {
 
 try {
   console.log('[smoke] Starting EverythingAI backend and frontend for local smoke test...');
-  spawnProcess('api', npmCommand, ['start'], apiDir);
+  spawnProcess('api', 'npm', ['start'], apiDir);
   await waitForUrl('Backend API', `${API_URL}/api/status`, [200, 401]);
 
-  spawnProcess('ui', npmCommand, ['run', 'dev', '--', '--host', '127.0.0.1'], uiDir, {
+  spawnProcess('ui', 'npm', ['run', 'dev', '--', '--host', '127.0.0.1'], uiDir, {
     EVERYTHINGAI_API_URL: API_URL,
   });
   await waitForUrl('Frontend UI', UI_URL, [200]);
