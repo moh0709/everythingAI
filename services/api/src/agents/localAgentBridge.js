@@ -120,7 +120,7 @@ async function resolveLaunchCommand(command) {
   if (extension === '.cmd' || extension === '.bat') {
     return {
       executable: process.env.ComSpec || 'cmd.exe',
-      argsPrefix: ['/d', '/s', '/c', `"${executablePath}"`, ...parsed.args],
+      argsPrefix: ['/d', '/s', '/c', 'call', executablePath, ...parsed.args],
       shell: false,
     };
   }
