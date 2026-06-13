@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, AlertTriangle, Bot, CheckCircle2, ShieldCheck, Terminal } from 'lucide-react';
+import { Activity, AlertTriangle, Bot, CheckCircle2, ClipboardCheck, ShieldCheck, Terminal } from 'lucide-react';
 import { agentCatalog } from '../../providerCatalog';
 import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings } from '../../providerSettingsApi';
 
@@ -108,6 +108,59 @@ function connectorHealth({
   };
 }
 
+function checklistItems({
+  agentId,
+  config,
+  bridgeStatus,
+  detection,
+  probe,
+}: {
+  agentId: string;
+  config: AgentIntegrationSettings;
+  bridgeStatus: AgentBridgeStatus | null;
+  detection?: AgentDetectionResult;
+  probe?: AgentProbeResult;
+}) {
+  const status = bridgeStatus?.integrations?.[agentId];
+  return [
+    {
+      label: 'Saved command is safe',
+      done: Boolean(status?.commandSafe),
+      detail: status?.commandSafe ? 'Command passed browser-side bridge safety inspection.' : 'Refresh bridge status and verify the saved command contains no shell metacharacters.',
+    },
+    {
+      label: 'CLI detected on PATH',
+      done: Boolean(detection?.found),
+      detail: detection?.found ? (detection.commandPath || detection.message) : 'Run Detect to confirm the local CLI is installed and reachable.',
+    },
+    {
+      label: 'Connector enabled only for controlled diagnostics',
+      done: Boolean(config.enabled),
+      detail: config.enabled ? 'Connector can be used for safe probe actions when bridge execution is locally enabled.' : 'Keep disabled until you are ready to run controlled local diagnostics.',
+    },
+    {
+      label: 'Bridge execution flag verified locally',
+      done: Boolean(bridgeStatus?.bridgeEnabled),
+      detail: bridgeStatus?.bridgeEnabled ? 'Safe probe execution is locally enabled.' : 'Set EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true only for controlled local testing.',
+    },
+    {
+      label: 'Version probe completed',
+      done: Boolean(probe?.ok),
+      detail: probe?.ok ? (probe.stdout || probe.message) : 'Run Probe Version after detect, enable, and bridge flag checks are complete.',
+    },
+    {
+      label: 'Connector chat remains disabled',
+      done: !bridgeStatus?.chatEnabled && !config.chatEnabled,
+      detail: !bridgeStatus?.chatEnabled && !config.chatEnabled ? 'Chat execution remains off as required for Phase 8.3A.' : 'Disable connector chat and local chat execution unless explicitly approved.',
+    },
+  ];
+}
+
+function readinessText(items: Array<{ done: boolean }>) {
+  const done = items.filter((item) => item.done).length;
+  return `${done}/${items.length} setup checks complete`;
+}
+
 export function AgentConnectorsPanel({
   agentIntegrations,
   bridgeStatus,
@@ -159,6 +212,17 @@ export function AgentConnectorsPanel({
       </div>
     </div>
 
+    <div className="settings-help-grid">
+      <div>
+        <strong><ClipboardCheck size={16} /> Controlled setup checklist</strong>
+        <p>Use the checklist on each Codex and Claude Code card before treating a connector as ready. Detection and version probes are allowed; connector chat remains blocked until explicitly approved.</p>
+      </div>
+      <div>
+        <strong><AlertTriangle size={16} /> Operator guardrails</strong>
+        <p>Do not enable chat, workspace context, or bridge execution for general users. Client Workspace must stay provider-only and must never expose Agent Connectors.</p>
+      </div>
+    </div>
+
     {bridgeStatus && <div className={`status-strip ${bridgeStatus.bridgeEnabled ? 'ready' : 'working'}`}>
       Bridge: {bridgeStatus.bridgeEnabled ? 'enabled' : 'disabled'} · Chat: {bridgeStatus.chatEnabled ? 'enabled' : 'disabled'} · Platform: {bridgeStatus.platform} · Probe timeout: {bridgeStatus.timeoutMs}ms
     </div>}
@@ -185,6 +249,7 @@ export function AgentConnectorsPanel({
         const detection = detectionResults[agent.id];
         const probe = probeResults[agent.id];
         const health = connectorHealth({ agentId: agent.id, config, bridgeStatus, detection, probe });
+        const setupChecklist = checklistItems({ agentId: agent.id, config, bridgeStatus, detection, probe });
         const isExpanded = expanded === agent.id;
         const isPrimaryTarget = PHASE_83A_TARGETS.has(agent.id);
         const isDocumentedMissing = DOCUMENTED_NOT_INSTALLED.has(agent.id);
@@ -212,7 +277,21 @@ export function AgentConnectorsPanel({
           </div>
           <p className="muted">Next action: {health.nextAction}</p>
 
+          {isPrimaryTarget && <div className="status-strip working">
+            <ClipboardCheck size={14} /> Controlled setup readiness: {readinessText(setupChecklist)}. Complete detection, safe version probe, and chat-disabled checks before advancing this connector.
+          </div>}
+
           {isExpanded && <div className="settings-grid">
+            {isPrimaryTarget && <div className="panel" style={{ gridColumn: '1 / -1' }}>
+              <h3><ClipboardCheck size={16} /> Controlled setup checklist</h3>
+              <p className="muted">Phase 8.3A allows controlled detection and version probing for Codex and Claude Code only. Chat remains disabled unless explicitly approved later.</p>
+              <div className="settings-help-grid">
+                {setupChecklist.map((item) => <div key={item.label}>
+                  <strong>{item.done ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />} {item.label}</strong>
+                  <p>{item.detail}</p>
+                </div>)}
+              </div>
+            </div>}
             <label className="setting-check">
               <input
                 type="checkbox"
