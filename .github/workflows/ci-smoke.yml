@@ -99,12 +99,16 @@ jobs:
       - name: Wait for backend API
         run: |
           for i in {1..60}; do
-            if curl -fsS http://127.0.0.1:4100/api/status >/dev/null; then
-              echo "Backend ready"
-              exit 0
-            fi
-            sleep 1
-          done
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4100/api/status || true)
+
+          if [ "$STATUS" != "200" ] && [ "$STATUS" != "401" ]; then
+            echo "Backend failed to start"
+            cat backend-ci.log || true
+            exit 1
+          fi
+
+          sleep 1
+        done
 
           echo "Backend failed to start"
           cat backend-ci.log || true
