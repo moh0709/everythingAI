@@ -1,7 +1,7 @@
 import { detectAgentIntegration, getBridgeStatus, runAgentProbe, bridgeSecurityNotice } from '../agents/localAgentBridge.js';
 import { getDefaultAiProviderSettings } from '../settings/aiProviderSettings.js';
 
-const DEFAULT_TARGETS = ['codex', 'claudeCode'];
+const DEFAULT_TARGETS = ['codex', 'claudeCode', 'openCode', 'kiloCode', 'cline'];
 const requestedTargets = process.argv.slice(2).filter(Boolean);
 const targets = requestedTargets.length ? requestedTargets : DEFAULT_TARGETS;
 
