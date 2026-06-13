@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Activity, AlertTriangle, Bot, CheckCircle2, ClipboardCheck, ShieldCheck, Terminal } from 'lucide-react';
+import { Activity, AlertTriangle, BookOpen, Bot, CheckCircle2, ClipboardCheck, ShieldCheck, Terminal } from 'lucide-react';
 import { agentCatalog } from '../../providerCatalog';
 import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings } from '../../providerSettingsApi';
 
@@ -29,6 +29,45 @@ type AgentProbeResult = {
 
 const PHASE_83A_TARGETS = new Set(['codex', 'claudeCode']);
 const DOCUMENTED_NOT_INSTALLED = new Set(['openCode', 'kiloCode', 'cline', 'aider', 'continue']);
+
+const CONNECTOR_SETUP_NOTES: Record<string, Array<{ title: string; detail: string }>> = {
+  codex: [
+    {
+      title: 'Recommended command',
+      detail: 'Use the installed Codex CLI command only, for example codex. Keep the Command field simple and avoid chained commands.',
+    },
+    {
+      title: 'External app session',
+      detail: 'The connector expects Codex access to be handled by the external Codex app or CLI session. The connector card only stores setup metadata.',
+    },
+    {
+      title: 'Troubleshooting path',
+      detail: 'If Detect fails, confirm Codex is installed, restart the local API process so PATH is refreshed, then run Refresh Bridge and Detect again.',
+    },
+    {
+      title: 'Ready-to-advance rule',
+      detail: 'Treat Codex as ready only after safe command, PATH detection, enabled diagnostics, bridge flag, version probe, and chat-disabled checks are complete.',
+    },
+  ],
+  claudeCode: [
+    {
+      title: 'Recommended command',
+      detail: 'Use the installed Claude Code CLI command only, for example claude. Keep the Command field simple and avoid chained commands.',
+    },
+    {
+      title: 'External app session',
+      detail: 'The connector expects Claude Code access to be handled by the external Claude Code app or CLI session. The connector card only stores setup metadata.',
+    },
+    {
+      title: 'Troubleshooting path',
+      detail: 'If Detect fails, confirm Claude Code is installed and visible on PATH, restart the local API process, then run Refresh Bridge and Detect again.',
+    },
+    {
+      title: 'Ready-to-advance rule',
+      detail: 'Treat Claude Code as ready only after safe command, PATH detection, enabled diagnostics, bridge flag, version probe, and chat-disabled checks are complete.',
+    },
+  ],
+};
 
 function formatArgs(args?: string[]) {
   return Array.isArray(args) ? args.join(' ') : '';
@@ -223,6 +262,17 @@ export function AgentConnectorsPanel({
       </div>
     </div>
 
+    <div className="settings-help-grid">
+      <div>
+        <strong><BookOpen size={16} /> Connector-specific setup notes</strong>
+        <p>Codex and Claude Code cards now include command, external app session, troubleshooting, and ready-to-advance notes for controlled operator setup.</p>
+      </div>
+      <div>
+        <strong><ShieldCheck size={16} /> Readiness rule</strong>
+        <p>A connector is not considered ready until the checklist passes and chat remains disabled. Optional connectors remain documented as not installed until explicitly configured.</p>
+      </div>
+    </div>
+
     {bridgeStatus && <div className={`status-strip ${bridgeStatus.bridgeEnabled ? 'ready' : 'working'}`}>
       Bridge: {bridgeStatus.bridgeEnabled ? 'enabled' : 'disabled'} · Chat: {bridgeStatus.chatEnabled ? 'enabled' : 'disabled'} · Platform: {bridgeStatus.platform} · Probe timeout: {bridgeStatus.timeoutMs}ms
     </div>}
@@ -250,6 +300,7 @@ export function AgentConnectorsPanel({
         const probe = probeResults[agent.id];
         const health = connectorHealth({ agentId: agent.id, config, bridgeStatus, detection, probe });
         const setupChecklist = checklistItems({ agentId: agent.id, config, bridgeStatus, detection, probe });
+        const setupNotes = CONNECTOR_SETUP_NOTES[agent.id] || [];
         const isExpanded = expanded === agent.id;
         const isPrimaryTarget = PHASE_83A_TARGETS.has(agent.id);
         const isDocumentedMissing = DOCUMENTED_NOT_INSTALLED.has(agent.id);
@@ -288,6 +339,16 @@ export function AgentConnectorsPanel({
               <div className="settings-help-grid">
                 {setupChecklist.map((item) => <div key={item.label}>
                   <strong>{item.done ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />} {item.label}</strong>
+                  <p>{item.detail}</p>
+                </div>)}
+              </div>
+            </div>}
+            {setupNotes.length > 0 && <div className="panel" style={{ gridColumn: '1 / -1' }}>
+              <h3><BookOpen size={16} /> Connector-specific setup notes</h3>
+              <p className="muted">These notes are operator guidance only. They do not enable execution, chat, or workspace context.</p>
+              <div className="settings-help-grid">
+                {setupNotes.map((item) => <div key={item.title}>
+                  <strong>{item.title}</strong>
                   <p>{item.detail}</p>
                 </div>)}
               </div>
