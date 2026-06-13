@@ -76,7 +76,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
     await expect(page.getByText('Connector Health Summary')).toBeVisible();
     await expect(page.getByText('Phase 8.3A scope')).toBeVisible();
-    await expect(page.getByText('Controlled setup checklist')).toBeVisible();
+    await expect(page.getByText('Controlled setup checklist').first()).toBeVisible();
     await expect(page.getByText('Operator guardrails')).toBeVisible();
     await expect(page.getByText('Detection and version probes are allowed; connector chat remains blocked until explicitly approved')).toBeVisible();
     await expect(page.getByText('Do not enable chat, workspace context, or bridge execution for general users')).toBeVisible();
