@@ -10,6 +10,17 @@ import { PlanningView, type PreviewRecord } from './PlanningView';
 import { SettingsView } from './SettingsView';
 import type { ApiOptions } from '../../api';
 
+type AgentProbeResult = {
+  agentId: string;
+  action: string;
+  command?: string;
+  bridgeEnabled?: boolean;
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  message: string;
+};
+
 type FilePreview = {
   file?: IndexedFile & { extracted_text?: string };
   insight?: { summary?: string; classification?: string } | null;
@@ -97,6 +108,7 @@ type AdminViewRouterProps = {
   saveSettingsFeedback: string;
   agentBridgeStatus: AgentBridgeStatus | null;
   agentDetectionResults: Record<string, AgentDetectionResult>;
+  agentProbeResults: Record<string, AgentProbeResult>;
   refreshAgentBridgeStatus: () => void;
   detectAgent: (agentId: string) => void;
   detectAllAgents: () => void;
@@ -189,6 +201,7 @@ export function AdminViewRouter(props: AdminViewRouterProps) {
         saveSettingsFeedback={props.saveSettingsFeedback}
         agentBridgeStatus={props.agentBridgeStatus}
         agentDetectionResults={props.agentDetectionResults}
+        agentProbeResults={props.agentProbeResults}
         refreshAgentBridgeStatus={props.refreshAgentBridgeStatus}
         detectAgent={props.detectAgent}
         detectAllAgents={props.detectAllAgents}
