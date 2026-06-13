@@ -19,6 +19,7 @@ The work intentionally stays inside the existing safety model:
 ```text
 apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx
 apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts
+apps/everything-ai-ui/scripts/run-smoke-with-servers.mjs
 docs/VALIDATION_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_UX.md
 ```
 
@@ -104,20 +105,71 @@ The Admin smoke test now verifies that Admin Settings contains:
 - Codex + Claude Code primary target wording
 - missing-connector guidance for OpenCode, Kilo Code, Cline, Aider, and Continue
 
-## Validation commands to run locally
+### 7. Local smoke runner
 
-These commands should be run from the local Windows repository:
+Added a local smoke runner that starts the backend API and frontend dev server before running Playwright.
+
+```text
+apps/everything-ai-ui/scripts/run-smoke-with-servers.mjs
+```
+
+The runner:
+
+- starts `services/api` with `npm start`
+- waits for `http://127.0.0.1:4100/api/status` to return HTTP 200 or 401
+- starts `apps/everything-ai-ui` with `npm run dev -- --host 127.0.0.1`
+- waits for `http://127.0.0.1:5151`
+- runs `npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed`
+- stops the child processes afterward
+
+## Validation commands run by user
+
+Backend tests passed from:
 
 ```powershell
-cd E:\01PROJEKTER\EverythingAI\services\api
+cd C:\temp\EverythingAI\services\api
 npm test
 ```
 
+Result:
+
+```text
+tests 113
+pass 113
+fail 0
+```
+
+Frontend typecheck and build passed from:
+
 ```powershell
-cd E:\01PROJEKTER\EverythingAI\apps\everything-ai-ui
+cd C:\temp\EverythingAI\apps\everything-ai-ui
 npm run typecheck
 npm run build
-npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed
+```
+
+Result:
+
+```text
+TypeScript typecheck: PASS
+Vite production build: PASS
+```
+
+Playwright smoke failed because required local servers were not running:
+
+```text
+http://localhost:5151 -> connection refused
+http://localhost:4100 -> connection refused
+```
+
+This was an environment/startup issue, not a product assertion failure.
+
+## Updated local smoke command
+
+Use this command from the UI folder to start required services and run Playwright in one step:
+
+```powershell
+cd C:\temp\EverythingAI\apps\everything-ai-ui
+node scripts/run-smoke-with-servers.mjs
 ```
 
 ## Expected result
@@ -126,7 +178,7 @@ npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed
 Backend tests: PASS
 Frontend typecheck: PASS
 Frontend build: PASS
-Playwright smoke: PASS
+Playwright smoke with server runner: PASS
 GitHub CI: should remain GREEN after push to main
 ```
 
