@@ -35,22 +35,31 @@ The connector panel already supports optional probe results. This batch connects
 - No provider or API key behavior changed.
 - No trust, quality, human validation, or evidence provenance rules changed.
 
-## Expected validation
+## Validation result
 
-Run from apps/everything-ai-ui:
+Status: GREEN
 
-- npm run typecheck
-- npm run build
+User validated the local smoke runner after this batch.
+
+Command:
+
 - node scripts/run-smoke-with-servers.mjs
 
-Expected result:
+Result:
 
-- Typecheck passes.
-- Build passes.
-- Playwright smoke passes.
-- Admin Settings still shows Agent Connectors.
-- Version probe output remains visible in the connector card after a probe completes.
+- Backend API reachable during smoke run
+- Frontend UI reachable during smoke run
+- Playwright smoke: 4 passed, 0 failed
+- Duration: about 7.7 seconds
+
+Confirmed smoke coverage included:
+
+- Client Workspace separation
+- Client Ask AI message visibility
+- Admin Dashboard separation
+- Admin Settings and Agent Connectors visibility
+- Backend API reachability
 
 ## Follow-up
 
-After validation, the next safe batch should add a controlled Codex and Claude Code setup checklist inside Admin Agent Connectors without enabling chat by default.
+Next safe batch: add a controlled Codex and Claude Code setup checklist inside Admin Agent Connectors without enabling connector chat by default and without changing bridge defaults.
