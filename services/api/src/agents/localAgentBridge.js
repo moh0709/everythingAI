@@ -1,5 +1,7 @@
 import { execFile } from 'node:child_process';
+import fs from 'node:fs';
 import os from 'node:os';
+import path from 'node:path';
 import { promisify } from 'node:util';
 import { getDefaultAiProviderSettings } from '../settings/aiProviderSettings.js';
 
@@ -45,6 +47,43 @@ function splitCommand(command = '') {
   return { executable: value, args: [] };
 }
 
+function normalizeCommandPath(value = '') {
+  return String(value).trim().replace(/^"|"$/g, '');
+}
+
+function windowsCommandCandidates(commandPathOrName) {
+  const value = normalizeCommandPath(commandPathOrName);
+  if (!value) return [];
+
+  const ext = path.extname(value).toLowerCase();
+  if (ext) return [value];
+
+  return [
+    value,
+    `${value}.cmd`,
+    `${value}.bat`,
+    `${value}.exe`,
+  ];
+}
+
+function preferWindowsExecutable(paths = []) {
+  const normalized = paths.map(normalizeCommandPath).filter(Boolean);
+  const preferredExtensions = ['.cmd', '.bat', '.exe'];
+
+  for (const extension of preferredExtensions) {
+    const match = normalized.find((item) => path.extname(item).toLowerCase() === extension);
+    if (match) return match;
+  }
+
+  for (const item of normalized) {
+    for (const candidate of windowsCommandCandidates(item)) {
+      if (fs.existsSync(candidate) && path.extname(candidate).toLowerCase() !== '.ps1') return candidate;
+    }
+  }
+
+  return normalized[0] || null;
+}
+
 async function commandExists(command) {
   const platform = os.platform();
   const lookupCommand = platform === 'win32' ? 'where' : 'command';
@@ -56,22 +95,53 @@ async function commandExists(command) {
       windowsHide: true,
       shell: platform !== 'win32',
     });
-    return { found: true, path: result.stdout.trim().split(/\r?\n/)[0] || command };
+    const matches = result.stdout.trim().split(/\r?\n/).map(normalizeCommandPath).filter(Boolean);
+    const resolved = platform === 'win32' ? preferWindowsExecutable(matches) : (matches[0] || command);
+    return { found: true, path: resolved || command };
   } catch {
     return { found: false, path: null };
   }
 }
 
-async function runCommand({ command, args = [], input = '', timeoutMs = COMMAND_TIMEOUT_MS }) {
+async function resolveLaunchCommand(command) {
   const parsed = splitCommand(command);
+  if (!parsed) return null;
+
+  if (os.platform() !== 'win32') {
+    return { executable: parsed.executable, argsPrefix: parsed.args, shell: false };
+  }
+
+  const lookup = await commandExists(parsed.executable);
+  const resolvedPath = lookup.found ? lookup.path : parsed.executable;
+  const candidates = windowsCommandCandidates(resolvedPath);
+  const executablePath = candidates.find((candidate) => fs.existsSync(candidate)) || resolvedPath;
+  const extension = path.extname(executablePath).toLowerCase();
+
+  if (extension === '.cmd' || extension === '.bat') {
+    return {
+      executable: process.env.ComSpec || 'cmd.exe',
+      argsPrefix: ['/d', '/s', '/c', `"${executablePath}"`, ...parsed.args],
+      shell: false,
+    };
+  }
+
+  if (extension === '.ps1') {
+    return null;
+  }
+
+  return { executable: executablePath, argsPrefix: parsed.args, shell: false };
+}
+
+async function runCommand({ command, args = [], input = '', timeoutMs = COMMAND_TIMEOUT_MS }) {
+  const launch = await resolveLaunchCommand(command);
   const cleanedArgs = safeArgs(args);
-  if (!parsed || !cleanedArgs) return { ok: false, stdout: '', stderr: 'Unsafe command or arguments.' };
+  if (!launch || !cleanedArgs) return { ok: false, stdout: '', stderr: 'Unsafe command or arguments.' };
 
   try {
-    const result = await execFileAsync(parsed.executable, [...parsed.args, ...cleanedArgs], {
+    const result = await execFileAsync(launch.executable, [...launch.argsPrefix, ...cleanedArgs], {
       timeout: timeoutMs,
       windowsHide: true,
-      shell: false,
+      shell: launch.shell,
       cwd: process.cwd(),
       env: process.env,
       input,
