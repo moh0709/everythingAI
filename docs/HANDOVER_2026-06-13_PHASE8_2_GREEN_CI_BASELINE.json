@@ -1,0 +1,254 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Phase 8.2 Green CI Baseline Handover",
+    "version": "1.0",
+    "date": "2026-06-13",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "local_repo_path_usual": "E:\\01PROJEKTER\\EverythingAI",
+      "branch_policy": "Work directly on main unless the user explicitly changes this rule. CI now validates pushes to main and pull requests to main."
+    },
+    "read_first": [
+      "docs/HANDOVER_2026-06-13_PHASE8_2_GREEN_CI_BASELINE.json",
+      "docs/DOCUMENTATION_AUDIT_2026-06-13_PHASE8_2_GREEN_CI.md",
+      "docs/ROADMAP.md",
+      "docs/IMPLEMENTATION_ROADMAP.md",
+      "docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md"
+    ],
+    "executive_summary": {
+      "project_identity": "EverythingAI is a validated local-first, source-backed AI knowledge workspace with a Client Workspace, Admin Dashboard, durable Knowledge Base/Wiki layer, governed planning/execution/undo, admin-selected AI providers, admin-only Agent Connectors, and a green GitHub CI smoke pipeline.",
+      "current_phase": "Phase 8.2 Green CI Baseline complete. Ready for Phase 8.3 connector-specific setup and release hardening.",
+      "latest_milestone": "GitHub Actions CI smoke workflow is implemented and green across backend tests, frontend typecheck/build, and Playwright Client/Admin smoke tests.",
+      "important_note": "Phase 8.2 was initially documented before the CI workflow was fully verified. That inconsistency has been resolved. The workflow now exists, runs, and has passed."
+    },
+    "validated_baseline": {
+      "backend_tests": {
+        "command": "cd services/api && npm test",
+        "expected": "113/113 pass",
+        "status": "PASS"
+      },
+      "frontend_typecheck": {
+        "command": "cd apps/everything-ai-ui && npm run typecheck",
+        "status": "PASS"
+      },
+      "frontend_build": {
+        "command": "cd apps/everything-ai-ui && npm run build",
+        "status": "PASS"
+      },
+      "playwright_smoke": {
+        "command": "cd apps/everything-ai-ui && npx playwright test smoke/client-admin-smoke.spec.ts",
+        "status": "PASS in GitHub CI"
+      },
+      "ci_smoke": {
+        "workflow_file": ".github/workflows/ci-smoke.yml",
+        "workflow_name": "EverythingAI CI Smoke",
+        "triggers": ["push -> main", "pull_request -> main"],
+        "jobs": {
+          "backend-tests": "PASS",
+          "frontend-build": "PASS",
+          "playwright-smoke": "PASS"
+        },
+        "status": "GREEN"
+      }
+    },
+    "ci_workflow_details": {
+      "file": ".github/workflows/ci-smoke.yml",
+      "backend_job": {
+        "working_directory": "services/api",
+        "commands": ["npm ci", "npm test"]
+      },
+      "frontend_job": {
+        "working_directory": "apps/everything-ai-ui",
+        "commands": ["npm ci", "npm run typecheck", "npm run build"]
+      },
+      "playwright_job": {
+        "services_started": ["backend API on 4100", "frontend dev server on 5151"],
+        "important_fix": "Backend readiness accepts HTTP 200 or HTTP 401 from /api/status because /api/status is authenticated and 401 proves the backend is alive.",
+        "commands": [
+          "npm ci in services/api",
+          "npm ci in apps/everything-ai-ui",
+          "npx playwright install --with-deps chromium",
+          "npm start for backend",
+          "npm run dev -- --host 127.0.0.1 for frontend",
+          "npx playwright test smoke/client-admin-smoke.spec.ts"
+        ],
+        "artifacts": ["backend-ci-log", "frontend-ci-log", "playwright-report", "playwright-test-results"]
+      }
+    },
+    "connector_state": {
+      "safety_model": {
+        "agent_connectors_admin_only": true,
+        "client_workspace_exposes_connectors": false,
+        "bridge_execution_default": "disabled",
+        "chat_execution_default": "disabled",
+        "arbitrary_browser_shell_execution": "blocked",
+        "only_saved_connector_commands_can_be_detected_or_probed": true
+      },
+      "installed_or_detected": {
+        "codex": {
+          "detected": true,
+          "version_probe": "PASS",
+          "version": "codex-cli 0.124.0"
+        },
+        "claudeCode": {
+          "detected": true,
+          "version_probe": "PASS",
+          "version": "2.1.176 (Claude Code)"
+        }
+      },
+      "not_installed_or_not_on_path": [
+        "openCode",
+        "kiloCode",
+        "cline",
+        "aider",
+        "continue"
+      ],
+      "primary_next_connector_targets": [
+        "codex",
+        "claudeCode"
+      ]
+    },
+    "roadmap_state": {
+      "completed": [
+        "Phase 8.1A — Connector Safety Tests",
+        "Phase 8.1B — Connector Detection",
+        "Phase 8.1C — Controlled Version Probes",
+        "Phase 8.1C.1 — Windows Connector Compatibility",
+        "Phase 8.2 — CI Smoke Test Integration"
+      ],
+      "next_recommended_phase": "Phase 8.3 — Connector-Specific Setup, Release Hardening, and Production-Readiness Cleanup",
+      "phase_8_3_required_next": [
+        "Controlled connector-specific setup/testing for Codex",
+        "Controlled connector-specific setup/testing for Claude Code",
+        "Keep OpenCode, Kilo Code, and Cline documented as not installed / not on PATH until installed",
+        "Continue frontend modularization and cleanup of legacy admin paths",
+        "Improve API key lifecycle UX: saved / replace / clear",
+        "Improve rich citation/source highlighting and extracted document formatting",
+        "Update release checklist after Phase 8.3 work"
+      ],
+      "later_enterprise_items": [
+        "Authentication",
+        "Users",
+        "Workspace / tenant model",
+        "Device/client identity",
+        "Installed client agent architecture",
+        "Central server architecture",
+        "PostgreSQL migration",
+        "pgvector or dedicated vector database",
+        "Background job queue",
+        "Secure credential storage",
+        "Enterprise permission model",
+        "File access control model",
+        "Production logging and monitoring",
+        "Backup and migration strategy",
+        "Deployment strategy"
+      ]
+    },
+    "production_readiness": {
+      "backend_local_mvp": "90-95%",
+      "client_workspace_mvp": "85-90%",
+      "admin_dashboard_mvp": "85-90%",
+      "ai_provider_system": "85-90%",
+      "planning_workflow": "85-90%",
+      "knowledge_base_ui": "80-85%",
+      "admin_agent_connectors": "75-85% implemented, connector-specific setup pending",
+      "ci_smoke_integration": "complete / green",
+      "production_readiness": "30-40%"
+    },
+    "critical_architecture_rules": [
+      "Normal users use Client Workspace.",
+      "Admin/operators use Admin Dashboard.",
+      "Client Workspace can chat with AI only through the backend/admin-selected active provider.",
+      "Client Workspace must not expose provider selection, API keys, remote-provider policy, planning policy, or agent connector configuration.",
+      "Admin Dashboard owns provider settings, API keys, remote-provider policy, planning rules, and Agent Connectors.",
+      "Agent bridge execution remains disabled by default.",
+      "Agent chat execution remains disabled by default.",
+      "Do not enable arbitrary shell command execution from the browser.",
+      "Do not expose Agent Connectors in Client Workspace.",
+      "Do not change trust-score calculations.",
+      "Do not change quality-score calculations.",
+      "Do not change human-validation governance rules.",
+      "Do not remove existing diagnostics or validation artifacts.",
+      "Do not weaken evidence/source provenance rules."
+    ],
+    "important_files": {
+      "backend": [
+        "services/api/src/routes/search.routes.js",
+        "services/api/src/ai/providerRuntime.js",
+        "services/api/src/agents/localAgentBridge.js",
+        "services/api/src/routes/agentBridge.routes.js",
+        "services/api/src/settings/aiProviderSettings.js",
+        "services/api/src/scripts/detectAgentConnectors.js",
+        "services/api/src/scripts/probeAgentVersions.js",
+        "services/api/test/agentBridgeSafety.test.js"
+      ],
+      "frontend": [
+        "apps/everything-ai-ui/src/providerSettingsApi.ts",
+        "apps/everything-ai-ui/src/providerCatalog.ts",
+        "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
+        "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx",
+        "apps/everything-ai-ui/src/admin/components/SettingsView.tsx",
+        "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx",
+        "apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts"
+      ],
+      "ci_and_docs": [
+        ".github/workflows/ci-smoke.yml",
+        "docs/DOCUMENTATION_AUDIT_2026-06-13_PHASE8_2_GREEN_CI.md",
+        "docs/HANDOVER_2026-06-13_PHASE8_2_GREEN_CI_BASELINE.json",
+        "docs/ROADMAP.md",
+        "docs/IMPLEMENTATION_ROADMAP.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md",
+        "docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md",
+        "docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md"
+      ]
+    },
+    "validation_commands": {
+      "backend": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\services\\api",
+        "npm test"
+      ],
+      "frontend": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui",
+        "npm run typecheck",
+        "npm run build"
+      ],
+      "playwright_local": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui",
+        "npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed"
+      ],
+      "connector_detection": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\services\\api",
+        "npm run agents:detect"
+      ],
+      "connector_version_probes": [
+        "cd E:\\01PROJEKTER\\EverythingAI\\services\\api",
+        "$env:EVERYTHINGAI_AGENT_BRIDGE_ENABLED=\"true\"; npm run agents:probe:versions; Remove-Item Env:EVERYTHINGAI_AGENT_BRIDGE_ENABLED"
+      ],
+      "ci": [
+        "Push to main or open PR to main",
+        "Verify EverythingAI CI Smoke passes all jobs in GitHub Actions"
+      ]
+    },
+    "recommended_next_session_plan": {
+      "step_0": "Read the Green CI handover and documentation audit. Run git status and git pull origin main. Confirm working tree is clean.",
+      "step_1": "Review Phase 8.3 requirements in docs/ROADMAP.md and docs/IMPLEMENTATION_ROADMAP.md.",
+      "step_2": "Start Phase 8.3A: controlled Codex connector-specific setup/testing without enabling arbitrary browser command execution or default chat execution.",
+      "step_3": "Continue Phase 8.3A: controlled Claude Code connector-specific setup/testing under the same safety constraints.",
+      "step_4": "If all validations stay green, proceed to Admin connector diagnostics UX polish and connector health visibility.",
+      "step_5": "Run backend tests, frontend typecheck/build, Playwright smoke tests, and verify GitHub CI is green.",
+      "step_6": "Create validation artifact and handover at the next milestone boundary."
+    },
+    "known_risks_and_followups": [
+      "Branch protection is not yet enforced. CI validates pushes but does not block direct pushes to main unless GitHub branch protection is configured later.",
+      "GitHub Actions displayed a warning about Node.js 20 action runtime deprecation for actions/checkout@v4, actions/setup-node@v4, and actions/upload-artifact@v4. This is not currently blocking but should be tracked as maintenance.",
+      "Frontend dependency audit still reports high-severity warnings from npm audit. Do not run npm audit fix --force without review because it may introduce breaking changes.",
+      "Production readiness remains 30-40%; authentication, users, tenants, secure credential storage, and production infrastructure are still later roadmap items.",
+      "Agent chat must not be enabled until connector-specific setup, security review, and explicit user approval are complete."
+    ],
+    "final_status": "EverythingAI Phase 8.2 Green CI Baseline is complete. The next session should begin Phase 8.3A connector-specific hardening from this handover."
+  }
+}
