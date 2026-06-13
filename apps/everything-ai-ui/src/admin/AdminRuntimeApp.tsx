@@ -27,10 +27,22 @@ import {
 } from './hooks';
 import type { AdminSection } from './types';
 
+type AgentProbeResult = {
+  agentId: string;
+  action: string;
+  command?: string;
+  bridgeEnabled?: boolean;
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  message: string;
+};
+
 export function AdminRuntimeApp() {
   const [section, setSection] = useState<AdminSection>('dashboard');
   const [agentBridgeStatus, setAgentBridgeStatus] = useState<AgentBridgeStatus | null>(null);
   const [agentDetectionResults, setAgentDetectionResults] = useState<Record<string, AgentDetectionResult>>({});
+  const [agentProbeResults, setAgentProbeResults] = useState<Record<string, AgentProbeResult>>({});
   const localSettings = useAdminLocalSettings();
   const task = useAdminTaskRunner();
   const workspace = useAdminWorkspaceData();
@@ -265,6 +277,7 @@ export function AdminRuntimeApp() {
   async function probeAgent(agentId: string) {
     await task.run(`Probing ${agentId} connector...`, async () => {
       const payload = await runAgentProbe(options, agentId, 'version');
+      setAgentProbeResults((current) => ({ ...current, [agentId]: payload }));
       task.setMessage(payload.message || (payload.ok ? `${agentId} probe succeeded.` : `${agentId} probe failed.`));
     });
   }
@@ -351,6 +364,7 @@ export function AdminRuntimeApp() {
       saveSettingsFeedback=""
       agentBridgeStatus={agentBridgeStatus}
       agentDetectionResults={agentDetectionResults}
+      agentProbeResults={agentProbeResults}
       refreshAgentBridgeStatus={refreshAgentBridgeStatus}
       detectAgent={detectAgent}
       detectAllAgents={detectAllAgents}
