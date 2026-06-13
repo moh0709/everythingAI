@@ -7,7 +7,7 @@ type AgentConnectorsPanelProps = {
   agentIntegrations: Record<string, AgentIntegrationSettings>;
   bridgeStatus: AgentBridgeStatus | null;
   detectionResults: Record<string, AgentDetectionResult>;
-  probeResults: Record<string, AgentProbeResult>;
+  probeResults?: Record<string, AgentProbeResult>;
   updateAgentIntegration: (agentId: string, patch: Partial<AgentIntegrationSettings>) => void;
   refreshAgentBridgeStatus: () => void;
   detectAgent: (agentId: string) => void;
@@ -112,7 +112,7 @@ export function AgentConnectorsPanel({
   agentIntegrations,
   bridgeStatus,
   detectionResults,
-  probeResults,
+  probeResults = {},
   updateAgentIntegration,
   refreshAgentBridgeStatus,
   detectAgent,
