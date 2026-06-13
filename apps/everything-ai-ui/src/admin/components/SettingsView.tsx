@@ -7,6 +7,17 @@ import { PlanningPolicyPanel } from './PlanningPolicyPanel';
 import { ProviderConfigurationPanel } from './ProviderConfigurationPanel';
 import { ProviderSelectorPanel } from './ProviderSelectorPanel';
 
+type AgentProbeResult = {
+  agentId: string;
+  action: string;
+  command?: string;
+  bridgeEnabled?: boolean;
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  message: string;
+};
+
 type SettingsViewProps = {
   baseUrl: string;
   setBaseUrl: (value: string) => void;
@@ -28,6 +39,7 @@ type SettingsViewProps = {
   saveSettingsFeedback: string;
   agentBridgeStatus?: AgentBridgeStatus | null;
   agentDetectionResults?: Record<string, AgentDetectionResult>;
+  agentProbeResults?: Record<string, AgentProbeResult>;
   refreshAgentBridgeStatus?: () => void;
   detectAgent?: (agentId: string) => void;
   detectAllAgents?: () => void;
@@ -58,6 +70,7 @@ export function SettingsView({
   saveSettingsFeedback,
   agentBridgeStatus = null,
   agentDetectionResults = {},
+  agentProbeResults = {},
   refreshAgentBridgeStatus = noop,
   detectAgent = noop,
   detectAllAgents = noop,
@@ -183,6 +196,7 @@ export function SettingsView({
       agentIntegrations={activeDraft.agentIntegrations || {}}
       bridgeStatus={agentBridgeStatus}
       detectionResults={agentDetectionResults}
+      probeResults={agentProbeResults}
       updateAgentIntegration={updateAgentIntegration}
       refreshAgentBridgeStatus={refreshAgentBridgeStatus}
       detectAgent={detectAgent}
