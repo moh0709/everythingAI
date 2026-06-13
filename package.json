@@ -1,0 +1,18 @@
+{
+  "name": "everythingai",
+  "version": "0.1.0",
+  "description": "App that will search, see, understand, learn, organize your filesystem (documents and data) and store it locally in a structured way.",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "AI",
+    "filesystem",
+    "search",
+    "local"
+  ],
+  "author": "",
+  "license": "MIT"
+}
