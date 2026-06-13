@@ -105,6 +105,33 @@ Expected screenshot names:
 - `07-admin-files-content.png`
 - `08-admin-settings-providers.png`
 
+## CI smoke-test relationship
+
+Phase 8.2 completed CI smoke-test integration for this smoke-test agent.
+
+CI workflow:
+
+```text
+.github/workflows/ci-smoke.yml
+```
+
+CI Playwright job:
+
+```powershell
+cd apps/everything-ai-ui
+npx playwright install --with-deps chromium
+npx playwright test smoke/client-admin-smoke.spec.ts
+```
+
+CI artifacts:
+
+```text
+playwright-report
+test-results
+```
+
+Local headed smoke testing remains useful for interactive Windows verification. CI headless smoke testing provides repeatable main-branch validation.
+
 ## Interpreting failures
 
 If a label assertion fails, the UI copy or navigation changed and the smoke test should be updated or the UI should be corrected.

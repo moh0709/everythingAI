@@ -77,6 +77,16 @@ Then use the active docs listed above for current roadmap, setup, smoke-test, an
 
 Historical handovers/validations may be used for background only and must not override the latest consolidated handover.
 
-## Result
+## Superseded by Phase 8.2 audit
 
-Active/current documentation is refreshed and aligned with the June 7 validated Local MVP + Admin Agent Connectors baseline.
+This June 7 audit remains historical evidence for the Local MVP + Admin Agent Connectors baseline. The current active documentation audit for the completed Phase 8.2 CI Smoke Test Integration milestone is:
+
+```text
+docs/DOCUMENTATION_AUDIT_2026-06-13_PHASE8_2.md
+```
+
+The current consolidated source of truth is:
+
+```text
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
+```

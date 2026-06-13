@@ -1,0 +1,175 @@
+{
+  "handover_report": {
+    "title": "EverythingAI Phase 8.2 CI Smoke Test Integration Completion Handover",
+    "version": "1.0",
+    "date": "2026-06-13",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "working_branch_policy": "All work happens directly on main unless the user explicitly changes this rule."
+    },
+    "source_of_truth_status": {
+      "this_file_is_now_the_latest_consolidated_source_of_truth": true,
+      "previous_consolidated_handover": "docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json",
+      "latest_validation_artifacts": [
+        "docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md",
+        "docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md",
+        "docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md",
+        "docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md",
+        "docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md"
+      ]
+    },
+    "executive_summary": {
+      "project_identity": "EverythingAI is a local-first, source-backed AI knowledge workspace and file intelligence platform that indexes scoped local files, extracts content, builds durable Knowledge Base / Wiki views, generates governed planning suggestions, supports safe file organization, and separates normal Client Workspace usage from Admin Dashboard operations.",
+      "current_state": "Phase 8.2 CI Smoke Test Integration is complete. The current verified baseline is 113 backend tests passing, frontend typecheck PASS, frontend build PASS, and CI smoke-test integration implemented through .github/workflows/ci-smoke.yml.",
+      "latest_validated_result": "Backend npm test passed with 113 tests and 0 failures. Frontend npm run typecheck passed. Frontend npm run build passed. Playwright smoke coverage is included in the CI pipeline.",
+      "recommended_next_focus": "Proceed to Phase 8.3: connector-specific setup/testing for installed Codex and Claude Code, continued release hardening, frontend modularization, API key lifecycle UX, and richer citation/source formatting."
+    },
+    "completed_phases": [
+      {
+        "id": "8.1A",
+        "name": "Connector Safety Tests",
+        "status": "complete"
+      },
+      {
+        "id": "8.1B",
+        "name": "Connector Detection",
+        "status": "complete"
+      },
+      {
+        "id": "8.1C",
+        "name": "Controlled Version Probes",
+        "status": "complete"
+      },
+      {
+        "id": "8.1C.1",
+        "name": "Windows Connector Compatibility",
+        "status": "complete"
+      },
+      {
+        "id": "8.2",
+        "name": "CI Smoke Test Integration",
+        "status": "complete"
+      }
+    ],
+    "latest_validation_evidence": {
+      "backend": {
+        "working_directory": "services/api",
+        "command": "npm test",
+        "result": "passed",
+        "tests": 113,
+        "pass": 113,
+        "fail": 0
+      },
+      "frontend_typecheck": {
+        "working_directory": "apps/everything-ai-ui",
+        "command": "npm run typecheck",
+        "result": "PASS"
+      },
+      "frontend_build": {
+        "working_directory": "apps/everything-ai-ui",
+        "command": "npm run build",
+        "result": "PASS"
+      },
+      "ci_pipeline": {
+        "workflow": ".github/workflows/ci-smoke.yml",
+        "triggers": [
+          "push -> main",
+          "pull_request -> main"
+        ],
+        "result": "implemented"
+      },
+      "overall": "passed"
+    },
+    "agent_connector_state": {
+      "codex": {
+        "detected": true,
+        "version_probe": "PASS",
+        "version": "codex-cli 0.124.0"
+      },
+      "claudeCode": {
+        "detected": true,
+        "version_probe": "PASS",
+        "version": "2.1.176"
+      },
+      "openCode": {
+        "detected": false,
+        "status": "NOT_INSTALLED"
+      },
+      "kiloCode": {
+        "detected": false,
+        "status": "NOT_INSTALLED"
+      },
+      "cline": {
+        "detected": false,
+        "status": "NOT_INSTALLED"
+      }
+    },
+    "security_and_governance_invariants_preserved": [
+      "Client Workspace and Admin Dashboard separation is preserved.",
+      "Provider configuration remains Admin-only.",
+      "Agent Connectors remain Admin-only.",
+      "Client Workspace must not expose provider selection, API keys, or Agent Connector settings.",
+      "Agent bridge execution remains disabled by default.",
+      "Agent chat execution remains disabled by default.",
+      "Arbitrary shell command execution remains blocked.",
+      "Trust score calculations are unchanged.",
+      "Quality score calculations are unchanged.",
+      "Human validation governance is unchanged.",
+      "Wiki diagnostics are unchanged.",
+      "Evidence engine is unchanged."
+    ],
+    "current_capabilities": [
+      "Client Workspace with Home, Sources & Files, Knowledge Base, and Ask AI.",
+      "Admin Dashboard with Dashboard, Files & Content, Planning, Ask AI, Analytics, and Settings.",
+      "Admin-only AI Provider Configuration with broad provider catalog.",
+      "Admin-only Agent Connectors panel and backend connector catalog.",
+      "Connector detection and controlled version probes for installed connectors.",
+      "CI smoke-test pipeline for backend tests, frontend typecheck/build, and Playwright smoke test.",
+      "Playwright report and test result artifacts documented for CI."
+    ],
+    "known_limitations_and_followups": [
+      "OpenCode, Kilo Code, and Cline are not installed or not on PATH in the current connector state.",
+      "Connector-specific setup/testing remains needed for installed Codex and Claude Code before relying on real connector workflows.",
+      "Agent bridge chat remains disabled unless EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true and EVERYTHINGAI_AGENT_CHAT_ENABLED=true are intentionally set in the backend environment.",
+      "Frontend admin files still include a legacy AdminAppV2 path; controlled modular cleanup remains recommended.",
+      "AnythingLLM remains optional/not configured unless the user intentionally installs and connects it.",
+      "OpenDataLoader PDF remains a future optional extraction connector candidate only if it adds clear new extraction functionality beyond the current extractor."
+    ],
+    "recommended_next_actions": [
+      {
+        "priority": 1,
+        "phase": "8.3",
+        "task": "Controlled connector-specific setup/testing for installed Codex and Claude Code.",
+        "validation": "Verify connector-specific behavior, safety flags, and disabled-by-default execution without exposing connectors to Client Workspace."
+      },
+      {
+        "priority": 2,
+        "phase": "8.3",
+        "task": "Continue release hardening and frontend modularization.",
+        "validation": "After each cleanup, run frontend typecheck/build and Playwright smoke test."
+      },
+      {
+        "priority": 3,
+        "phase": "8.3",
+        "task": "Improve API key lifecycle UX and citation/source formatting.",
+        "validation": "Validate with backend tests, frontend typecheck/build, and smoke coverage where UI behavior changes."
+      }
+    ],
+    "startup_instructions_for_next_agent": [
+      "Read this handover first before making changes.",
+      "Confirm repo is on main and clean with git status.",
+      "Use docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md as the current Phase 8.2 validation reference.",
+      "Preserve Client/Admin separation.",
+      "Do not expose provider/API-key settings or Agent Connectors in Client Workspace.",
+      "Do not change trust-score or quality-score calculations.",
+      "Do not enable agent bridge execution or agent chat execution by default.",
+      "After backend changes, run npm test in services/api.",
+      "After frontend changes, run npm run typecheck and npm run build in apps/everything-ai-ui.",
+      "For UI changes, run npx playwright test smoke/client-admin-smoke.spec.ts from apps/everything-ai-ui."
+    ]
+  }
+}

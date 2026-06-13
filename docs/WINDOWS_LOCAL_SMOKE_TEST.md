@@ -11,7 +11,10 @@ This smoke test is intentionally focused on runtime behavior, not another refact
 Latest validation references:
 
 ```text
-docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
+docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md
+docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md
 docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
 docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 ```
@@ -19,10 +22,10 @@ docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 Current validated baseline:
 
 ```text
-Backend npm test:        106/106 passed
-Frontend typecheck:      passed
-Frontend build:          passed
-Playwright smoke test:   4/4 passed
+Backend npm test:        113/113 passed
+Frontend typecheck:      PASS
+Frontend build:          PASS
+CI smoke pipeline:       implemented
 ```
 
 Official local MVP surfaces:
@@ -152,7 +155,7 @@ npm test
 Expected current baseline:
 
 ```text
-106 tests / 106 passed / 0 failed
+113 tests / 113 passed / 0 failed
 ```
 
 Do not claim a new backend validation result unless this command was actually rerun.
@@ -448,6 +451,7 @@ The Windows local MVP smoke test can be marked as passed only when:
 - backend tests pass or a previous same-session backend pass is cited
 - frontend typecheck passes
 - frontend production build passes
+- CI smoke pipeline is implemented
 - Playwright smoke test passes
 - backend starts successfully
 - Client Workspace opens at `http://localhost:5151`
@@ -478,6 +482,7 @@ Safe test folder:
 Backend tests:
 Frontend typecheck:
 Frontend build:
+CI smoke pipeline:
 Playwright smoke test:
 
 Client Workspace:
@@ -494,6 +499,41 @@ Backend errors:
 Result: PASS / PARTIAL / FAIL
 Notes:
 ```
+
+## 21. CI smoke-test relationship
+
+Phase 8.2 CI smoke-test integration is complete.
+
+CI workflow:
+
+```text
+.github/workflows/ci-smoke.yml
+```
+
+CI triggers:
+
+```text
+push -> main
+pull_request -> main
+```
+
+CI smoke jobs:
+
+```text
+services/api: npm ci, npm test
+apps/everything-ai-ui: npm ci, npm run typecheck, npm run build
+apps/everything-ai-ui: npx playwright install --with-deps chromium
+apps/everything-ai-ui: npx playwright test smoke/client-admin-smoke.spec.ts
+```
+
+CI artifacts:
+
+```text
+playwright-report
+test-results
+```
+
+Local smoke testing remains useful for interactive Windows verification, while CI smoke testing provides repeatable main-branch validation.
 
 ## Final rule
 

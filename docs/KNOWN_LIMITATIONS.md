@@ -140,7 +140,18 @@ There is no tenant/user/workspace/device permission model in the local MVP.
 
 This belongs to the production-platform phase.
 
-## Final note
+## 14. CI smoke pipeline is smoke-level validation
+
+Phase 8.2 CI Smoke Test Integration is complete and documents backend tests, frontend typecheck/build, and Playwright smoke coverage on main-branch changes.
+
+This is still not a full enterprise release gate. Production release readiness still requires:
+
+- authentication
+- tenant isolation
+- production permission model
+- production deployment strategy
+- secure credential storage
+- deeper end-to-end release tests
 
 The current MVP should be judged as a local proof-of-value system, not yet a production platform.
 

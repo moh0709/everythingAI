@@ -157,12 +157,22 @@ The artifact should record:
 - pass/fail result
 - risks/follow-up tasks
 
-## Next step after passing
+## Follow-up status
 
-If version probes pass, the recommended next step is:
+Phase 8.2 — CI Smoke Test Integration — completed on 2026-06-13.
+
+Current Phase 8.2 handover:
 
 ```text
-Phase 8.2 — CI smoke-test integration
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
 ```
 
-Do not enable agent chat until detection, probe behavior, CI, and safety documentation are complete.
+Current Phase 8.2 validation artifact:
+
+```text
+docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+```
+
+The next roadmap phase is Phase 8.3 — connector-specific setup, release hardening, and production-readiness cleanup.
+
+Do not enable agent chat until connector-specific setup, CI behavior, and safety documentation remain complete and intentionally approved.

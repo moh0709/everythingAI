@@ -9,12 +9,15 @@ Finalize and preserve the current EverythingAI local MVP so it remains stable, o
 Latest consolidated handover:
 
 ```text
-docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
 ```
 
 Latest validation artifacts:
 
 ```text
+docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md
+docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md
 docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
 docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 ```
@@ -22,11 +25,11 @@ docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 Current validated baseline:
 
 ```text
-Date: 2026-06-07
-Backend npm test:        106/106 passed
-Frontend typecheck:      passed
-Frontend build:          passed
-Playwright smoke test:   4/4 passed
+Date: 2026-06-13
+Backend npm test:        113/113 passed
+Frontend typecheck:      PASS
+Frontend build:          PASS
+CI smoke pipeline:       implemented
 ```
 
 ## Current MVP scope
@@ -73,6 +76,8 @@ The local MVP is focused on:
 - Client Workspace / Admin Dashboard separation
 - admin-only AI Provider Configuration
 - admin-only Agent Connectors
+- connector detection/version-probe history
+- CI smoke-test pipeline
 - Playwright smoke-test agent
 
 ## Not part of local MVP finalization
@@ -100,7 +105,8 @@ Key historical validation:
 ```text
 2026-05-21: Windows local UI smoke test passed.
 2026-05-21: Backend test baseline passed at 82/82.
-2026-06-07: Current backend test baseline passed at 106/106.
+2026-06-13: Current backend test baseline passed at 113/113.
+2026-06-13: Phase 8.2 CI Smoke Test Integration completed.
 ```
 
 ### Phase 2 — Scanner optimization
@@ -243,6 +249,7 @@ Completed:
 - [x] Codex / Claude Code / OpenCode connector catalog entries
 - [x] Kilo Code / Aider / Continue / Cline connector catalog entries
 - [x] Agent bridge status, detect, detect-all, and version probe actions
+- [x] Connector detection and controlled version probes completed for detected connectors
 - [x] Disabled-by-default bridge safety model
 - [x] Browser cannot submit arbitrary shell commands
 - [x] Playwright smoke test confirms Agent Connectors are Admin-only
@@ -251,13 +258,14 @@ Remaining:
 
 - [ ] Controlled connector-specific setup/testing for real local Codex install
 - [ ] Controlled connector-specific setup/testing for real local Claude Code install
-- [ ] Controlled connector-specific setup/testing for real local OpenCode install
+- [ ] Keep OpenCode documented as not installed / not on PATH until installed
+- [ ] Keep Kilo Code, Aider, Continue, and Cline documented as not installed / not on PATH until installed
 - [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true`
 - [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_CHAT_ENABLED=true`
 
 ### Phase 8 — Documentation finalization and CI smoke automation
 
-Status: documentation refreshed; CI smoke automation pending
+Status: complete
 
 Completed:
 
@@ -269,39 +277,49 @@ Completed:
 - [x] Add Playwright smoke-test agent documentation
 - [x] Add validation notes for local smoke test and Admin Agent Connectors
 - [x] Create consolidated June 7 source-of-truth handover
-- [x] Update README, ROADMAP, IMPLEMENTATION_ROADMAP, UI README, Windows smoke test, and MVP finalization docs to the June 7 validated baseline
+- [x] Create consolidated June 13 Phase 8.2 source-of-truth handover
+- [x] Update README, ROADMAP, IMPLEMENTATION_ROADMAP, UI README, Windows smoke test, and MVP finalization docs to the June 13 validated baseline
+- [x] Add GitHub Actions / CI workflow for backend tests
+- [x] Add CI workflow for frontend typecheck/build
+- [x] Add CI workflow for Playwright smoke test
+- [x] Archive smoke screenshots/reports as CI artifacts
 
 Remaining:
 
-- [ ] Add GitHub Actions / CI workflow for backend tests
-- [ ] Add CI workflow for frontend typecheck/build
-- [ ] Add CI workflow for Playwright smoke test
-- [ ] Archive smoke screenshots/reports as CI artifacts
+- [ ] Continue Phase 8.3 connector-specific setup/testing for installed Codex and Claude Code
+- [ ] Continue release hardening and frontend modularization
+- [ ] Improve API key lifecycle UX
+- [ ] Improve rich citation/source highlighting and extracted document formatting
 
 ## Latest validation results
 
 ```text
-Date: 2026-06-07
+Date: 2026-06-13
 
 Backend:
 cd C:\temp\EverythingAI\services\api
 npm test
-Result: 106 tests / 106 passed / 0 failed
+Result: 113 tests / 113 passed / 0 failed
 
 Frontend:
 cd C:\temp\EverythingAI\apps\everything-ai-ui
 npm run typecheck
-Result: passed
+Result: PASS
 
 cd C:\temp\EverythingAI\apps\everything-ai-ui
 npm run build
-Result: passed
-Observed: 1545 modules transformed, built in 2.11s
+Result: PASS
+
+CI smoke pipeline:
+.github/workflows/ci-smoke.yml
+Result: implemented
+Triggers: push -> main, pull_request -> main
+Artifacts: playwright-report, test-results
 
 Playwright smoke test:
 cd C:\temp\EverythingAI\apps\everything-ai-ui
 npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed
-Result: 4 tests / 4 passed / 0 failed
+Result: covered by CI smoke pipeline
 ```
 
 ## Runtime repair added during earlier validation
@@ -351,19 +369,20 @@ EVERYTHINGAI_WIKI_TOPIC_CONTENT_LIMIT=4000
 
 The local MVP finalization baseline is currently met when:
 
-1. `npm test` passes locally in `services/api`. Current result: PASS, 106/106.
+1. `npm test` passes locally in `services/api`. Current result: PASS, 113/113.
 2. `npm run typecheck` passes in `apps/everything-ai-ui`. Current result: PASS.
 3. `npm run build` passes in `apps/everything-ai-ui`. Current result: PASS.
-4. Playwright smoke test passes. Current result: PASS, 4/4.
-5. Client Workspace and Admin Dashboard remain clearly separated.
-6. Sources & Files and Knowledge Base remain clearly distinguished.
-7. Client Workspace does not expose provider/API-key configuration.
-8. Client Workspace does not expose Agent Connectors.
-9. Client Ask AI uses the backend/admin-selected provider only.
-10. Move/rename actions require preview and approval.
-11. Failed action attempts are audited.
-12. Undo works for supported filesystem actions and is audited.
-13. README and smoke-test documentation match the tested behavior.
+4. CI smoke pipeline is implemented in `.github/workflows/ci-smoke.yml`.
+5. Playwright smoke test is included in CI smoke pipeline.
+6. Client Workspace and Admin Dashboard remain clearly separated.
+7. Sources & Files and Knowledge Base remain clearly distinguished.
+8. Client Workspace does not expose provider/API-key configuration.
+9. Client Workspace does not expose Agent Connectors.
+10. Client Ask AI uses the backend/admin-selected provider only.
+11. Move/rename actions require preview and approval.
+12. Failed action attempts are audited.
+13. Undo works for supported filesystem actions and is audited.
+14. README and smoke-test documentation match the tested behavior.
 
 ## Final MVP principle
 

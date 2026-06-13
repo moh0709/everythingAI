@@ -1,5 +1,11 @@
 # Enterprise Testing & Validation Specification
 
+## Current local MVP relationship
+
+The current local MVP has completed Phase 8.2 CI Smoke Test Integration. The active CI smoke pipeline validates backend tests, frontend typecheck/build, and Playwright smoke coverage for main-branch changes.
+
+This enterprise validation specification remains the future production release gate. It is not replaced by the local CI smoke pipeline.
+
 ## Purpose
 
 This document defines how EverythingAI Workspace MVP should be tested before release.

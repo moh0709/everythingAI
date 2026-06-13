@@ -2,19 +2,22 @@
 
 ## Current roadmap position
 
-EverythingAI is now in the **validated local MVP + admin connector hardening phase**.
+EverythingAI is now in the **validated local MVP + Phase 8.2 CI smoke integration complete** phase.
 
 The project has moved beyond concept/prototype planning and beyond an unverified local MVP. The current implementation contains a working local backend engine, separated Client Workspace and Admin Dashboard UIs, backend-persisted source paths, automatic knowledge consumption, durable Knowledge Base/Wiki pages, safe planning previews/execution, undo/recovery, broad AI provider configuration, provider-backed planning, and admin-only Agent Connectors.
 
 Latest consolidated source of truth:
 
 ```text
-docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
 ```
 
 Latest validation artifacts:
 
 ```text
+docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md
+docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md
 docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
 docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 ```
@@ -22,13 +25,15 @@ docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 Current validated baseline:
 
 ```text
-Backend npm test:        106/106 passed
-Frontend typecheck:      passed
-Frontend build:          passed
-Playwright smoke test:   4/4 passed
+Backend npm test:        113/113 passed
+Frontend typecheck:      PASS
+Frontend build:          PASS
+CI smoke pipeline:       implemented
+Connector detection:     Codex and Claude Code detected
+Version probes:          Codex and Claude Code PASS
 ```
 
-The project is **not production ready yet**, but the local MVP is now product-reviewable and smoke-tested in the running Windows environment.
+The project is **not production ready yet**, but the local MVP is now product-reviewable, connector safety/detection/version-probe history is documented, and CI smoke-test integration is complete.
 
 ---
 
@@ -106,12 +111,11 @@ Validated local MVP backend
 - [x] Undo/recovery snapshots.
 - [x] Trash/restore and permanent purge blocking.
 - [x] AnythingLLM sync backend endpoint.
-- [x] Backend test suite validated at 106/106 passing.
+- [x] Backend test suite validated at 113/113 passing after connector safety tests.
 
 ### Still to finalize
 
-- [ ] Controlled connector-specific testing for real local Codex / Claude Code / OpenCode installs.
-- [ ] Add CI job to run backend tests automatically.
+- [ ] Controlled connector-specific testing for real local Codex / Claude Code installs. OpenCode is not installed or not on PATH.
 - [ ] Add real background job queue later for production.
 - [ ] Add production-grade secure credential storage later.
 
@@ -158,7 +162,6 @@ Validated local MVP UI
 
 ### Still to finalize
 
-- [ ] Add CI job for frontend typecheck/build and Playwright smoke test.
 - [ ] Continue controlled frontend modularization and cleanup of legacy admin paths.
 - [ ] Improve UI layout after broader product review.
 - [ ] Add clearer progress indicators for long scans/builds where still needed.
@@ -315,7 +318,7 @@ Connect EverythingAI to optional external knowledge systems and admin-only local
 ### Status
 
 ```text
-AnythingLLM sync UI exists; Admin Agent Connectors validated; connector-specific setup still pending
+AnythingLLM sync UI exists; Admin Agent Connectors validated; connector detection/version probes completed; connector-specific setup still pending
 ```
 
 ### Finished
@@ -331,6 +334,8 @@ AnythingLLM sync UI exists; Admin Agent Connectors validated; connector-specific
 - [x] Agent bridge status refresh.
 - [x] Agent detect and detect-all actions.
 - [x] Agent version probe action.
+- [x] Connector detection completed for configured catalog.
+- [x] Controlled version probes completed for detected connectors.
 - [x] Disabled-by-default local agent bridge safety model.
 - [x] Client Workspace does not expose Agent Connectors.
 
@@ -338,7 +343,8 @@ AnythingLLM sync UI exists; Admin Agent Connectors validated; connector-specific
 
 - [ ] Controlled connector-specific setup/testing for real local Codex install.
 - [ ] Controlled connector-specific setup/testing for real local Claude Code install.
-- [ ] Controlled connector-specific setup/testing for real local OpenCode install.
+- [ ] Keep OpenCode documented as not installed / not on PATH until installed.
+- [ ] Keep Kilo Code, Aider, Continue, and Cline documented as not installed / not on PATH until installed.
 - [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true` locally.
 - [ ] Decide when/if to enable `EVERYTHINGAI_AGENT_CHAT_ENABLED=true` locally.
 - [ ] AnythingLLM remains optional/not configured unless intentionally installed and connected.
@@ -347,11 +353,79 @@ AnythingLLM sync UI exists; Admin Agent Connectors validated; connector-specific
 
 ---
 
-## Phase 8 — CI, launch hardening, and production platform readiness
+## Phase 8.1 — Agent Connector Safety, Detection, and Controlled Version Probes
 
 ### Goal
 
-Move from validated local MVP into repeatable CI validation, release hardening, and later production-ready platform architecture.
+Validate local agent connector safety boundaries without exposing connectors to Client Workspace, enabling agent chat by default, or allowing arbitrary shell command execution.
+
+### Status
+
+```text
+Complete
+```
+
+### Finished
+
+- [x] Phase 8.1A — Connector Safety Tests.
+- [x] Phase 8.1B — Connector Detection.
+- [x] Phase 8.1C — Controlled Version Probes.
+- [x] Phase 8.1C.1 — Windows Connector Compatibility.
+- [x] Connector catalog remains Admin-only.
+- [x] Client Workspace remains free of Agent Connector settings.
+- [x] Agent bridge execution remains disabled by default.
+- [x] Agent chat execution remains disabled by default.
+- [x] Arbitrary shell command execution remains blocked.
+- [x] Codex detected and version-probed as `codex-cli 0.124.0`.
+- [x] Claude Code detected and version-probed as `2.1.176`.
+- [x] OpenCode, Kilo Code, and Cline documented as not installed or not on PATH.
+
+### Still to finalize
+
+- [ ] Controlled connector-specific setup/testing for installed Codex.
+- [ ] Controlled connector-specific setup/testing for installed Claude Code.
+- [ ] Revisit OpenCode, Kilo Code, and Cline only after they are installed or explicitly added to PATH.
+
+---
+
+## Phase 8.2 — CI Smoke Test Integration
+
+### Goal
+
+Move the validated local MVP into repeatable CI validation for backend tests, frontend typecheck/build, and Playwright smoke testing.
+
+### Status
+
+```text
+Complete
+```
+
+### Finished
+
+- [x] CI smoke-test workflow documented at `.github/workflows/ci-smoke.yml`.
+- [x] CI triggers documented for `push -> main` and `pull_request -> main`.
+- [x] Backend CI job documented for `services/api` using `npm ci` and `npm test`.
+- [x] Frontend CI job documented for `apps/everything-ai-ui` using `npm ci`, `npm run typecheck`, and `npm run build`.
+- [x] Playwright CI smoke job documented for `smoke/client-admin-smoke.spec.ts`.
+- [x] Playwright Chromium dependency install documented for CI.
+- [x] CI artifacts documented for `playwright-report` and `test-results`.
+- [x] Backend baseline documented at 113/113 passing.
+- [x] Frontend typecheck and build documented as PASS.
+- [x] Phase 8.2 handover and validation artifacts created.
+
+### Still to finalize
+
+- [ ] Continue release hardening under Phase 8.3.
+- [ ] Keep CI smoke coverage aligned with UI changes.
+- [ ] Add deeper enterprise release gates later when auth, tenant isolation, and production infrastructure are implemented.
+
+---
+
+## Phase 8.3 — Connector-Specific Setup, Release Hardening, and Production-Readiness Cleanup
+
+### Goal
+
+Use the completed Phase 8.2 baseline to harden installed connector workflows, continue release cleanup, and prepare the local MVP for broader product review without weakening security boundaries.
 
 ### Status
 
@@ -361,12 +435,13 @@ Next recommended phase
 
 ### Required next
 
-- [ ] Add GitHub Actions / CI workflow for backend `npm test`.
-- [ ] Add CI workflow for frontend `npm run typecheck` and `npm run build`.
-- [ ] Add CI workflow for Playwright smoke test.
-- [ ] Archive Playwright screenshots/reports as CI artifacts.
-- [ ] Update release checklist.
-- [ ] Continue frontend modularization.
+- [ ] Controlled connector-specific setup/testing for Codex.
+- [ ] Controlled connector-specific setup/testing for Claude Code.
+- [ ] Keep OpenCode, Kilo Code, and Cline documented as not installed / not on PATH until installed.
+- [ ] Continue frontend modularization and cleanup of legacy admin paths.
+- [ ] Improve API key lifecycle UX: saved / replace / clear.
+- [ ] Improve rich citation/source highlighting and extracted document formatting.
+- [ ] Update release checklist after Phase 8.3 work.
 
 ### Required later
 
@@ -399,19 +474,19 @@ Admin Dashboard MVP:        85–90%
 AI provider system:         85–90%
 Planning workflow:          85–90%
 Knowledge Base UI:          80–85%
-Admin Agent Connectors:     70–80% implemented, connector-specific setup pending
+Admin Agent Connectors:     75–85% implemented, connector-specific setup pending
+CI smoke integration:       complete
 Production readiness:       30–40%
 ```
 
 ## Immediate next priorities
 
-1. Controlled connector-specific setup/testing for Codex, Claude Code, and OpenCode.
-2. Add CI smoke-test integration for backend, frontend, and Playwright.
-3. Continue controlled frontend modularization and cleanup of legacy admin paths.
-4. Improve API key lifecycle UX.
-5. Improve rich citation/source highlighting and extracted document formatting.
-6. Keep AnythingLLM and OpenDataLoader PDF as optional future connectors only when they add clear new value.
+1. Phase 8.3 connector-specific setup/testing for installed Codex and Claude Code.
+2. Continue release hardening and frontend modularization.
+3. Improve API key lifecycle UX.
+4. Improve rich citation/source highlighting and extracted document formatting.
+5. Keep AnythingLLM and OpenDataLoader PDF as optional future connectors only when they add clear new value.
 
 ## One-sentence status
 
-EverythingAI is now a validated local-first, source-backed AI knowledge workspace with a safe Client Workspace, Admin Dashboard, durable Knowledge Base, governed planning/execution/undo, admin-selected AI providers, and admin-only Agent Connectors — ready for connector-specific testing and CI hardening, but not yet production platform ready.
+EverythingAI is now a validated local-first, source-backed AI knowledge workspace with a safe Client Workspace, Admin Dashboard, durable Knowledge Base, governed planning/execution/undo, admin-selected AI providers, admin-only Agent Connectors, completed connector safety/detection/version-probe history, and completed CI smoke-test integration — ready for Phase 8.3 connector-specific setup and release hardening, but not yet production platform ready.

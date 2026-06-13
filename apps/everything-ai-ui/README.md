@@ -5,16 +5,20 @@ This React/Vite app has separate Client Workspace and Admin Dashboard entry poin
 Current validated state:
 
 ```text
-Date: 2026-06-07
+Date: 2026-06-13
 Frontend typecheck: PASS
 Frontend build: PASS
-Playwright smoke test: 4/4 PASS
+CI smoke pipeline: implemented
+Playwright smoke test: included in CI smoke pipeline
 ```
 
 Latest validation references:
 
 ```text
-../../docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+../../docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
+../../docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+../../docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md
+../../docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md
 ../../docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
 ../../docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 ```
@@ -131,6 +135,34 @@ EVERYTHINGAI_AGENT_CHAT_ENABLED=true
 
 The browser cannot submit arbitrary shell commands. Only saved connector commands can be detected/probed/chat-enabled through backend bridge rules.
 
+## CI smoke-test relationship
+
+Phase 8.2 CI smoke-test integration includes this UI app.
+
+CI workflow:
+
+```text
+../../.github/workflows/ci-smoke.yml
+```
+
+CI commands for this app:
+
+```bash
+cd apps/everything-ai-ui
+npm ci
+npm run typecheck
+npm run build
+npx playwright install --with-deps chromium
+npx playwright test smoke/client-admin-smoke.spec.ts
+```
+
+CI artifacts:
+
+```txt
+playwright-report
+test-results
+```
+
 ## Verification
 
 Before switching runtime behavior or after frontend changes, validate the UI app locally:
@@ -154,7 +186,8 @@ Expected current baseline:
 ```txt
 Frontend typecheck: PASS
 Frontend build: PASS
-Playwright smoke test: 4/4 PASS
+CI smoke pipeline: implemented
+Playwright smoke test: included in CI smoke pipeline
 ```
 
 Manual smoke URLs:

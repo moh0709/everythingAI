@@ -179,3 +179,90 @@ Central server is hosted by EverythingApp/OmniWare. Clients sync data securely.
 - File actions require approval.
 - Every file action must be logged.
 - Server commands to clients must be signed or authenticated.
+
+## Current local MVP and Phase 8.2 CI validation architecture
+
+EverythingAI currently has a validated local MVP architecture that sits below the future enterprise architecture. The local MVP is intentionally small, repeatable, and smoke-tested before production-platform expansion.
+
+```text
+services/api
+  -> SQLite persistence
+  -> indexing, extraction, search, Knowledge Base, planning, safe actions, audit
+  -> admin-selected AI provider runtime
+  -> admin-only Agent Connector catalog, detection, and version probes
+  -> disabled-by-default agent bridge/chat execution
+  -> blocked arbitrary shell command execution
+
+apps/everything-ai-ui
+  -> Client Workspace
+  -> Admin Dashboard
+  -> Playwright smoke/client-admin-smoke.spec.ts
+  -> frontend typecheck/build validation
+
+.github/workflows/ci-smoke.yml
+  -> push -> main
+  -> pull_request -> main
+  -> backend: npm ci, npm test
+  -> frontend: npm ci, npm run typecheck, npm run build
+  -> Playwright: install Chromium, run smoke/client-admin-smoke.spec.ts
+  -> artifacts: playwright-report, test-results
+```
+
+Phase 8.2 validation state:
+
+```text
+Backend tests:        113/113 passed
+Frontend typecheck:   PASS
+Frontend build:       PASS
+CI pipeline:          implemented
+```
+
+Agent Connector architecture rules preserved for Phase 8.2:
+
+```text
+Provider configuration remains Admin-only.
+Agent Connectors remain Admin-only.
+Client Workspace must not expose provider selection.
+Client Workspace must not expose API keys.
+Client Workspace must not expose Agent Connector settings.
+Agent bridge execution is disabled by default.
+Agent chat execution is disabled by default.
+Arbitrary shell command execution is blocked.
+Only saved connector commands from the backend catalog may be detected/probed/chat-enabled through backend bridge rules.
+```
+
+Connector validation history preserved:
+
+```text
+8.1A Connector Safety Tests: complete
+8.1B Connector Detection: complete
+8.1C Controlled Version Probes: complete
+8.1C.1 Windows Connector Compatibility: complete
+8.2 CI Smoke Test Integration: complete
+```
+
+Current connector state:
+
+```text
+Codex:      detected, version probe PASS, codex-cli 0.124.0
+ClaudeCode: detected, version probe PASS, 2.1.176
+OpenCode:   not installed / not on PATH
+KiloCode:   not installed / not on PATH
+Cline:      not installed / not on PATH
+```
+
+Governance invariants preserved:
+
+```text
+Trust score calculations unchanged.
+Quality score calculations unchanged.
+Human validation governance unchanged.
+Wiki diagnostics unchanged.
+Evidence engine unchanged.
+```
+
+Recommended next architecture phase:
+
+```text
+Phase 8.3 — connector-specific setup, release hardening, and production-readiness cleanup.
+```

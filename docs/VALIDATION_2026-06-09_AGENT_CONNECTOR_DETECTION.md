@@ -146,6 +146,13 @@ codex
 claudeCode
 ```
 
+Follow-up status:
+
+- Phase 8.1C controlled version probes completed.
+- Phase 8.2 CI Smoke Test Integration completed on 2026-06-13.
+- Current source of truth: `docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json`.
+- Current validation artifact: `docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md`.
+
 Do not enable chat execution yet.
 
 Do not expose Agent Connectors to Client Workspace.

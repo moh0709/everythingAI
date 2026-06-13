@@ -86,3 +86,10 @@ Current status:
 Recommended next action:
 
 - Create the next consolidated handover report marking Local MVP smoke test plus Admin Agent Connectors as validated, then proceed to controlled connector-specific setup/testing or CI smoke-test integration.
+
+Follow-up status:
+
+- Phase 8.1 connector safety/detection/version-probe work completed.
+- Phase 8.2 CI Smoke Test Integration completed on 2026-06-13.
+- Current source of truth: `docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json`.
+- Current validation artifact: `docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md`.

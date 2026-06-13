@@ -5,18 +5,22 @@ EverythingAI is the project foundation for **EverythingApp**: a local-first, sou
 ## Current baseline
 
 ```text
-Local MVP baseline date: 2026-06-07
-Backend tests: 106 passed / 0 failed
+Local MVP baseline date: 2026-06-13
+Backend tests: 113 passed / 0 failed
 Frontend typecheck: PASS
 Frontend build: PASS
-Playwright smoke test: 4 passed / 0 failed
+CI pipeline: implemented
+CI workflow: .github/workflows/ci-smoke.yml
 Windows local running-app smoke: PASS
 ```
 
 Latest source-of-truth documents:
 
 ```text
-docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
+docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md
+docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md
 docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
 docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 ```
@@ -27,7 +31,7 @@ docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 
 ## Current focus
 
-The current objective is to preserve the validated **local MVP** baseline while moving into controlled connector-specific testing and CI smoke automation.
+The current objective is to preserve the validated **local MVP** baseline while moving into Phase 8.3: connector-specific setup, release hardening, and production-readiness cleanup.
 
 EverythingAI should remain stable, safe, boring, and reliable before broader production-platform features are added.
 
@@ -38,9 +42,10 @@ Backend local MVP: runnable through API
 Client Workspace:  http://localhost:5151
 Admin Dashboard:   http://localhost:5151/admin.html
 Backend API:       http://127.0.0.1:4100
-Automated backend tests: 106 passed / 0 failed
+Automated backend tests: 113 passed / 0 failed
 Frontend typecheck/build: passed
-Playwright smoke test: 4 passed / 0 failed
+CI smoke pipeline: implemented
+Playwright smoke test: included in CI smoke pipeline
 ```
 
 Validated MVP capabilities:
@@ -53,7 +58,9 @@ Phase 4: AI provider system — admin-selected provider runtime validated
 Phase 5: Governed planning/execution/undo — complete for local MVP / validated
 Phase 6: Knowledge Base / Wiki layer — complete for local MVP / validated
 Phase 7: Integrations and Admin Agent Connectors — implemented / connector-specific setup pending
-Phase 8: CI and production hardening — next phase
+Phase 8.1: Agent connector safety, detection, and controlled version probes — complete
+Phase 8.2: CI and smoke-test integration — complete
+Phase 8.3: Connector-specific setup and release hardening — next phase
 ```
 
 The local MVP currently supports:
@@ -87,6 +94,8 @@ The local MVP currently supports:
 - Client Workspace Ask AI with auto-scroll
 - Admin-only AI Provider Configuration
 - Admin-only Agent Connectors panel
+- Connector detection and controlled version probes for installed connectors
+- CI smoke-test pipeline for backend, frontend, and Playwright smoke validation
 - Playwright smoke-test agent
 
 ## Client Workspace vs Admin Dashboard
@@ -163,6 +172,16 @@ EVERYTHINGAI_AGENT_CHAT_ENABLED=true
 
 The browser cannot submit arbitrary shell commands. Only saved connector commands can be detected/probed/chat-enabled through backend bridge rules.
 
+Current connector validation state:
+
+```text
+Codex:      detected, version probe PASS, codex-cli 0.124.0
+ClaudeCode: detected, version probe PASS, 2.1.176
+OpenCode:   not installed / not on PATH
+KiloCode:   not installed / not on PATH
+Cline:      not installed / not on PATH
+```
+
 ## Content-controlled Knowledge Base rule
 
 The Knowledge Base / Wiki layer is intentionally strict:
@@ -223,11 +242,39 @@ npm run typecheck
 npm run build
 ```
 
-Run Playwright smoke test:
+Run backend tests:
+
+```powershell
+cd C:\temp\EverythingAI\services\api
+npm test
+```
+
+Run frontend validation:
+
+```powershell
+cd C:\temp\EverythingAI\apps\everything-ai-ui
+npm run typecheck
+npm run build
+```
+
+Run Playwright smoke test locally:
 
 ```powershell
 cd C:\temp\EverythingAI\apps\everything-ai-ui
 npx playwright test smoke/client-admin-smoke.spec.ts --browser=chromium --headed
+```
+
+CI smoke pipeline:
+
+```text
+.github/workflows/ci-smoke.yml
+push -> main
+pull_request -> main
+services/api: npm ci, npm test
+apps/everything-ai-ui: npm ci, npm run typecheck, npm run build
+apps/everything-ai-ui: npx playwright install --with-deps chromium
+apps/everything-ai-ui: npx playwright test smoke/client-admin-smoke.spec.ts
+artifacts: playwright-report, test-results
 ```
 
 Manual Wiki schema repair, if needed for older local SQLite databases:
@@ -292,7 +339,11 @@ See the `/docs` folder.
 
 ### Current source-of-truth documentation
 
-- [`HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json`](docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json)
+- [`HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json`](docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json)
+- [`VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md`](docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md)
+- [`VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md`](docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md)
+- [`VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md`](docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md)
+- [`DOCUMENTATION_AUDIT_2026-06-13_PHASE8_2.md`](docs/DOCUMENTATION_AUDIT_2026-06-13_PHASE8_2.md)
 - [`VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md`](docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md)
 - [`VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md`](docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md)
 - [`ROADMAP.md`](docs/ROADMAP.md)

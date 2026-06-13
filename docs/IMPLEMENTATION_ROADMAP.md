@@ -8,17 +8,20 @@ The project should prioritize disciplined implementation over more conceptual ex
 
 ## Current execution reality
 
-As of 2026-06-07, EverythingAI is not starting from Sprint 1 anymore and is not merely an unvalidated prototype. The local MVP has been validated through backend tests, frontend typecheck/build, and Playwright smoke testing.
+As of 2026-06-13, EverythingAI is not starting from Sprint 1 anymore and is not merely an unvalidated prototype. The local MVP has been validated through backend tests, frontend typecheck/build, connector detection/version probes, and CI smoke-test integration.
 
 Latest consolidated source of truth:
 
 ```text
-docs/HANDOVER_2026-06-07_LOCAL_MVP_AND_AGENT_CONNECTORS_VALIDATED.json
+docs/HANDOVER_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.json
 ```
 
 Latest validation artifacts:
 
 ```text
+docs/VALIDATION_2026-06-13_PHASE8_2_CI_SMOKE_COMPLETION.md
+docs/VALIDATION_2026-06-09_AGENT_CONNECTOR_DETECTION.md
+docs/VALIDATION_PLAN_2026-06-09_AGENT_VERSION_PROBES.md
 docs/VALIDATION_2026-06-07_LOCAL_SMOKE_TEST.md
 docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 ```
@@ -26,10 +29,11 @@ docs/VALIDATION_2026-06-07_ADMIN_AGENT_CONNECTORS.md
 Current validated baseline:
 
 ```text
-Backend npm test:        106/106 passed
-Frontend typecheck:      passed
-Frontend build:          passed
-Playwright smoke test:   4/4 passed
+Backend npm test:        113/113 passed
+Frontend typecheck:      PASS
+Frontend build:          PASS
+CI smoke pipeline:       implemented
+Connector probes:        Codex and Claude Code PASS
 ```
 
 Current confirmed direction:
@@ -48,10 +52,10 @@ local files
 Current active priority:
 
 ```text
-harden the validated local MVP with connector-specific testing and CI smoke automation before expanding into enterprise production-platform architecture
+harden the validated local MVP with Phase 8.3 connector-specific setup, release hardening, and controlled frontend cleanup before expanding into enterprise production-platform architecture
 ```
 
-The enterprise roadmap below remains the strategic target, but the immediate execution path is now focused on validated local MVP hardening, connector testing, CI automation, and controlled frontend cleanup.
+The enterprise roadmap below remains the strategic target, but the immediate execution path is now focused on Phase 8.3 connector-specific setup, release hardening, CI-aligned validation, and controlled frontend cleanup.
 
 ## Core implementation principle
 
@@ -302,7 +306,7 @@ admin-controlled engines/connectors
 Current local MVP status:
 
 ```text
-Admin Dashboard implemented; Agent Connectors validated as admin-only configuration surface
+Admin Dashboard implemented; Agent Connectors validated as admin-only configuration surface with detection/version-probe history
 ```
 
 Validated / implemented:
@@ -316,6 +320,7 @@ Validated / implemented:
 - [x] Admin Agent Connectors panel.
 - [x] Codex, Claude Code, OpenCode connector entries.
 - [x] Agent bridge status, detect, detect-all, and version probe actions.
+- [x] Connector detection and controlled version probes completed for detected connectors.
 - [x] Disabled-by-default bridge safety model.
 - [x] Browser cannot submit arbitrary shell commands.
 - [x] Client Workspace does not expose Agent Connectors.
@@ -324,7 +329,7 @@ Remaining:
 
 - [ ] Controlled connector-specific setup/testing for real local Codex.
 - [ ] Controlled connector-specific setup/testing for real local Claude Code.
-- [ ] Controlled connector-specific setup/testing for real local OpenCode.
+- [ ] Keep OpenCode documented as not installed / not on PATH until installed.
 - [ ] Decide when/if to enable bridge/chat environment flags locally.
 - [ ] Production role/page/capability control later.
 
@@ -345,7 +350,7 @@ smoke tests
 Current local MVP status:
 
 ```text
-Smoke-tested and documentation refreshed
+Smoke-tested, CI smoke pipeline documented, and documentation refreshed
 ```
 
 Validated / implemented:
@@ -357,13 +362,12 @@ Validated / implemented:
 - [x] Local smoke-test report.
 - [x] Validation addenda.
 - [x] Consolidated handover.
+- [x] Phase 8.2 CI smoke-test integration.
 
 Remaining:
 
-- [ ] Add CI smoke-test integration.
-- [ ] Archive smoke screenshots/reports as CI artifacts.
 - [ ] Continue UI polish after broader product review.
-- [ ] Update release checklist.
+- [ ] Update release checklist for Phase 8.3.
 
 ## Engineering rules
 
@@ -386,12 +390,11 @@ no arbitrary browser-submitted shell commands
 ## Immediate next implementation priorities
 
 ```text
-1. Controlled connector-specific setup/testing for Codex, Claude Code, and OpenCode
-2. Add CI smoke-test integration for backend, frontend, and Playwright
-3. Continue frontend modularization / cleanup of legacy admin paths
-4. Improve API key lifecycle UX: saved / replace / clear
-5. Improve rich citations, source highlighting, and extracted document formatting
-6. Keep AnythingLLM and OpenDataLoader PDF optional unless they add clear new value
+1. Phase 8.3 connector-specific setup/testing for installed Codex and Claude Code
+2. Continue frontend modularization / cleanup of legacy admin paths
+3. Improve API key lifecycle UX: saved / replace / clear
+4. Improve rich citations, source highlighting, and extracted document formatting
+5. Keep AnythingLLM and OpenDataLoader PDF optional unless they add clear new value
 ```
 
 ## Strategic outcome
