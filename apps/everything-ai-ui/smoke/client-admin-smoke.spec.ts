@@ -84,6 +84,10 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Operator guardrails')).toBeVisible();
     await expect(page.getByText('Connector-specific setup notes').first()).toBeVisible();
     await expect(page.getByText('Readiness rule')).toBeVisible();
+    await expect(page.getByText('Local diagnostics refresh order')).toBeVisible();
+    await expect(page.getByText('Refresh Bridge, Detect, enable only for controlled diagnostics, Probe Version')).toBeVisible();
+    await expect(page.getByText('Smoke runner cleanup reminder')).toBeVisible();
+    await expect(page.getByText('port 5151 is already responding')).toBeVisible();
     await expect(page.getByText('Recommended command')).toBeVisible();
     await expect(page.getByText('External app session', { exact: true })).toBeVisible();
     await expect(page.getByText('Troubleshooting path')).toBeVisible();
