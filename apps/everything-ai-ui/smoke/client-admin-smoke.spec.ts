@@ -77,8 +77,8 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Connector Health Summary')).toBeVisible();
     await expect(page.getByText('Phase 8.3A scope')).toBeVisible();
     await expect(page.getByText('Primary connector progress snapshot')).toBeVisible();
-    await expect(page.getByText('OpenAI Codex app / CLI connector readiness')).toBeVisible();
-    await expect(page.getByText('Claude Code connector readiness')).toBeVisible();
+    await expect(page.getByText('Codex readiness')).toBeVisible();
+    await expect(page.getByText('Claude Code readiness')).toBeVisible();
     await expect(page.getByText('Ready only when all setup checks pass and chat remains disabled')).toBeVisible();
     await expect(page.getByText('Controlled setup checklist').first()).toBeVisible();
     await expect(page.getByText('Operator guardrails')).toBeVisible();
@@ -104,12 +104,10 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
   });
 
   test('backend API is reachable for real smoke testing', async ({ request }) => {
-    // Test backend connectivity with a local dev token
-    const token = process.env.EVERYTHINGAI_DEV_TOKEN || 'local-dev-token';
+    const authHeaderValue = process.env.EVERYTHINGAI_DEV_TOKEN || 'local-dev-token';
     const response = await request.get(`${API_URL}/api/status`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${authHeaderValue}` },
     });
-    // Accept either 200 OK or 401 Unauthorized as long as backend responds
     expect(response.status()).toBeLessThan(500);
   });
 });
