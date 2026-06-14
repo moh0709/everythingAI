@@ -2,7 +2,7 @@
 
 Date: 2026-06-14
 Phase: 8.3B release hardening
-Status: In progress
+Status: API key lifecycle UX batch GREEN
 
 ## Source of truth
 
@@ -58,13 +58,21 @@ git pull
 - [x] Provide clear operator copy for saved / replace / clear behavior.
 - [x] Provide a clear saved-key removal action when the backend reports a saved key.
 - [x] Cover the lifecycle UI in the admin smoke test.
+- [x] Fix strict OpenAI selector ambiguity in the admin smoke test.
+- [x] Improve smoke-helper diagnostics for the smoke stage.
 
 ### Release checklist and validation discipline
 
 - [x] Add this Phase 8.3B release-hardening checklist.
-- [ ] Run local Windows validation after pulling latest `main`.
-- [ ] Record green local validation artifact after `clean-and-smoke.bat` passes.
+- [x] Run local Windows validation after pulling latest `main`.
+- [x] Record green local validation artifact after `clean-and-smoke.bat` passes.
 - [ ] Confirm GitHub Actions state after the pushed commits finish.
+
+Confirmed local validation summary:
+
+```text
+GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
+```
 
 ### Deferred / tracked follow-ups
 
@@ -73,7 +81,7 @@ git pull
 - [ ] Track GitHub Actions Node runtime warning maintenance.
 - [ ] Track frontend dependency audit warnings without force-upgrading blindly.
 
-## Required validation commands before declaring Phase 8.3B complete
+## Required validation commands before declaring a future Phase 8.3B batch complete
 
 ```bat
 cd C:\temp\EverythingAI\apps\everything-ai-ui
