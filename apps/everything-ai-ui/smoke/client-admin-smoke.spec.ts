@@ -76,6 +76,10 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
     await expect(page.getByText('Connector Health Summary')).toBeVisible();
     await expect(page.getByText('Phase 8.3A scope')).toBeVisible();
+    await expect(page.getByText('Primary connector progress snapshot')).toBeVisible();
+    await expect(page.getByText('OpenAI Codex app / CLI connector readiness')).toBeVisible();
+    await expect(page.getByText('Claude Code connector readiness')).toBeVisible();
+    await expect(page.getByText('Ready only when all setup checks pass and chat remains disabled')).toBeVisible();
     await expect(page.getByText('Controlled setup checklist').first()).toBeVisible();
     await expect(page.getByText('Operator guardrails')).toBeVisible();
     await expect(page.getByText('Connector-specific setup notes').first()).toBeVisible();
