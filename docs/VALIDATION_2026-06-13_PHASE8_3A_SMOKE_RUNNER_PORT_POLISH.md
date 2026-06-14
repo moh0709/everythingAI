@@ -30,26 +30,27 @@ The runner also prints clearer cleanup guidance for Windows and Unix-like system
 - No provider configuration behavior changed.
 - Trust, quality, human validation, and evidence provenance rules were not changed.
 
-## Expected validation
+## Validation result
 
-Run from apps/everything-ai-ui:
+Status: GREEN
 
-- npm run typecheck
-- npm run build
-- node scripts/run-smoke-with-servers.mjs
+User validated both smoke-runner paths locally.
 
-Expected result when no old frontend server is running:
+Results:
 
-- Typecheck passes.
-- Build passes.
-- Playwright smoke passes.
+- Typecheck: PASS
+- Production build: PASS
+- Early stale-frontend guard: PASS
+- Local smoke runner after cleanup: PASS
+- Playwright smoke: 4 passed, 0 failed
+- Duration after cleanup: about 10.5 seconds
 
-Expected result when an old frontend server is already running on the configured frontend URL:
+Confirmed behavior:
 
-- Runner exits early.
-- Runner explains that the old UI dev server should be stopped.
-- Runner avoids testing a stale UI instance.
+- Runner exits early when port 5151 is already occupied by an old frontend server.
+- Runner prints cleanup guidance instead of testing a stale UI instance.
+- After old frontend cleanup, runner starts its own UI and smoke tests pass.
 
 ## Follow-up
 
-After this validates green, the next safe batch should add a small troubleshooting section to the Admin Agent Connectors panel for local diagnostics refresh order.
+Next safe batch: add a small troubleshooting section to the Admin Agent Connectors panel for local diagnostics refresh order.
