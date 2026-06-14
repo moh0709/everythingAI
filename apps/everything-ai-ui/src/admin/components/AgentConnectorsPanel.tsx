@@ -335,6 +335,17 @@ export function AgentConnectorsPanel({
       </div>
     </div>
 
+    <div className="settings-help-grid">
+      <div>
+        <strong><Activity size={16} /> Local diagnostics refresh order</strong>
+        <p>Use this order: Refresh Bridge, Detect, enable only for controlled diagnostics, Probe Version, then confirm connector chat remains disabled.</p>
+      </div>
+      <div>
+        <strong><AlertTriangle size={16} /> Smoke runner cleanup reminder</strong>
+        <p>If local smoke reports port 5151 is already responding, stop the old UI dev server before rerunning the smoke runner.</p>
+      </div>
+    </div>
+
     {bridgeStatus && <div className={`status-strip ${bridgeStatus.bridgeEnabled ? 'ready' : 'working'}`}>
       Bridge: {bridgeStatus.bridgeEnabled ? 'enabled' : 'disabled'} · Chat: {bridgeStatus.chatEnabled ? 'enabled' : 'disabled'} · Platform: {bridgeStatus.platform} · Probe timeout: {bridgeStatus.timeoutMs}ms
     </div>}
