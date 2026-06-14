@@ -109,7 +109,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     if (!(await remotePolicyCheckbox.isChecked())) {
       await remotePolicyCheckbox.check();
     }
-    await page.getByRole('button', { name: /OpenAI/ }).click();
+    await page.getByRole('button', { name: 'OpenAI Remote model provider', exact: true }).click();
     await expect(page.getByText('API key lifecycle')).toBeVisible();
     await expect(page.getByText('No key configured')).toBeVisible();
     await page.getByLabel('OpenAI API key').fill('smoke-test-replacement-key');
