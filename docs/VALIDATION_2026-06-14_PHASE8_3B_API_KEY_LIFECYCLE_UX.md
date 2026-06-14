@@ -9,6 +9,7 @@ Batch: API key lifecycle UX and release checklist
 ```text
 apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx
 apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts
+apps/everything-ai-ui/scripts/clean-and-smoke.bat
 docs/RELEASE_CHECKLIST_2026-06-14_PHASE8_3B.md
 docs/VALIDATION_2026-06-14_PHASE8_3B_API_KEY_LIFECYCLE_UX.md
 ```
@@ -24,6 +25,7 @@ It covers:
 - clear saved-key action visibility
 - smoke coverage for the API key lifecycle UI
 - Phase 8.3B release checklist creation
+- smoke-helper diagnostics for the smoke stage
 
 ## Safety boundaries preserved
 
@@ -61,6 +63,12 @@ The admin smoke test now verifies that:
 - no-key state is visible,
 - entering a draft key shows replacement-staged state.
 
+A strict selector issue was fixed after local validation showed that `/OpenAI/` also matched Azure OpenAI and Custom OpenAI. The smoke test now targets the exact OpenAI provider card.
+
+### clean-and-smoke.bat
+
+The Windows clean smoke helper now reports a clearer smoke-stage failure reason instead of leaving the smoke result as `NOT RUN` when the smoke runner exits early.
+
 ### RELEASE_CHECKLIST_2026-06-14_PHASE8_3B.md
 
 A Phase 8.3B release-hardening checklist was added to track the active hardening scope and validation gates.
@@ -69,9 +77,7 @@ A Phase 8.3B release-hardening checklist was added to track the active hardening
 
 GitHub file updates were completed directly on `main`.
 
-Local validation has not been executed by this assistant environment.
-
-Required validation command for the local Windows repo:
+Local Windows validation was executed by the user from:
 
 ```bat
 cd C:\temp\EverythingAI\apps\everything-ai-ui
@@ -79,13 +85,22 @@ git pull
 .\scripts\clean-and-smoke.bat
 ```
 
-Expected result before declaring this batch green:
+Confirmed local validation summary:
 
 ```text
-GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
+=== EVERYTHINGAI VALIDATION SUMMARY ===
+Port cleanup: PASS
+Stopped ports:  4100 5151
+Git pull: PASS
+Typecheck: PASS
+Build: PASS
+Smoke: PASS - Playwright smoke completed successfully
+Final result: GREEN
+Report this to ChatGPT: GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS.
+=======================================
 ```
 
-Optional backend baseline:
+Optional backend baseline remains available:
 
 ```bat
 cd C:\temp\EverythingAI\services\api
@@ -94,4 +109,4 @@ npm test
 
 ## Current result
 
-Status: implementation committed; local validation pending.
+Status: GREEN — git pull PASS, typecheck PASS, build PASS, smoke PASS.
