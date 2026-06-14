@@ -97,7 +97,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Controlled setup readiness').first()).toBeVisible();
     await expect(page.getByText('Saved command is safe')).toBeVisible();
     await expect(page.getByText('CLI detected on PATH')).toBeVisible();
-    await expect(page.getByText('Connector chat remains disabled')).toBeVisible();
+    await expect(page.getByText('Connector chat remains disabled', { exact: true })).toBeVisible();
     await expect(page.getByText('Primary setup targets are Codex and Claude Code')).toBeVisible();
     await expect(page.getByText('OpenCode, Kilo Code, Cline, Aider, and Continue stay documented as not installed', { exact: false })).toBeVisible();
     await expect(page.getByText('OpenAI Codex app / CLI connector')).toBeVisible();
