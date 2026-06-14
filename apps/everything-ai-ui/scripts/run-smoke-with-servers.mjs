@@ -24,6 +24,15 @@ function log(prefix, message) {
   }
 }
 
+function cleanupHint() {
+  console.log('[smoke] Cleanup hint: close old EverythingAI API/UI terminals, stop old npm/node dev processes, then rerun this smoke command.');
+  if (isWindows) {
+    console.log('[smoke] Windows hint: use Task Manager or PowerShell Get-Process node to find old Node/Vite processes if ports stay occupied.');
+  } else {
+    console.log('[smoke] Unix hint: use your usual process manager or lsof/ps to find old Node/Vite processes if ports stay occupied.');
+  }
+}
+
 function quoteWindowsArg(value) {
   const text = String(value);
   if (!text) return '""';
@@ -91,6 +100,22 @@ function requestStatus(url) {
   });
 }
 
+async function preflightPorts() {
+  const apiStatus = await requestStatus(`${API_URL}/api/status`);
+  const uiStatus = await requestStatus(UI_URL);
+
+  if (apiStatus) {
+    console.log(`[smoke] Existing backend response detected at ${API_URL}/api/status with HTTP ${apiStatus}. The runner will start its own API process, but an old process may already be running.`);
+  }
+
+  if (uiStatus) {
+    console.error(`[smoke] Frontend URL ${UI_URL} is already responding with HTTP ${uiStatus}.`);
+    console.error('[smoke] Refusing to continue because Playwright must test the UI started by this runner, not a stale dev server.');
+    cleanupHint();
+    throw new Error('Frontend smoke port is already occupied. Stop the old UI dev server and rerun.');
+  }
+}
+
 async function waitForUrl(name, url, acceptedStatuses, timeoutMs = 60000) {
   const started = Date.now();
 
@@ -103,6 +128,7 @@ async function waitForUrl(name, url, acceptedStatuses, timeoutMs = 60000) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 
+  cleanupHint();
   throw new Error(`${name} did not become ready at ${url} within ${timeoutMs}ms`);
 }
 
@@ -149,10 +175,12 @@ process.on('SIGTERM', () => {
 
 try {
   console.log('[smoke] Starting EverythingAI backend and frontend for local smoke test...');
+  await preflightPorts();
+
   spawnProcess('api', 'npm', ['start'], apiDir);
   await waitForUrl('Backend API', `${API_URL}/api/status`, [200, 401]);
 
-  spawnProcess('ui', 'npm', ['run', 'dev', '--', '--host', '127.0.0.1'], uiDir, {
+  spawnProcess('ui', 'npm', ['run', 'dev', '--', '--host', '127.0.0.1', '--strictPort'], uiDir, {
     EVERYTHINGAI_API_URL: API_URL,
   });
   await waitForUrl('Frontend UI', UI_URL, [200]);
