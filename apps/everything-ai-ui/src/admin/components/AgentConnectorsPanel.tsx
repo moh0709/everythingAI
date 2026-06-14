@@ -200,6 +200,56 @@ function readinessText(items: Array<{ done: boolean }>) {
   return `${done}/${items.length} setup checks complete`;
 }
 
+function readinessTone(items: Array<{ done: boolean }>) {
+  const done = items.filter((item) => item.done).length;
+  if (done === items.length) return 'ready';
+  return 'working';
+}
+
+function primaryTargetProgress({
+  agentIntegrations,
+  bridgeStatus,
+  detectionResults,
+  probeResults,
+}: {
+  agentIntegrations: Record<string, AgentIntegrationSettings>;
+  bridgeStatus: AgentBridgeStatus | null;
+  detectionResults: Record<string, AgentDetectionResult>;
+  probeResults: Record<string, AgentProbeResult>;
+}) {
+  return Array.from(PHASE_83A_TARGETS).map((agentId) => {
+    const agent = agentCatalog.find((item) => item.id === agentId);
+    const config = agentIntegrations[agentId] || {
+      enabled: false,
+      mode: 'local-cli',
+      command: '',
+      authStrategy: 'external-app',
+      chatEnabled: false,
+      chatMode: 'stdin',
+      chatArgs: [],
+      allowWorkspaceContext: false,
+      maxInputChars: 12000,
+      timeoutMs: 120000,
+    };
+    const items = checklistItems({
+      agentId,
+      config,
+      bridgeStatus,
+      detection: detectionResults[agentId],
+      probe: probeResults[agentId],
+    });
+    const done = items.filter((item) => item.done).length;
+    return {
+      agentId,
+      label: agent?.label || agentId,
+      done,
+      total: items.length,
+      tone: readinessTone(items),
+      ready: done === items.length,
+    };
+  });
+}
+
 export function AgentConnectorsPanel({
   agentIntegrations,
   bridgeStatus,
@@ -216,6 +266,7 @@ export function AgentConnectorsPanel({
   const detectedCount = Object.values(detectionResults).filter((result) => result.found).length;
   const missingCount = Object.values(detectionResults).filter((result) => !result.found).length;
   const probePassCount = Object.values(probeResults).filter((result) => result.ok).length;
+  const primaryProgress = primaryTargetProgress({ agentIntegrations, bridgeStatus, detectionResults, probeResults });
 
   return <section className="panel">
     <div className="panel-title">
@@ -249,6 +300,17 @@ export function AgentConnectorsPanel({
         <strong><ShieldCheck size={16} /> Phase 8.3A scope</strong>
         <p>Primary setup targets are Codex and Claude Code. OpenCode, Kilo Code, Cline, Aider, and Continue stay documented as not installed until explicitly installed.</p>
       </div>
+    </div>
+
+    <div className="settings-help-grid">
+      <div>
+        <strong><ClipboardCheck size={16} /> Primary connector progress snapshot</strong>
+        <p>Admin-only readiness snapshot for Codex and Claude Code. Ready only when all setup checks pass and chat remains disabled.</p>
+      </div>
+      {primaryProgress.map((item) => <div key={item.agentId}>
+        <strong>{item.ready ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />} {item.label} readiness</strong>
+        <p>{item.done}/{item.total} setup checks complete · {item.ready ? 'ready for the next approved phase' : 'not ready yet'}</p>
+      </div>)}
     </div>
 
     <div className="settings-help-grid">
