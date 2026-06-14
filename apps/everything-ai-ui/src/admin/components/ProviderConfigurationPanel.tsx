@@ -59,16 +59,31 @@ type RemoteProviderConfigurationProps = {
 function RemoteProviderConfiguration({ active, draft, providerModels, update }: RemoteProviderConfigurationProps) {
   const activeBlock = draft[active];
   const models = providerModels?.[active] || [];
+  const hasSavedApiKey = activeBlock.apiKey === '__saved__';
+  const hasDraftApiKey = Boolean(activeBlock.apiKey && !hasSavedApiKey);
+  const keyStatus = hasSavedApiKey ? 'Saved key present' : hasDraftApiKey ? 'Replacement key staged' : 'No key configured';
+  const keyGuidance = hasSavedApiKey
+    ? 'The saved secret is masked. Typing a new value replaces it on save; clearing it removes the saved key.'
+    : hasDraftApiKey
+      ? 'A replacement key is staged in this draft and will be stored only after Save AI Settings.'
+      : 'Paste a key to save one for this provider, or leave blank to keep this provider without credentials.';
 
   return <div className="settings-grid">
     <label>
       API Key
       <input
         type="password"
-        value={activeBlock.apiKey}
+        value={hasSavedApiKey ? '' : activeBlock.apiKey}
         onChange={(event) => update(`${active}.apiKey`, event.target.value)}
-        placeholder="Stored in backend settings"
+        placeholder={hasSavedApiKey ? 'Saved key is masked' : 'Paste API key to save or replace'}
+        aria-label={`${providerLabel(active)} API key`}
       />
+      <span className="muted">API key lifecycle: {keyStatus}. {keyGuidance}</span>
+      <div className="button-row">
+        {hasSavedApiKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '')}>Clear saved key</button>}
+        {hasSavedApiKey && <span className="scope-pill">Saved / replace / clear visibility</span>}
+        {hasDraftApiKey && <span className="scope-pill">Replacement staged</span>}
+      </div>
     </label>
     <label>
       Endpoint
