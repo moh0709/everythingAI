@@ -104,6 +104,17 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Claude Code connector')).toBeVisible();
     await expect(page.getByText('OpenCode agent connector')).toBeVisible();
     await expect(page.getByText('Client Workspace users continue to chat only through the AI provider selected in Admin Settings', { exact: false })).toBeVisible();
+
+    const remotePolicyCheckbox = page.getByLabel('Enable remote providers through server policy');
+    if (!(await remotePolicyCheckbox.isChecked())) {
+      await remotePolicyCheckbox.check();
+    }
+    await page.getByRole('button', { name: /OpenAI/ }).click();
+    await expect(page.getByText('API key lifecycle')).toBeVisible();
+    await expect(page.getByText('No key configured')).toBeVisible();
+    await page.getByLabel('OpenAI API key').fill('smoke-test-replacement-key');
+    await expect(page.getByText('Replacement key staged')).toBeVisible();
+
     await saveScreenshot(page, '08-admin-settings-providers-agents');
   });
 
