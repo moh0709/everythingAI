@@ -81,7 +81,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Connector-specific setup notes').first()).toBeVisible();
     await expect(page.getByText('Readiness rule')).toBeVisible();
     await expect(page.getByText('Recommended command')).toBeVisible();
-    await expect(page.getByText('External app session')).toBeVisible();
+    await expect(page.getByText('External app session', { exact: true })).toBeVisible();
     await expect(page.getByText('Troubleshooting path')).toBeVisible();
     await expect(page.getByText('Ready-to-advance rule')).toBeVisible();
     await expect(page.getByText('Detection and version probes are allowed; connector chat remains blocked until explicitly approved')).toBeVisible();
