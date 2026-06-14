@@ -1,0 +1,234 @@
+{
+  "handover_report": {
+    "title": "EverythingAI — Phase 8.3A Connector Diagnostics Completion Handover",
+    "version": "1.0",
+    "date": "2026-06-13",
+    "prepared_for": "Next AI engineering agent / continuation session",
+    "repository": {
+      "name": "everythingAI",
+      "owner": "moh0709",
+      "full_name": "moh0709/everythingAI",
+      "default_branch": "main",
+      "local_repo_paths_seen": [
+        "E:\\01PROJEKTER\\EverythingAI",
+        "C:\\temp\\EverythingAI"
+      ],
+      "branch_policy": "Work directly on main unless the user explicitly changes this rule."
+    },
+    "read_first": [
+      "docs/HANDOVER_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_COMPLETION.json",
+      "docs/HANDOVER_2026-06-13_PHASE8_2_GREEN_CI_BASELINE.json",
+      "docs/DOCUMENTATION_AUDIT_2026-06-13_PHASE8_2_GREEN_CI.md",
+      "docs/ROADMAP.md",
+      "docs/IMPLEMENTATION_ROADMAP.md"
+    ],
+    "executive_summary": {
+      "project_identity": "EverythingAI is a validated local-first, source-backed AI knowledge workspace with a Client Workspace, Admin Dashboard, durable Knowledge Base/Wiki layer, governed planning/execution/undo, admin-selected AI providers, admin-only Agent Connectors, and green local/CI smoke validation.",
+      "current_phase": "Phase 8.3A Connector Diagnostics UX and local validation helper work is complete and green.",
+      "latest_milestone": "Admin Agent Connectors now has health summaries, persistent probe results, controlled setup checklists, connector-specific notes, primary connector progress, local troubleshooting guidance, and a Windows clean-and-smoke helper.",
+      "important_note": "Phase 8.3A improved visibility and operator diagnostics only. It did not enable connector chat, did not expose connectors to Client Workspace, and did not change bridge execution defaults."
+    },
+    "validated_baseline": {
+      "frontend_typecheck": {
+        "command": "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui && npm run typecheck",
+        "status": "PASS"
+      },
+      "frontend_build": {
+        "command": "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui && npm run build",
+        "status": "PASS"
+      },
+      "local_clean_smoke_helper": {
+        "command": "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui && .\\scripts\\clean-and-smoke.bat",
+        "status": "GREEN",
+        "reported_summary": {
+          "port_cleanup": "PASS",
+          "stopped_ports": ["4100", "5151"],
+          "git_pull": "PASS",
+          "typecheck": "PASS",
+          "build": "PASS",
+          "smoke": "PASS - Playwright smoke completed successfully",
+          "final_result": "GREEN"
+        }
+      },
+      "playwright_smoke": {
+        "status": "PASS locally through clean-and-smoke helper",
+        "expected_result": "4 passed"
+      }
+    },
+    "phase_8_3a_delivered": {
+      "admin_connector_diagnostics_ux": {
+        "status": "complete",
+        "description": "Admin Agent Connectors shows health summary, per-connector status, next action guidance, Phase 8.3A target markers, and optional connector missing-state labels."
+      },
+      "persistent_probe_results": {
+        "status": "complete",
+        "description": "Agent probe results persist in AdminRuntimeApp and are passed through AdminViewRouter and SettingsView into AgentConnectorsPanel."
+      },
+      "controlled_setup_checklist": {
+        "status": "complete",
+        "description": "Codex and Claude Code cards include readiness checklists covering safe command, PATH detection, controlled enablement, bridge flag, version probe, and chat-disabled checks."
+      },
+      "connector_specific_setup_notes": {
+        "status": "complete",
+        "description": "Codex and Claude Code cards include setup notes for command shape, external app session expectation, troubleshooting path, and ready-to-advance rule."
+      },
+      "primary_connector_progress_snapshot": {
+        "status": "complete",
+        "description": "Admin Settings shows readiness progress for Codex and Claude Code as a concise setup-check count."
+      },
+      "local_troubleshooting_guidance": {
+        "status": "complete",
+        "description": "Admin Settings includes local diagnostics refresh order and smoke runner cleanup reminder."
+      },
+      "smoke_runner_port_guard": {
+        "status": "complete",
+        "description": "Local smoke runner refuses to test against stale frontend servers on port 5151 and uses strict Vite port behavior."
+      },
+      "windows_clean_smoke_helper": {
+        "status": "complete",
+        "description": "Windows helper frees local dev ports, pulls latest main, runs typecheck, build, and smoke, then prints a reportable validation summary."
+      }
+    },
+    "commits_in_phase_8_3a": [
+      {"sha": "b28cabbc0e6ac88f9749d08144844f773896d470", "message": "Improve admin connector health diagnostics"},
+      {"sha": "faa4aacf4acdb396799e94996cf950cc4c1fd8b1", "message": "Keep connector diagnostics prop backward compatible"},
+      {"sha": "1e63d6836202172e78a74f63a28d4e0cac842512", "message": "Cover connector diagnostics in admin smoke test"},
+      {"sha": "67300f0bd7440af2ee8b36780f1c3446b7bc991d", "message": "Document Phase 8.3A connector diagnostics UX work"},
+      {"sha": "01b18d6c68de1b6179ec2783bd868adbb4658542", "message": "Add local smoke runner with servers"},
+      {"sha": "7f4995c610e12c0db9f1d66a8520fd6fd778ee97", "message": "Document local smoke runner for Phase 8.3A"},
+      {"sha": "e96d8d47338593fc84587e76db912b782c6b16c5", "message": "Fix Windows smoke runner process spawning"},
+      {"sha": "6a31aeaf862fcd4062e4facf27289e0faeacbfa5", "message": "Fix Windows smoke runner command quoting"},
+      {"sha": "bf0b5c429a382230a9a05cd2ad3bc72359abf076", "message": "Record green local Phase 8.3A smoke validation"},
+      {"sha": "5ce53ec249cbdad508c07e0f6feaf9945d8bda56", "message": "Pass agent probe results into settings view"},
+      {"sha": "e3bcc2501c92f1ef19462f255f9f53a594713c84", "message": "Route agent probe results to settings view"},
+      {"sha": "6c711b6237dbcdb30e96520ab1813f964c08be7d", "message": "Persist agent probe results in admin runtime"},
+      {"sha": "9521b7c8a389a4bfe800de8859faf9049ca0b94f", "message": "Document persistent connector probe result wiring"},
+      {"sha": "6378221f4adbcc44d32aeae745705bc49d2560a7", "message": "Record green smoke for persistent probe results"},
+      {"sha": "c548409577693409f30641fcb377e7cad4e7dc67", "message": "Add controlled connector setup checklist"},
+      {"sha": "701f84ddcf7fabff584aea5c25f3794f4f03abdb", "message": "Cover controlled connector setup checklist in smoke test"},
+      {"sha": "6c8aee8e6ae01930049e968dce2911cdee4c83fc", "message": "Document controlled connector setup checklist batch"},
+      {"sha": "1c646071960c5989c7dfc14701aec5443454e9b1", "message": "Fix strict smoke selector for setup checklist"},
+      {"sha": "008083fc41a12391b8dcfc7076b1701d7f98cb0e", "message": "Fix strict smoke selector for setup readiness"},
+      {"sha": "2282886bbed4755011af8eeaf77168a01533cea3", "message": "Add connector-specific setup notes"},
+      {"sha": "cf7d89e1047d50f0553a04c495c5296fec03414c", "message": "Cover connector-specific setup notes in smoke test"},
+      {"sha": "92b5f5c94afd6449a20a8013088e6c1f3f5f1723", "message": "Document connector-specific setup notes batch"},
+      {"sha": "859ad85860bc85f71fa9782ab5c7c0f5f8f8828f", "message": "Fix strict smoke selector for external app session note"},
+      {"sha": "068ff5351bbd5241bafc326ac80591bb1dd6c36e", "message": "Record green validation for connector setup notes"},
+      {"sha": "47dd69d0e55dce55b500c261a2ac848874388c9b", "message": "Add primary connector progress snapshot"},
+      {"sha": "8bdf6e948918fd4298e0d60998f09bdd4a4f0d04", "message": "Cover primary connector progress snapshot in smoke test"},
+      {"sha": "2d599b41416a6bc97df993019de0d239e0a65053", "message": "Document primary connector progress snapshot batch"},
+      {"sha": "d972ed9125615a88445c30e41d512cd7da24cbbf", "message": "Fix progress snapshot smoke labels"},
+      {"sha": "09970dd041db28702d06959faa3de12dfb1c52bf", "message": "Improve local smoke runner port guidance"},
+      {"sha": "45a4f5609002b4bdd702767ed487cd889d965a81", "message": "Document smoke runner port polish batch"},
+      {"sha": "6c5df0704e5894ebdf71e46d17f60dfa8ae2cdcc", "message": "Record green smoke runner port polish validation"},
+      {"sha": "ebab8f1b028122111c1a53a5e3dfbcba8af96244", "message": "Add connector diagnostics troubleshooting guidance"},
+      {"sha": "5e9fe5b6fe8b7f0c9746b5a8dff6d0cea794fe81", "message": "Cover connector troubleshooting guidance in smoke test"},
+      {"sha": "f333ad764bd0dbe815e38c76f3e61ecf0e7236d4", "message": "Document connector troubleshooting guidance batch"},
+      {"sha": "042c3be59c64d15c1fc52feaa8504f4d5ae1acaa", "message": "Add Windows clean smoke helper"},
+      {"sha": "1d9ab970d54a61bcd32e0a6cef440457436fb4ce", "message": "Fix strict selector for connector chat checklist"},
+      {"sha": "68cd9216b1ab66168081ef67b2fd03e7b0412863", "message": "Improve clean smoke helper final summary"},
+      {"sha": "4dbc9edcfb0423ad3c5aa611d10587cf7bc57f7a", "message": "Record green clean smoke helper validation"}
+    ],
+    "important_files_changed_or_added": {
+      "frontend": [
+        "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx",
+        "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
+        "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx",
+        "apps/everything-ai-ui/src/admin/components/SettingsView.tsx",
+        "apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts",
+        "apps/everything-ai-ui/scripts/run-smoke-with-servers.mjs",
+        "apps/everything-ai-ui/scripts/clean-and-smoke.bat"
+      ],
+      "docs": [
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_UX.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_GREEN_LOCAL_SMOKE.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_PERSISTENT_PROBE_RESULTS.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_CONTROLLED_SETUP_CHECKLIST.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_CONNECTOR_SETUP_NOTES.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_PRIMARY_CONNECTOR_PROGRESS.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_SMOKE_RUNNER_PORT_POLISH.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_CONNECTOR_TROUBLESHOOTING_GUIDANCE.md",
+        "docs/VALIDATION_2026-06-13_PHASE8_3A_CLEAN_SMOKE_HELPER_GREEN.md",
+        "docs/HANDOVER_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_COMPLETION.json"
+      ]
+    },
+    "connector_state": {
+      "safety_model": {
+        "agent_connectors_admin_only": true,
+        "client_workspace_exposes_connectors": false,
+        "bridge_execution_default": "disabled",
+        "chat_execution_default": "disabled",
+        "arbitrary_browser_shell_execution": "blocked",
+        "only_saved_connector_commands_can_be_detected_or_probed": true
+      },
+      "primary_phase_8_3a_targets": [
+        "codex",
+        "claudeCode"
+      ],
+      "documented_not_installed_or_not_on_path": [
+        "openCode",
+        "kiloCode",
+        "cline",
+        "aider",
+        "continue"
+      ],
+      "ready_meaning": "A primary connector is not treated as ready until safe command, PATH detection, controlled enablement, bridge flag, version probe, and chat-disabled checks are complete."
+    },
+    "critical_architecture_rules": [
+      "Normal users use Client Workspace.",
+      "Admin/operators use Admin Dashboard.",
+      "Client Workspace can chat with AI only through the backend/admin-selected active provider.",
+      "Client Workspace must not expose provider selection, API keys, remote-provider policy, planning policy, or agent connector configuration.",
+      "Admin Dashboard owns provider settings, API keys, remote-provider policy, planning rules, and Agent Connectors.",
+      "Agent bridge execution remains disabled by default.",
+      "Agent chat execution remains disabled by default.",
+      "Do not enable arbitrary shell command execution from the browser.",
+      "Do not expose Agent Connectors in Client Workspace.",
+      "Do not change trust-score calculations.",
+      "Do not change quality-score calculations.",
+      "Do not change human-validation governance rules.",
+      "Do not remove existing diagnostics or validation artifacts.",
+      "Do not weaken evidence/source provenance rules."
+    ],
+    "validation_commands": {
+      "recommended_windows_full_local": [
+        "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+        "git pull",
+        ".\\scripts\\clean-and-smoke.bat"
+      ],
+      "manual_frontend": [
+        "cd C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+        "npm run typecheck",
+        "npm run build",
+        "node scripts/run-smoke-with-servers.mjs"
+      ],
+      "backend_baseline": [
+        "cd C:\\temp\\EverythingAI\\services\\api",
+        "npm test"
+      ]
+    },
+    "recommended_next_session_plan": {
+      "step_0": "Read this Phase 8.3A completion handover first, then read the Phase 8.2 Green CI baseline handover.",
+      "step_1": "Run git pull on main and verify the working tree is clean.",
+      "step_2": "Run the Windows clean-and-smoke helper or equivalent local validation.",
+      "step_3": "Proceed to Phase 8.3B release hardening: API key lifecycle UX, release checklist, and frontend cleanup without weakening governance.",
+      "step_4": "Keep connector chat disabled unless the user explicitly approves a later connector-chat phase.",
+      "step_5": "Create validation artifacts after each milestone-sized batch."
+    },
+    "remaining_phase_8_3_priorities": [
+      "Phase 8.3B release hardening and release checklist update.",
+      "API key lifecycle UX: saved / replace / clear visibility.",
+      "Frontend modularization and cleanup of legacy admin paths.",
+      "Richer citation/source highlighting and extracted document formatting.",
+      "Track GitHub Actions Node runtime warning maintenance.",
+      "Track frontend dependency audit warnings without force-upgrading blindly."
+    ],
+    "known_risks_and_followups": [
+      "Branch protection is not yet enforced. CI validates pushes but does not block direct pushes to main unless GitHub branch protection is configured later.",
+      "Production readiness remains about 30-40%; authentication, users, tenants, secure credential storage, and production infrastructure remain later roadmap items.",
+      "Agent chat must not be enabled until connector-specific setup, security review, and explicit user approval are complete.",
+      "The Windows clean-and-smoke helper stops local Node processes on ports 4100 and 5151-5155. Use it only for EverythingAI local validation sessions."
+    ],
+    "final_status": "EverythingAI Phase 8.3A Connector Diagnostics UX and local validation helper work is complete and green. Next recommended work is Phase 8.3B release hardening."
+  }
+}
