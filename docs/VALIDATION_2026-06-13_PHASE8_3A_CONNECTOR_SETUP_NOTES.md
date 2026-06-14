@@ -45,20 +45,28 @@ The Playwright smoke test now checks that Admin Settings includes:
 - No provider configuration behavior changed.
 - Trust, quality, human validation, and evidence provenance rules were not changed.
 
-## Expected validation
+## Validation result
 
-Run from apps/everything-ai-ui:
+Status: GREEN
 
-- npm run typecheck
-- npm run build
-- node scripts/run-smoke-with-servers.mjs
+User validated locally after narrowing the smoke selector for the External app session note.
 
-Expected result:
+Results:
 
-- Typecheck passes.
-- Build passes.
-- Playwright smoke passes.
+- Typecheck: PASS
+- Production build: PASS
+- Local smoke runner: PASS
+- Playwright smoke: 4 passed, 0 failed
+- Duration: about 10.0 seconds
+
+The passing smoke run confirms:
+
+- Client Workspace remains separated from Admin Dashboard.
+- Admin Settings shows Admin Agent Connectors.
+- Connector-specific setup notes are visible.
+- Readiness rule is visible.
+- Backend API remains reachable.
 
 ## Follow-up
 
-After this validates green, the next safe batch should add a small Admin-only connector setup progress snapshot that summarizes Codex and Claude Code readiness at the top of the panel.
+Next safe batch: add a small Admin-only connector setup progress snapshot that summarizes Codex and Claude Code readiness at the top of the panel.
