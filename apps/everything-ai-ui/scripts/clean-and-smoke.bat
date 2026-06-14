@@ -128,11 +128,32 @@ if errorlevel 1 (
 set "BUILD_RESULT=PASS"
 
 echo.
-echo Running local smoke runner...
-node scripts/run-smoke-with-servers.mjs
+echo Verifying Node runtime before smoke...
+where node >nul 2>nul
 if errorlevel 1 (
-  set "SMOKE_RESULT=FAILED"
-  echo ERROR: smoke runner failed.
+  set "SMOKE_RESULT=FAILED - node command not found"
+  echo ERROR: Node.js was not found on PATH, so the smoke runner cannot start.
+  echo.
+  echo === EVERYTHINGAI VALIDATION SUMMARY ===
+  echo Port cleanup: PASS
+  echo Stopped ports: %STOPPED_PORTS%
+  echo Git pull: %GIT_RESULT%
+  echo Typecheck: %TYPECHECK_RESULT%
+  echo Build: %BUILD_RESULT%
+  echo Smoke: %SMOKE_RESULT%
+  echo Final result: FAILED
+  echo Copy this summary back to ChatGPT.
+  echo =======================================
+  exit /b 1
+)
+
+echo Running local smoke runner...
+set "SMOKE_RESULT=STARTED"
+call node scripts/run-smoke-with-servers.mjs
+set "SMOKE_EXIT_CODE=%ERRORLEVEL%"
+if not "%SMOKE_EXIT_CODE%"=="0" (
+  set "SMOKE_RESULT=FAILED - smoke runner exited with code %SMOKE_EXIT_CODE%"
+  echo ERROR: smoke runner failed with exit code %SMOKE_EXIT_CODE%.
   echo.
   echo === EVERYTHINGAI VALIDATION SUMMARY ===
   echo Port cleanup: PASS
