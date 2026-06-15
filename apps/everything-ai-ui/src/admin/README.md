@@ -22,14 +22,37 @@ Admin/operator code belongs under this folder and may include workflows such as:
 - provider governance
 - source path management
 - automation governance
+- agent connector diagnostics
 
 ## Current State
 
-`AdminApp.tsx` currently wraps the existing `AppComplete.tsx` implementation. This is intentional as a low-risk first step.
+`AdminApp.tsx` is the admin entry boundary and currently renders the modular `AdminRuntimeApp.tsx` implementation.
+
+Legacy operator prototypes remain in the root `src/` folder for reference during migration only:
+
+```txt
+apps/everything-ai-ui/src/App.tsx
+apps/everything-ai-ui/src/AppEnhanced.tsx
+apps/everything-ai-ui/src/AppComplete.tsx
+```
+
+These legacy files are intentionally excluded from strict frontend typechecking in:
+
+```txt
+apps/everything-ai-ui/tsconfig.json
+```
+
+The active admin path must continue through:
+
+```txt
+apps/everything-ai-ui/src/admin/AdminApp.tsx
+apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx
+apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx
+```
 
 ## Split Plan
 
-Extract from `AppComplete.tsx` in this order:
+Continue extracting and validating admin runtime code in this order:
 
 1. `components/AdminHeader.tsx`
 2. `components/DashboardView.tsx`
@@ -48,4 +71,9 @@ Extract from `AppComplete.tsx` in this order:
 - Do not import admin components into `UserApp.tsx`.
 - Do not expose destructive workflows in the user UI.
 - Keep `main.tsx` pointed at `UserApp.tsx` unless intentionally testing admin locally.
+- Keep `admin.html` / admin entry routing pointed at the admin boundary.
+- Keep provider selection, API keys, remote-provider policy, planning policy, and Agent Connectors admin-only.
+- Keep agent bridge execution disabled by default.
+- Keep agent chat execution disabled by default.
+- Do not enable arbitrary browser-submitted shell commands.
 - Permanent purge remains forbidden in the local MVP.
