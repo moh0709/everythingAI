@@ -116,6 +116,17 @@ export type AgentDetectionResult = {
   message: string;
 };
 
+export type AgentProbeResult = {
+  agentId: string;
+  action: string;
+  command?: string;
+  bridgeEnabled?: boolean;
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  message: string;
+};
+
 export type ProviderModels = Record<ProviderName, Array<{ id: string; name: string }>>;
 
 export async function getProviderSettings(options: ApiOptions) {
@@ -147,7 +158,7 @@ export async function detectAllAgentIntegrations(options: ApiOptions) {
 }
 
 export async function runAgentProbe(options: ApiOptions, agentId: string, action = 'version') {
-  return apiRequest<{ agentId: string; action: string; ok: boolean; stdout: string; stderr: string; message: string }>(options, '/api/agent-bridge/probe', { agentId, action }, 'POST');
+  return apiRequest<AgentProbeResult>(options, '/api/agent-bridge/probe', { agentId, action }, 'POST');
 }
 
 export async function getAgentIntegrations(options: ApiOptions) {
