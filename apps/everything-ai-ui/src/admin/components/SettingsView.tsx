@@ -1,22 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Settings } from 'lucide-react';
-import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings, ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
+import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings, AgentProbeResult, ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
 import type { SourcePathRecord } from '../../sourcePathsApi';
 import { AgentConnectorsPanel } from './AgentConnectorsPanel';
 import { PlanningPolicyPanel } from './PlanningPolicyPanel';
 import { ProviderConfigurationPanel } from './ProviderConfigurationPanel';
 import { ProviderSelectorPanel } from './ProviderSelectorPanel';
-
-type AgentProbeResult = {
-  agentId: string;
-  action: string;
-  command?: string;
-  bridgeEnabled?: boolean;
-  ok: boolean;
-  stdout: string;
-  stderr: string;
-  message: string;
-};
 
 type SettingsViewProps = {
   baseUrl: string;
