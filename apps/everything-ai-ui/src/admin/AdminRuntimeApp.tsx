@@ -10,6 +10,7 @@ import {
   testProviderConnection,
   type AgentBridgeStatus,
   type AgentDetectionResult,
+  type AgentProbeResult,
   type ProviderName,
   type ProviderSettings,
 } from '../providerSettingsApi';
@@ -26,17 +27,6 @@ import {
   useAdminWorkspaceData,
 } from './hooks';
 import type { AdminSection } from './types';
-
-type AgentProbeResult = {
-  agentId: string;
-  action: string;
-  command?: string;
-  bridgeEnabled?: boolean;
-  ok: boolean;
-  stdout: string;
-  stderr: string;
-  message: string;
-};
 
 export function AdminRuntimeApp() {
   const [section, setSection] = useState<AdminSection>('dashboard');
