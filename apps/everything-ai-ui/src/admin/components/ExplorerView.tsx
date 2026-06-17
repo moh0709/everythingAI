@@ -1,5 +1,6 @@
 import type { IndexedFile } from '../../api';
 import { extractedTextPreviewStyle } from '../../shared/extractedTextPreviewStyle';
+import { selectExtractedPreviewText } from '../../shared/selectExtractedPreviewText';
 import { formatSize } from '../utils/format';
 
 type FilePreview = {
@@ -57,7 +58,7 @@ export function ExplorerView({
   setFilterStatus,
   extensionOptions,
 }: ExplorerViewProps) {
-  const previewText = selectedPreview?.previewText || selectedPreview?.extracted_text || selectedPreview?.file?.extracted_text || '';
+  const previewText = selectExtractedPreviewText(selectedPreview);
 
   return <section>
     <div className="explorer-search">
