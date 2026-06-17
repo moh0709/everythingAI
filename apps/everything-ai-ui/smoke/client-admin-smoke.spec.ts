@@ -51,7 +51,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await input.fill(smokePrompt);
     await page.locator('main').getByRole('button', { name: /^Ask$/ }).click();
 
-    const userMessage = page.locator('.chat-message.user p', { hasText: smokePrompt }).last();
+    const userMessage = page.locator('.chat-bubble.user p', { hasText: smokePrompt }).last();
     await expect(userMessage).toBeVisible();
     await page.waitForTimeout(1000);
     await saveScreenshot(page, '05-client-ask-after-message');
