@@ -2,29 +2,15 @@
 
 Date: 2026-06-14
 Phase: 8.3B release hardening
-Status: API key lifecycle UX batch GREEN
+Status: Multiple Phase 8.3B batches GREEN locally
 
 ## Source of truth
 
-Latest handover to read first:
+Latest handover to read first: docs/HANDOVER_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_COMPLETION.json
 
-```text
-docs/HANDOVER_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_COMPLETION.json
-```
+Phase 8.3A validated baseline: GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
 
-Phase 8.3A validated baseline:
-
-```text
-GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
-```
-
-Recommended local validation helper:
-
-```bat
-cd C:\temp\EverythingAI\apps\everything-ai-ui
-git pull
-.\scripts\clean-and-smoke.bat
-```
+Recommended local validation helper: cd C:\temp\EverythingAI\apps\everything-ai-ui, then git pull, then .\scripts\clean-and-smoke.bat
 
 ## Release hardening scope
 
@@ -48,59 +34,58 @@ git pull
 - [x] Windows clean-and-smoke helper.
 - [x] Phase 8.3A completion handover.
 
-## Phase 8.3B active checklist
+## Phase 8.3B completed green batches
 
 ### API key lifecycle UX
 
-- [x] Show when the active remote-provider API key is not configured.
-- [x] Show when a replacement API key is staged locally before saving.
-- [x] Keep saved secrets masked instead of rendering the saved sentinel as visible field content.
-- [x] Provide clear operator copy for saved / replace / clear behavior.
-- [x] Provide a clear saved-key removal action when the backend reports a saved key.
-- [x] Cover the lifecycle UI in the admin smoke test.
-- [x] Fix strict OpenAI selector ambiguity in the admin smoke test.
-- [x] Improve smoke-helper diagnostics for the smoke stage.
+- [x] No-key, saved-key, replacement-key, and clear-key states are visible to admins.
+- [x] Saved secrets remain masked.
+- [x] Admin smoke coverage exists for the lifecycle UI.
+- [x] Smoke selector ambiguity was fixed.
+- [x] Smoke-helper diagnostics were improved.
+- [x] Local validation confirmed GREEN.
+- Validation artifact: docs/VALIDATION_2026-06-14_PHASE8_3B_API_KEY_LIFECYCLE_UX.md
+
+### Admin cleanup and shared frontend types
+
+- [x] Stale admin boundary documentation corrected.
+- [x] Active modular admin runtime path documented.
+- [x] Legacy root app files documented as reference-only prototypes.
+- [x] AgentProbeResult frontend type centralized in providerSettingsApi.ts.
+- [x] AdminRuntimeApp.tsx and SettingsView.tsx consume the shared probe-result type.
+- [x] Local validation confirmed GREEN.
+- Validation artifact: docs/VALIDATION_2026-06-14_PHASE8_3B_ADMIN_CLEANUP_SHARED_TYPES.md
+
+### Wiki chunk citation highlighting
+
+- [x] Chunk-level citation references are preserved when opening Knowledge Base source previews.
+- [x] Existing WikiView.tsx chunk-ref handling can pass the exact source chunk to WikiSourcePreviewDrawer.
+- [x] Backend schema and API contracts remain unchanged.
+- [x] Local validation confirmed GREEN.
+- Validation artifact: docs/VALIDATION_2026-06-14_PHASE8_3B_WIKI_CHUNK_CITATION_HIGHLIGHTING.md
 
 ### Release checklist and validation discipline
 
 - [x] Add this Phase 8.3B release-hardening checklist.
-- [x] Run local Windows validation after pulling latest `main`.
-- [x] Record green local validation artifact after `clean-and-smoke.bat` passes.
+- [x] Run local Windows validation after pulling latest main for each completed batch.
+- [x] Record green local validation artifacts for completed batches where connector writes succeeded.
 - [ ] Confirm GitHub Actions state after the pushed commits finish.
 
-Confirmed local validation summary:
+Confirmed local validation summary for completed batches: GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
 
-```text
-GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
-```
-
-### Deferred / tracked follow-ups
+## Deferred / tracked follow-ups
 
 - [ ] Continue frontend modularization and cleanup of legacy admin paths without broad refactors.
-- [ ] Improve citation/source highlighting and extracted document formatting.
+- [ ] Improve extracted document formatting.
+- [ ] Continue citation/source highlighting polish beyond chunk-ref preservation.
 - [ ] Track GitHub Actions Node runtime warning maintenance.
 - [ ] Track frontend dependency audit warnings without force-upgrading blindly.
 
-## Required validation commands before declaring a future Phase 8.3B batch complete
+## Required validation before declaring a future Phase 8.3B batch complete
 
-```bat
-cd C:\temp\EverythingAI\apps\everything-ai-ui
-git pull
-.\scripts\clean-and-smoke.bat
-```
+Run the local Windows helper from apps/everything-ai-ui after pulling latest main. Expected final summary: GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS.
 
-Expected final summary:
-
-```text
-GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS
-```
-
-Optional backend baseline:
-
-```bat
-cd C:\temp\EverythingAI\services\api
-npm test
-```
+Optional backend baseline: run npm test from services/api.
 
 ## Notes
 
