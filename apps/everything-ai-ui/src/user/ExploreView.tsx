@@ -25,6 +25,12 @@ type ExploreViewProps = {
   saveConnection: () => void;
 };
 
+const extractedTextPreviewStyle: React.CSSProperties = {
+  margin: 0,
+  fontFamily: 'inherit',
+  overflowWrap: 'anywhere',
+};
+
 export function ExploreView({
   error, busy, status, baseUrl, setBaseUrl, token, setToken,
   query, setQuery, files, selectedFile, documentContext,
@@ -109,7 +115,7 @@ export function ExploreView({
           <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
           {documentContext.insight?.summary && <><h3>File Insight</h3><p>{documentContext.insight.summary}</p></>}
           <h3>Extracted File Text</h3>
-          <pre className="preview-box text-preview">{documentContext.previewText || 'No preview text available.'}</pre>
+          <pre className="preview-box text-preview" style={extractedTextPreviewStyle}>{documentContext.previewText || 'No preview text available.'}</pre>
         </> : <p>Select a file to inspect extracted file content. To read saved knowledge pages, open Knowledge Base.</p>}
       </aside>
     </section>
