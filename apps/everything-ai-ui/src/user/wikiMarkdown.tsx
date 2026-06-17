@@ -37,7 +37,7 @@ export function findWikiPageByLabel(pages: WikiPage[], label: string) {
 }
 
 export function normalizeCitationRef(part: string): string {
-  return part.slice(1, -1).split(':')[0];
+  return part.replace(/^\[/, '').replace(/\]$/, '');
 }
 
 function escapeRegExp(value: string) {
