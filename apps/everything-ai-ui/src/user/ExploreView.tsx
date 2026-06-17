@@ -3,6 +3,7 @@ import { FileText, Search, Server } from 'lucide-react';
 import { formatSize } from './userUtils';
 import type { DocumentContext } from './types';
 import type { IndexedFile } from '../api';
+import { extractedTextPreviewStyle } from '../shared/extractedTextPreviewStyle';
 import './localSettingsHelp.css';
 
 type ExploreViewProps = {
@@ -23,12 +24,6 @@ type ExploreViewProps = {
   handleAskFromHero: () => void;
   loadDocumentContext: (fileId: string) => void;
   saveConnection: () => void;
-};
-
-const extractedTextPreviewStyle: React.CSSProperties = {
-  margin: 0,
-  fontFamily: 'inherit',
-  overflowWrap: 'anywhere',
 };
 
 export function ExploreView({
