@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { IndexedFile } from '../../api';
 import { formatSize } from '../utils/format';
 
@@ -24,6 +25,12 @@ type ExplorerViewProps = {
   filterStatus: string;
   setFilterStatus: (status: string) => void;
   extensionOptions: string[];
+};
+
+const extractedTextPreviewStyle: CSSProperties = {
+  margin: 0,
+  fontFamily: 'inherit',
+  overflowWrap: 'anywhere',
 };
 
 function dynamicTags(file?: IndexedFile, preview?: FilePreview | null) {
@@ -135,7 +142,7 @@ export function ExplorerView({
             <p>{selectedPreview.insight.summary}</p>
           </>}
           <h3>Content Preview</h3>
-          <pre className="preview-box text-preview">{previewText || 'Select a file to load extracted text and insight preview.'}</pre>
+          <pre className="preview-box text-preview" style={extractedTextPreviewStyle}>{previewText || 'Select a file to load extracted text and insight preview.'}</pre>
         </>}
       </aside>
     </div>
