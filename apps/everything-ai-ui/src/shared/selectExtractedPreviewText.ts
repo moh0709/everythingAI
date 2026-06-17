@@ -1,4 +1,4 @@
-type ExtractedPreviewSource = {
+export type ExtractedPreviewSource = {
   previewText?: string | null;
   extracted_text?: string | null;
   file?: object | null;
