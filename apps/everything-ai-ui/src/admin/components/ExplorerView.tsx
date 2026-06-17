@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
 import type { IndexedFile } from '../../api';
+import { extractedTextPreviewStyle } from '../../shared/extractedTextPreviewStyle';
 import { formatSize } from '../utils/format';
 
 type FilePreview = {
@@ -25,12 +25,6 @@ type ExplorerViewProps = {
   filterStatus: string;
   setFilterStatus: (status: string) => void;
   extensionOptions: string[];
-};
-
-const extractedTextPreviewStyle: CSSProperties = {
-  margin: 0,
-  fontFamily: 'inherit',
-  overflowWrap: 'anywhere',
 };
 
 function dynamicTags(file?: IndexedFile, preview?: FilePreview | null) {
