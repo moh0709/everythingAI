@@ -135,7 +135,7 @@ export function ExplorerView({
             <p>{selectedPreview.insight.summary}</p>
           </>}
           <h3>Content Preview</h3>
-          <div className="preview-box text-preview">{previewText || 'Select a file to load extracted text and insight preview.'}</div>
+          <pre className="preview-box text-preview">{previewText || 'Select a file to load extracted text and insight preview.'}</pre>
         </>}
       </aside>
     </div>
