@@ -46,16 +46,17 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await page.getByRole('navigation').getByRole('button', { name: 'Ask AI' }).click();
     await expect(page.getByRole('heading', { name: 'Ask AI about the Knowledge Base' })).toBeVisible();
 
+    const smokePrompt = 'Smoke test: confirm what source this answer is based on.';
     const input = page.getByPlaceholder('Ask about the knowledge base, file content, source context, or extracted documents...');
-    await input.fill('Smoke test: confirm what source this answer is based on.');
+    await input.fill(smokePrompt);
     await page.locator('main').getByRole('button', { name: /^Ask$/ }).click();
 
-    await expect(page.getByText('Smoke test: confirm what source this answer is based on.')).toBeVisible();
+    const userMessage = page.locator('.chat-message.user p', { hasText: smokePrompt }).last();
+    await expect(userMessage).toBeVisible();
     await page.waitForTimeout(1000);
     await saveScreenshot(page, '05-client-ask-after-message');
 
-    const lastUserMessage = page.getByText('Smoke test: confirm what source this answer is based on.');
-    await expect(lastUserMessage).toBeInViewport();
+    await expect(userMessage).toBeInViewport();
   });
 
   test('admin dashboard is clearly separated from client workspace', async ({ page }) => {
