@@ -1,4 +1,5 @@
 import type { SetupStep } from './types';
+export { formatSize } from '../shared/formatSize';
 
 export const DEFAULT_API = 'http://127.0.0.1:4100';
 export const DEFAULT_TOKEN = 'replace-with-your-local-development-token';
@@ -16,13 +17,6 @@ export const INITIAL_SETUP_STEPS: SetupStep[] = [
   { id: 'insights', label: 'Generate source insights', status: 'waiting' },
   { id: 'ready', label: 'Workspace ready', status: 'waiting' },
 ];
-
-export function formatSize(bytes = 0) {
-  if (!bytes) return '0 Bytes';
-  if (bytes < 1024) return `${bytes} Bytes`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
-  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
-}
 
 export function filePathHref(filePath = '') {
   if (!filePath) return '';
