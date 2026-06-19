@@ -1,13 +1,11 @@
 import type { IndexedFile } from '../../api';
 import { extractedTextPreviewStyle } from '../../shared/extractedTextPreviewStyle';
 import { selectExtractedPreviewText } from '../../shared/selectExtractedPreviewText';
+import type { ExtractedPreviewSource } from '../../shared/selectExtractedPreviewText';
 import { formatSize } from '../utils/format';
 
-type FilePreview = {
-  file?: IndexedFile & { extracted_text?: string };
+type FilePreview = NonNullable<ExtractedPreviewSource> & {
   insight?: { summary?: string; classification?: string } | null;
-  previewText?: string;
-  extracted_text?: string;
 };
 
 type ExplorerViewProps = {
