@@ -1,5 +1,6 @@
 import type { IndexedFile } from '../../api';
 import { ExtractedTextPreview } from '../../shared/ExtractedTextPreview';
+import { formatDate } from '../../shared/formatDate';
 import type { ExtractedPreviewSource } from '../../shared/selectExtractedPreviewText';
 import { formatSize } from '../utils/format';
 
@@ -112,7 +113,7 @@ export function ExplorerView({
             <td>{file.absolute_path}</td>
             <td><span className="chip blue">{file.extension || 'file'}</span></td>
             <td>{formatSize(file.size_bytes)}</td>
-            <td>{file.modified_at ? new Date(file.modified_at).toLocaleDateString() : '-'}</td>
+            <td>{formatDate(file.modified_at)}</td>
           </tr>)}
         </tbody>
       </table>
