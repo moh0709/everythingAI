@@ -1,12 +1,16 @@
 import React from 'react';
 import { extractedTextPreviewStyle } from './extractedTextPreviewStyle';
+import { selectExtractedPreviewText } from './selectExtractedPreviewText';
+import type { ExtractedPreviewSource } from './selectExtractedPreviewText';
 
 type ExtractedTextPreviewProps = {
-  text: string;
+  source: ExtractedPreviewSource;
   fallback: string;
 };
 
-export function ExtractedTextPreview({ text, fallback }: ExtractedTextPreviewProps) {
+export function ExtractedTextPreview({ source, fallback }: ExtractedTextPreviewProps) {
+  const text = selectExtractedPreviewText(source);
+
   return React.createElement(
     'pre',
     {
