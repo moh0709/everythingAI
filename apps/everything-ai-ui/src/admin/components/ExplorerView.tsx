@@ -1,6 +1,5 @@
 import type { IndexedFile } from '../../api';
 import { ExtractedTextPreview } from '../../shared/ExtractedTextPreview';
-import { selectExtractedPreviewText } from '../../shared/selectExtractedPreviewText';
 import type { ExtractedPreviewSource } from '../../shared/selectExtractedPreviewText';
 import { formatSize } from '../utils/format';
 
@@ -56,8 +55,6 @@ export function ExplorerView({
   setFilterStatus,
   extensionOptions,
 }: ExplorerViewProps) {
-  const previewText = selectExtractedPreviewText(selectedPreview);
-
   return <section>
     <div className="explorer-search">
       <input
@@ -135,7 +132,7 @@ export function ExplorerView({
             <p>{selectedPreview.insight.summary}</p>
           </>}
           <h3>Content Preview</h3>
-          <ExtractedTextPreview text={previewText} fallback="Select a file to load extracted text and insight preview." />
+          <ExtractedTextPreview source={selectedPreview} fallback="Select a file to load extracted text and insight preview." />
         </>}
       </aside>
     </div>
