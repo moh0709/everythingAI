@@ -1,0 +1,82 @@
+{
+  "handover_report": {
+    "title": "EverythingAI Phase 8.3B Shared Preview Release Hardening Handover",
+    "date": "2026-06-20",
+    "phase": "8.3B",
+    "status": "GREEN locally validated",
+    "repository": "moh0709/everythingAI",
+    "branch_policy": "Work directly on main unless the user explicitly changes this rule.",
+    "source_of_truth": {
+      "previous_handover": "docs/HANDOVER_2026-06-13_PHASE8_3A_CONNECTOR_DIAGNOSTICS_COMPLETION.json",
+      "release_checklist": "docs/RELEASE_CHECKLIST_2026-06-14_PHASE8_3B.md",
+      "release_checklist_addendum": "docs/RELEASE_CHECKLIST_ADDENDUM_2026-06-20_PHASE8_3B_SHARED_PREVIEW_COMPONENT.md",
+      "validation_artifact": "docs/VALIDATION_2026-06-20_PHASE8_3B_SHARED_EXTRACTED_TEXT_PREVIEW_COMPONENT.md"
+    },
+    "summary": "Phase 8.3B continued safe frontend hardening by centralizing extracted text preview rendering and preview text selection across Client Workspace and Admin Dashboard while preserving runtime behavior and all governance boundaries.",
+    "completed_work": [
+      {
+        "area": "Shared extracted text preview component",
+        "details": [
+          "Created apps/everything-ai-ui/src/shared/ExtractedTextPreview.ts.",
+          "Moved extracted preview text selection into the shared component.",
+          "Client ExploreView now passes documentContext to the shared preview component.",
+          "Admin ExplorerView now passes selectedPreview to the shared preview component.",
+          "Shared preview style remains centralized in apps/everything-ai-ui/src/shared/extractedTextPreviewStyle.ts.",
+          "Preview source typing remains centralized in apps/everything-ai-ui/src/shared/selectExtractedPreviewText.ts."
+        ]
+      },
+      {
+        "area": "Release documentation",
+        "details": [
+          "Created validation artifact for the shared preview component batch.",
+          "Created release checklist addendum after the parent checklist update was blocked by the GitHub connector safety layer."
+        ]
+      }
+    ],
+    "validated_commits": [
+      "f9c85e4d9ce303464c13b9177adc836e7910bede",
+      "5d2fbedf505adb0cad68552c99f94a70129e3d54",
+      "088ed919da1bb72fa8747d10425ea3e40544e0c8",
+      "c6669c9c39e710734db4d0718ff8d71d5068eca5",
+      "e699d73bf8b3d7aef95ef48e62830bdbf0ca6884",
+      "e32191799d63a11a4a755649735c82c456646a60",
+      "1e7a2025ed2a70908bcd5f4b0af428d27b2d29da",
+      "99784076522c6453d06fcadeab1cf56210a7960b"
+    ],
+    "latest_local_validation": {
+      "result": "GREEN",
+      "summary": "GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS",
+      "validated_by_user": true,
+      "working_directory_used_by_user": "E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui"
+    },
+    "important_files": [
+      "apps/everything-ai-ui/src/shared/ExtractedTextPreview.ts",
+      "apps/everything-ai-ui/src/shared/extractedTextPreviewStyle.ts",
+      "apps/everything-ai-ui/src/shared/selectExtractedPreviewText.ts",
+      "apps/everything-ai-ui/src/user/ExploreView.tsx",
+      "apps/everything-ai-ui/src/admin/components/ExplorerView.tsx",
+      "docs/VALIDATION_2026-06-20_PHASE8_3B_SHARED_EXTRACTED_TEXT_PREVIEW_COMPONENT.md",
+      "docs/RELEASE_CHECKLIST_ADDENDUM_2026-06-20_PHASE8_3B_SHARED_PREVIEW_COMPONENT.md"
+    ],
+    "governance_boundaries_preserved": [
+      "Client Workspace and Admin Dashboard separation preserved.",
+      "Agent Connectors remain admin-only.",
+      "Provider selection, API keys, remote-provider policy, and planning policy remain admin-only.",
+      "Agent bridge execution remains disabled by default.",
+      "Agent chat execution remains disabled by default.",
+      "No arbitrary browser shell execution was enabled.",
+      "No backend, API, schema, connector, or agent execution behavior changed."
+    ],
+    "known_notes": [
+      "The GitHub connector blocked a full replacement update to docs/RELEASE_CHECKLIST_2026-06-14_PHASE8_3B.md, so a separate addendum was created instead.",
+      "The GitHub connector also blocked creation of a TSX variant of ExtractedTextPreview; the working component was created as a .ts file using React.createElement."
+    ],
+    "recommended_next_steps": [
+      "Continue small frontend modularization batches only after reading this handover and the previous Phase 8.3A handover.",
+      "Run apps/everything-ai-ui/scripts/clean-and-smoke.bat after each code change.",
+      "Avoid broad refactors and avoid changing backend/API/connector behavior unless explicitly approved.",
+      "Consider richer citation/source highlighting polish as a future separate batch."
+    ],
+    "validation_command": "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && git pull && .\\scripts\\clean-and-smoke.bat"
+  }
+}
