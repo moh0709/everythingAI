@@ -132,7 +132,7 @@ export function ExplorerView({
             <p>{selectedPreview.insight.summary}</p>
           </>}
           <h3>Content Preview</h3>
-          <ExtractedTextPreview source={selectedPreview} fallback="Select a file to load extracted text and insight preview." />
+          <ExtractedTextPreview source={selectedPreview} fallback="Select a file to load extracted text and insight preview." label="Admin extracted file text preview" />
         </>}
       </aside>
     </div>
