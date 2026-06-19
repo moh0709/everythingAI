@@ -3,7 +3,7 @@ import { FileText, Search, Server } from 'lucide-react';
 import { formatSize } from './userUtils';
 import type { DocumentContext } from './types';
 import type { IndexedFile } from '../api';
-import { extractedTextPreviewStyle } from '../shared/extractedTextPreviewStyle';
+import { ExtractedTextPreview } from '../shared/ExtractedTextPreview';
 import { selectExtractedPreviewText } from '../shared/selectExtractedPreviewText';
 import './localSettingsHelp.css';
 
@@ -113,7 +113,7 @@ export function ExploreView({
           <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
           {documentContext.insight?.summary && <><h3>File Insight</h3><p>{documentContext.insight.summary}</p></>}
           <h3>Extracted File Text</h3>
-          <pre className="preview-box text-preview" style={extractedTextPreviewStyle}>{previewText || 'No preview text available.'}</pre>
+          <ExtractedTextPreview text={previewText} fallback="No preview text available." />
         </> : <p>Select a file to inspect extracted file content. To read saved knowledge pages, open Knowledge Base.</p>}
       </aside>
     </section>
