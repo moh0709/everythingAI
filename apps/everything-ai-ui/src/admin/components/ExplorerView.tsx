@@ -1,5 +1,6 @@
 import type { IndexedFile } from '../../api';
 import { ExtractedTextPreview } from '../../shared/ExtractedTextPreview';
+import { FILE_STATUS_FILTER_OPTIONS } from '../../shared/fileStatusOptions';
 import { formatDate } from '../../shared/formatDate';
 import type { ExtractedPreviewSource } from '../../shared/selectExtractedPreviewText';
 import { formatSize } from '../utils/format';
@@ -83,11 +84,7 @@ export function ExplorerView({
       <label>
         Status
         <select value={filterStatus} onChange={(event) => setFilterStatus(event.target.value)}>
-          <option value="all">All statuses</option>
-          <option value="indexed">Indexed</option>
-          <option value="failed">Failed</option>
-          <option value="extracted">Extracted</option>
-          <option value="unsupported">Unsupported</option>
+          {FILE_STATUS_FILTER_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         </select>
       </label>
       <span>{files.length}/{allFiles.length} files visible</span>
