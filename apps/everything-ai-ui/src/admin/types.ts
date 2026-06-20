@@ -1,1 +1,1 @@
-export type AdminSection = 'dashboard' | 'explorer' | 'planning' | 'analytics' | 'settings' | 'askai';
+export type AdminSection = 'dashboard' | 'explorer' | 'planning' | 'analytics' | 'settings' | 'agentConnectors' | 'askai';
