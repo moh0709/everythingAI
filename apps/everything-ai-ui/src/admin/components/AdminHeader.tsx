@@ -10,14 +10,14 @@ type AdminHeaderProps = {
   activeProvider: ProviderName;
 };
 
-const NAV_ITEMS: Array<{ id: AdminSection; label: string }> = [
-  { id: 'dashboard', label: 'Dashboard' },
-  { id: 'explorer', label: 'Files & Content' },
-  { id: 'planning', label: 'Planning' },
-  { id: 'askai', label: 'Ask AI' },
-  { id: 'agentConnectors', label: 'Agent Connectors' },
-  { id: 'analytics', label: 'Analytics' },
-  { id: 'settings', label: 'Settings' },
+const NAV_ITEMS: Array<{ id: string; target: AdminSection; label: string }> = [
+  { id: 'dashboard', target: 'dashboard', label: 'Dashboard' },
+  { id: 'explorer', target: 'explorer', label: 'Files & Content' },
+  { id: 'planning', target: 'planning', label: 'Planning' },
+  { id: 'askai', target: 'askai', label: 'Ask AI' },
+  { id: 'agentConnectors', target: 'settings', label: 'Agent Connectors' },
+  { id: 'analytics', target: 'analytics', label: 'Analytics' },
+  { id: 'settings', target: 'settings', label: 'Settings' },
 ];
 
 export function AdminHeader({ section, setSection, loadAudit, activeProvider }: AdminHeaderProps) {
@@ -26,8 +26,8 @@ export function AdminHeader({ section, setSection, loadAudit, activeProvider }: 
     <nav>
       {NAV_ITEMS.map((item) => <button
         key={item.id}
-        className={section === item.id ? 'active' : ''}
-        onClick={() => item.id === 'analytics' ? loadAudit() : setSection(item.id)}
+        className={section === item.target ? 'active' : ''}
+        onClick={() => item.target === 'analytics' ? loadAudit() : setSection(item.target)}
       >
         {item.label}
       </button>)}
