@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Activity, AlertTriangle, BookOpen, Bot, CheckCircle2, ClipboardCheck, ShieldCheck, Terminal } from 'lucide-react';
 import { agentCatalog } from '../../providerCatalog';
-import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings } from '../../providerSettingsApi';
+import type { AgentBridgeStatus, AgentDetectionResult, AgentIntegrationSettings, AgentProbeResult } from '../../providerSettingsApi';
 
 type AgentConnectorsPanelProps = {
   agentIntegrations: Record<string, AgentIntegrationSettings>;
@@ -14,17 +14,6 @@ type AgentConnectorsPanelProps = {
   detectAllAgents: () => void;
   probeAgent: (agentId: string) => void;
   busy: boolean;
-};
-
-type AgentProbeResult = {
-  agentId: string;
-  action: string;
-  command?: string;
-  bridgeEnabled?: boolean;
-  ok: boolean;
-  stdout: string;
-  stderr: string;
-  message: string;
 };
 
 const PHASE_83A_TARGETS = new Set(['codex', 'claudeCode']);
@@ -250,6 +239,20 @@ function primaryTargetProgress({
   });
 }
 
+function phase83CloseoutSummary(primaryProgress: Array<{ ready: boolean; done: number; total: number }>) {
+  const readyCount = primaryProgress.filter((item) => item.ready).length;
+  const totalChecks = primaryProgress.reduce((sum, item) => sum + item.total, 0);
+  const doneChecks = primaryProgress.reduce((sum, item) => sum + item.done, 0);
+  const allReady = readyCount === primaryProgress.length && primaryProgress.length > 0;
+
+  return {
+    allReady,
+    tone: allReady ? 'ready' : 'working',
+    label: allReady ? 'Phase 8.3 connector closeout gates passed' : 'Phase 8.3 connector closeout gates pending',
+    detail: `${readyCount}/${primaryProgress.length} primary connector(s) ready · ${doneChecks}/${totalChecks} total setup checks complete`,
+  };
+}
+
 export function AgentConnectorsPanel({
   agentIntegrations,
   bridgeStatus,
@@ -267,6 +270,7 @@ export function AgentConnectorsPanel({
   const missingCount = Object.values(detectionResults).filter((result) => !result.found).length;
   const probePassCount = Object.values(probeResults).filter((result) => result.ok).length;
   const primaryProgress = primaryTargetProgress({ agentIntegrations, bridgeStatus, detectionResults, probeResults });
+  const closeoutSummary = phase83CloseoutSummary(primaryProgress);
 
   return <section className="panel">
     <div className="panel-title">
@@ -278,6 +282,10 @@ export function AgentConnectorsPanel({
         <button className="outline" onClick={refreshAgentBridgeStatus} disabled={busy}>Refresh Bridge</button>
         <button className="outline" onClick={detectAllAgents} disabled={busy}>Detect All</button>
       </div>
+    </div>
+
+    <div className={`status-strip ${closeoutSummary.tone}`}>
+      {closeoutSummary.allReady ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />} {closeoutSummary.label}: {closeoutSummary.detail}
     </div>
 
     <div className="settings-help-grid">
