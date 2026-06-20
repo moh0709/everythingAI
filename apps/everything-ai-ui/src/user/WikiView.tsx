@@ -86,6 +86,7 @@ export function WikiView({
     return map;
   }, [selectedWikiPage]);
 
+  const activeCitationRef = activeChunkRef || activeSourceRef;
   const citationCoverageLabel = formatCitationCoverage(selectedWikiPage?.citation_coverage_score);
   const sourceFingerprint = shortHash(selectedWikiPage?.source_fingerprint);
   const pageSearchMatchCount = selectedWikiPage ? countMarkdownMatches(selectedWikiPage.markdown, pageSearchTerm) : 0;
@@ -181,7 +182,7 @@ export function WikiView({
             {pageSearchTerm ? <span>{pageSearchMatchCount} match(es)</span> : <span>Knowledge page search</span>}
             {pageSearchTerm ? <button type="button" className="outline" onClick={() => setPageSearchTerm('')} aria-label="Clear knowledge page search"><X size={14} /> Clear</button> : null}
           </div>
-          <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleSourceCitationClick} searchTerm={pageSearchTerm} />
+          <MarkdownArticle markdown={selectedWikiPage.markdown} pages={wiki?.pages || []} onWikiLink={openWikiPage} onSourceRefClick={handleSourceCitationClick} searchTerm={pageSearchTerm} activeCitationRef={activeCitationRef} />
         </> : <p>Select a knowledge page.</p>}
       </section>
 
