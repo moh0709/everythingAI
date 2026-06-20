@@ -15,6 +15,7 @@ const NAV_ITEMS: Array<{ id: AdminSection; label: string }> = [
   { id: 'explorer', label: 'Files & Content' },
   { id: 'planning', label: 'Planning' },
   { id: 'askai', label: 'Ask AI' },
+  { id: 'agentConnectors', label: 'Agent Connectors' },
   { id: 'analytics', label: 'Analytics' },
   { id: 'settings', label: 'Settings' },
 ];
