@@ -79,6 +79,20 @@
   padding: 0.02rem 0.14rem;
 }
 
+.wiki-source-ref.active,
+.wiki-source-ref-btn.active {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16), 0 10px 24px rgba(99, 102, 241, 0.2);
+  transform: translateY(-1px);
+}
+
+.wiki-source-ref-btn.active:focus-visible {
+  outline: 3px solid rgba(168, 85, 247, 0.35);
+  outline-offset: 2px;
+}
+
 .wiki-table-wrap {
   max-width: 100%;
   overflow-x: auto;
