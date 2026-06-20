@@ -21,6 +21,7 @@ type MarkdownRenderOptions = {
   onWikiLink?: (pageId: string) => void;
   onSourceRefClick?: (ref: string) => void;
   searchTerm?: string;
+  activeCitationRef?: string | null;
 };
 
 type MarkdownImage = {
@@ -38,6 +39,17 @@ export function findWikiPageByLabel(pages: WikiPage[], label: string) {
 
 export function normalizeCitationRef(part: string): string {
   return part.replace(/^\[/, '').replace(/\]$/, '');
+}
+
+function baseCitationRef(ref?: string | null) {
+  return normalizeCitationRef(ref || '').split(':')[0];
+}
+
+function isActiveCitationRef(ref: string, activeCitationRef?: string | null) {
+  const normalizedRef = normalizeCitationRef(ref);
+  const normalizedActiveRef = normalizeCitationRef(activeCitationRef || '');
+  if (!normalizedRef || !normalizedActiveRef) return false;
+  return normalizedRef === normalizedActiveRef || baseCitationRef(normalizedRef) === baseCitationRef(normalizedActiveRef);
 }
 
 function escapeRegExp(value: string) {
@@ -99,7 +111,7 @@ export function countMarkdownMatches(markdown: string, searchTerm: string) {
 }
 
 export function renderInlineMarkdown(text: string, options: MarkdownRenderOptions = {}): ReactNode[] {
-  const { pages = [], onWikiLink, onSourceRefClick, searchTerm } = options;
+  const { pages = [], onWikiLink, onSourceRefClick, searchTerm, activeCitationRef } = options;
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[\[.+?\]\]|\[S\d+(?::C\d+)?\])/g).filter(Boolean);
   return parts.map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**')) return <strong key={index}>{highlightText(part.slice(2, -2), searchTerm)}</strong>;
@@ -113,10 +125,11 @@ export function renderInlineMarkdown(text: string, options: MarkdownRenderOption
       return <span key={index} className="wiki-link">{highlightText(label, searchTerm)}</span>;
     }
     if (/^\[S\d+(?::C\d+)?\]$/.test(part)) {
+      const activeClassName = isActiveCitationRef(part, activeCitationRef) ? ' active' : '';
       if (onSourceRefClick) {
-        return <button key={index} type="button" className="wiki-source-ref wiki-source-ref-btn" onClick={() => onSourceRefClick(normalizeCitationRef(part))}>{part}</button>;
+        return <button key={index} type="button" className={`wiki-source-ref wiki-source-ref-btn${activeClassName}`} aria-current={activeClassName ? 'location' : undefined} onClick={() => onSourceRefClick(normalizeCitationRef(part))}>{part}</button>;
       }
-      return <sup key={index} className="wiki-source-ref">{part}</sup>;
+      return <sup key={index} className={`wiki-source-ref${activeClassName}`}>{part}</sup>;
     }
     return highlightText(part, searchTerm);
   });
@@ -219,7 +232,7 @@ function renderMarkdownLines(lines: string[], options: MarkdownRenderOptions = {
   return nodes;
 }
 
-function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick, searchTerm }: { sections: MarkdownSection[]; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void; searchTerm?: string }) {
+function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick, searchTerm, activeCitationRef }: { sections: MarkdownSection[]; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void; searchTerm?: string; activeCitationRef?: string | null }) {
   const [activeTitle, setActiveTitle] = useState(sections[0]?.title || '');
   const activeSection = sections.find((section) => section.title === activeTitle) || sections[0];
 
@@ -250,21 +263,21 @@ function WikiTabbedSections({ sections, pages, onWikiLink, onSourceRefClick, sea
         ))}
       </div>
       <div className="wiki-tab-panel" role="tabpanel">
-        {renderMarkdownLines(activeSection.lines, { pages, onWikiLink, onSourceRefClick, searchTerm })}
+        {renderMarkdownLines(activeSection.lines, { pages, onWikiLink, onSourceRefClick, searchTerm, activeCitationRef })}
       </div>
     </details>
   );
 }
 
-export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick, searchTerm }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void; searchTerm?: string }) {
+export function MarkdownArticle({ markdown, pages, onWikiLink, onSourceRefClick, searchTerm, activeCitationRef }: { markdown: string; pages?: WikiPage[]; onWikiLink?: (pageId: string) => void; onSourceRefClick?: (ref: string) => void; searchTerm?: string; activeCitationRef?: string | null }) {
   const { visibleLines, tabbedSections } = useMemo(() => splitArticleSections(markdown.split('\n')), [markdown]);
-  const documentContent = renderMarkdownLines(visibleLines, { pages, onWikiLink, onSourceRefClick, searchTerm }, true);
+  const documentContent = renderMarkdownLines(visibleLines, { pages, onWikiLink, onSourceRefClick, searchTerm, activeCitationRef }, true);
 
   return <article className="wiki-article">
     <section className="wiki-document-content">
       <div className="wiki-document-content-label">Document Content</div>
       {documentContent}
     </section>
-    <WikiTabbedSections sections={tabbedSections} pages={pages} onWikiLink={onWikiLink} onSourceRefClick={onSourceRefClick} searchTerm={searchTerm} />
+    <WikiTabbedSections sections={tabbedSections} pages={pages} onWikiLink={onWikiLink} onSourceRefClick={onSourceRefClick} searchTerm={searchTerm} activeCitationRef={activeCitationRef} />
   </article>;
 }
