@@ -1,0 +1,105 @@
+{
+  "handover_report": {
+    "title": "EverythingAI Phase 8.3 Closeout Candidate Handover",
+    "date": "2026-06-20",
+    "phase": "8.3",
+    "status": "closeout candidate - frontend hardening green, connector manual gates remain",
+    "repository": "moh0709/everythingAI",
+    "branch_policy": "Work directly on main unless the user explicitly changes this rule.",
+    "source_of_truth": {
+      "roadmap": "docs/ROADMAP.md",
+      "previous_handover": "docs/HANDOVER_2026-06-20_PHASE8_3B_SHARED_PREVIEW_RELEASE_HARDENING.json",
+      "latest_validation_artifact": "docs/VALIDATION_2026-06-20_PHASE8_3B_WIKI_ACTIVE_CITATION_HIGHLIGHTING.md",
+      "release_checklist": "docs/RELEASE_CHECKLIST_2026-06-14_PHASE8_3B.md",
+      "release_checklist_addendum": "docs/RELEASE_CHECKLIST_ADDENDUM_2026-06-20_PHASE8_3B_SHARED_PREVIEW_COMPONENT.md"
+    },
+    "executive_summary": "Phase 8.3 has advanced from general release-hardening into a closeout-candidate state. The frontend hardening, extracted-text preview consolidation, shared format utilities, admin explorer cleanup, status filter centralization, and Knowledge Base active citation highlighting are locally GREEN validated. The remaining true closeout blockers are controlled manual connector-specific setup/testing for installed Codex and Claude Code, plus final release checklist completion after those manual gates.",
+    "completed_phase_8_3_work": [
+      {
+        "area": "API key lifecycle UX",
+        "status": "completed and green validated earlier in Phase 8.3B",
+        "summary": "Admin provider settings support saved/replaced/cleared API key semantics while preserving masking and backend key-preservation behavior."
+      },
+      {
+        "area": "Extracted text formatting and preview reuse",
+        "status": "completed and green validated",
+        "summary": "Client and Admin extracted text previews use shared preview selection, shared style, and a shared ExtractedTextPreview component. Formatting is preserved using pre-based rendering."
+      },
+      {
+        "area": "Frontend modularization and cleanup",
+        "status": "completed for multiple Phase 8.3-safe batches",
+        "summary": "Shared formatter utilities, shared date formatting, shared file status filter options, and admin explorer cleanup were implemented with repeated local GREEN validation."
+      },
+      {
+        "area": "Knowledge Base citation/source highlighting",
+        "status": "completed and green validated",
+        "summary": "Knowledge Base article citations now keep active citation state visible across article rendering, source rail context, and source preview drawer interactions."
+      },
+      {
+        "area": "Connector-specific admin guidance",
+        "status": "implemented in Admin Agent Connectors panel",
+        "summary": "Admin-only connector panel includes Codex and Claude Code setup checklists, diagnostics progress snapshot, setup notes, guardrails, and chat-disabled readiness rules."
+      }
+    ],
+    "latest_green_validation": {
+      "result": "GREEN",
+      "summary": "GREEN - git pull PASS, typecheck PASS, build PASS, smoke PASS",
+      "validated_by_user": true,
+      "working_directory_used_by_user": "E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui",
+      "validated_commits": [
+        "d8b1f4c1911ff33200d1cf6d46700723e598947d",
+        "31fb9c13c17c73de1bf4b53858db6bbf151404cd",
+        "ff45ed5e730b6f22862fa220722f63ce5fffaeaa",
+        "a3d2b4b514e649f09d133c94de81a03c1adf220c"
+      ]
+    },
+    "important_files": [
+      "apps/everything-ai-ui/src/user/wikiMarkdown.tsx",
+      "apps/everything-ai-ui/src/user/WikiView.tsx",
+      "apps/everything-ai-ui/src/user/wikiMarkdown.css",
+      "apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx",
+      "apps/everything-ai-ui/src/shared/ExtractedTextPreview.ts",
+      "apps/everything-ai-ui/src/shared/selectExtractedPreviewText.ts",
+      "apps/everything-ai-ui/src/shared/extractedTextPreviewStyle.ts",
+      "apps/everything-ai-ui/src/shared/formatSize.ts",
+      "apps/everything-ai-ui/src/shared/formatDate.ts",
+      "apps/everything-ai-ui/src/shared/fileStatusOptions.ts",
+      "apps/everything-ai-ui/src/admin/components/ExplorerView.tsx",
+      "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx"
+    ],
+    "governance_boundaries_preserved": [
+      "Client Workspace and Admin Dashboard separation preserved.",
+      "Agent Connectors remain admin-only.",
+      "Provider selection, API keys, remote-provider policy, and planning policy remain admin-only.",
+      "Agent bridge execution remains disabled by default.",
+      "Agent chat execution remains disabled by default.",
+      "No arbitrary browser shell execution was enabled.",
+      "No backend, API, database schema, connector execution, or provider runtime behavior changed in the latest frontend hardening batches."
+    ],
+    "remaining_closeout_gates": [
+      {
+        "gate": "Controlled Codex connector-specific setup/testing",
+        "status": "manual gate remains",
+        "requirement": "Run Admin Agent Connectors controlled setup checklist for Codex in local environment. Confirm safe command, PATH detection, connector enabled only for diagnostics, bridge flag verified, version probe completed, and connector chat disabled."
+      },
+      {
+        "gate": "Controlled Claude Code connector-specific setup/testing",
+        "status": "manual gate remains",
+        "requirement": "Run Admin Agent Connectors controlled setup checklist for Claude Code in local environment. Confirm safe command, PATH detection, connector enabled only for diagnostics, bridge flag verified, version probe completed, and connector chat disabled."
+      },
+      {
+        "gate": "Final Phase 8.3 release checklist update",
+        "status": "pending manual connector gates",
+        "requirement": "Create final Phase 8.3 completion artifact only after connector-specific gates are validated or explicitly deferred."
+      }
+    ],
+    "recommended_next_step": "Use the Admin Dashboard Agent Connectors panel to perform controlled Codex and Claude Code connector-specific checks, then record a final Phase 8.3 validation/completion artifact.",
+    "validation_command": "cd E:\\01PROJEKTER\\EverythingAI\\apps\\everything-ai-ui && git pull && .\\scripts\\clean-and-smoke.bat",
+    "phase_8_3_completion_estimate": {
+      "frontend_release_hardening": "90-95%",
+      "knowledge_base_polish": "85-90%",
+      "connector_specific_manual_gates": "40-60% depending on local Codex/Claude checks",
+      "overall_phase_8_3": "80-85% closeout candidate"
+    }
+  }
+}
