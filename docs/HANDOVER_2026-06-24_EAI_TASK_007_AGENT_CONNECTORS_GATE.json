@@ -1,27 +1,52 @@
 {
-  "repository": "moh0709/everythingAI",
-  "branch": "main",
-  "taskId": "EAI-TASK-007",
+  "task": "EAI-TASK-007",
   "issueNumber": 29,
-  "finalStatus": "BLOCKED",
-  "artifactCommitSha": "5db17fecd0e79300a0a5df21065b5518ebbd9b31",
-  "validationStatusSummary": {
+  "title": "Validate Admin Agent Connectors readiness gate",
+  "status": "BLOCKED",
+  "summary": "Admin connector readiness is safety-gated and the UI boundary remains admin-only, but Codex and Claude Code are not installed on PATH so the gate cannot be marked usable today.",
+  "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
-    "agentConnectorDetection": "PASS",
-    "agentVersionProbes": "PASS",
+    "detectAgentConnectors": "PASS",
+    "probeAgentVersions": "PASS (safe probes only; Codex and Claude Code skipped because they were not on PATH)",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS"
   },
-  "hermesReadyForRealTasks": false,
-  "remainingRisks": [
-    "Codex CLI is not installed or not on PATH on the validation machine.",
-    "Claude Code CLI is not installed or not on PATH on the validation machine."
+  "connectors": {
+    "codex": {
+      "detected": false,
+      "version": null,
+      "usableToday": false,
+      "setupNeeded": "Install Codex and make the CLI available on PATH"
+    },
+    "claudeCode": {
+      "detected": false,
+      "version": null,
+      "usableToday": false,
+      "setupNeeded": "Install Claude Code and make the CLI available on PATH"
+    }
+  },
+  "backendSafety": [
+    "Bridge execution is disabled by default",
+    "Only safe version/help probes are allowed",
+    "Unsafe commands are rejected before execution",
+    "Chat execution remains disabled by default"
   ],
-  "recommendedNextPMTask": "Install the Codex and Claude Code CLIs on the validation machine and rerun the readiness gate.",
-  "notes": [
-    ".hermes/state.json did not exist, so it was not created or updated.",
-    "Validation output was captured in LOGS/EAI-TASK-007-terminal.log."
-  ]
+  "adminBoundary": [
+    "Agent Connectors are mounted from the admin settings view",
+    "AdminHeader routes the Agent Connectors nav item to the admin connector anchor",
+    "The connector panel states it is admin/operator only and not exposed in the Client Workspace"
+  ],
+  "blockers": [
+    "Codex CLI not on PATH",
+    "Claude Code CLI not on PATH"
+  ],
+  "recommendedNextTask": "Install and PATH-enable Codex and Claude Code, then rerun the readiness gate.",
+  "artifacts": {
+    "terminalLog": "LOGS/EAI-TASK-007-terminal.log",
+    "report": "REPORTS/EAI-TASK-007-AGENT-CONNECTORS-READINESS-GATE.md",
+    "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_007_AGENT_CONNECTORS_GATE.json",
+    "artifactCommitSha": "TBD_AFTER_COMMIT"
+  }
 }
