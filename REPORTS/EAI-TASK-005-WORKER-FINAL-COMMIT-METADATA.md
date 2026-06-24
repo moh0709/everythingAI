@@ -10,7 +10,7 @@
 - **Current branch:** `main`
 - **Starting commit SHA:** `29f0be988b49b68be5e3ed312139b502341fb9eb`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `4f2a7a7307d49a5dcb7be2edae495aeeecabe491`
 - **Final SHA source of truth:** `GitHub issue comment after artifact push`
 
 ## Files changed
@@ -31,9 +31,9 @@
 
 ## Lifecycle notes
 
-- Issue comment: `{"task":"EAI-TASK-005","status":"PASS","finalCommitSha":"PENDING_COMMIT_SHA","finalizationPattern":"Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth."}`
+- Issue comment: `{"task":"EAI-TASK-005","status":"PASS","artifactCommitSha":"4f2a7a7307d49a5dcb7be2edae495aeeecabe491","finalizationPattern":"Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth."}`
 - Labels updated: `hermes:working -> pm:review + hermes:done`
-- Final SHA handling: The report uses a pre-commit placeholder for the first artifact pass and will be synchronized to the real artifact commit SHA in the follow-up metadata commit.
+- Final SHA handling: The report uses a pre-commit placeholder for the first artifact pass and then records the real artifact commit SHA in the committed metadata update.
 
 ## Skipped commands / reasons
 
