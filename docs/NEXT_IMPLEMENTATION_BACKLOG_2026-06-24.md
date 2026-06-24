@@ -1,6 +1,6 @@
 # Next Implementation Backlog — 2026-06-24
 
-This backlog follows the Phase 8.3 closeout and prioritizes the next concrete product-development work. The order below reflects roadmap priority and readiness risk.
+Phase 8.3 is now closed. This backlog follows the closeout and prioritizes the next concrete product-development work. The order below reflects roadmap priority and readiness risk.
 
 ## 1) Controlled connector-specific setup/testing for installed Codex
 - **Why it matters:** Codex is now detected and version-probed successfully; the remaining work is controlled setup/testing, not new connector discovery.
