@@ -1,0 +1,49 @@
+{
+  "task": "EAI-TASK-009",
+  "issueNumber": 31,
+  "title": "Rerun Admin Connector readiness after CLI install",
+  "status": "PASS",
+  "summary": "Codex and Claude Code are installed and PATH-verified, safe version probes passed, and the Admin Connector readiness gate is cleared.",
+  "validation": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "apiTests": "PASS",
+    "detectAgentConnectors": "PASS",
+    "probeAgentVersions": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "codexCommand": "PASS",
+    "claudeCommand": "PASS"
+  },
+  "connectors": {
+    "codex": {
+      "detected": true,
+      "command": "/usr/bin/codex",
+      "version": "codex-cli 0.142.0",
+      "usableToday": true
+    },
+    "claudeCode": {
+      "detected": true,
+      "command": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)",
+      "usableToday": true
+    }
+  },
+  "safety": {
+    "bridgeEnabledForVersionProbe": true,
+    "chatEnabled": false,
+    "unsafeCommandsBlocked": true,
+    "productionBehaviorChanged": false
+  },
+  "adminUiBoundaryResult": "PASS",
+  "connectorGateCleared": true,
+  "blockers": [],
+  "recommendedNextTask": "PM review and issue closure.",
+  "artifacts": {
+    "terminalLog": "LOGS/EAI-TASK-009-terminal.log",
+    "report": "REPORTS/EAI-TASK-009-ADMIN-CONNECTOR-READINESS-RERUN.md",
+    "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_009_CONNECTORS_READY.json",
+    "state": ".hermes/state.json",
+    "artifactCommitSha": "d0bd7f0281a8ea5fa0623f6868322db4d8b2950a"
+  }
+}
