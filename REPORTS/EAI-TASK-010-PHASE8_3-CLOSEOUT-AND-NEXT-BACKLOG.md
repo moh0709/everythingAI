@@ -48,4 +48,4 @@ No production app behavior was changed. This task was documentation, roadmap, an
 Why first: it is the most immediate remaining Phase 8.3 gap and is already called out as the top priority in the roadmap.
 
 ## Artifact commit SHA
-PENDING
+34f9c53b6c1d30b4bb6ec50c93cac5251986d092
