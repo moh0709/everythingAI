@@ -25,11 +25,11 @@ const requiredFiles = [
 function checkGh() {
   const status = spawnSync('gh', ['auth', 'status', '--hostname', 'github.com'], { encoding: 'utf8' });
   if (status.error) {
-    return { ok: false, detail: `gh auth status failed: ${status.error.message}` };
+    return { ok: false, detail: 'gh auth status failed to run' };
   }
   return {
     ok: status.status === 0,
-    detail: status.status === 0 ? 'gh authenticated' : status.stderr.trim() || status.stdout.trim() || 'gh auth status failed'
+    detail: status.status === 0 ? 'gh authenticated' : 'gh auth status reported a failure'
   };
 }
 
