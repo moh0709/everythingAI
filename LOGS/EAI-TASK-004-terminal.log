@@ -1,0 +1,60 @@
+# EAI-TASK-004 terminal log
+
+Repository: /root/.hermes/projects/everythingAI
+Branch: main
+Issue: #26 EAI-TASK-004: Implement Hermes worker lifecycle claim/report/state flow
+
+## Validation commands and outputs
+
+### 1) Framework doctor
+Command:
+`node scripts/framework-doctor.mjs`
+
+Result:
+```json
+{
+  "repoRoot": "/root/.hermes/projects/everythingAI/",
+  "status": "PASS",
+  "gh": {
+    "ok": true,
+    "detail": "gh authenticated"
+  },
+  "state": "valid json"
+}
+```
+
+### 2) Worker dry run
+Command:
+`npm run worker:once -- --dry-run`
+
+Result:
+```text
+[task-worker] Dry run selected: #26 EAI-TASK-004 EAI-TASK-004: Implement Hermes worker lifecycle claim/report/state flow
+[task-worker] Matching report exists: no
+[task-worker] Would write report: /root/.hermes/projects/everythingAI/REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md
+[task-worker] Would write log: /root/.hermes/projects/everythingAI/LOGS/EAI-TASK-004-terminal.log
+```
+
+### 3) UI typecheck
+Command:
+`cd apps/everything-ai-ui && npm run typecheck`
+
+Result: PASS
+
+### 4) UI build
+Command:
+`cd apps/everything-ai-ui && npm run build`
+
+Result: PASS
+
+### 5) API tests
+Command:
+`cd services/api && npm test`
+
+Result: PASS
+
+## Notes
+
+- The issue was temporarily toggled to `hermes:ready` to validate dry-run selection, then returned to `hermes:working`.
+- No application code paths were changed outside the Hermes worker/lifecycle framework files.
+- Final commit SHA was not yet known at the moment this log was written; it will be recorded after commit finalization.

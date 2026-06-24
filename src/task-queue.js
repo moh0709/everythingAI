@@ -1,10 +1,18 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const reportDir = resolve(repoRoot, 'REPORTS');
+const logDir = resolve(repoRoot, 'LOGS');
+const statePath = resolve(repoRoot, '.hermes/state.json');
+
+function ensureDir(path) {
+  if (!existsSync(path)) {
+    mkdirSync(path, { recursive: true });
+  }
+}
 
 function runGh(args) {
   const result = spawnSync('gh', args, { cwd: repoRoot, encoding: 'utf8' });
@@ -20,6 +28,18 @@ function runGh(args) {
 function taskToken(issue) {
   const match = issue?.title?.match(/EAI-TASK-\d+/i);
   return match ? match[0].toUpperCase() : null;
+}
+
+function issueTaskId(issue) {
+  return taskToken(issue) ?? `TASK-${issue.number}`;
+}
+
+function reportPathForIssue(issue) {
+  return resolve(reportDir, `${issueTaskId(issue)}-HERMES-WORKER-LIFECYCLE.md`);
+}
+
+function logPathForIssue(issue) {
+  return resolve(logDir, `${issueTaskId(issue)}-terminal.log`);
 }
 
 function hasMatchingReport(issue) {
@@ -48,9 +68,26 @@ export async function claimRunnableIssue({ issueNumber } = {}) {
 }
 
 export function summarizeIssue(issue) {
-  return `#${issue.number} ${issue.title}`;
+  return `#${issue.number} ${issueTaskId(issue)} ${issue.title}`;
 }
 
 export function matchingReportExists(issue) {
   return hasMatchingReport(issue);
+}
+
+export { ensureDir, issueTaskId, logDir, logPathForIssue, reportDir, reportPathForIssue, repoRoot, runGh, statePath };
+
+export function readStateIfPresent() {
+  if (!existsSync(statePath)) {
+    return null;
+  }
+  return JSON.parse(readFileSync(statePath, 'utf8'));
+}
+
+export function writeStateIfPresent(state) {
+  if (!existsSync(statePath)) {
+    return false;
+  }
+  writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`);
+  return true;
 }

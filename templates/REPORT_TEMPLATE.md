@@ -17,10 +17,16 @@
 
 ## Validation summary
 
+- Dry run: {{DRY_RUN}}
 - Framework doctor: {{FRAMEWORK_DOCTOR}}
 - UI typecheck: {{UI_TYPECHECK}}
 - UI build: {{UI_BUILD}}
 - API tests: {{API_TESTS}}
+
+## Lifecycle notes
+
+- Issue comment: {{ISSUE_COMMENT}}
+- Labels updated: {{LABELS}}
 
 ## Skipped commands / reasons
 
