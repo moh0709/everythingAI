@@ -1,0 +1,76 @@
+{
+  "task": "EAI-TASK-008",
+  "issueNumber": 30,
+  "title": "Install and verify Codex and Claude Code CLIs for connector gate",
+  "status": "PASS",
+  "summary": "Codex and Claude Code are installed and visible on PATH, safe version probes passed, and the connector readiness gate can be rerun with live CLI detection.",
+  "environment": {
+    "os": "Linux 6.8.0-100-generic x86_64",
+    "shell": "/usr/bin/bash",
+    "node": "v22.22.0",
+    "npm": "11.12.1"
+  },
+  "installActions": [
+    "npm install -g @openai/codex @anthropic-ai/claude-code",
+    "Verified codex at /usr/bin/codex",
+    "Verified claude at /usr/bin/claude"
+  ],
+  "validation": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "apiTests": "PASS",
+    "detectAgentConnectors": "PASS",
+    "probeAgentVersions": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS"
+  },
+  "connectors": {
+    "codex": {
+      "detected": true,
+      "command": "/usr/bin/codex",
+      "version": "codex-cli 0.142.0",
+      "usableToday": true
+    },
+    "claudeCode": {
+      "detected": true,
+      "command": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)",
+      "usableToday": true
+    },
+    "openCode": {
+      "detected": false,
+      "command": "opencode",
+      "version": null,
+      "usableToday": false,
+      "status": "skipped"
+    },
+    "kiloCode": {
+      "detected": false,
+      "command": "kilo",
+      "version": null,
+      "usableToday": false,
+      "status": "skipped"
+    },
+    "cline": {
+      "detected": false,
+      "command": "cline",
+      "version": null,
+      "usableToday": false,
+      "status": "skipped"
+    }
+  },
+  "safety": {
+    "bridgeEnabledForVersionProbe": true,
+    "chatEnabled": false,
+    "unsafeCommandsBlocked": true,
+    "productionBehaviorChanged": false
+  },
+  "blockers": [],
+  "recommendedNextTask": "Rerun the connector readiness gate task now that Codex and Claude Code are available on PATH.",
+  "artifacts": {
+    "terminalLog": "LOGS/EAI-TASK-008-terminal.log",
+    "report": "REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md",
+    "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json",
+    "artifactCommitSha": "pending"
+  }
+}
