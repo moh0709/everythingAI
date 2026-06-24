@@ -4,6 +4,7 @@
   "taskId": "EAI-TASK-006",
   "issueNumber": 28,
   "finalStatus": "PASS",
+  "artifactCommitSha": "e0ee190",
   "validationStatusSummary": {
     "frameworkDoctor": "PASS",
     "workerDryRun": "PASS",

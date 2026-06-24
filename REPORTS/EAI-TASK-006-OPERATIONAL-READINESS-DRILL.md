@@ -10,7 +10,7 @@
 - **Current branch:** `main`
 - **Issue number:** `28`
 - **Starting commit SHA:** `f72026ac053e0eb960eae4839f8b4467f7cdaefb`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `e0ee190`
 - **Finalization pattern:** Two-step post-commit finalization: commit artifacts first, then record the artifact commit SHA in the issue comment and state/report synchronization commit.
 
 ## Label lifecycle observed
@@ -31,7 +31,7 @@
 
 - `.hermes/state.json` exists and was updated for issue `28` / task `EAI-TASK-006`.
 - The file records the starting commit SHA, PASS result, and the two-step finalization pattern.
-- The artifact commit SHA will be written during the follow-up synchronization commit.
+- The artifact commit SHA is recorded as `e0ee190`.
 
 ## Commands skipped
 
