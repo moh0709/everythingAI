@@ -53,4 +53,4 @@ Install and PATH-enable Codex and Claude Code on the machine, then rerun the rea
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-007-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_007_AGENT_CONNECTORS_GATE.json`
-- Artifact commit SHA: `TBD_AFTER_COMMIT`
+- Artifact commit SHA: `334870af5a47336724ab26f830f37a1b87ca7265`

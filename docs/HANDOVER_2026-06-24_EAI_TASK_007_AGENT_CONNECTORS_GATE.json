@@ -47,6 +47,6 @@
     "terminalLog": "LOGS/EAI-TASK-007-terminal.log",
     "report": "REPORTS/EAI-TASK-007-AGENT-CONNECTORS-READINESS-GATE.md",
     "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_007_AGENT_CONNECTORS_GATE.json",
-    "artifactCommitSha": "TBD_AFTER_COMMIT"
+    "artifactCommitSha": "334870af5a47336724ab26f830f37a1b87ca7265"
   }
 }
