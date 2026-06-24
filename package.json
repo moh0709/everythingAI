@@ -1,0 +1,11 @@
+{
+  "name": "everythingai-root",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "framework:doctor": "node scripts/framework-doctor.mjs",
+    "worker:once": "node scripts/task-worker.mjs",
+    "worker:watch": "node scripts/task-poller.mjs --watch"
+  }
+}
