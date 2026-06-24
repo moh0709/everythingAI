@@ -3,7 +3,7 @@
 **Final status:** PASS
 
 ## Summary
-Reran the Admin Connector readiness gate after the Codex and Claude Code CLIs became available on the Hermes machine. The connector gate is now cleared: both target CLIs are detected on PATH and their safe version probes pass. No product behavior was changed.
+Reran the Admin Connector readiness gate after the Codex and Claude Code CLIs were confirmed available on the Hermes machine. The connector gate is cleared: both target CLIs are detected on PATH and their safe version probes pass. No product behavior was changed.
 
 ## Validation results
 - `git pull --ff-only` — PASS
@@ -50,7 +50,7 @@ Reran the Admin Connector readiness gate after the Codex and Claude Code CLIs be
 - Vite production build completed successfully.
 
 ## Admin UI boundary result
-PASS. Code inspection shows the Agent Connectors surface is mounted inside `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` and navigated from `AdminHeader.tsx` via the Admin-only settings route/hash handling. `AgentConnectorsPanel.tsx` explicitly states the connectors are admin-only and not exposed in the Client Workspace, and the panel footer reiterates that normal Client Workspace users remain provider-only.
+PASS. Code inspection shows the Agent Connectors surface is mounted inside `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` and navigated from `AdminHeader.tsx` via the Admin-only settings route/hash handling. `AgentConnectorsPanel.tsx` keeps the connector controls in the Admin settings area and the boundary remains unchanged.
 
 ## Files inspected
 - `services/api/src/agents/localAgentBridge.js`
@@ -60,7 +60,7 @@ PASS. Code inspection shows the Agent Connectors surface is mounted inside `apps
 - `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
 - `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
 - `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
-- `.hermes/state.json` — present and updated for this rerun
+- `.hermes/state.json` — not present in this checkout, so it was not created or updated
 
 ## Safety / boundary notes
 - The local agent bridge keeps arbitrary shell execution blocked.
@@ -72,4 +72,4 @@ PASS. Code inspection shows the Agent Connectors surface is mounted inside `apps
 Proceed to the next PM-approved EverythingAI task now that the connector gate is cleared.
 
 ## Artifact commit SHA
-996dd303c8586747b321a1d6c759d640db38c87f
+PENDING_FINAL_ISSUE_COMMENT

@@ -31,8 +31,8 @@
     }
   },
   "adminBoundaryResult": "PASS",
-  "stateFileUpdated": true,
-  "stateFilePath": ".hermes/state.json",
-  "artifactCommitSha": "996dd303c8586747b321a1d6c759d640db38c87f",
+  "stateFileUpdated": false,
+  "stateFilePath": ".hermes/state.json (absent in this checkout; not created per repo policy)",
+  "artifactCommitSha": "PENDING_FINAL_ISSUE_COMMENT",
   "nextRecommendedTask": "Proceed to the next PM-approved EverythingAI task now that the connector gate is cleared."
 }
