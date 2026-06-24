@@ -60,7 +60,7 @@ PASS. Code inspection shows the Agent Connectors surface is mounted inside `apps
 - `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
 - `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
 - `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
-- `.hermes/state.json` — not present in this repository, so no state update was made
+- `.hermes/state.json` — present and updated for this rerun
 
 ## Safety / boundary notes
 - The local agent bridge keeps arbitrary shell execution blocked.
@@ -72,4 +72,4 @@ PASS. Code inspection shows the Agent Connectors surface is mounted inside `apps
 Proceed to the next PM-approved EverythingAI task now that the connector gate is cleared.
 
 ## Artifact commit SHA
-915bf5f1f92cb58cda4b2c55f8ff65d1a8cbf93d
+996dd303c8586747b321a1d6c759d640db38c87f
