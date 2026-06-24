@@ -61,4 +61,4 @@ Rerun `EAI-TASK-007` / connector readiness gate now that Codex and Claude Code a
 - Terminal log: `LOGS/EAI-TASK-008-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json`
 - State file: `.hermes/state.json`
-- Artifact commit SHA: `pending`
+- Artifact commit SHA: `c1359acc1357df7251287afa18dc5b89f201b627`

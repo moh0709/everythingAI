@@ -71,6 +71,6 @@
     "terminalLog": "LOGS/EAI-TASK-008-terminal.log",
     "report": "REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md",
     "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json",
-    "artifactCommitSha": "pending"
+    "artifactCommitSha": "c1359acc1357df7251287afa18dc5b89f201b627"
   }
 }
