@@ -8,37 +8,42 @@
 
 - **Repository path used:** `/root/.hermes/projects/everythingAI`
 - **Current branch:** `main`
-- **Starting commit SHA:** `4d55e0a9d0fbbf4f9cc7d7a66df0d5f5f68f2d3b`
+- **Starting commit SHA:** `12c09a9a7740f33d64358fb260ef90ee9723c9b4`
 - **Final commit SHA:** `PENDING_COMMIT_SHA`
 
 ## Files changed
 
 - `.hermes/state.json`
-- `scripts/framework-doctor.mjs`
-- `templates/REPORT_TEMPLATE.md`
 - `LOGS/EAI-TASK-003-terminal.log`
 - `REPORTS/EAI-TASK-003-HERMES-FINALIZATION-SYNC.md`
 
 ## Validation summary
 
+- Dry run: N/A
 - Framework doctor: PASS
 - UI typecheck: PASS
 - UI build: PASS
 - API tests: PASS
 
+## Lifecycle notes
+
+- The repository already contained Hermes framework files, a valid `.hermes/state.json`, and a working report template.
+- The task was completed without changing production application logic.
+- Validation artifacts were written before final metadata reconciliation so the workflow can preserve a clear post-commit finalization pattern.
+
 ## Skipped commands / reasons
 
-- None
+- None.
 
 ## Follow-up
 
-- No further code changes required for this task.
-- The final GitHub issue comment will carry the real commit SHA after the commit is pushed.
+- After the commit SHA for the artifact set is known, the state file and final issue comment should be updated to reflect that SHA explicitly.
 
-## Finalization rule
+## Commit SHA rule
 
-`PENDING_COMMIT_SHA` is allowed only as a pre-commit placeholder. After the artifact commit exists, the final issue comment must record the actual commit SHA, and `.hermes/state.json` should be kept free of stale placeholder values for previously completed tasks.
+The report, GitHub issue comment, and state file must describe the same finalization story.
 
-## State synchronization note
-
-`.hermes/state.json` was updated so the prior completed task now stores a real final commit SHA instead of `PENDING_COMMIT_SHA`.
+- Before the artifact commit SHA is known, `PENDING_COMMIT_SHA` is acceptable as a temporary placeholder.
+- After the artifact commit exists, update the final issue comment, report, and `.hermes/state.json` so they reference the real artifact SHA.
+- If the workflow cannot update all three artifacts atomically, the report must explicitly describe the two-step finalization pattern that was used.
+- This task uses that two-step pattern so the metadata can be updated after the validation artifacts exist.
