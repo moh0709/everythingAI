@@ -7,6 +7,7 @@ Low-risk readiness smoke test for the EverythingAI repository. No core applicati
 - `git pull --ff-only`: already up to date.
 - Local branch: `main`
 - Commit before artifact commit: `f8e70a02c4fec5edc34b570e3f251851afa61af8`
+- Artifact commit SHA: `fd96591`
 
 ## Hermes framework readiness
 The following Hermes framework files are present in the repository:
