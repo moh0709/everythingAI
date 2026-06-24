@@ -45,4 +45,4 @@ Phase 8.3 is formally closed. Hermes onboarding is complete, the Admin Connector
 It is the highest-priority remaining Phase 8.3 item and the clearest next step after the connector gate was cleared.
 
 ## Artifact commit SHA
-PENDING_ARTIFACT_COMMIT_SHA
+c414d16
