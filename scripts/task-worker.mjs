@@ -102,7 +102,9 @@ function writeLifecycleArtifacts(issue, status, details) {
     REPO_PATH: repoRoot,
     BRANCH: 'main',
     START_SHA: details.startingCommitSha,
-    FINAL_SHA: details.finalCommitSha,
+    PRE_COMMIT_ARTIFACT_SHA: details.preCommitArtifactSha,
+    ARTIFACT_SHA: details.artifactCommitSha,
+    FINAL_SHA_SOURCE: details.finalShaSource,
     FILES_CHANGED: details.filesChanged,
     DRY_RUN: details.dryRun,
     FRAMEWORK_DOCTOR: details.frameworkDoctor,
@@ -111,6 +113,7 @@ function writeLifecycleArtifacts(issue, status, details) {
     API_TESTS: details.apiTests,
     ISSUE_COMMENT: details.issueComment,
     LABELS: details.labels,
+    FINAL_SHA_HANDLING: details.finalShaHandling,
     SKIPS: details.skips,
     FOLLOW_UP: details.followUp
   });
@@ -142,6 +145,7 @@ if (!issue) {
 
   updateState(issue, 'IN_PROGRESS', {
     startingCommitSha: startSha,
+    artifactCommitSha: null,
     finalCommitSha: null,
     startedAt: startTime
   });
@@ -159,14 +163,17 @@ if (!issue) {
 
   const details = {
     startingCommitSha: startSha,
-    finalCommitSha: 'PENDING_COMMIT_SHA',
+    preCommitArtifactSha: 'PENDING_COMMIT_SHA',
+    artifactCommitSha: 'recorded after artifact commit',
+    finalShaSource: 'GitHub issue comment after artifact push',
+    finalShaHandling: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.',
     filesChanged: '- `scripts/task-worker.mjs`\n- `scripts/task-poller.mjs`\n- `src/task-queue.js`\n- `templates/REPORT_TEMPLATE.md`\n- `.hermes/state.json`\n- `LOGS/EAI-TASK-004-terminal.log`\n- `REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md`',
     dryRun: 'N/A',
     frameworkDoctor: 'PENDING',
     uiTypecheck: 'PENDING',
     uiBuild: 'PENDING',
     apiTests: 'PENDING',
-    issueComment: JSON.stringify({ task: taskId, status: 'PASS', finalCommitSha: 'PENDING_COMMIT_SHA' }),
+    issueComment: JSON.stringify({ task: taskId, status: 'PASS', artifactCommitSha: 'recorded after artifact commit' }),
     labels: 'hermes:working -> pm:review + hermes:done',
     skips: '- Validation commands are intentionally not run by the lifecycle worker itself.',
     followUp: '- PM review should inspect the selected issue, generated report, and terminal log.'
@@ -175,7 +182,9 @@ if (!issue) {
   writeLifecycleArtifacts(issue, 'PASS', { ...details, logLines });
   updateState(issue, 'PASS', {
     startingCommitSha: startSha,
-    finalCommitSha: 'PENDING_COMMIT_SHA',
+    artifactCommitSha: 'recorded in the final issue comment',
+    finalCommitSha: 'recorded in the final issue comment',
+    finalizationPattern: 'Two-step post-commit finalization: commit artifacts first, then record the artifact commit SHA in the issue comment and state update.',
     startedAt: startTime,
     completedAt: nowIso()
   });
@@ -186,7 +195,8 @@ if (!issue) {
     claim: 'hermes:working -> hermes:done',
     report: reportPath,
     log: logPath,
-    finalCommitSha: 'PENDING_COMMIT_SHA'
+    finalCommitSha: 'recorded in the final issue comment',
+    finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.'
   };
   const commentResult = runGh(['issue', 'comment', String(issue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)]);
 

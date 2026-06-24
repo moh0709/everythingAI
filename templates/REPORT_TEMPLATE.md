@@ -9,7 +9,9 @@
 - **Repository path used:** `{{REPO_PATH}}`
 - **Current branch:** `{{BRANCH}}`
 - **Starting commit SHA:** `{{START_SHA}}`
-- **Final commit SHA:** `{{FINAL_SHA}}`
+- **Pre-commit artifact SHA placeholder:** `{{PRE_COMMIT_ARTIFACT_SHA}}`
+- **Artifact commit SHA:** `{{ARTIFACT_SHA}}`
+- **Final SHA source of truth:** `{{FINAL_SHA_SOURCE}}`
 
 ## Files changed
 
@@ -27,6 +29,7 @@
 
 - Issue comment: {{ISSUE_COMMENT}}
 - Labels updated: {{LABELS}}
+- Final SHA handling: {{FINAL_SHA_HANDLING}}
 
 ## Skipped commands / reasons
 
@@ -38,8 +41,8 @@
 
 ## Commit SHA rule
 
-The report, GitHub issue comment, and state file must converge on the same final commit SHA.
+The report, GitHub issue comment, and state file must describe the same artifact commit SHA even when the workflow uses a follow-up metadata commit.
 
-- Before the commit that produces the artifact SHA is known, it is acceptable to use `PENDING_COMMIT_SHA` as a temporary placeholder.
-- After the commit exists, update the final issue comment, report, and `.hermes/state.json` so they all reference the real final SHA.
-- If the workflow cannot update all three artifacts atomically, the report must explicitly describe the two-step finalization pattern that was used.
+- Before the artifact commit exists, `PENDING_COMMIT_SHA` is acceptable only as a temporary placeholder.
+- After the artifact commit exists, update the final issue comment, report, and `.hermes/state.json` so they all reference the real artifact SHA.
+- If a follow-up metadata commit is used, the report must explicitly state that the GitHub issue comment is the source of truth for the artifact commit SHA and that the metadata commit is a separate synchronization step.
