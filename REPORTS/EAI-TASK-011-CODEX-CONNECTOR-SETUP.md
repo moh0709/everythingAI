@@ -44,4 +44,4 @@ Codex is installed on PATH and can be safely detected and version-probed through
 - Continue with controlled connector-specific setup/testing for the other admin connector target, Claude Code.
 
 ## Artifact commit SHA
-PENDING_COMMIT_SHA
+e760ec9
