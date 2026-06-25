@@ -69,6 +69,11 @@ function shortHash(value?: string | null) {
   return value.slice(0, 10);
 }
 
+function formatCitationLabel(sourceRef?: string | null, chunkRef?: string | null) {
+  if (!sourceRef) return null;
+  return chunkRef ? `[${sourceRef}:${chunkRef}]` : `[${sourceRef}]`;
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
@@ -90,6 +95,12 @@ export function WikiView({
   const citationCoverageLabel = formatCitationCoverage(selectedWikiPage?.citation_coverage_score);
   const sourceFingerprint = shortHash(selectedWikiPage?.source_fingerprint);
   const pageSearchMatchCount = selectedWikiPage ? countMarkdownMatches(selectedWikiPage.markdown, pageSearchTerm) : 0;
+  const focusCitationLabel = formatCitationLabel(previewSource?.ref, activeChunkRef);
+
+  function closeSourcePreview() {
+    setPreviewSource(null);
+    setActiveChunkRef(null);
+  }
 
   function openSourcePreview(source?: WikiSource | null, chunkRef?: string | null) {
     if (!source) return;
@@ -190,6 +201,35 @@ export function WikiView({
         {selectedWikiPage ? <>
           <h3>File Sources</h3>
           <p className="muted">Original indexed files used as evidence for this saved knowledge page.</p>
+          {previewSource ? <section className="wiki-citation-focus" aria-label="Focused citation details">
+            <div className="wiki-citation-focus-top">
+              <span className="wiki-citation-focus-label">Citation focus</span>
+              <button type="button" className="outline" onClick={closeSourcePreview}>Close focus</button>
+            </div>
+            <p className="wiki-citation-focus-copy">
+              Inspecting {focusCitationLabel || '[citation]'} while keeping the knowledge page visible.
+            </p>
+            <dl className="wiki-citation-focus-meta">
+              <div>
+                <dt>Source</dt>
+                <dd>{previewSource.filename || 'Source file'}</dd>
+              </div>
+              <div>
+                <dt>Location</dt>
+                <dd>{previewSource.location || 'file-level source reference'}</dd>
+              </div>
+              {activeChunkRef ? <div>
+                <dt>Chunk</dt>
+                <dd>{activeChunkRef}</dd>
+              </div> : null}
+            </dl>
+            <div className="source-actions wiki-citation-focus-actions">
+              <button className="outline" onClick={() => copyCitationRef(previewSource.ref)}>Copy citation</button>
+              {previewSource.absolute_path ? <button className="outline" onClick={() => copySourcePath(previewSource.absolute_path)}>Copy path</button> : null}
+              {previewSource.file_id ? <button className="outline" onClick={() => openSourceContext(previewSource.file_id as string)}>Open file context</button> : null}
+              {previewSource.file_id ? <button className="outline" onClick={() => revealSourceFile(previewSource.file_id as string, previewSource.absolute_path || undefined)}>Reveal in folder</button> : null}
+            </div>
+          </section> : null}
           <div className="source-list compact-source-list">
             {selectedWikiPage.sources.map((source) => <div
               className={`source-card wiki-source-card${activeSourceRef === source.ref ? ' wiki-source-card-active' : ''}`}
@@ -215,10 +255,7 @@ export function WikiView({
     <WikiSourcePreviewDrawer
       source={previewSource}
       activeChunkRef={activeChunkRef}
-      onClose={() => {
-        setPreviewSource(null);
-        setActiveChunkRef(null);
-      }}
+      onClose={closeSourcePreview}
       onCopyCitation={copyCitationRef}
       onCopyPath={copySourcePath}
     />

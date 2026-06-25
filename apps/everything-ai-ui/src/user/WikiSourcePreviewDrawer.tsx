@@ -75,6 +75,30 @@ export function WikiSourcePreviewDrawer({
         {source.absolute_path ? <button type="button" className="outline" onClick={() => onCopyPath(source.absolute_path)}>Copy path</button> : null}
       </div>
 
+      <section className="wiki-citation-focus wiki-source-preview-focus" aria-label="Source citation focus">
+        <div className="wiki-citation-focus-top">
+          <span className="wiki-citation-focus-label">Active citation</span>
+          {normalizedActiveChunkRef ? <span className="wiki-source-preview-focus-pill">[{source.ref}:{normalizedActiveChunkRef}]</span> : null}
+        </div>
+        <p className="wiki-citation-focus-copy">
+          This drawer stays pinned to the citation so you can inspect source evidence without leaving the knowledge page.
+        </p>
+        <dl className="wiki-citation-focus-meta">
+          <div>
+            <dt>Source</dt>
+            <dd>{source.filename || 'Source preview'}</dd>
+          </div>
+          <div>
+            <dt>Location</dt>
+            <dd>{source.location || 'file-level source reference'}</dd>
+          </div>
+          {normalizedActiveChunkRef ? <div>
+            <dt>Chunk</dt>
+            <dd>{normalizedActiveChunkRef}</dd>
+          </div> : null}
+        </dl>
+      </section>
+
       {source.absolute_path ? (
         <div className="wiki-source-preview-path">
           <span>Path</span>

@@ -378,6 +378,85 @@
   white-space: nowrap;
 }
 
+.wiki-citation-focus {
+  margin: 1rem 0;
+  border: 1px solid #c7d2fe;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.06));
+  padding: 0.95rem 1rem;
+}
+
+.wiki-citation-focus-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.65rem;
+}
+
+.wiki-citation-focus-label,
+.wiki-source-preview-focus-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wiki-citation-focus-label {
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 0.28rem 0.52rem;
+}
+
+.wiki-source-preview-focus-pill {
+  border: 1px solid #ddd6fe;
+  background: #f5f3ff;
+  color: #6d28d9;
+  padding: 0.22rem 0.5rem;
+}
+
+.wiki-citation-focus-copy {
+  margin: 0;
+  color: #334155;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.wiki-citation-focus-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.65rem;
+  margin: 0.85rem 0 0;
+}
+
+.wiki-citation-focus-meta div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.wiki-citation-focus-meta dt {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wiki-citation-focus-meta dd {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.wiki-citation-focus-actions {
+  margin-top: 0.85rem;
+}
+
 .wiki-source-preview-path {
   display: grid;
   gap: 0.4rem;
