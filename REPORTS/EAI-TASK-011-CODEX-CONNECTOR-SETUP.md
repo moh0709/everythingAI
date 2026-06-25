@@ -1,48 +1,56 @@
-# EAI-TASK-011: Controlled Codex connector setup and safe probe verification
+# EAI-TASK-011: Codex Connector Setup and Safe Probe Verification
 
 **Final status:** PASS
 
 ## Summary
-Codex remains visible on PATH and safe to probe for admin/operator readiness checks. The required framework, API, and UI validation steps all passed. No production app behavior was changed.
+Validated that Codex remains available on PATH, reports the expected CLI version, and is handled only through the safe admin/operator connector path. The repo stayed on `main`, no core product code was changed, framework doctor passed, the API test suite passed, Codex detection/probe commands succeeded, and the UI typecheck/build checks passed.
 
 ## Validation results
-- `git pull --ff-only` — PASS (`Already up to date.`)
+- `git pull --ff-only` — PASS
+- `command -v codex` — PASS
+- `codex --version` — PASS
 - `node scripts/framework-doctor.mjs` — PASS
-- `cd services/api && npm test` — PASS (`113` tests, `112` passed, `1` skipped, `0` failed)
+- `cd services/api && npm test` — PASS
 - `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
 - `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
-- `command -v codex` — PASS
-- `codex --version` — PASS
 
 ## Codex readiness summary
-- **Codex command path:** `/usr/bin/codex`
-- **Codex version:** `codex-cli 0.142.0`
-- **Detection script result:** Codex detected on PATH; connector reported as local CLI, admin/operator-only, and not enabled by default.
-- **Version probe result:** Codex version probe completed successfully with the safe bridge flag enabled.
+- Command path: `/usr/bin/codex`
+- Version: `codex-cli 0.142.0`
+- Detection: PASS
+- Version probe: PASS
+- Result: Codex is usable for safe version/readiness probes on this machine.
 
 ## Backend safety findings
-- Bridge execution remains disabled by default.
-- Chat execution remains disabled by default.
-- Arbitrary shell commands stay blocked.
-- The Codex connector is treated as a local CLI/admin-capable integration, not a general workspace connector.
-- No unsafe command execution path was introduced.
+PASS. The backend bridge keeps execution constrained:
+- `services/api/src/agents/localAgentBridge.js` blocks arbitrary shell execution and only permits safe probe actions (`version`, `help`).
+- The bridge remains disabled unless `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true` is set locally.
+- Chat execution remains off unless both the bridge and chat flags are set locally.
+- `services/api/src/routes/agentBridge.routes.js` exposes only the controlled status, detect, probe, and chat endpoints; detection/probe routes do not execute arbitrary browser-supplied commands.
+- Detection/probe results stay limited to safe PATH checks and version probes.
 
 ## Admin UI boundary findings
-- Admin connector controls remain scoped to the admin UI surface.
-- No client workspace connector exposure was introduced.
-- The connector panel remains positioned as an admin/operator readiness feature.
-- Chat stayed off for this validation.
+PASS. The admin UI keeps connector controls scoped to Admin settings:
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx` routes `Agent Connectors` into Admin Settings using the `#agent-connectors` hash.
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` mounts `AgentConnectorsPanel` inside the admin settings experience.
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` documents Codex as a Phase 8.3A admin/operator target with chat disabled and readiness checks gated.
+- No Client Workspace connector controls were introduced.
 
-## Artifact and reporting notes
-- **Terminal log:** `LOGS/EAI-TASK-011-terminal.log`
-- **Handover JSON:** `docs/HANDOVER_2026-06-24_EAI_TASK_011_CODEX_CONNECTOR_SETUP.json`
-- **Artifact commit SHA:** `227d9bd`
-- `.hermes/state.json` existed and was updated for this task.
+## Reported connector detection/probe results
+- Codex was detected on PATH.
+- Codex version probe succeeded with `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true`.
+- The safe-probe path stayed in version mode only; no chat execution was enabled.
+- No new connector exposure was introduced beyond the admin/operator boundary already present in the repo.
 
 ## Blockers
 None.
 
 ## Recommended next task
-Proceed to controlled connector-specific setup/testing for installed Claude Code.
+Proceed with the next PM-reviewed ready issue in the queue. No additional Codex setup work is required from this task.
+
+## Artifacts
+- Terminal log: `LOGS/EAI-TASK-011-terminal.log`
+- Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_011_CODEX_CONNECTOR_SETUP.json`
+- Artifact commit SHA: `PENDING_COMMIT_SHA`

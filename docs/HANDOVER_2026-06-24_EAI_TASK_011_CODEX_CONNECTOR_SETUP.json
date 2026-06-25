@@ -4,22 +4,28 @@
   "taskId": "EAI-TASK-011",
   "issueNumber": 33,
   "finalStatus": "PASS",
-  "validationSummary": {
+  "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
-    "detectAgentConnectors": "PASS",
-    "probeAgentVersionsCodex": "PASS",
+    "connectorDetection": "PASS",
+    "connectorVersionProbe": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
-    "codexPath": "/usr/bin/codex",
-    "codexVersion": "codex-cli 0.142.0"
+    "codexPath": "PASS",
+    "codexVersion": "PASS"
   },
-  "hermesReadyForRealEverythingAITasks": true,
-  "remainingRisks": [
-    "The task relied on the existing Hermes state file; no product code changes were needed.",
-    "Codex setup remains admin/operator scoped and should stay chat-disabled unless explicitly approved."
-  ],
-  "recommendedNextPMTask": "Proceed to controlled connector-specific setup/testing for installed Claude Code.",
-  "artifactCommitSha": "227d9bd"
+  "codexReadiness": {
+    "command": "/usr/bin/codex",
+    "version": "codex-cli 0.142.0",
+    "detection": "PASS",
+    "probe": "PASS",
+    "safeProbeOnly": true
+  },
+  "backendSafety": "The local agent bridge remains disabled by default, rejects arbitrary shell execution, and only permits safe probe actions or opt-in local chat execution.",
+  "adminUiBoundary": "Connector controls remain inside apps/everything-ai-ui/src/admin/** with Admin-only routing to the Agent Connectors panel.",
+  "blockers": [],
+  "recommendedNextTask": "Proceed with the next PM-reviewed ready issue in the queue.",
+  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "updatedAt": "2026-06-25T06:51:56Z"
 }
