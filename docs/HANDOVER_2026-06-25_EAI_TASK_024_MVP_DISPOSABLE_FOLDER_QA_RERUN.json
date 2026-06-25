@@ -1,0 +1,67 @@
+{
+  "task": "EAI-TASK-024",
+  "title": "Re-run MVP disposable-folder QA after wiki repair",
+  "final_status": "PASS",
+  "environment": {
+    "os": "Linux vmi2938167 6.8.0-100-generic x86_64",
+    "node": "v22.22.0",
+    "npm": "11.12.1",
+    "repository_head_start": "dde5eda",
+    "api_db": "/tmp/eai-task-024.Cxsuql/everythingai.sqlite",
+    "disposable_folder": "/tmp/eai-task-024.Cxsuql/disposable-alpha"
+  },
+  "workflow_steps_validated": {
+    "prepare_disposable_folder": true,
+    "index_files": true,
+    "extract_readable_content": true,
+    "inspect_progress_status_visibility": true,
+    "search_indexed_content": true,
+    "inspect_extracted_preview_readability": true,
+    "build_persisted_wiki": true,
+    "wiki_evidence_source_route": true,
+    "wiki_validation_preview_route": true,
+    "diagnostics_trust_panels": true,
+    "no_destructive_file_actions": true
+  },
+  "workflow_steps_not_validated": [
+    {
+      "step": "browser_level_ui_interaction",
+      "reason": "This run validated the backend/API routes and returned JSON evidence instead."
+    }
+  ],
+  "validation_commands": [
+    { "command": "git pull --ff-only", "result": "PASS" },
+    { "command": "node scripts/framework-doctor.mjs", "result": "PASS" },
+    { "command": "cd apps/everything-ai-ui && npm run typecheck", "result": "PASS" },
+    { "command": "cd apps/everything-ai-ui && npm run build", "result": "PASS" },
+    { "command": "cd services/api && npm test", "result": "PASS" }
+  ],
+  "runtime_qa": [
+    { "command": "GET /health", "result": "PASS" },
+    { "command": "POST /api/index", "result": "PASS" },
+    { "command": "POST /api/extract", "result": "PASS" },
+    { "command": "GET /api/files", "result": "PASS" },
+    { "command": "GET /api/search?q=supplier", "result": "PASS" },
+    { "command": "GET /api/files/:fileId/preview", "result": "PASS" },
+    { "command": "GET /api/intelligence/document-context/:fileId", "result": "PASS" },
+    { "command": "GET /api/status", "result": "PASS" },
+    { "command": "POST /api/wiki/build", "result": "PASS" },
+    { "command": "GET /api/wiki", "result": "PASS" },
+    { "command": "GET /api/wiki/pages/workspace-overview/evidence", "result": "PASS" },
+    { "command": "POST /api/wiki/pages/workspace-overview/validation-preview", "result": "PASS" },
+    { "command": "GET /api/wiki/pages/workspace-overview", "result": "PASS" },
+    { "command": "GET /api/wiki/diagnostics", "result": "PASS" }
+  ],
+  "files_changed": [
+    "LOGS/EAI-TASK-024-terminal.log",
+    "REPORTS/EAI-TASK-024-MVP-DISPOSABLE-FOLDER-QA-RERUN.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_024_MVP_DISPOSABLE_FOLDER_QA_RERUN.json"
+  ],
+  "risks": [
+    "No blocking issues found.",
+    "One unsupported file was intentionally included and safely reported.",
+    "Validation preview was checked through the API rather than a browser UI."
+  ],
+  "recommended_next_task": "PM review, or a browser-level UI pass if needed.",
+  "artifact_commit_sha": "529c795"
+}
