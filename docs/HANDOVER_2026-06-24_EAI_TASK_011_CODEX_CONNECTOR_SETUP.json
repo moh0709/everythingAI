@@ -4,8 +4,8 @@
   "final_status": "PASS",
   "codex_path": "/usr/bin/codex",
   "codex_version": "codex-cli 0.142.0",
-  "detection_result": "Codex detected on PATH and marked command-safe.",
-  "version_probe_result": "Codex version probe completed successfully with bridge enabled.",
+  "detection_result": "Codex detected on PATH; connector reported as local CLI, admin/operator-only, and not enabled by default.",
+  "version_probe_result": "Codex version probe completed successfully with the safe bridge flag enabled.",
   "backend_safety": {
     "bridge_enabled_by_default": false,
     "chat_enabled_by_default": false,
@@ -24,9 +24,11 @@
     "detect_agent_connectors": "PASS",
     "probe_agent_versions_codex": "PASS",
     "ui_typecheck": "PASS",
-    "ui_build": "PASS"
+    "ui_build": "PASS",
+    "command_v_codex": "PASS",
+    "codex_version": "PASS"
   },
   "blockers": [],
-  "recommended_next_task": "Controlled connector-specific setup/testing for Claude Code.",
-  "artifact_commit_sha": "e760ec9"
+  "recommended_next_task": "Controlled connector-specific setup/testing for installed Claude Code.",
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA"
 }
