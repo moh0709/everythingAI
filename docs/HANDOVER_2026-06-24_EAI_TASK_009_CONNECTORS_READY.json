@@ -4,36 +4,24 @@
   "taskId": "EAI-TASK-009",
   "issueNumber": 31,
   "finalStatus": "PASS",
-  "validation": {
-    "gitPull": "PASS",
+  "validationStatus": {
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
     "codexDetection": "PASS",
-    "codexVersionProbe": "PASS",
-    "claudeDetection": "PASS",
-    "claudeVersionProbe": "PASS",
-    "notes": [
-      "Safe detection and version probes passed for both target CLIs.",
-      "Bridge chat remained disabled.",
-      "No product behavior was changed."
-    ]
+    "codexVersion": "PASS",
+    "claudeCodeDetection": "PASS",
+    "claudeCodeVersion": "PASS",
+    "detectionScript": "PASS",
+    "versionProbeScript": "PASS"
   },
-  "connectorReadiness": {
-    "gateCleared": true,
-    "codex": {
-      "command": "/usr/bin/codex",
-      "version": "codex-cli 0.142.0",
-      "usableToday": true
-    },
-    "claudeCode": {
-      "command": "/usr/bin/claude",
-      "version": "2.1.191 (Claude Code)",
-      "usableToday": true
-    }
-  },
-  "remainingRisks": [],
-  "recommendedNextPmTask": "Proceed to PM review and then the next PM-approved EverythingAI task.",
-  "artifactCommitSha": "ccaedd3"
+  "connectorGateCleared": true,
+  "remainingRisks": [
+    "The connector bridge stays intentionally restricted to safe detection and version probes unless explicitly enabled locally.",
+    "Admin connector readiness still depends on the local machine having the CLIs on PATH."
+  ],
+  "recommendedNextPmTask": "Proceed to the next real EverythingAI product-development task.",
+  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "metadataBackfillPending": true
 }
