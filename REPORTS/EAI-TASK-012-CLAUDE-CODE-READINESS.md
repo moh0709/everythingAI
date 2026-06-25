@@ -53,4 +53,4 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Claude
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-012-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json`
-- Artifact commit SHA: `PENDING_ARTIFACT_COMMIT_SHA`
+- Artifact commit SHA: `5994df3`

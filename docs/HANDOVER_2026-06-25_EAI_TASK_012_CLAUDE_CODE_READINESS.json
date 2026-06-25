@@ -26,7 +26,7 @@
   },
   "remaining_risks": [],
   "recommended_next_pm_task": "Proceed with the next PM-reviewed ready issue in the queue.",
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifact_commit_sha": "5994df3",
   "terminal_log": "LOGS/EAI-TASK-012-terminal.log",
   "report": "REPORTS/EAI-TASK-012-CLAUDE-CODE-READINESS.md",
   "state_file": "not present"
