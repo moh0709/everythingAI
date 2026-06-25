@@ -56,5 +56,5 @@ Proceed with the next PM-reviewed open task in the EverythingAI queue, currently
 - Terminal log: `LOGS/EAI-TASK-009-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_009_CONNECTORS_READY.json`
 - State file: `.hermes/state.json`
-- Artifact bundle commit SHA: `PENDING_BUNDLE_COMMIT`
-- Finalization commit SHA: `PENDING_FINALIZATION_COMMIT`
+- Artifact bundle commit SHA: `5af0b5b76be601334cb78544d8082503a7d16aae`
+- Finalization commit SHA: `5af0b5b76be601334cb78544d8082503a7d16aae` (no separate finalization commit was required)

@@ -29,7 +29,7 @@
     "gateCleared": true
   },
   "adminUiBoundary": "Connector controls remain admin-scoped under apps/everything-ai-ui/src/admin/**.",
-  "artifactBundleCommitSha": "PENDING_BUNDLE_COMMIT",
-  "finalizationCommitSha": "PENDING_FINALIZATION_COMMIT",
+  "artifactBundleCommitSha": "5af0b5b76be601334cb78544d8082503a7d16aae",
+  "finalizationCommitSha": "5af0b5b76be601334cb78544d8082503a7d16aae",
   "updatedAt": "2026-06-25T05:40:47Z"
 }
