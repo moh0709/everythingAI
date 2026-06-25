@@ -1,38 +1,24 @@
 {
-  "repository": "everythingAI",
+  "repository": "moh0709/everythingAI",
   "branch": "main",
   "taskId": "EAI-TASK-009",
   "issueNumber": 31,
   "finalStatus": "PASS",
-  "connectorGateCleared": true,
-  "validation": {
-    "gitPull": "PASS",
+  "validationStatusSummary": {
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
     "codexDetection": "PASS",
-    "claudeDetection": "PASS",
     "codexProbe": "PASS",
-    "claudeProbe": "PASS"
+    "claudeCodeDetection": "PASS",
+    "claudeCodeProbe": "PASS"
   },
-  "readinessSummary": {
-    "codex": {
-      "commandPath": "/usr/bin/codex",
-      "version": "codex-cli 0.142.0",
-      "detected": true,
-      "probed": true
-    },
-    "claudeCode": {
-      "commandPath": "/usr/bin/claude",
-      "version": "2.1.191 (Claude Code)",
-      "detected": true,
-      "probed": true
-    }
-  },
-  "adminBoundaryResult": "PASS",
-  "stateFileUpdated": false,
-  "stateFilePath": ".hermes/state.json (absent in this checkout; not created per repo policy)",
-  "artifactCommitSha": "PENDING_FINAL_ISSUE_COMMENT",
-  "nextRecommendedTask": "Proceed to the next PM-approved EverythingAI task now that the connector gate is cleared."
+  "connectorGateCleared": true,
+  "remainingRisks": [
+    "Connector execution remains disabled by default until explicitly enabled on the local machine.",
+    "Chat execution remains disabled and was not exercised."
+  ],
+  "recommendedNextPMTask": "Review the connector readiness rerun and, if approved, create a follow-up connector enablement task.",
+  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA"
 }
