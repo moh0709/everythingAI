@@ -82,4 +82,4 @@ Proceed to PM review and then the next PM-approved EverythingAI task; the connec
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-009-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_009_CONNECTORS_READY.json`
-- Artifact commit SHA: `PENDING_COMMIT_SHA`
+- Artifact commit SHA: `ccaedd3`
