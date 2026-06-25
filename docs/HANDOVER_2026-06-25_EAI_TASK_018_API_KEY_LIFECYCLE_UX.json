@@ -11,9 +11,28 @@
     "uiBuild": "PASS",
     "apiTests": "PASS"
   },
-  "remainingRisks": [
-    "The clear-pending indicator is UI-only; the persistence behavior remains governed by the existing backend save flow."
+  "uxBehavior": [
+    "The admin provider settings panel now distinguishes saved, replace, clear-pending, new-key, and no-key states.",
+    "Saved API keys remain masked while staged replacements can still be typed.",
+    "The selected-provider connection check is labeled as a saved-connection test, with a note explaining that staged changes must be saved first."
   ],
+  "preservedBehavior": [
+    "Saved remote API keys remain masked.",
+    "The __saved__ preservation flow remains intact.",
+    "Empty-string clear behavior still works when the operator intentionally clears a key.",
+    "Provider settings remain admin-only.",
+    "Client Workspace remains unaffected.",
+    "Provider connection testing still works against the saved provider settings."
+  ],
+  "filesChanged": [
+    "apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx",
+    "apps/everything-ai-ui/src/admin/components/SettingsView.tsx"
+  ],
+  "risks": [
+    "The admin key section is slightly denser because it now surfaces the saved/replace/clear states explicitly.",
+    "No backend route or persistence logic was changed."
+  ],
+  "rollbackNote": "Revert the two admin UI files if the explicit key-lifecycle controls need to be removed.",
   "recommendedNextTask": "Poll the next open issue with pm:ready and hermes:ready labels that does not already have a matching report artifact.",
-  "artifactCommitSha": "246699f045450c9279761cf95a382de8e02dd6d4"
+  "artifactCommitSha": "PENDING_COMMIT_SHA"
 }

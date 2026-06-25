@@ -63,34 +63,50 @@ function RemoteProviderConfiguration({ active, draft, providerSettings, provider
   const savedBlock = providerSettings?.[active];
   const models = providerModels?.[active] || [];
   const hasSavedApiKey = savedBlock?.apiKey === '__saved__';
-  const hasDraftApiKey = Boolean(activeBlock.apiKey && !hasSavedApiKey);
-  const hasClearPending = hasSavedApiKey && activeBlock.apiKey === '';
-  const keyStatus = hasClearPending ? 'Clear pending' : hasSavedApiKey ? 'Saved key present' : hasDraftApiKey ? 'Replacement key staged' : 'No key configured';
-  const keyGuidance = hasClearPending
-    ? 'The saved secret is masked and will be removed when you save AI settings.'
-    : hasSavedApiKey
-      ? 'The saved secret is masked. Typing a new value replaces it on save; clearing it stages a remove-on-save action.'
-      : hasDraftApiKey
-        ? 'A replacement key is staged in this draft and will be stored only after Save AI Settings.'
-        : 'Paste a key to save one for this provider, or leave blank to keep this provider without credentials.';
+  const isPreservedSavedKey = hasSavedApiKey && activeBlock.apiKey === '__saved__';
+  const isClearPending = hasSavedApiKey && activeBlock.apiKey === '';
+  const isReplacementStaged = hasSavedApiKey && activeBlock.apiKey !== '' && activeBlock.apiKey !== '__saved__';
+  const isNewKeyStaged = !hasSavedApiKey && activeBlock.apiKey !== '';
+  const apiKeyValue = isPreservedSavedKey ? '' : activeBlock.apiKey;
+  const keyStatus = isClearPending
+    ? 'Clear pending'
+    : isReplacementStaged
+      ? 'Replacement key staged'
+      : isPreservedSavedKey
+        ? 'Saved key preserved'
+        : isNewKeyStaged
+          ? 'New key staged'
+          : 'No key configured';
+  const keyGuidance = isClearPending
+    ? 'The masked saved secret will be removed when you save AI settings.'
+    : isReplacementStaged
+      ? 'A new key is staged in this draft and will replace the saved secret when you save AI settings.'
+      : isPreservedSavedKey
+        ? 'The saved secret stays masked. Type a new value to replace it, or clear the field to stage removal.'
+        : isNewKeyStaged
+          ? 'This provider has a new key staged in the draft and it will be stored after Save AI Settings.'
+          : 'Paste a key to save one for this provider, or leave it blank to keep it unconfigured.';
 
   return <div className="settings-grid">
     <label>
       API Key
       <input
         type="password"
-        value={hasSavedApiKey ? '' : activeBlock.apiKey}
+        value={apiKeyValue}
         onChange={(event) => update(`${active}.apiKey`, event.target.value)}
-        placeholder={hasSavedApiKey ? 'Saved key is masked' : 'Paste API key to save or replace'}
+        placeholder={isPreservedSavedKey ? 'Type to replace the masked saved key' : 'Paste API key to save or replace'}
         aria-label={`${providerLabel(active)} API key`}
       />
       <span className="muted">API key lifecycle: {keyStatus}. {keyGuidance}</span>
       <div className="button-row">
-        {hasSavedApiKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '')}>Clear saved key</button>}
-        {hasSavedApiKey && <span className="scope-pill">Saved key</span>}
-        {hasClearPending && <span className="scope-pill">Clear pending</span>}
-        {hasDraftApiKey && <span className="scope-pill">Replacement staged</span>}
+        {hasSavedApiKey && !isPreservedSavedKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '__saved__')}>Keep saved key</button>}
+        {hasSavedApiKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '')}>Clear key</button>}
+        {hasSavedApiKey && isPreservedSavedKey && <span className="scope-pill">Saved key</span>}
+        {isReplacementStaged && <span className="scope-pill">Replace key</span>}
+        {isClearPending && <span className="scope-pill">Clear pending</span>}
+        {isNewKeyStaged && <span className="scope-pill">New key staged</span>}
       </div>
+      <p className="muted">Staged key changes are saved with <strong>Save AI Settings</strong>; <strong>Test Saved Connection</strong> checks the last saved provider config.</p>
     </label>
     <label>
       Endpoint

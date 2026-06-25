@@ -131,7 +131,7 @@ export function SettingsView({
       </div>
       <div className="button-row">
         <button className="outline" onClick={refreshModels}>Refresh Models</button>
-        <button className="outline" onClick={handleTest} disabled={testing}>{testing ? 'Testing...' : 'Test Connection'}</button>
+        <button className="outline" onClick={handleTest} disabled={testing}>{testing ? 'Testing...' : 'Test Saved Connection'}</button>
         <button onClick={() => saveAiSettings(activeDraft)}>Save AI Settings</button>
       </div>
     </div>
