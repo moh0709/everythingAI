@@ -1,10 +1,9 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "task": "EAI-TASK-009",
+  "taskId": "EAI-TASK-009",
   "issueNumber": 31,
-  "status": "PASS",
-  "summary": "Codex and Claude Code are installed and visible on PATH, safe version probes passed, the connector readiness gate is cleared, and the admin UI boundary remains intact.",
+  "finalStatus": "PASS",
   "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
@@ -13,13 +12,28 @@
     "uiBuild": "PASS",
     "codexDetection": "PASS",
     "codexVersionProbe": "PASS",
-    "claudeCodeDetection": "PASS",
-    "claudeCodeVersionProbe": "PASS",
-    "adminUiBoundary": "PASS"
+    "claudeDetection": "PASS",
+    "claudeVersionProbe": "PASS",
+    "notes": [
+      "Safe detection and version probes passed for both target CLIs.",
+      "Bridge chat remained disabled.",
+      "No product behavior was changed."
+    ]
   },
-  "connectorGateCleared": true,
-  "stateUpdate": "PASS",
+  "connectorReadiness": {
+    "gateCleared": true,
+    "codex": {
+      "command": "/usr/bin/codex",
+      "version": "codex-cli 0.142.0",
+      "usableToday": true
+    },
+    "claudeCode": {
+      "command": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)",
+      "usableToday": true
+    }
+  },
   "remainingRisks": [],
-  "recommendedNextTask": "Create the next real EverythingAI product-development task now that the connector gate is clear.",
-  "artifactCommitSha": "1fac7eac3b1b10e8ec8e7a673cc74702b4f32f29"
+  "recommendedNextPmTask": "Proceed to PM review and then the next PM-approved EverythingAI task.",
+  "artifactCommitSha": "PENDING_COMMIT_SHA"
 }
