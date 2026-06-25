@@ -63,5 +63,5 @@
     "Validation preview was checked through the API rather than a browser UI."
   ],
   "recommended_next_task": "PM review, or a browser-level UI pass if needed.",
-  "artifact_commit_sha": "529c795"
+  "artifact_commit_sha": "e70c35f"
 }
