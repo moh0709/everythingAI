@@ -619,6 +619,8 @@ function insertPages(db, pages = [], generatedAt = new Date().toISOString()) {
       updated_at = excluded.updated_at
   `);
 
+  const relationQueue = [];
+
   for (const page of pages) {
     const updatedAt = page.updated_at || generatedAt;
     const sources = page.sources || [];
@@ -700,11 +702,10 @@ function insertPages(db, pages = [], generatedAt = new Date().toISOString()) {
     });
 
     (page.related_pages || []).forEach((relatedPage, index) => {
-      const targetPageId = relatedPage.id || relatedPage.slug || relatedPage.title || `related-${index}`;
-      insertRelation.run({
+      relationQueue.push({
         id: relationRecordId(page.id, relatedPage, index),
         source_page_id: page.id,
-        target_page_id: targetPageId,
+        target_page_id: relatedPage.id || relatedPage.slug || relatedPage.title || `related-${index}`,
         relation_type: 'semantic',
         label: relatedPage.title || relatedPage.slug || relatedPage.id || 'Related Page',
         score: null,
@@ -713,6 +714,10 @@ function insertPages(db, pages = [], generatedAt = new Date().toISOString()) {
         updated_at: updatedAt,
       });
     });
+  }
+
+  for (const relation of relationQueue) {
+    insertRelation.run(relation);
   }
 }
 

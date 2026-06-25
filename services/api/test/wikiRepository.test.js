@@ -152,3 +152,48 @@ test('persists durable wiki pages, sections, sources, chunks, relations, and reb
 
   db.close();
 });
+
+test('persists cross-page relations even when the target page appears later in the batch', () => {
+  const db = openDatabase(tempDbPath());
+
+  const wiki = {
+    generated_at: '2026-05-19T12:00:00.000Z',
+    pages: [
+      {
+        id: 'page-alpha',
+        slug: 'page-alpha',
+        title: 'Page Alpha',
+        page_type: 'category',
+        category: 'General Knowledge',
+        subcategory: 'Alpha',
+        summary: 'Alpha page.',
+        markdown: '# Page Alpha',
+        sources: [],
+        related_pages: [{ id: 'page-beta', title: 'Page Beta', slug: 'page-beta' }],
+      },
+      {
+        id: 'page-beta',
+        slug: 'page-beta',
+        title: 'Page Beta',
+        page_type: 'topic',
+        category: 'General Knowledge',
+        subcategory: 'Beta',
+        summary: 'Beta page.',
+        markdown: '# Page Beta',
+        sources: [],
+        related_pages: [],
+      },
+    ],
+  };
+
+  const persisted = persistWikiPages(db, wiki);
+  const relation = db.prepare(
+    'SELECT * FROM wiki_page_relations WHERE source_page_id = ? AND target_page_id = ?'
+  ).get('page-alpha', 'page-beta');
+
+  assert.equal(persisted.page_count, 2);
+  assert.equal(relation.relation_type, 'semantic');
+  assert.equal(relation.label, 'Page Beta');
+
+  db.close();
+});
