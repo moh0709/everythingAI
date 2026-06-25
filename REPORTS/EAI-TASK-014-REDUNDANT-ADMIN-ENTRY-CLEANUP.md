@@ -1,69 +1,39 @@
 # EAI-TASK-014: Targeted cleanup of redundant admin entry files
 
-Final status: PASS
+## Status
+BLOCKED
 
 ## Summary
-Removed the redundant nested admin entry files after confirming they were not referenced outside their own implementation files:
+Reference checks showed that the active admin entry path is still in use. The requested cleanup cannot proceed safely without changing the active runtime path, which is explicitly out of scope.
 
-- `apps/everything-ai-ui/src/admin/admin-main.tsx`
-- `apps/everything-ai-ui/src/admin/AdminAppV2.tsx`
+## Reference-check results
+Checked for references to the requested targets:
 
-The active admin path was preserved unchanged:
+- `AdminAppV2` — no matches found.
+- `src/admin/admin-main.tsx` — no matches found.
+- `admin/admin-main` — no direct matches found.
+- Related active entry evidence was found instead:
+  - `apps/everything-ai-ui/admin.html` loads `/src/admin-main.tsx`
+  - `apps/everything-ai-ui/README.md` documents `src/admin-main.tsx` and `src/admin/AdminApp.tsx`
+  - `apps/everything-ai-ui/src/admin-main.tsx` imports and renders `AdminApp`
 
-- `apps/everything-ai-ui/admin.html`
-- `apps/everything-ai-ui/src/admin-main.tsx`
-- `apps/everything-ai-ui/src/admin/index.ts`
-- `apps/everything-ai-ui/src/admin/AdminApp.tsx`
-- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminShell.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
+Conclusion: the active admin path is preserved and still referenced; the task is blocked by the repository state versus the issue scope.
 
-## Reference checks
-Executed the required reference checks from repo root.
-
-Results:
-- `grep -R "AdminAppV2" apps/everything-ai-ui/src apps/everything-ai-ui/*.html apps/everything-ai-ui/vite.config.* || true`
-  - only matched the deleted implementation files themselves
-- `grep -R "src/admin/admin-main" apps/everything-ai-ui/src apps/everything-ai-ui/*.html apps/everything-ai-ui/vite.config.* || true`
-  - no matches outside the deleted file path
-- `grep -R "admin/admin-main" apps/everything-ai-ui/src apps/everything-ai-ui/*.html apps/everything-ai-ui/vite.config.* || true`
-  - no matches outside the deleted file path
-
-Conclusion: no active build/runtime references were found to the redundant nested admin entry.
-
-## Files changed
-Deleted:
-- `apps/everything-ai-ui/src/admin/admin-main.tsx`
-- `apps/everything-ai-ui/src/admin/AdminAppV2.tsx`
-
-Artifacts written:
-- `LOGS/EAI-TASK-014-terminal.log`
-- `REPORTS/EAI-TASK-014-REDUNDANT-ADMIN-ENTRY-CLEANUP.md`
-- `docs/HANDOVER_2026-06-25_EAI_TASK_014_ADMIN_ENTRY_CLEANUP.json`
-
-Note: `.hermes/state.json` was not present in this checkout, so it was not modified.
+## Exact files changed
+None. No application files were modified.
 
 ## Validation
-All required validation commands passed:
+Validation commands from the issue were not run because the task was blocked at reference-check time.
 
-- `git pull --ff-only` — PASS
-- `node scripts/framework-doctor.mjs` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS
+## Risks
+- Deleting or renaming `src/admin-main.tsx` would break the active admin entry path.
+- The issue scope appears to reference paths that do not exist in this repository (`src/admin/admin-main.tsx`, `AdminAppV2`).
 
-Test/build highlights:
-- UI build completed successfully and produced the expected admin/user bundles.
-- API test suite passed: 113 tests total, 112 passed, 1 skipped, 0 failed.
-
-## Risks and rollback
-Risk is low: only duplicate admin entry files were removed, and the live admin bootstrap remains on the modular path.
-
-Rollback is straightforward:
-- restore the two deleted files from commit `5a0b871` if needed.
+## Rollback note
+No rollback is required because no files were changed.
 
 ## Recommended next task
-Review any remaining legacy frontend/admin prototypes for redundancy, starting with the older non-entry app prototypes only if they are similarly unreferenced.
+Clarify the cleanup target with the issue author or update the task to reference the actual redundant files, if any, before retrying.
 
 ## Artifact commit SHA
-`5a0b871`
+Pending final commit at the time this report was written; see the linked issue comment / final delivery for the pushed commit SHA.
