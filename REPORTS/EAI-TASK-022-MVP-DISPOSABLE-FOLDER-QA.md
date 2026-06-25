@@ -85,4 +85,4 @@ Investigate and fix the `FOREIGN KEY constraint failed` error in `POST /api/wiki
 
 ## Artifact commit SHA
 
-PENDING_COMMIT_SHA
+06495b6b227e1f7b1f4f352de0a8f8b0c532f6e9

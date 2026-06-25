@@ -54,5 +54,5 @@
     "Wiki persistence integrity issue blocks full evidence-route validation on disposable data."
   ],
   "recommended_next_task": "Investigate POST /api/wiki/build foreign-key failure using a fresh disposable database and a minimal wiki persistence repro.",
-  "artifact_commit_sha": "PENDING_COMMIT_SHA"
+  "artifact_commit_sha": "06495b6b227e1f7b1f4f352de0a8f8b0c532f6e9"
 }
