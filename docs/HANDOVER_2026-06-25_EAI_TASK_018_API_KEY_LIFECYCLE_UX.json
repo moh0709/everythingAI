@@ -4,35 +4,16 @@
   "taskId": "EAI-TASK-018",
   "issueNumber": 40,
   "finalStatus": "PASS",
-  "artifactCommitSha": "b8c028f",
-  "validationStatusSummary": {
+  "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
     "apiTests": "PASS"
   },
-  "changedFiles": [
-    "LOGS/EAI-TASK-018-terminal.log",
-    "REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json"
-  ],
-  "behaviorValidated": [
-    "Saved remote API keys remain masked in the Admin provider panel.",
-    "The UI clearly distinguishes saved, replacement-staged, and clear-saved API-key states.",
-    "The explicit Clear saved key action only appears when a saved key exists.",
-    "The Test Connection action remains available for provider connectivity checks.",
-    "The __saved__ preservation flow remains intact and is still resolved server-side on save."
-  ],
-  "backendBehaviorPreserved": [
-    "Provider settings remain Admin-only.",
-    "Client Workspace does not expose API-key controls.",
-    "Provider connection tests still work.",
-    "Existing provider settings routes and tests were not modified."
-  ],
   "remainingRisks": [
-    "Low-risk documentation-only run; no production code changes were required in this pass."
+    "The clear-pending indicator is UI-only; the persistence behavior remains governed by the existing backend save flow."
   ],
-  "rollbackNote": "Remove the generated log, report, and handover artifacts if a cleanup rollback is needed.",
-  "recommendedNextTask": "Pick the next ready issue without a matching result report."
+  "recommendedNextTask": "Poll the next open issue with pm:ready and hermes:ready labels that does not already have a matching report artifact.",
+  "artifactCommitSha": "246699f045450c9279761cf95a382de8e02dd6d4"
 }

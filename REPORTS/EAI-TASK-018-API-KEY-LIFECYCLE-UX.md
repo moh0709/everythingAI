@@ -1,58 +1,52 @@
 # EAI-TASK-018: Improve Admin API key lifecycle UX
 
-## Result
+## Final status
 
-**Final status:** PASS
-
-## Repository / environment
-
-- **Repository path used:** `/root/.hermes/projects/everythingAI`
-- **Current branch:** `main`
-- **Starting commit SHA:** `e0cc706`
-- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `b8c028f`
-- **Final SHA source of truth:** GitHub issue comment after artifact push
+PASS
 
 ## Files changed
 
+- `apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx`
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
 - `LOGS/EAI-TASK-018-terminal.log`
 - `REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md`
 - `docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json`
+- `.hermes/state.json`
 
-## UX behavior validated
+## UX behavior implemented
 
-- Saved remote API keys remain masked in the Admin provider panel.
-- The UI clearly distinguishes a saved key from a replacement key staged in the draft.
-- The UI exposes an explicit `Clear saved key` control only when a saved key exists.
-- `Test Connection` remains available for provider connectivity checks.
-- The `__saved__` preservation flow remains intact: a saved secret stays masked in the client and is only resolved server-side on save.
-- Empty input still clears a stored key only when the operator intentionally uses the clear control.
+- The Admin provider settings panel now distinguishes a masked saved key from a staged replacement key.
+- The panel now exposes an explicit clear flow for operators that want to remove a saved key.
+- The UI now shows a separate "Clear pending" state when a saved key has been cleared in the draft but not yet saved.
+- `Test Connection` remains available and unchanged.
+- The admin settings section still presents provider settings and agent connector controls in the Admin shell only.
 
 ## Backend behavior preserved
 
+- Saved remote API keys remain masked with the existing `__saved__` flow.
+- The backend `preserveSavedKeys` behavior remains intact.
+- Clearing still requires an intentional operator action through the UI clear control.
 - Provider settings remain Admin-only.
-- Client Workspace does not expose API-key controls.
-- Provider connection tests still work through the existing API route.
-- The backend `__saved__` masking/preservation behavior remains unchanged.
-- Existing provider settings routes and tests were not modified.
+- Client Workspace remains unaffected and does not gain API-key controls.
+- Provider connection tests continue to use the existing API route.
 
 ## Validation summary
 
-- `git pull --ff-only`: PASS
+- `git pull --ff-only`: PASS (`Already up to date.`)
 - `node scripts/framework-doctor.mjs`: PASS
-- `cd apps/everything-ai-ui && npm run typecheck`: PASS
+- `cd apps/everything-ai-ui && npm run typecheck`: PASS after fixing a prop passthrough issue surfaced by the first run
 - `cd apps/everything-ai-ui && npm run build`: PASS
 - `cd services/api && npm test`: PASS
 
 ## Risks and rollback note
 
-- Risk is low because the task required no production code changes in this run.
-- Rollback is trivial: remove the log/report/handover artifacts if needed.
+- Risk is low because the change is constrained to Admin settings UI copy/state handling and does not alter backend provider-setting persistence logic.
+- Rollback: revert `apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx` and `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`.
 
 ## Recommended next task
 
-Proceed to the next open `pm:ready` + `hermes:ready` issue that does not already have a matching result report.
+- Poll the next open issue with `pm:ready` and `hermes:ready` labels that does not already have a matching report artifact.
 
 ## Artifact commit SHA
 
-`b8c028f`
+- `246699f045450c9279761cf95a382de8e02dd6d4`
