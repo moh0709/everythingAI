@@ -4,26 +4,32 @@
   "taskId": "EAI-TASK-009",
   "issueNumber": 31,
   "finalStatus": "PASS",
-  "validationStatus": {
+  "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
+    "connectorDetection": "PASS",
+    "connectorVersionProbe": "PASS",
     "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "codexDetection": "PASS",
-    "codexVersion": "PASS",
-    "claudeCodeDetection": "PASS",
-    "claudeCodeVersion": "PASS",
-    "detectionScript": "PASS",
-    "versionProbeScript": "PASS"
+    "uiBuild": "PASS"
   },
-  "connectorGateCleared": true,
-  "remainingRisks": [
-    "The connector bridge stays intentionally restricted to safe detection and version probes unless explicitly enabled locally.",
-    "Admin connector readiness still depends on the local machine having the CLIs on PATH."
-  ],
-  "recommendedNextPmTask": "Proceed to the next real EverythingAI product-development task.",
-  "artifactCommitSha": "1e43d60bf5d903da66441e32544d8270b770dc37",
-  "verificationAt": "2026-06-25T05:04:01Z",
-  "metadataBackfillPending": false
+  "connectorReadiness": {
+    "codex": {
+      "command": "/usr/bin/codex",
+      "version": "codex-cli 0.142.0",
+      "detection": "PASS",
+      "probe": "PASS"
+    },
+    "claudeCode": {
+      "command": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)",
+      "detection": "PASS",
+      "probe": "PASS"
+    },
+    "gateCleared": true
+  },
+  "adminUiBoundary": "Connector controls remain admin-scoped under apps/everything-ai-ui/src/admin/**.",
+  "artifactBundleCommitSha": "PENDING_BUNDLE_COMMIT",
+  "finalizationCommitSha": "PENDING_FINALIZATION_COMMIT",
+  "updatedAt": "2026-06-25T05:40:47Z"
 }
