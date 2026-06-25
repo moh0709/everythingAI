@@ -1,0 +1,48 @@
+EAI-TASK-022 terminal log
+
+Repository: /root/.hermes/projects/everythingAI
+Branch: main
+Disposable test folder: /tmp/eai-task-022/disposable-alpha
+Temp database: /tmp/eai-task-022/everythingai.sqlite
+Server: services/api on http://127.0.0.1:4100
+Auth token used: default local development token from repo middleware
+
+1) Repo sync and framework doctor
+- git pull --ff-only -> Already up to date.
+- node scripts/framework-doctor.mjs -> PASS
+  - gh authenticated
+  - .hermes/state.json present and valid json
+  - required framework files present
+
+2) Frontend validation
+- cd apps/everything-ai-ui && npm run typecheck -> PASS
+- cd apps/everything-ai-ui && npm run build -> PASS
+  - Vite build completed successfully
+
+3) Backend validation
+- cd services/api && npm test -> PASS
+  - 113 tests passed, 0 failed, 1 skipped
+
+4) Disposable-folder runtime drill
+- Created disposable folder with two files:
+  - alpha.txt
+  - subdir/beta.md
+- Started API server with EVERYTHINGAI_DB_PATH=/tmp/eai-task-022/everythingai.sqlite
+- GET /health -> OK
+- POST /api/index for disposable folder -> OK
+  - indexed 2 files
+  - automation summary reported 2 skipped-unchanged extractions on the first automated pass
+- GET /api/files?limit=20 -> listed both files as indexed
+- GET /api/files/<alpha-id>/preview -> returned preview text, source reference, and insight
+- GET /api/files/<beta-id>/preview -> returned preview text, source reference, and insight
+- GET /api/search?q=preview&limit=10 -> returned beta.md with matching snippet
+- GET /api/wiki?limit=10&filePageLimit=5 -> returned generated wiki content with source-backed evidence and chunk references
+- GET /api/status -> reported 2 total files, 2 indexed, 2 extracted, 2 embedded, 2 insight files
+- GET /api/wiki/diagnostics?limit=10 -> route loaded, but persisted wiki diagnostics were empty before a successful build
+- POST /api/wiki/build -> failed with HTTP 500: FOREIGN KEY constraint failed
+  - persisted wiki page/evidence routes therefore remained unavailable
+
+5) Safety notes
+- No real user/business files were used.
+- No destructive file actions were performed.
+- Runtime validation was limited to disposable test data and read-only API calls except indexing/building the disposable data.
