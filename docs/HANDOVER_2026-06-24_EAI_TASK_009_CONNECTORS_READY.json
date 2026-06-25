@@ -1,10 +1,12 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-009",
+  "task": "EAI-TASK-009",
   "issueNumber": 31,
-  "finalStatus": "PASS",
+  "status": "PASS",
+  "summary": "Codex and Claude Code are installed and visible on PATH, safe version probes passed, the connector readiness gate is cleared, and the admin UI boundary remains intact.",
   "validation": {
+    "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
     "uiTypecheck": "PASS",
@@ -16,7 +18,8 @@
     "adminUiBoundary": "PASS"
   },
   "connectorGateCleared": true,
+  "stateUpdate": "PASS",
   "remainingRisks": [],
   "recommendedNextTask": "Create the next real EverythingAI product-development task now that the connector gate is clear.",
-  "artifactCommitSha": "d28e8dd360724e15433a535da15ac9360ded86f6"
+  "artifactCommitSha": "1fac7eac3b1b10e8ec8e7a673cc74702b4f32f29"
 }
