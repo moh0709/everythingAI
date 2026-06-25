@@ -1,0 +1,70 @@
+{
+  "task": "EAI-TASK-009",
+  "issueNumber": 31,
+  "title": "Rerun Admin Connector readiness after CLI install",
+  "status": "PASS",
+  "summary": "Codex and Claude Code are installed on PATH, safe version probes passed, the backend bridge remained safety-gated, and the Admin Connector readiness gate is now cleared.",
+  "validation": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "apiTests": "PASS",
+    "detectAgentConnectors": "PASS",
+    "probeAgentVersions": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS"
+  },
+  "connectors": {
+    "codex": {
+      "detected": true,
+      "command": "/usr/bin/codex",
+      "version": "codex-cli 0.142.0",
+      "usableToday": true
+    },
+    "claudeCode": {
+      "detected": true,
+      "command": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)",
+      "usableToday": true
+    },
+    "openCode": {
+      "detected": false,
+      "command": "opencode",
+      "version": null,
+      "usableToday": false,
+      "status": "missing-on-path"
+    },
+    "kiloCode": {
+      "detected": false,
+      "command": "kilo",
+      "version": null,
+      "usableToday": false,
+      "status": "missing-on-path"
+    },
+    "cline": {
+      "detected": false,
+      "command": "cline",
+      "version": null,
+      "usableToday": false,
+      "status": "missing-on-path"
+    }
+  },
+  "safety": {
+    "bridgeEnabledForVersionProbe": true,
+    "chatEnabled": false,
+    "unsafeCommandsBlocked": true,
+    "productionBehaviorChanged": false
+  },
+  "adminBoundary": {
+    "adminOnlyConnectorSurface": true,
+    "clientWorkspaceExposesConnectors": false,
+    "navigationAnchor": "#agent-connectors"
+  },
+  "blockers": [],
+  "recommendedNextTask": "Wait for the next runnable pm:ready + hermes:ready issue, or proceed with the next backlog item once opened.",
+  "artifacts": {
+    "terminalLog": "LOGS/EAI-TASK-009-terminal.log",
+    "report": "REPORTS/EAI-TASK-009-ADMIN-CONNECTOR-READINESS-RERUN.md",
+    "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_009_CONNECTOR_READINESS_RERUN.json",
+    "artifactCommitSha": "f71b48777b603abf4bc74f235f633221a12bcdfa"
+  }
+}
