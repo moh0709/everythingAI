@@ -1,0 +1,31 @@
+{
+  "task": "EAI-TASK-014",
+  "status": "PASS",
+  "summary": "Removed redundant nested admin entry files after confirming there were no active references outside the files themselves.",
+  "active_admin_path_preserved": true,
+  "deleted_files": [
+    "apps/everything-ai-ui/src/admin/admin-main.tsx",
+    "apps/everything-ai-ui/src/admin/AdminAppV2.tsx"
+  ],
+  "reference_checks": {
+    "AdminAppV2": "Only matched the deleted implementation files themselves.",
+    "src/admin/admin-main": "No matches outside the deleted file path.",
+    "admin/admin-main": "No matches outside the deleted file path."
+  },
+  "validation": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "artifacts": [
+    "LOGS/EAI-TASK-014-terminal.log",
+    "REPORTS/EAI-TASK-014-REDUNDANT-ADMIN-ENTRY-CLEANUP.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_014_ADMIN_ENTRY_CLEANUP.json"
+  ],
+  "state_file_updated": false,
+  "state_file_reason": ".hermes/state.json did not exist in this checkout.",
+  "rollback": "Restore the deleted files from commit 5a0b871 if required.",
+  "artifact_commit_sha": "5a0b871"
+}
