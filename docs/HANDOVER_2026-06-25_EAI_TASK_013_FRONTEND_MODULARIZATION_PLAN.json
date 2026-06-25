@@ -4,7 +4,7 @@
   "issue": 35,
   "task": "EAI-TASK-013",
   "finalStatus": "PASS",
-  "artifactCommitSha": "f319ef5",
+  "artifactCommitSha": "3bc6de9",
   "validationSummary": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
