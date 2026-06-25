@@ -9,10 +9,12 @@ I reviewed the remaining legacy frontend prototype files and verified that they 
 No production or user-facing behavior was changed for this task.
 
 ## Reference-check results
-Checked the issue-specified paths and references:
+Checked the issue-specified paths and references.
 
-- `AppEnhanced` — no active runtime references found in the UI entrypoints/build config.
-- `AppComplete` — no active runtime references found in the UI entrypoints/build config.
+Reference search results:
+
+- `AppEnhanced` — matches found only in `src/admin/README.md`, `src/AppEnhanced.tsx`, and a non-runtime comment in `src/admin/AdminApp.tsx`.
+- `AppComplete` — matches found only in `src/admin/README.md`, `src/AppComplete.tsx`, and a non-runtime comment in `src/admin/AdminApp.tsx`.
 - `from './App'`, `from './App.tsx'`, `<App` — no active entrypoint references found in `main.tsx`, `admin-main.tsx`, `index.html`, `admin.html`, or `vite.config.ts`.
 
 Active runtime confirmation:
@@ -22,12 +24,7 @@ Active runtime confirmation:
 - `apps/everything-ai-ui/src/main.tsx` renders `UserApp`.
 - `apps/everything-ai-ui/src/admin-main.tsx` renders `AdminApp`.
 - `apps/everything-ai-ui/vite.config.ts` builds the user and admin entrypoints only.
-
-Important context:
-
-- `apps/everything-ai-ui/tsconfig.json` explicitly excludes `src/App.tsx`, `src/AppEnhanced.tsx`, and `src/AppComplete.tsx` from strict typechecking.
-- `apps/everything-ai-ui/src/admin/README.md` documents the legacy prototype files as reference-only migration artifacts.
-- `apps/everything-ai-ui/src/admin/AdminApp.tsx` contains a comment that mentions `AppComplete.tsx` as legacy reference text only; it is not imported.
+- `apps/everything-ai-ui/src/admin/README.md` explicitly documents `App.tsx`, `AppEnhanced.tsx`, and `AppComplete.tsx` as legacy reference-only migration artifacts.
 
 Conclusion: the old prototype files are archived references, not active runtime dependencies.
 
@@ -35,7 +32,7 @@ Conclusion: the old prototype files are archived references, not active runtime 
 None. No application source files were modified.
 
 ## Validation
-Validation commands were run from the repo root or the relevant package directory.
+Validation commands were run from the repo root.
 
 Results:
 
@@ -43,12 +40,13 @@ Results:
 - `node scripts/framework-doctor.mjs` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS on retry after one flaky initial failure
+- `cd services/api && npm test` — PASS
 
-Notes:
+Additional notes:
 
-- The first `npm test` run failed once on the watcher-cycle timing assertion.
-- A second full `npm test` run passed cleanly.
+- `node scripts/framework-doctor.mjs` reported valid Hermes framework files and `gh authenticated`.
+- `npm run build` completed successfully and emitted both user and admin bundles.
+- `npm test` completed successfully with 112 passing tests and 1 skipped test.
 
 ## Risks
 - Keeping legacy prototype files in place has low runtime risk because they are excluded from active entrypoints.
