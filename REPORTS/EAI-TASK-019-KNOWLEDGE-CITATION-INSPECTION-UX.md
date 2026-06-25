@@ -1,58 +1,56 @@
 # EAI-TASK-019: Improve Knowledge Base citation inspection UX
 
-## Result
+## Final status
 
-**Final status:** PASS
-
-## Repository / environment
-
-- **Repository path used:** `/root/.hermes/projects/everythingAI`
-- **Current branch:** `main`
-- **Starting commit SHA:** `a3841d1`
-- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
-- **Final SHA source of truth:** GitHub issue comment after artifact push
+PASS
 
 ## Files changed
 
+- `apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx`
+- `apps/everything-ai-ui/src/user/wikiMarkdown.css`
 - `LOGS/EAI-TASK-019-terminal.log`
 - `REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md`
 - `docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json`
 
-## UX behavior reviewed
+## UX behavior implemented
 
-- Knowledge Base pages already load with a dedicated reading surface.
-- Source-backed citations are visually highlighted in the article body and in the source rail.
-- The source inspector clearly shows the pinned citation, source filename, source location, and optional chunk reference.
-- The inspector and source preview keep the knowledge page visible so inspection does not break reading context.
-- Citations can be copied, source paths can be copied, and file context can be opened or revealed without leaving the page.
-- The page header already exposes citation coverage, source count, section count, weak-source warnings, and source fingerprint signals.
+- The source drawer now shows the exact citation label for the active source/chunk.
+- The drawer now surfaces a connected source snippet so the user can verify the evidence without losing reading context.
+- Active chunks are visually labeled as the active citation inside the source preview list.
+- The existing knowledge-page reading flow remains in place, with citations still opening the pinned source drawer.
 
-## Backend behavior preserved
+## Behavior preserved
 
-- Existing knowledge pages still load through the current wiki routes.
-- Existing source rails and diagnostics remain available.
-- The data model for wiki pages, sources, chunks, and diagnostics was not changed.
+- Knowledge Base pages still load.
+- Existing source rails still work.
+- Existing diagnostics remain available.
+- Existing citation/source data model remains compatible.
 - Client Workspace remains read-only for knowledge inspection.
-- Admin governance and diagnostics remain unaffected.
+- Admin governance and diagnostics were not modified.
 
-## Validation summary
+## Validation results
 
-- `git pull --ff-only`: PASS
-- `node scripts/framework-doctor.mjs`: PASS
-- `cd apps/everything-ai-ui && npm run typecheck`: PASS
-- `cd apps/everything-ai-ui && npm run build`: PASS
-- `cd services/api && npm test`: PASS
+- `git pull --ff-only` — PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `cd services/api && npm test` — PASS
 
 ## Risks and rollback note
 
-- Risk is low because no product code changes were required in this pass.
-- Rollback is trivial: remove the generated log, report, and handover artifacts if needed.
+- Risk: the source drawer now shows slightly denser citation metadata and snippet context.
+- Mitigation: the added UI is read-only and only exposes information already present in persisted source/chunk data.
+- Rollback: revert `apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx` and `apps/everything-ai-ui/src/user/wikiMarkdown.css`.
 
 ## Recommended next task
 
-Proceed to the next open `pm:ready` + `hermes:ready` issue that does not already have a matching result report.
+- EAI-TASK-018: Improve Admin API key lifecycle UX.
 
 ## Artifact commit SHA
 
-`PENDING_COMMIT_SHA`
+- `PENDING_COMMIT_SHA`
+
+## Notes
+
+- `.hermes/state.json` does not exist in this repository snapshot, so it was not modified.
+- Final issue comment should record the real artifact commit SHA after commit/push.

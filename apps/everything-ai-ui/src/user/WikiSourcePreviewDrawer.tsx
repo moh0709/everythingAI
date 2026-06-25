@@ -47,6 +47,11 @@ export function WikiSourcePreviewDrawer({
   const chunkRefs = useRef<Record<string, HTMLElement | null>>({});
   const normalizedActiveChunkRef = normalizeChunkRef(activeChunkRef);
   const chunks = useMemo(() => source?.chunks || [], [source]);
+  const activeChunk = useMemo(() => {
+    if (!normalizedActiveChunkRef) return null;
+    return chunks.find((chunk) => chunkRefCandidates(chunk).includes(normalizedActiveChunkRef)) || null;
+  }, [chunks, normalizedActiveChunkRef]);
+  const activeChunkSnippet = activeChunk?.evidence || activeChunk?.text || source?.evidence || null;
 
   useEffect(() => {
     if (!normalizedActiveChunkRef) return;
@@ -92,11 +97,21 @@ export function WikiSourcePreviewDrawer({
             <dt>Location</dt>
             <dd>{source.location || 'file-level source reference'}</dd>
           </div>
+          <div>
+            <dt>Citation</dt>
+            <dd>{normalizedActiveChunkRef ? `[${source.ref}:${normalizedActiveChunkRef}]` : `[${source.ref}]`}</dd>
+          </div>
           {normalizedActiveChunkRef ? <div>
             <dt>Chunk</dt>
             <dd>{normalizedActiveChunkRef}</dd>
           </div> : null}
         </dl>
+        {activeChunkSnippet ? (
+          <div className="wiki-source-preview-snippet">
+            <span>Connected source snippet</span>
+            <blockquote>{activeChunkSnippet}</blockquote>
+          </div>
+        ) : null}
       </section>
 
       {source.absolute_path ? (
@@ -147,6 +162,7 @@ export function WikiSourcePreviewDrawer({
                   <div className="wiki-source-preview-chunk-top">
                     <strong>{chunkRef}</strong>
                     <span>{chunk.location || `Chunk ${chunk.chunk_number || ''}`}</span>
+                    {isActive ? <span className="wiki-source-preview-active-badge">Active citation</span> : null}
                   </div>
                   {meta.length ? <div className="wiki-source-preview-chunk-meta">{meta.map((label) => <span key={label}>{label}</span>)}</div> : null}
                   {chunk.id ? <code className="wiki-source-preview-chunk-id">{chunk.id}</code> : null}

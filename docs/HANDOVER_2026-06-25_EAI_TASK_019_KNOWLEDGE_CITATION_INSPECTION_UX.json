@@ -1,38 +1,36 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-019",
-  "issueNumber": 41,
-  "finalStatus": "PASS",
-  "artifactCommitSha": "PENDING_COMMIT_SHA",
-  "validationStatusSummary": {
-    "gitPull": "PASS",
-    "frameworkDoctor": "PASS",
-    "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "apiTests": "PASS"
+  "task_id": "EAI-TASK-019",
+  "issue_number": 41,
+  "final_status": "PASS",
+  "validation": {
+    "git_pull": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
   },
-  "changedFiles": [
-    "LOGS/EAI-TASK-019-terminal.log",
-    "REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json"
+  "ux_behavior": [
+    "Source drawer now shows the active citation label.",
+    "Source drawer now shows a connected source snippet for the pinned citation.",
+    "Active chunks are visually labeled in the source preview list."
   ],
-  "behaviorValidated": [
-    "Knowledge Base pages still load in the current UI.",
-    "Source-backed citations are highlighted in the article body and source rail.",
-    "Pinned citation inspection keeps the page visible while showing source filename, location, and optional chunk context.",
-    "Copy path, copy citation, open file context, and reveal-in-folder actions remain available.",
-    "Citation coverage, source count, section count, weak-source warnings, and source fingerprint signals remain visible."
+  "preserved_behavior": [
+    "Knowledge Base pages still load.",
+    "Existing source rails still work.",
+    "Existing diagnostics remain available.",
+    "Client Workspace remains read-only for knowledge inspection."
   ],
-  "backendBehaviorPreserved": [
-    "Existing wiki routes and diagnostics remain available.",
-    "The wiki data model was not changed.",
-    "Client Workspace remains read-only for knowledge inspection.",
-    "Admin governance and diagnostics remain unaffected."
+  "files_changed": [
+    "apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx",
+    "apps/everything-ai-ui/src/user/wikiMarkdown.css"
   ],
-  "remainingRisks": [
-    "Low-risk documentation-only run; no production code changes were required in this pass."
+  "risks": [
+    "Slightly denser citation metadata in the source drawer.",
+    "No backend or data-model changes were made."
   ],
-  "rollbackNote": "Remove the generated log, report, and handover artifacts if a cleanup rollback is needed.",
-  "recommendedNextTask": "Pick the next ready issue without a matching result report."
+  "rollback_note": "Revert the two UI files if the citation-inspection layout needs to be restored.",
+  "recommended_next_task": "EAI-TASK-018: Improve Admin API key lifecycle UX.",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA"
 }

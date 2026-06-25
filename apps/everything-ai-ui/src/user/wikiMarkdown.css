@@ -493,6 +493,35 @@
   margin-top: 0.85rem;
 }
 
+.wiki-source-preview-snippet {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 14px;
+  background: #eef2ff;
+  padding: 0.85rem;
+}
+
+.wiki-source-preview-snippet span {
+  color: #3730a3;
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.wiki-source-preview-snippet blockquote {
+  margin: 0;
+  border-left: 4px solid #a855f7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  padding: 0.8rem 0.95rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 .wiki-source-preview-path {
   display: grid;
   gap: 0.4rem;
@@ -582,6 +611,7 @@
   gap: 0.75rem;
   align-items: center;
   margin-bottom: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .wiki-source-preview-chunk-top strong {
@@ -599,6 +629,20 @@
   font-weight: 700;
   text-align: right;
   overflow-wrap: anywhere;
+}
+
+.wiki-source-preview-active-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 0.18rem 0.48rem;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .wiki-source-preview-chunk-meta {
