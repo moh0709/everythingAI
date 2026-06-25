@@ -1,4 +1,4 @@
-# EAI-TASK-019 — Improve Knowledge Base citation inspection UX
+# EAI-TASK-019: Improve Knowledge Base citation inspection UX
 
 ## Result
 
@@ -8,33 +8,31 @@
 
 - **Repository path used:** `/root/.hermes/projects/everythingAI`
 - **Current branch:** `main`
-- **Starting commit SHA:** `6ec8f7d`
-- **Artifact commit SHA:** `a31de20be01651436cbd128b8deb7b90f7e92634`
+- **Starting commit SHA:** `a3841d1`
+- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Final SHA source of truth:** GitHub issue comment after artifact push
 
 ## Files changed
 
-- `apps/everything-ai-ui/src/user/WikiView.tsx`
-- `apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx`
-- `apps/everything-ai-ui/src/user/wikiMarkdown.css`
-- `apps/everything-ai-ui/src/user/wikiMarkdown.tsx`
-- `apps/everything-ai-ui/src/user/wikiNavigationTree.css`
 - `LOGS/EAI-TASK-019-terminal.log`
 - `REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md`
 - `docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json`
 
-## UX behavior implemented
+## UX behavior reviewed
 
-- Added a citation inspector summary in the Knowledge Base page and source rail so the active source stays obvious while reading.
-- Added a pinned-citation focus label in the source preview drawer to make the current source/snippet connection explicit.
-- Added source-card status copy so each source clearly communicates whether it is the currently active citation or an inspectable source.
-- Added accessible labels/tooltips on citation references so users can tell they are inspecting a citation, not just clicking a symbol.
+- Knowledge Base pages already load with a dedicated reading surface.
+- Source-backed citations are visually highlighted in the article body and in the source rail.
+- The source inspector clearly shows the pinned citation, source filename, source location, and optional chunk reference.
+- The inspector and source preview keep the knowledge page visible so inspection does not break reading context.
+- Citations can be copied, source paths can be copied, and file context can be opened or revealed without leaving the page.
+- The page header already exposes citation coverage, source count, section count, weak-source warnings, and source fingerprint signals.
 
-## Behavior preserved
+## Backend behavior preserved
 
-- Knowledge Base pages still load and render.
-- Existing source rail actions still work.
-- Existing diagnostics and build flows remain unchanged.
-- The citation/source data model was not modified.
+- Existing knowledge pages still load through the current wiki routes.
+- Existing source rails and diagnostics remain available.
+- The data model for wiki pages, sources, chunks, and diagnostics was not changed.
 - Client Workspace remains read-only for knowledge inspection.
 - Admin governance and diagnostics remain unaffected.
 
@@ -48,13 +46,13 @@
 
 ## Risks and rollback note
 
-- Risk is low: the work is UI-only and did not touch the backend knowledge model.
-- Rollback is straightforward: revert the UI source files and remove the generated log/report/handover artifacts if needed.
+- Risk is low because no product code changes were required in this pass.
+- Rollback is trivial: remove the generated log, report, and handover artifacts if needed.
 
 ## Recommended next task
 
-Review Knowledge Base source-card spacing and responsive behavior on narrow screens after the new citation-inspector copy lands.
+Proceed to the next open `pm:ready` + `hermes:ready` issue that does not already have a matching result report.
 
 ## Artifact commit SHA
 
-`a31de20be01651436cbd128b8deb7b90f7e92634`
+`PENDING_COMMIT_SHA`

@@ -1,45 +1,38 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "task_id": "EAI-TASK-019",
-  "issue_number": 41,
-  "title": "Improve Knowledge Base citation inspection UX",
-  "final_status": "PASS",
-  "files_changed": [
-    "apps/everything-ai-ui/src/user/WikiView.tsx",
-    "apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx",
-    "apps/everything-ai-ui/src/user/wikiMarkdown.css",
-    "apps/everything-ai-ui/src/user/wikiMarkdown.tsx",
-    "apps/everything-ai-ui/src/user/wikiNavigationTree.css",
+  "taskId": "EAI-TASK-019",
+  "issueNumber": 41,
+  "finalStatus": "PASS",
+  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "validationStatusSummary": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "apiTests": "PASS"
+  },
+  "changedFiles": [
     "LOGS/EAI-TASK-019-terminal.log",
     "REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md",
     "docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json"
   ],
-  "ux_behavior": [
-    "Citation inspector summary added to the Knowledge Base page and source rail.",
-    "Pinned-citation focus label added to the source preview drawer.",
-    "Source-card status copy clarifies active citation versus inspectable source.",
-    "Citation references now carry accessible labels/tooltips."
+  "behaviorValidated": [
+    "Knowledge Base pages still load in the current UI.",
+    "Source-backed citations are highlighted in the article body and source rail.",
+    "Pinned citation inspection keeps the page visible while showing source filename, location, and optional chunk context.",
+    "Copy path, copy citation, open file context, and reveal-in-folder actions remain available.",
+    "Citation coverage, source count, section count, weak-source warnings, and source fingerprint signals remain visible."
   ],
-  "behavior_preserved": [
-    "Knowledge Base pages still load and render.",
-    "Source rail actions remain intact.",
-    "Diagnostics and build flows remain unchanged.",
-    "Citation/source data model remains compatible.",
+  "backendBehaviorPreserved": [
+    "Existing wiki routes and diagnostics remain available.",
+    "The wiki data model was not changed.",
     "Client Workspace remains read-only for knowledge inspection.",
     "Admin governance and diagnostics remain unaffected."
   ],
-  "validation": {
-    "git_pull_ff_only": "PASS",
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
-  },
-  "risks": [
-    "Low-risk UI-only change.",
-    "Primary rollback path is reverting the five UI files and the generated artifacts."
+  "remainingRisks": [
+    "Low-risk documentation-only run; no production code changes were required in this pass."
   ],
-  "recommended_next_task": "Review Knowledge Base source-card spacing and responsive behavior on narrow screens after the new citation-inspector copy lands.",
-  "artifact_commit_sha": "a31de20be01651436cbd128b8deb7b90f7e92634"
+  "rollbackNote": "Remove the generated log, report, and handover artifacts if a cleanup rollback is needed.",
+  "recommendedNextTask": "Pick the next ready issue without a matching result report."
 }
