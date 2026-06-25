@@ -52,6 +52,12 @@ function isActiveCitationRef(ref: string, activeCitationRef?: string | null) {
   return normalizedRef === normalizedActiveRef || baseCitationRef(normalizedRef) === baseCitationRef(normalizedActiveRef);
 }
 
+function citationAriaLabel(ref: string, activeCitationRef?: string | null) {
+  return isActiveCitationRef(ref, activeCitationRef)
+    ? `Inspect active citation ${ref}`
+    : `Inspect citation ${ref}`;
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
@@ -127,7 +133,8 @@ export function renderInlineMarkdown(text: string, options: MarkdownRenderOption
     if (/^\[S\d+(?::C\d+)?\]$/.test(part)) {
       const activeClassName = isActiveCitationRef(part, activeCitationRef) ? ' active' : '';
       if (onSourceRefClick) {
-        return <button key={index} type="button" className={`wiki-source-ref wiki-source-ref-btn${activeClassName}`} aria-current={activeClassName ? 'location' : undefined} onClick={() => onSourceRefClick(normalizeCitationRef(part))}>{part}</button>;
+        const label = citationAriaLabel(part, activeCitationRef);
+        return <button key={index} type="button" className={`wiki-source-ref wiki-source-ref-btn${activeClassName}`} aria-current={activeClassName ? 'location' : undefined} aria-label={label} title={label} onClick={() => onSourceRefClick(normalizeCitationRef(part))}>{part}</button>;
       }
       return <sup key={index} className={`wiki-source-ref${activeClassName}`}>{part}</sup>;
     }

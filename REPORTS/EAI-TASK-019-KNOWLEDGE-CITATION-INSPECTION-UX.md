@@ -9,25 +9,25 @@
 - **Repository path used:** `/root/.hermes/projects/everythingAI`
 - **Current branch:** `main`
 - **Starting commit SHA:** `6ec8f7d`
-- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `c814efc`
-- **Final SHA source of truth:** GitHub issue comment after artifact push
+- **Artifact commit SHA:** `a31de20be01651436cbd128b8deb7b90f7e92634`
 
 ## Files changed
 
 - `apps/everything-ai-ui/src/user/WikiView.tsx`
 - `apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx`
 - `apps/everything-ai-ui/src/user/wikiMarkdown.css`
+- `apps/everything-ai-ui/src/user/wikiMarkdown.tsx`
+- `apps/everything-ai-ui/src/user/wikiNavigationTree.css`
 - `LOGS/EAI-TASK-019-terminal.log`
 - `REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md`
 - `docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json`
 
 ## UX behavior implemented
 
-- Added a focused citation summary panel in the Knowledge Base source rail so the active source is visible without losing article context.
-- Added a pinned citation-focus section inside the source preview drawer with source, location, and chunk metadata.
-- Kept the existing source reference highlighting, copy citation, copy path, reveal-in-folder, and open-file-context actions intact.
-- Preserved the current knowledge-page reading flow and the source drawer behavior.
+- Added a citation inspector summary in the Knowledge Base page and source rail so the active source stays obvious while reading.
+- Added a pinned-citation focus label in the source preview drawer to make the current source/snippet connection explicit.
+- Added source-card status copy so each source clearly communicates whether it is the currently active citation or an inspectable source.
+- Added accessible labels/tooltips on citation references so users can tell they are inspecting a citation, not just clicking a symbol.
 
 ## Behavior preserved
 
@@ -49,12 +49,12 @@
 ## Risks and rollback note
 
 - Risk is low: the work is UI-only and did not touch the backend knowledge model.
-- Rollback is straightforward: revert the three UI source files and remove the generated log/report/handover artifacts if needed.
+- Rollback is straightforward: revert the UI source files and remove the generated log/report/handover artifacts if needed.
 
 ## Recommended next task
 
-No additional runnable `pm:ready` + `hermes:ready` issue without a matching report was identified during this pass.
+Review Knowledge Base source-card spacing and responsive behavior on narrow screens after the new citation-inspector copy lands.
 
 ## Artifact commit SHA
 
-`PENDING_COMMIT_SHA`
+`a31de20be01651436cbd128b8deb7b90f7e92634`

@@ -1,40 +1,45 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-019",
-  "issueNumber": 41,
-  "finalStatus": "PASS",
-  "artifactCommitSha": "c814efc",
-  "validationStatusSummary": {
-    "gitPull": "PASS",
-    "frameworkDoctor": "PASS",
-    "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "apiTests": "PASS"
-  },
-  "changedFiles": [
+  "task_id": "EAI-TASK-019",
+  "issue_number": 41,
+  "title": "Improve Knowledge Base citation inspection UX",
+  "final_status": "PASS",
+  "files_changed": [
     "apps/everything-ai-ui/src/user/WikiView.tsx",
     "apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx",
     "apps/everything-ai-ui/src/user/wikiMarkdown.css",
+    "apps/everything-ai-ui/src/user/wikiMarkdown.tsx",
+    "apps/everything-ai-ui/src/user/wikiNavigationTree.css",
     "LOGS/EAI-TASK-019-terminal.log",
     "REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md",
     "docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json"
   ],
-  "behaviorImplemented": [
-    "Added a focused citation summary panel in the Knowledge Base source rail so the active source stays visible alongside the article.",
-    "Added a pinned citation-focus section in the source preview drawer with source, location, and chunk metadata.",
-    "Kept the existing source reference highlight and inspection actions intact."
+  "ux_behavior": [
+    "Citation inspector summary added to the Knowledge Base page and source rail.",
+    "Pinned-citation focus label added to the source preview drawer.",
+    "Source-card status copy clarifies active citation versus inspectable source.",
+    "Citation references now carry accessible labels/tooltips."
   ],
-  "behaviorPreserved": [
+  "behavior_preserved": [
     "Knowledge Base pages still load and render.",
-    "Existing source rail actions still work.",
-    "The citation/source data model was not modified.",
+    "Source rail actions remain intact.",
+    "Diagnostics and build flows remain unchanged.",
+    "Citation/source data model remains compatible.",
     "Client Workspace remains read-only for knowledge inspection.",
     "Admin governance and diagnostics remain unaffected."
   ],
+  "validation": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
   "risks": [
     "Low-risk UI-only change.",
-    "Rollback is straightforward by reverting the three UI files and removing the generated artifacts."
+    "Primary rollback path is reverting the five UI files and the generated artifacts."
   ],
-  "recommendedNextTask": "No additional runnable pm:ready + hermes:ready issue without a matching report was identified during this pass."
+  "recommended_next_task": "Review Knowledge Base source-card spacing and responsive behavior on narrow screens after the new citation-inspector copy lands.",
+  "artifact_commit_sha": "a31de20be01651436cbd128b8deb7b90f7e92634"
 }

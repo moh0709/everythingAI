@@ -77,7 +77,7 @@ export function WikiSourcePreviewDrawer({
 
       <section className="wiki-citation-focus wiki-source-preview-focus" aria-label="Source citation focus">
         <div className="wiki-citation-focus-top">
-          <span className="wiki-citation-focus-label">Active citation</span>
+          <span className="wiki-citation-focus-label">Pinned citation</span>
           {normalizedActiveChunkRef ? <span className="wiki-source-preview-focus-pill">[{source.ref}:{normalizedActiveChunkRef}]</span> : null}
         </div>
         <p className="wiki-citation-focus-copy">

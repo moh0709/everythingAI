@@ -74,6 +74,13 @@ function formatCitationLabel(sourceRef?: string | null, chunkRef?: string | null
   return chunkRef ? `[${sourceRef}:${chunkRef}]` : `[${sourceRef}]`;
 }
 
+function citationInspectorCopy(sourceRef?: string | null, chunkRef?: string | null) {
+  const citationLabel = formatCitationLabel(sourceRef, chunkRef);
+  return citationLabel
+    ? `Inspecting ${citationLabel} while keeping the knowledge page visible.`
+    : 'Click a citation in the article or source list to pin its source and snippet here.';
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
@@ -96,6 +103,7 @@ export function WikiView({
   const sourceFingerprint = shortHash(selectedWikiPage?.source_fingerprint);
   const pageSearchMatchCount = selectedWikiPage ? countMarkdownMatches(selectedWikiPage.markdown, pageSearchTerm) : 0;
   const focusCitationLabel = formatCitationLabel(previewSource?.ref, activeChunkRef);
+  const pinnedCitationCopy = citationInspectorCopy(previewSource?.ref, activeChunkRef);
 
   function closeSourcePreview() {
     setPreviewSource(null);
@@ -176,6 +184,7 @@ export function WikiView({
                 {selectedWikiPage.weak_source_warning ? <span className="warning">Weak source coverage</span> : null}
                 {sourceFingerprint ? <span title={selectedWikiPage.source_fingerprint}>Fingerprint {sourceFingerprint}</span> : null}
               </div>
+              <p className="wiki-citation-hint">{pinnedCitationCopy}</p>
             </div>
             <div className="wiki-action-with-help">
               <button className="outline" onClick={() => askAboutWikiPage(selectedWikiPage)}>Ask about this knowledge page</button>
@@ -201,6 +210,10 @@ export function WikiView({
         {selectedWikiPage ? <>
           <h3>File Sources</h3>
           <p className="muted">Original indexed files used as evidence for this saved knowledge page.</p>
+          <section className="wiki-citation-rail-summary" aria-label="Citation inspector summary">
+            <span className="wiki-citation-rail-label">{previewSource ? 'Pinned citation' : 'Citation inspector'}</span>
+            <p>{pinnedCitationCopy}</p>
+          </section>
           {previewSource ? <section className="wiki-citation-focus" aria-label="Focused citation details">
             <div className="wiki-citation-focus-top">
               <span className="wiki-citation-focus-label">Citation focus</span>
@@ -238,6 +251,11 @@ export function WikiView({
             >
               <strong>[{source.ref}] {source.filename || 'Source file'}</strong>
               <p>{source.location || 'file-level reference'}</p>
+              <p className="wiki-source-card-status">
+                {activeSourceRef === source.ref
+                  ? 'This source supports the active citation and stays highlighted while you inspect it.'
+                  : 'Open this source to inspect evidence, source snippets, and file context.'}
+              </p>
               {source.absolute_path && <a className="source-path-link" href={filePathHref(source.absolute_path)} title="Open source file path" target="_blank" rel="noreferrer">{source.absolute_path}</a>}
               <div className="source-actions">
                 <button className="outline" onClick={() => openSourcePreview(source)}>Preview file source</button>
