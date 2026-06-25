@@ -10,7 +10,7 @@ Validated that Claude Code is available on PATH, reports the expected CLI versio
 - `node scripts/framework-doctor.mjs` — PASS
 - `cd services/api && npm test` — PASS
 - `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
-- `cd services/api && env EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js claudeCode` — PASS
+- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js claudeCode` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
 - `command -v claude` — PASS (`/usr/bin/claude`)
@@ -53,4 +53,5 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Claude
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-012-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json`
-- Artifact commit SHA: `2c9217f`
+- Artifact commit SHA: `PENDING_COMMIT_SHA`
+- Finalization note: the artifact SHA will be synchronized in the follow-up metadata commit after the initial artifact bundle is committed.

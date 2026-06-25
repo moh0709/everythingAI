@@ -4,24 +4,27 @@
   "taskId": "EAI-TASK-012",
   "issueNumber": 34,
   "finalStatus": "PASS",
-  "validationSummary": {
+  "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
-    "claudePath": "/usr/bin/claude",
-    "claudeVersion": "2.1.191 (Claude Code)",
     "apiTests": "PASS",
-    "detectionScript": "PASS",
-    "versionProbe": "PASS",
+    "detectAgentConnectors": "PASS",
+    "probeAgentVersionsClaudeCode": "PASS",
     "uiTypecheck": "PASS",
-    "uiBuild": "PASS"
+    "uiBuild": "PASS",
+    "commandVClaude": "PASS",
+    "claudeVersion": "PASS"
   },
-  "safetyFindings": {
-    "backendBridgeSafe": true,
-    "chatExecutionDisabled": true,
-    "arbitraryShellExecutionBlocked": true,
-    "clientWorkspaceConnectorExposure": false
+  "readiness": {
+    "claudeCodeCommandPath": "/usr/bin/claude",
+    "claudeCodeVersion": "2.1.191 (Claude Code)",
+    "detectedOnPath": true,
+    "versionProbePassed": true,
+    "adminBoundaryMaintained": true,
+    "productBehaviorChanged": false
   },
-  "remainingRisks": [],
+  "risks": [],
   "recommendedNextTask": "Proceed with the next PM-reviewed ready issue in the queue.",
-  "artifactCommitSha": "2c9217f"
+  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "generatedAt": "2026-06-25T10:54:13Z"
 }
