@@ -50,4 +50,4 @@ PASS
 
 ## Artifact commit SHA
 
-- `PENDING_COMMIT_SHA`
+- `ec7ee67e2bd429ad20436c970780230dc50d112a`

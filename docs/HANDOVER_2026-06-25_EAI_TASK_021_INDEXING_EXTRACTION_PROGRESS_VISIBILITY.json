@@ -25,7 +25,7 @@
     "ui_build": "PASS",
     "api_tests": "PASS"
   },
-  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "ec7ee67e2bd429ad20436c970780230dc50d112a",
   "notes": [
     "No .hermes/state.json file existed in this repository snapshot, so it was not modified.",
     "Final issue comment should include the real artifact commit SHA after the metadata sync commit."
