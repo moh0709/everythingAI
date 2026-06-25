@@ -26,6 +26,6 @@
   "adminUiBoundary": "Connector controls remain inside apps/everything-ai-ui/src/admin/** with Admin-only routing to the Agent Connectors panel.",
   "blockers": [],
   "recommendedNextTask": "Proceed with the next PM-reviewed ready issue in the queue.",
-  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "artifactCommitSha": "25c00bd",
   "updatedAt": "2026-06-25T06:51:56Z"
 }

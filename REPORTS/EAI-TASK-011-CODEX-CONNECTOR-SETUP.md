@@ -53,4 +53,4 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Codex 
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-011-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_011_CODEX_CONNECTOR_SETUP.json`
-- Artifact commit SHA: `PENDING_COMMIT_SHA`
+- Artifact commit SHA: `25c00bd`
