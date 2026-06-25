@@ -38,7 +38,7 @@ Codex remains visible on PATH and safe to probe for admin/operator readiness che
 ## Artifact and reporting notes
 - **Terminal log:** `LOGS/EAI-TASK-011-terminal.log`
 - **Handover JSON:** `docs/HANDOVER_2026-06-24_EAI_TASK_011_CODEX_CONNECTOR_SETUP.json`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `227d9bd`
 - `.hermes/state.json` existed and was updated for this task.
 
 ## Blockers
