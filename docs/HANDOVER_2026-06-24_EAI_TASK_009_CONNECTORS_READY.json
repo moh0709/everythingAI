@@ -30,6 +30,6 @@
   },
   "adminUiBoundary": "Connector controls remain admin-scoped under apps/everything-ai-ui/src/admin/**.",
   "artifactBundleCommitSha": "5af0b5b76be601334cb78544d8082503a7d16aae",
-  "finalizationCommitSha": "5af0b5b76be601334cb78544d8082503a7d16aae",
+  "finalizationCommitSha": "2fed0e08ae91e835c7aa6ecfcc375545afa34f0a",
   "updatedAt": "2026-06-25T05:40:47Z"
 }
