@@ -1,48 +1,950 @@
-EAI-TASK-022 terminal log
+### EAI-TASK-022 validation run
+UTC 2026-06-25T22:34:24Z
+## git pull --ff-only
+Already up to date.
+## node scripts/framework-doctor.mjs
+{
+  "repoRoot": "/root/.hermes/projects/everythingAI/",
+  "status": "PASS",
+  "gh": {
+    "ok": true,
+    "detail": "gh authenticated"
+  },
+  "state": "valid json",
+  "files": [
+    {
+      "path": "package.json",
+      "present": true
+    },
+    {
+      "path": "scripts/task-poller.mjs",
+      "present": true
+    },
+    {
+      "path": "scripts/task-worker.mjs",
+      "present": true
+    },
+    {
+      "path": "scripts/framework-doctor.mjs",
+      "present": true
+    },
+    {
+      "path": "src/task-queue.js",
+      "present": true
+    },
+    {
+      "path": "templates/ISSUE_TEMPLATE_TASK.md",
+      "present": true
+    },
+    {
+      "path": "templates/ISSUE_TEMPLATE_BUGFIX.md",
+      "present": true
+    },
+    {
+      "path": "templates/ISSUE_TEMPLATE_REVIEW.md",
+      "present": true
+    },
+    {
+      "path": "templates/REPORT_TEMPLATE.md",
+      "present": true
+    },
+    {
+      "path": "templates/STATE_TEMPLATE.json",
+      "present": true
+    },
+    {
+      "path": "skills/hermes-pm-framework.skill.md",
+      "present": true
+    },
+    {
+      "path": "skills/hermes-pm-framework.prompt.json",
+      "present": true
+    },
+    {
+      "path": "LOGS",
+      "present": true
+    },
+    {
+      "path": "REPORTS",
+      "present": true
+    }
+  ]
+}
+## apps/everything-ai-ui npm run typecheck
 
-Repository: /root/.hermes/projects/everythingAI
-Branch: main
-Disposable test folder: /tmp/eai-task-022/disposable-alpha
-Temp database: /tmp/eai-task-022/everythingai.sqlite
-Server: services/api on http://127.0.0.1:4100
-Auth token used: default local development token from repo middleware
+> everything-ai-ui@0.1.0 typecheck
+> tsc --noEmit
 
-1) Repo sync and framework doctor
-- git pull --ff-only -> Already up to date.
-- node scripts/framework-doctor.mjs -> PASS
-  - gh authenticated
-  - .hermes/state.json present and valid json
-  - required framework files present
+## apps/everything-ai-ui npm run build
 
-2) Frontend validation
-- cd apps/everything-ai-ui && npm run typecheck -> PASS
-- cd apps/everything-ai-ui && npm run build -> PASS
-  - Vite build completed successfully
+> everything-ai-ui@0.1.0 build
+> vite build
 
-3) Backend validation
-- cd services/api && npm test -> PASS
-  - 113 tests passed, 0 failed, 1 skipped
+vite v5.4.2 building for production...
+transforming...
+✓ 1553 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/admin.html                    0.48 kB │ gzip:  0.29 kB
+dist/index.html                    0.55 kB │ gzip:  0.30 kB
+dist/assets/styles-CTHDoyWt.css   18.98 kB │ gzip:  4.55 kB
+dist/assets/user-C1KcAk1Y.css     23.19 kB │ gzip:  4.70 kB
+dist/assets/admin-CQgzb_1a.js     74.77 kB │ gzip: 19.67 kB
+dist/assets/user-DBCXjZrN.js      88.71 kB │ gzip: 21.79 kB
+dist/assets/styles-CP9YyM-s.js   153.51 kB │ gzip: 49.49 kB
+✓ built in 8.21s
+## services/api npm test
 
-4) Disposable-folder runtime drill
-- Created disposable folder with two files:
-  - alpha.txt
-  - subdir/beta.md
-- Started API server with EVERYTHINGAI_DB_PATH=/tmp/eai-task-022/everythingai.sqlite
-- GET /health -> OK
-- POST /api/index for disposable folder -> OK
-  - indexed 2 files
-  - automation summary reported 2 skipped-unchanged extractions on the first automated pass
-- GET /api/files?limit=20 -> listed both files as indexed
-- GET /api/files/<alpha-id>/preview -> returned preview text, source reference, and insight
-- GET /api/files/<beta-id>/preview -> returned preview text, source reference, and insight
-- GET /api/search?q=preview&limit=10 -> returned beta.md with matching snippet
-- GET /api/wiki?limit=10&filePageLimit=5 -> returned generated wiki content with source-backed evidence and chunk references
-- GET /api/status -> reported 2 total files, 2 indexed, 2 extracted, 2 embedded, 2 insight files
-- GET /api/wiki/diagnostics?limit=10 -> route loaded, but persisted wiki diagnostics were empty before a successful build
-- POST /api/wiki/build -> failed with HTTP 500: FOREIGN KEY constraint failed
-  - persisted wiki page/evidence routes therefore remained unavailable
+> everythingai-api@0.1.0 test
+> node --test
 
-5) Safety notes
-- No real user/business files were used.
-- No destructive file actions were performed.
-- Runtime validation was limited to disposable test data and read-only API calls except indexing/building the disposable data.
+TAP version 13
+# Subtest: agent bridge defaults keep connector execution and chat disabled
+ok 1 - agent bridge defaults keep connector execution and chat disabled
+  ---
+  duration_ms: 8.067024
+  type: 'test'
+  ...
+# Subtest: primary connector catalog contains expected safe commands and disabled flags
+ok 2 - primary connector catalog contains expected safe commands and disabled flags
+  ---
+  duration_ms: 0.606133
+  type: 'test'
+  ...
+# Subtest: agent detection rejects unsafe connector command overrides before PATH lookup
+ok 3 - agent detection rejects unsafe connector command overrides before PATH lookup
+  ---
+  duration_ms: 5.188395
+  type: 'test'
+  ...
+# Subtest: agent probes refuse to execute even when an integration is enabled unless backend bridge flag is set
+ok 4 - agent probes refuse to execute even when an integration is enabled unless backend bridge flag is set
+  ---
+  duration_ms: 2.902364
+  type: 'test'
+  ...
+# Subtest: agent probes only allow explicit safe actions
+ok 5 - agent probes only allow explicit safe actions
+  ---
+  duration_ms: 0.623044
+  type: 'test'
+  ...
+# Subtest: agent chat refuses to execute unless both backend bridge and chat flags are set
+ok 6 - agent chat refuses to execute unless both backend bridge and chat flags are set
+  ---
+  duration_ms: 4.695183
+  type: 'test'
+  ...
+# Subtest: agent bridge security notice documents the browser command-execution boundary
+ok 7 - agent bridge security notice documents the browser command-execution boundary
+  ---
+  duration_ms: 0.72175
+  type: 'test'
+  ...
+# Subtest: document context includes active file metadata, preview text, source reference, and insight
+ok 8 - document context includes active file metadata, preview text, source reference, and insight
+  ---
+  duration_ms: 307.231206
+  type: 'test'
+  ...
+# Subtest: document context marks trashed files without hiding context
+ok 9 - document context marks trashed files without hiding context
+  ---
+  duration_ms: 181.26989
+  type: 'test'
+  ...
+# Subtest: document context exposes failed stale file state clearly
+ok 10 - document context exposes failed stale file state clearly
+  ---
+  duration_ms: 166.577835
+  type: 'test'
+  ...
+# Subtest: embedding generation accepts a custom synchronous provider while default search remains stable
+ok 11 - embedding generation accepts a custom synchronous provider while default search remains stable
+  ---
+  duration_ms: 332.157836
+  type: 'test'
+  ...
+# Subtest: embedding generation skips unchanged extracted text and regenerates changed text
+ok 12 - embedding generation skips unchanged extracted text and regenerates changed text
+  ---
+  duration_ms: 292.704641
+  type: 'test'
+  ...
+# Subtest: normal action execution keeps execution_batch_id null
+ok 13 - normal action execution keeps execution_batch_id null
+  ---
+  duration_ms: 325.951558
+  type: 'test'
+  ...
+# Subtest: successful action execution stores execution_batch_id when provided
+ok 14 - successful action execution stores execution_batch_id when provided
+  ---
+  duration_ms: 1528.040531
+  type: 'test'
+  ...
+# Subtest: failed action execution stores execution_batch_id when provided
+ok 15 - failed action execution stores execution_batch_id when provided
+  ---
+  duration_ms: 445.388965
+  type: 'test'
+  ...
+# Subtest: creates draft execution batch from selected ready preview IDs
+ok 16 - creates draft execution batch from selected ready preview IDs
+  ---
+  duration_ms: 379.157592
+  type: 'test'
+  ...
+# Subtest: creates draft batch with blocked preview counts without executing anything
+ok 17 - creates draft batch with blocked preview counts without executing anything
+  ---
+  duration_ms: 1464.393866
+  type: 'test'
+  ...
+# Subtest: deduplicates preview IDs while preserving first-seen order
+ok 18 - deduplicates preview IDs while preserving first-seen order
+  ---
+  duration_ms: 470.662963
+  type: 'test'
+  ...
+# Subtest: rejects empty or missing preview IDs
+ok 19 - rejects empty or missing preview IDs
+  ---
+  duration_ms: 181.394062
+  type: 'test'
+  ...
+# Subtest: lists execution batches and returns batch detail with executions array
+ok 20 - lists execution batches and returns batch detail with executions array
+  ---
+  duration_ms: 461.034341
+  type: 'test'
+  ...
+# Subtest: approves a draft execution batch with explicit approval
+ok 21 - approves a draft execution batch with explicit approval
+  ---
+  duration_ms: 482.206615
+  type: 'test'
+  ...
+# Subtest: rejects batch approval without explicit approval
+ok 22 - rejects batch approval without explicit approval
+  ---
+  duration_ms: 207.46561
+  type: 'test'
+  ...
+# Subtest: rejects approval for blocked-preview and missing batches
+ok 23 - rejects approval for blocked-preview and missing batches
+  ---
+  duration_ms: 164.776268
+  type: 'test'
+  ...
+# Subtest: rejects approving a batch that is no longer draft
+ok 24 - rejects approving a batch that is no longer draft
+  ---
+  duration_ms: 313.620677
+  type: 'test'
+  ...
+# Subtest: runs an approved execution batch through the safe executor
+ok 25 - runs an approved execution batch through the safe executor
+  ---
+  duration_ms: 187.995107
+  type: 'test'
+  ...
+# Subtest: rejects running batch without explicit approval or from wrong status
+ok 26 - rejects running batch without explicit approval or from wrong status
+  ---
+  duration_ms: 141.293387
+  type: 'test'
+  ...
+# Subtest: stops execution batch on first failure and marks completed_with_errors after partial success
+ok 27 - stops execution batch on first failure and marks completed_with_errors after partial success
+  ---
+  duration_ms: 233.695875
+  type: 'test'
+  ...
+# Subtest: execution without approval is rejected without creating execution or snapshot
+ok 28 - execution without approval is rejected without creating execution or snapshot
+  ---
+  duration_ms: 364.041516
+  type: 'test'
+  ...
+# Subtest: blocked preview cannot execute and is rejected before mutation
+ok 29 - blocked preview cannot execute and is rejected before mutation
+  ---
+  duration_ms: 517.013076
+  type: 'test'
+  ...
+# Subtest: source missing creates failed execution, failed audit, and no snapshot
+ok 30 - source missing creates failed execution, failed audit, and no snapshot
+  ---
+  duration_ms: 217.925917
+  type: 'test'
+  ...
+# Subtest: target exists creates failed execution, failed audit, and no snapshot
+ok 31 - target exists creates failed execution, failed audit, and no snapshot
+  ---
+  duration_ms: 161.520033
+  type: 'test'
+  ...
+# Subtest: execution against active trashed file is rejected with failed audit and no snapshot
+ok 32 - execution against active trashed file is rejected with failed audit and no snapshot
+  ---
+  duration_ms: 327.562779
+  type: 'test'
+  ...
+# Subtest: move execution creates and uses recovery snapshot before filesystem mutation
+ok 33 - move execution creates and uses recovery snapshot before filesystem mutation
+  ---
+  duration_ms: 163.156934
+  type: 'test'
+  ...
+# Subtest: rename execution creates and uses recovery snapshot before filesystem mutation
+ok 34 - rename execution creates and uses recovery snapshot before filesystem mutation
+  ---
+  duration_ms: 246.102339
+  type: 'test'
+  ...
+# Subtest: app-level label execution does not create filesystem recovery snapshot
+ok 35 - app-level label execution does not create filesystem recovery snapshot
+  ---
+  duration_ms: 222.079348
+  type: 'test'
+  ...
+# Subtest: job runner records completed jobs
+ok 36 - job runner records completed jobs
+  ---
+  duration_ms: 4.357333
+  type: 'test'
+  ...
+# Subtest: job runner records failed jobs and rethrows errors
+ok 37 - job runner records failed jobs and rethrows errors
+  ---
+  duration_ms: 6.364282
+  type: 'test'
+  ...
+# Subtest: knowledge ingestion can be wrapped as a job without creating planning suggestions
+ok 38 - knowledge ingestion can be wrapped as a job without creating planning suggestions
+  ---
+  duration_ms: 291.578868
+  type: 'test'
+  ...
+# Subtest: watcher cycles are recorded as jobs without automatic planning suggestions
+ok 39 - watcher cycles are recorded as jobs without automatic planning suggestions
+  ---
+  duration_ms: 1826.569194
+  type: 'test'
+  ...
+# Subtest: indexes recursively, skips unsafe folders, and hashes files stably
+ok 40 - indexes recursively, skips unsafe folders, and hashes files stably
+  ---
+  duration_ms: 293.343717
+  type: 'test'
+  ...
+# Subtest: extracts supported readable files and records failures without aborting
+ok 41 - extracts supported readable files and records failures without aborting
+  ---
+  duration_ms: 353.467646
+  type: 'test'
+  ...
+# Subtest: searches filename, path, and extracted content with snippets
+ok 42 - searches filename, path, and extracted content with snippets
+  ---
+  duration_ms: 644.430885
+  type: 'test'
+  ...
+# Subtest: prepares chat retrieval and creates preview-only suggestions without mutating source files
+ok 43 - prepares chat retrieval and creates preview-only suggestions without mutating source files
+  ---
+  duration_ms: 286.072699
+  type: 'test'
+  ...
+# Subtest: calls an Ollama-compatible provider when configured
+ok 44 - calls an Ollama-compatible provider when configured
+  ---
+  duration_ms: 1.824189
+  type: 'test'
+  ...
+# Subtest: defaults provider settings to Ollama and updates model options
+ok 45 - defaults provider settings to Ollama and updates model options
+  ---
+  duration_ms: 12.099859
+  type: 'test'
+  ...
+# Subtest: parses selected Windows folder path from the native folder picker
+ok 46 - parses selected Windows folder path from the native folder picker # SKIP Windows-only folder picker
+  ---
+  duration_ms: 0.34828
+  type: 'test'
+  ...
+# Subtest: creates safe action previews without executing file actions
+ok 47 - creates safe action previews without executing file actions
+  ---
+  duration_ms: 248.188236
+  type: 'test'
+  ...
+# Subtest: uses Organizor2-inspired content rules for organization suggestions
+ok 48 - uses Organizor2-inspired content rules for organization suggestions
+  ---
+  duration_ms: 388.783631
+  type: 'test'
+  ...
+# Subtest: executes approved move previews and can undo filesystem changes
+ok 49 - executes approved move previews and can undo filesystem changes
+  ---
+  duration_ms: 185.874995
+  type: 'test'
+  ...
+# Subtest: executes app-level label actions and lists applied labels
+ok 50 - executes app-level label actions and lists applied labels
+  ---
+  duration_ms: 146.59786
+  type: 'test'
+  ...
+# Subtest: syncs extracted files to AnythingLLM upload API when configured
+ok 51 - syncs extracted files to AnythingLLM upload API when configured
+  ---
+  duration_ms: 262.707748
+  type: 'test'
+  ...
+# Subtest: generates deterministic insights and semantic related search results
+ok 52 - generates deterministic insights and semantic related search results
+  ---
+  duration_ms: 416.287354
+  type: 'test'
+  ...
+# Subtest: detects duplicate files by content hash
+ok 53 - detects duplicate files by content hash
+  ---
+  duration_ms: 185.872631
+  type: 'test'
+  ...
+# Subtest: starts a watcher and indexes changed files without automatic planning suggestions
+ok 54 - starts a watcher and indexes changed files without automatic planning suggestions
+  ---
+  duration_ms: 1781.167897
+  type: 'test'
+  ...
+# Subtest: builds knowledge index from generated insights
+ok 55 - builds knowledge index from generated insights
+  ---
+  duration_ms: 141.612564
+  type: 'test'
+  ...
+# Subtest: reports system status counts for the local dashboard
+ok 56 - reports system status counts for the local dashboard
+  ---
+  duration_ms: 206.6841
+  type: 'test'
+  ...
+# Subtest: knowledge ingestion pipeline prepares searchable knowledge without organization suggestions
+ok 57 - knowledge ingestion pipeline prepares searchable knowledge without organization suggestions
+  ---
+  duration_ms: 168.085412
+  type: 'test'
+  ...
+# Subtest: nested undo restores the original nested relative path after approved cross-folder move
+ok 58 - nested undo restores the original nested relative path after approved cross-folder move
+  ---
+  duration_ms: 272.679722
+  type: 'test'
+  ...
+# Subtest: configured suggestions enforce action allow-list rules
+ok 59 - configured suggestions enforce action allow-list rules
+  ---
+  duration_ms: 308.134966
+  type: 'test'
+  ...
+# Subtest: configured suggestions enforce confidence threshold
+ok 60 - configured suggestions enforce confidence threshold
+  ---
+  duration_ms: 212.00896
+  type: 'test'
+  ...
+# Subtest: configured suggestions can mark previews as not requiring approval
+ok 61 - configured suggestions can mark previews as not requiring approval
+  ---
+  duration_ms: 132.309379
+  type: 'test'
+  ...
+# Subtest: dry-run-only planning rule blocks action previews from execution
+ok 62 - dry-run-only planning rule blocks action previews from execution
+  ---
+  duration_ms: 318.298678
+  type: 'test'
+  ...
+# Subtest: creates and lists planning sessions
+ok 63 - creates and lists planning sessions
+  ---
+  duration_ms: 307.985397
+  type: 'test'
+  ...
+# Subtest: runs a planning session and links generated suggestions to the session
+ok 64 - runs a planning session and links generated suggestions to the session
+  ---
+  duration_ms: 340.123832
+  type: 'test'
+  ...
+# Subtest: session-aware dedupe does not let global suggestions block session suggestions
+ok 65 - session-aware dedupe does not let global suggestions block session suggestions
+  ---
+  duration_ms: 294.915042
+  type: 'test'
+  ...
+# Subtest: rerunning the same planning session dedupes inside that session
+ok 66 - rerunning the same planning session dedupes inside that session
+  ---
+  duration_ms: 127.098041
+  type: 'test'
+  ...
+# Subtest: previews and execution still work from session-linked suggestions
+ok 67 - previews and execution still work from session-linked suggestions
+  ---
+  duration_ms: 167.565801
+  type: 'test'
+  ...
+# Subtest: provider planning sessions use the configured provider for suggestions
+ok 68 - provider planning sessions use the configured provider for suggestions
+  ---
+  duration_ms: 327.467782
+  type: 'test'
+  ...
+# Subtest: configured provider can generate safe planning suggestions
+ok 69 - configured provider can generate safe planning suggestions
+  ---
+  duration_ms: 310.005491
+  type: 'test'
+  ...
+# Subtest: configured provider suggestion generation falls back to deterministic suggestions when provider is unavailable
+ok 70 - configured provider suggestion generation falls back to deterministic suggestions when provider is unavailable
+  ---
+  duration_ms: 208.9583
+  type: 'test'
+  ...
+# Subtest: provider runtime explains remote provider policy blocks
+ok 71 - provider runtime explains remote provider policy blocks
+  ---
+  duration_ms: 283.512855
+  type: 'test'
+  ...
+# Subtest: provider runtime explains missing API keys
+ok 72 - provider runtime explains missing API keys
+  ---
+  duration_ms: 79.454442
+  type: 'test'
+  ...
+# Subtest: provider runtime classifies provider HTTP authorization failures
+ok 73 - provider runtime classifies provider HTTP authorization failures
+  ---
+  duration_ms: 103.86098
+  type: 'test'
+  ...
+# Subtest: moves a file to local recovery trash with retention metadata and audit event
+ok 74 - moves a file to local recovery trash with retention metadata and audit event
+  ---
+  duration_ms: 229.360874
+  type: 'test'
+  ...
+# Subtest: prevents duplicate active trash records for the same file
+ok 75 - prevents duplicate active trash records for the same file
+  ---
+  duration_ms: 304.436265
+  type: 'test'
+  ...
+# Subtest: restores a trashed file record and records recovery audit event
+ok 76 - restores a trashed file record and records recovery audit event
+  ---
+  duration_ms: 99.249512
+  type: 'test'
+  ...
+# Subtest: prevents restoring a trash record more than once
+ok 77 - prevents restoring a trash record more than once
+  ---
+  duration_ms: 106.082291
+  type: 'test'
+  ...
+# Subtest: prevents restoring when indexed file path changed after trashing
+ok 78 - prevents restoring when indexed file path changed after trashing
+  ---
+  duration_ms: 103.289993
+  type: 'test'
+  ...
+# Subtest: blocks permanent purge in the local MVP and audits the denial
+ok 79 - blocks permanent purge in the local MVP and audits the denial
+  ---
+  duration_ms: 114.987872
+  type: 'test'
+  ...
+# Subtest: hides active trash records from file list visibility by default
+ok 80 - hides active trash records from file list visibility by default
+  ---
+  duration_ms: 88.570628
+  type: 'test'
+  ...
+# Subtest: hides active trash records from keyword search by default
+ok 81 - hides active trash records from keyword search by default
+  ---
+  duration_ms: 150.163391
+  type: 'test'
+  ...
+# Subtest: creates recovery snapshot with replay metadata
+ok 82 - creates recovery snapshot with replay metadata
+  ---
+  duration_ms: 278.623198
+  type: 'test'
+  ...
+# Subtest: lists recovery snapshots by file, preview, execution, and status
+ok 83 - lists recovery snapshots by file, preview, execution, and status
+  ---
+  duration_ms: 123.529484
+  type: 'test'
+  ...
+# Subtest: marks recovery snapshot used and failed
+ok 84 - marks recovery snapshot used and failed
+  ---
+  duration_ms: 104.142476
+  type: 'test'
+  ...
+# Subtest: rejects invalid recovery snapshot requests
+ok 85 - rejects invalid recovery snapshot requests
+  ---
+  duration_ms: 108.659436
+  type: 'test'
+  ...
+# Subtest: content search results include stable source references
+ok 86 - content search results include stable source references
+  ---
+  duration_ms: 182.544983
+  type: 'test'
+  ...
+# Subtest: filename and path search results include stable source references
+ok 87 - filename and path search results include stable source references
+  ---
+  duration_ms: 207.479726
+  type: 'test'
+  ...
+# Subtest: normal search hides trashed files while includeTrashed returns explicit trashed state
+ok 88 - normal search hides trashed files while includeTrashed returns explicit trashed state
+  ---
+  duration_ms: 435.923718
+  type: 'test'
+  ...
+# Subtest: failed extraction files remain searchable by filename with explicit failed extraction state
+ok 89 - failed extraction files remain searchable by filename with explicit failed extraction state
+  ---
+  duration_ms: 262.090655
+  type: 'test'
+  ...
+# Subtest: unsupported files remain searchable by filename with explicit unsupported extraction state
+ok 90 - unsupported files remain searchable by filename with explicit unsupported extraction state
+  ---
+  duration_ms: 97.275474
+  type: 'test'
+  ...
+# Subtest: stale missing files remain searchable by filename with explicit failed index state
+ok 91 - stale missing files remain searchable by filename with explicit failed index state
+  ---
+  duration_ms: 162.933816
+  type: 'test'
+  ...
+# Subtest: scanner skips persisted unchanged files and re-indexes changed files
+ok 92 - scanner skips persisted unchanged files and re-indexes changed files
+  ---
+  duration_ms: 208.281825
+  type: 'test'
+  ...
+# Subtest: persisted active source paths are selected for restart resume
+ok 93 - persisted active source paths are selected for restart resume
+  ---
+  duration_ms: 187.508527
+  type: 'test'
+  ...
+# Subtest: resumePersistedWatchers restarts only persisted active source paths
+ok 94 - resumePersistedWatchers restarts only persisted active source paths
+  ---
+  duration_ms: 175.739857
+  type: 'test'
+  ...
+# Subtest: resumePersistedWatchers reports failed persisted source paths without aborting remaining resumes
+ok 95 - resumePersistedWatchers reports failed persisted source paths without aborting remaining resumes
+  ---
+  duration_ms: 155.940257
+  type: 'test'
+  ...
+# Subtest: marks missing indexed files as stale failures during extraction
+ok 96 - marks missing indexed files as stale failures during extraction
+  ---
+  duration_ms: 301.412495
+  type: 'test'
+  ...
+# Subtest: undo without approval is rejected without audit or snapshot
+ok 97 - undo without approval is rejected without audit or snapshot
+  ---
+  duration_ms: 151.771318
+  type: 'test'
+  ...
+# Subtest: successful filesystem undo creates used undo snapshot and audit includes snapshot id
+ok 98 - successful filesystem undo creates used undo snapshot and audit includes snapshot id
+  ---
+  duration_ms: 109.714428
+  type: 'test'
+  ...
+# Subtest: undo source missing is rejected and audited without snapshot
+ok 99 - undo source missing is rejected and audited without snapshot
+  ---
+  duration_ms: 109.176032
+  type: 'test'
+  ...
+# Subtest: undo target exists is rejected and audited without snapshot
+ok 100 - undo target exists is rejected and audited without snapshot
+  ---
+  duration_ms: 284.972233
+  type: 'test'
+  ...
+# Subtest: semantic search hides trashed files by default and includes them when requested
+ok 101 - semantic search hides trashed files by default and includes them when requested
+  ---
+  duration_ms: 267.044081
+  type: 'test'
+  ...
+# Subtest: unified search does not leak trashed file-linked rows by default
+ok 102 - unified search does not leak trashed file-linked rows by default
+  ---
+  duration_ms: 286.175471
+  type: 'test'
+  ...
+# Subtest: watcher handles rapid file changes through debounced queued cycles
+ok 103 - watcher handles rapid file changes through debounced queued cycles
+  ---
+  duration_ms: 19172.5123
+  type: 'test'
+  ...
+# Subtest: wiki file pages do not use AI summaries as source-backed document body
+ok 104 - wiki file pages do not use AI summaries as source-backed document body
+  ---
+  duration_ms: 99.97045
+  type: 'test'
+  ...
+# Subtest: wiki file pages populate document body from extracted source text when available
+ok 105 - wiki file pages populate document body from extracted source text when available
+  ---
+  duration_ms: 74.295633
+  type: 'test'
+  ...
+# Subtest: wiki source chunks include page numbers when extraction metadata provides a page map
+ok 106 - wiki source chunks include page numbers when extraction metadata provides a page map
+  ---
+  duration_ms: 355.616052
+  type: 'test'
+  ...
+# Subtest: persists durable wiki pages, sections, sources, chunks, relations, and rebuild records
+ok 107 - persists durable wiki pages, sections, sources, chunks, relations, and rebuild records
+  ---
+  duration_ms: 527.870635
+  type: 'test'
+  ...
+# Subtest: durable wiki evidence routes expose pages, evidence, and source chunks
+ok 108 - durable wiki evidence routes expose pages, evidence, and source chunks
+  ---
+  duration_ms: 377.075321
+  type: 'test'
+  ...
+# Subtest: wiki validation preview route returns advisory read-only preview for persisted page
+ok 109 - wiki validation preview route returns advisory read-only preview for persisted page
+  ---
+  duration_ms: 259.814562
+  type: 'test'
+  ...
+# Subtest: wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history
+ok 110 - wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history
+  ---
+  duration_ms: 293.299454
+  type: 'test'
+  ...
+# Subtest: wiki build persists generated wiki on first build when no persisted wiki exists
+ok 111 - wiki build persists generated wiki on first build when no persisted wiki exists
+  ---
+  duration_ms: 133.601183
+  type: 'test'
+  ...
+# Subtest: wiki build no-op preserves persisted wiki pages after a real prior build
+ok 112 - wiki build no-op preserves persisted wiki pages after a real prior build
+  ---
+  duration_ms: 188.614193
+  type: 'test'
+  ...
+# Subtest: wiki build detects changed extraction dependencies and selectively replaces affected pages
+ok 113 - wiki build detects changed extraction dependencies and selectively replaces affected pages
+  ---
+  duration_ms: 17996.013889
+  type: 'test'
+  ...
+1..113
+# tests 113
+# suites 0
+# pass 112
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 32902.717263
+### runtime smoke start
+folder /tmp/eai-task-022/disposable-alpha
+health 200 {
+  status: 'ok',
+  service: 'everythingai-api',
+  timestamp: '2026-06-25T22:40:13.891Z'
+}
+index 201 {
+  indexed: 2,
+  files_found: undefined,
+  extracted: undefined,
+  automation: { enabled: false },
+  job: null
+}
+extract 200 {
+  total: 2,
+  extracted: 2,
+  failed: 0,
+  stale_missing: 0,
+  unsupported: 0,
+  skipped_unchanged: 0,
+  failedItems: [],
+  staleMissingItems: [],
+  unsupportedItems: [],
+  skippedItems: [],
+  diagnostics: {
+    failedItems: [],
+    staleMissingItems: [],
+    unsupportedItems: [],
+    skippedItems: []
+  }
+}
+files 200 {
+  count: 2,
+  sample: [
+    {
+      id: 'b1c67790285e25656ac441abd6c5a779b17347c3346bac5b46afbe49e0d76292',
+      filename: 'beta.md',
+      absolute_path: '/tmp/eai-task-022/disposable-alpha/subdir/beta.md',
+      index_status: 'indexed',
+      extraction_status: undefined,
+      recovery_status: 'active'
+    },
+    {
+      id: '138d1903c91bf5f1cdc566b1fea4804d58a939090dde59002606b9e1856dc338',
+      filename: 'alpha.txt',
+      absolute_path: '/tmp/eai-task-022/disposable-alpha/alpha.txt',
+      index_status: 'indexed',
+      extraction_status: undefined,
+      recovery_status: 'active'
+    }
+  ]
+}
+file_preview 200 {
+  file: {
+    id: 'b1c67790285e25656ac441abd6c5a779b17347c3346bac5b46afbe49e0d76292',
+    filename: 'beta.md',
+    absolute_path: '/tmp/eai-task-022/disposable-alpha/subdir/beta.md',
+    index_status: 'indexed',
+    extraction_status: 'extracted',
+    recovery_status: 'active'
+  },
+  preview: null,
+  source_reference: null
+}
+search 200 {
+  count: 1,
+  sample: [
+    {
+      id: '138d1903c91bf5f1cdc566b1fea4804d58a939090dde59002606b9e1856dc338',
+      filename: 'alpha.txt',
+      absolute_path: '/tmp/eai-task-022/disposable-alpha/alpha.txt',
+      index_status: 'indexed',
+      extraction_status: 'extracted',
+      recovery_status: 'active'
+    }
+  ]
+}
+status 200 {
+  status: {
+    total_files: 2,
+    indexed_files: 2,
+    failed_files: 0,
+    extracted_files: 2,
+    failed_extractions: 0,
+    searchable_files: 2,
+    embedded_files: 2,
+    insight_files: 2,
+    suggestions: 0,
+    last_indexed_at: '2026-06-25T22:40:14.117Z'
+  },
+  provider: { chat: 'ollama', model: null, configured: false }
+}
+wiki_build 500 { wiki: null, rebuild_id: null }
+wiki 200 {
+  page_count: 7,
+  generated_at: '2026-06-25T22:40:14.322Z',
+  sample_pages: [
+    {
+      id: 'workspace-overview',
+      title: 'Workspace Overview',
+      slug: 'workspace-overview'
+    },
+    {
+      id: 'category-projects-planning',
+      title: 'Projects & Planning',
+      slug: 'category-projects-planning'
+    },
+    {
+      id: 'category-legal-compliance',
+      title: 'Legal & Compliance',
+      slug: 'category-legal-compliance'
+    }
+  ]
+}
+wiki_diagnostics 200 {
+  diagnostics: {
+    generated_at: '2026-06-25T22:40:14.336Z',
+    page_stats: {
+      total_pages: 0,
+      active_pages: 0,
+      stale_pages: 0,
+      failed_pages: 0,
+      archived_pages: 0
+    },
+    evidence_stats: {
+      section_count: 0,
+      source_count: 0,
+      chunk_count: 0,
+      relation_count: 0
+    },
+    workspace_trust_health: {
+      status: 'unknown',
+      quality_score: 0,
+      quality_grade: 'F',
+      page_count: 0,
+      grade_counts: [Object],
+      reasons: [Array]
+    },
+    validation_summary: {
+      status: 'complete',
+      page_count: 0,
+      counts: [Object],
+      conflict_count: 0,
+      review_candidate_count: 0,
+      conflicts: [],
+      review_candidates: [],
+      reasons: [Array]
+    },
+    quality_summary: [],
+    build_state: [],
+    fingerprints: [],
+    dependencies: [],
+    rebuilds: [ [Object], [Object], [Object] ]
+  }
+}
+wiki_page_evidence 404 { error: 'Wiki page evidence not found', pageId: 'workspace-overview' }
+wiki_validation_preview 404 {
+  error: 'Wiki page validation preview not found',
+  pageId: 'workspace-overview'
+}
+### runtime smoke end

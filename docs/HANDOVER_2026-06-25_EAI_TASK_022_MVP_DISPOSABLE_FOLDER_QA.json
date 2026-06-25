@@ -1,44 +1,58 @@
 {
-  "task": "EAI-TASK-022",
-  "title": "Run MVP disposable-folder QA drill",
-  "status": "BLOCKED",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "task_id": "EAI-TASK-022",
+  "issue_number": 44,
+  "final_status": "BLOCKED",
   "environment": {
-    "repository": "/root/.hermes/projects/everythingAI",
-    "branch": "main",
-    "server": "http://127.0.0.1:4100",
-    "disposable_test_folder": "/tmp/eai-task-022/disposable-alpha",
-    "temp_database": "/tmp/eai-task-022/everythingai.sqlite"
+    "repo_root": "/root/.hermes/projects/everythingAI",
+    "server_api": "http://127.0.0.1:4100",
+    "server_db": "/tmp/eai-task-022/everythingai.sqlite",
+    "disposable_test_folder": "/tmp/eai-task-022/disposable-alpha"
   },
-  "disposable_folder_approach": "Created a disposable local folder outside the repository with two non-sensitive sample files (alpha.txt and subdir/beta.md) and used it for API-based MVP validation.",
+  "disposable_folder_approach": {
+    "path": "/tmp/eai-task-022/disposable-alpha",
+    "files": ["alpha.txt", "subdir/beta.md"],
+    "safety_note": "No real user or business files were used."
+  },
   "validated_steps": [
-    "Repository sync and framework doctor",
-    "Frontend typecheck",
-    "Frontend build",
-    "Backend tests",
-    "Indexing the disposable folder",
-    "Listing indexed files",
-    "Inspecting extracted document previews",
-    "Searching indexed content",
-    "Loading generated wiki content",
-    "Checking system status",
-    "Loading wiki diagnostics"
+    "git pull --ff-only",
+    "framework doctor",
+    "frontend typecheck",
+    "frontend build",
+    "backend tests",
+    "health endpoint",
+    "index disposable folder",
+    "extract disposable files",
+    "list indexed files",
+    "inspect extracted file preview",
+    "search indexed content",
+    "status endpoint",
+    "wiki generation endpoint",
+    "wiki diagnostics endpoint"
   ],
-  "not_validated_steps": [
-    "Persisted wiki build and persisted evidence routes"
+  "blocked_steps": [
+    "persisted wiki build",
+    "wiki source evidence endpoint",
+    "wiki validation preview endpoint"
   ],
-  "validation_results": {
+  "blocked_reason": "POST /api/wiki/build returned HTTP 500 with FOREIGN KEY constraint failed on the disposable local database.",
+  "results_summary": {
     "framework_doctor": "PASS",
     "frontend_typecheck": "PASS",
     "frontend_build": "PASS",
-    "backend_tests": "PASS",
-    "api_runtime_drill": "PARTIAL_PASS",
-    "wiki_build_persistence": "FAIL_FOREIGN_KEY_CONSTRAINT"
+    "backend_tests": "PASS (112 passed / 0 failed / 1 skipped)",
+    "runtime_smoke": "PARTIAL_PASS",
+    "persisted_wiki_build": "FAIL"
   },
-  "files_changed": [],
-  "risks_and_blockers": [
-    "POST /api/wiki/build failed with FOREIGN KEY constraint failed",
-    "Persisted wiki page/evidence routes could not be confirmed after the build failure"
+  "files_changed": [
+    "LOGS/EAI-TASK-022-terminal.log",
+    "REPORTS/EAI-TASK-022-MVP-DISPOSABLE-FOLDER-QA.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_022_MVP_DISPOSABLE_FOLDER_QA.json"
   ],
-  "recommended_next_task": "Investigate and fix wiki persistence integrity for POST /api/wiki/build using a fresh disposable database.",
-  "artifact_commit_sha": "f498171cc4e29ab148cf6b57532b68ec47e8123f"
+  "risks_and_blockers": [
+    "Wiki persistence integrity issue blocks full evidence-route validation on disposable data."
+  ],
+  "recommended_next_task": "Investigate POST /api/wiki/build foreign-key failure using a fresh disposable database and a minimal wiki persistence repro.",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA"
 }
