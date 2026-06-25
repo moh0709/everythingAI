@@ -87,6 +87,26 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
     [jobs]
   );
 
+  const queuedJobs = useMemo(
+    () => jobs.filter((job) => job.status === 'queued'),
+    [jobs]
+  );
+
+  const runningJobs = useMemo(
+    () => jobs.filter((job) => job.status === 'running'),
+    [jobs]
+  );
+
+  const completedJobs = useMemo(
+    () => jobs.filter((job) => job.status === 'completed'),
+    [jobs]
+  );
+
+  const failedJobs = useMemo(
+    () => jobs.filter((job) => job.status === 'failed'),
+    [jobs]
+  );
+
   const clearDisabled = clearing || activeJobs.length > 0 || !jobs.length;
 
   return (
@@ -143,6 +163,26 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
           <strong>{activeJobs.length}</strong>
           <span>Active Jobs</span>
         </div>
+
+        <div className="wiki-rebuild-summary-card">
+          <strong>{queuedJobs.length}</strong>
+          <span>Queued</span>
+        </div>
+
+        <div className="wiki-rebuild-summary-card">
+          <strong>{runningJobs.length}</strong>
+          <span>Running</span>
+        </div>
+
+        <div className="wiki-rebuild-summary-card">
+          <strong>{completedJobs.length}</strong>
+          <span>Completed</span>
+        </div>
+
+        <div className="wiki-rebuild-summary-card">
+          <strong>{failedJobs.length}</strong>
+          <span>Failed</span>
+        </div>
       </div>
 
       <WikiDiagnosticsPanel options={options} />
@@ -194,7 +234,7 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
 
           {!jobs.length ? (
             <div className="wiki-rebuild-empty">
-              No rebuild jobs have been executed yet.
+              No rebuild jobs have been executed yet. Start a rebuild to surface queued, running, completed, and failed progress stages here.
             </div>
           ) : null}
         </div>

@@ -16,6 +16,17 @@ type FileProgressRecord = IndexedFile & {
   extraction_error_message?: string | null;
 };
 
+type FileProgressSummary = {
+  total: number;
+  complete: number;
+  running: number;
+  waiting: number;
+  partial: number;
+  failed: number;
+  trashed: number;
+  noProgressData: number;
+};
+
 type ExplorerViewProps = {
   files: IndexedFile[];
   allFiles: IndexedFile[];
@@ -141,6 +152,62 @@ function summarizeFiles(files: IndexedFile[]) {
   };
 }
 
+function summarizeProgress(files: IndexedFile[]): FileProgressSummary {
+  const progressFiles = files as FileProgressRecord[];
+
+  return progressFiles.reduce<FileProgressSummary>((summary, file) => {
+    if (file.recovery_status === 'trashed') {
+      summary.trashed += 1;
+      return summary;
+    }
+
+    const hasIndexStatus = Boolean(file.index_status);
+    const hasExtractionStatus = Boolean(file.extraction_status);
+
+    if (file.index_status === 'failed' || file.extraction_status === 'failed') {
+      summary.failed += 1;
+      return summary;
+    }
+
+    if (file.extraction_status === 'extracted') {
+      summary.complete += 1;
+      return summary;
+    }
+
+    if (file.extraction_status === 'unsupported') {
+      summary.partial += 1;
+      return summary;
+    }
+
+    if (file.index_status === 'indexed' && !file.extraction_status) {
+      summary.running += 1;
+      return summary;
+    }
+
+    if (!hasIndexStatus && !hasExtractionStatus) {
+      summary.waiting += 1;
+      return summary;
+    }
+
+    if (hasIndexStatus || hasExtractionStatus) {
+      summary.waiting += 1;
+      return summary;
+    }
+
+    summary.noProgressData += 1;
+    return summary;
+  }, {
+    total: progressFiles.length,
+    complete: 0,
+    running: 0,
+    waiting: 0,
+    partial: 0,
+    failed: 0,
+    trashed: 0,
+    noProgressData: 0,
+  });
+}
+
 export function ExplorerView({
   files,
   allFiles,
@@ -160,6 +227,7 @@ export function ExplorerView({
 }: ExplorerViewProps) {
   const summary = summarizeFiles(allFiles);
   const visibleSummary = summarizeFiles(files);
+  const progressSummary = summarizeProgress(allFiles);
   const selectedProgress = getFileProgress((selectedFile || selectedPreview?.file) as FileProgressRecord | undefined);
 
   return <section>
@@ -173,28 +241,30 @@ export function ExplorerView({
       </div>
       <div className="settings-help-grid">
         <div>
-          <strong>Complete</strong>
-          <p>{summary.extracted} file(s) have finished indexing and extraction.</p>
+          <strong>Running</strong>
+          <p>{progressSummary.running} file(s) are indexed and still waiting on extracted text.</p>
         </div>
         <div>
-          <strong>Awaiting extraction</strong>
-          <p>{summary.awaitingExtraction} file(s) are indexed but still waiting on extracted text.</p>
+          <strong>Waiting</strong>
+          <p>{progressSummary.waiting} file(s) have not started or do not yet have enough progress data to classify further.</p>
+        </div>
+        <div>
+          <strong>Complete</strong>
+          <p>{progressSummary.complete} file(s) have finished indexing and extraction.</p>
         </div>
         <div>
           <strong>Failures</strong>
-          <p>{summary.indexFailed + summary.extractionFailed} file(s) reported an index or extraction failure.</p>
+          <p>{progressSummary.failed} file(s) reported an index or extraction failure.</p>
         </div>
         <div>
           <strong>Unsupported</strong>
-          <p>{summary.unsupported} file(s) are indexed but unsupported for extraction.</p>
-        </div>
-        <div>
-          <strong>Visible filters</strong>
-          <p>{visibleSummary.total} file(s) are currently shown by the active filters and search query.</p>
+          <p>{progressSummary.partial} file(s) are indexed but unsupported for extraction.</p>
         </div>
         <div>
           <strong>Next step</strong>
-          <p>Refresh the explorer after scanner/extractor activity to see the latest state.</p>
+          <p>{progressSummary.running > 0
+            ? 'Refresh the explorer after scanner/extractor activity to see the latest state.'
+            : 'If nothing is running, start a scan or open a file with missing progress data to inspect the next stage.'}</p>
         </div>
       </div>
     </div>
@@ -272,6 +342,7 @@ export function ExplorerView({
           <p><strong>Type:</strong> {selectedFile.extension}</p>
           <p><strong>Size:</strong> {formatSize(selectedFile.size_bytes)}</p>
           <p><strong>Progress:</strong> {selectedProgress.label} — {selectedProgress.detail}</p>
+          <p><strong>Progress state:</strong> {selectedProgress.state}</p>
           <h3>Tags</h3>
           <div className="chips">
             {dynamicTags(selectedFile, selectedPreview).map((tag) => <span className="chip blue" key={tag}>{tag}</span>)}

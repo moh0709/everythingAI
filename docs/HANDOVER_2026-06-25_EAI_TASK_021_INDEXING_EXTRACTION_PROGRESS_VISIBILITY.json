@@ -6,14 +6,16 @@
   "files_changed": [
     "apps/everything-ai-ui/src/user/ExploreView.tsx",
     "apps/everything-ai-ui/src/admin/components/ExplorerView.tsx",
+    "apps/everything-ai-ui/src/user/WikiRebuildPanel.tsx",
     "LOGS/EAI-TASK-021-terminal.log",
     "REPORTS/EAI-TASK-021-INDEXING-EXTRACTION-PROGRESS-VISIBILITY.md",
     "docs/HANDOVER_2026-06-25_EAI_TASK_021_INDEXING_EXTRACTION_PROGRESS_VISIBILITY.json"
   ],
   "behavior": [
-    "Added workspace progress snapshot to the user Explore view.",
-    "Added clearer per-file progress labels for indexing and extraction states.",
-    "Added admin Explorer summary counts for complete, awaiting extraction, failed, and unsupported files.",
+    "Added clearer user Explore progress snapshots based on existing file metadata.",
+    "Added progress-state and status details to file detail panes.",
+    "Added mirrored admin Explorer progress summaries for workspace monitoring.",
+    "Added Wiki rebuild job counts for queued, running, completed, and failed stages.",
     "Preserved read-only monitoring and existing search/filter/preview flows."
   ],
   "validation": {
@@ -26,6 +28,6 @@
   "artifact_commit_sha": "PENDING_COMMIT_SHA",
   "notes": [
     "No .hermes/state.json file existed in this repository snapshot, so it was not modified.",
-    "Final issue comment should include the real artifact commit SHA after push."
+    "Final issue comment should include the real artifact commit SHA after the metadata sync commit."
   ]
 }

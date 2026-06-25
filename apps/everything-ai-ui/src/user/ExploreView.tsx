@@ -39,6 +39,17 @@ type FileProgress = {
   state: string;
 };
 
+type FileProgressSummary = {
+  total: number;
+  complete: number;
+  running: number;
+  waiting: number;
+  partial: number;
+  failed: number;
+  trashed: number;
+  noProgressData: number;
+};
+
 function getFileProgress(file?: FileProgressRecord | null): FileProgress {
   if (!file) {
     return {
@@ -133,12 +144,69 @@ function summarizeFiles(files: IndexedFile[]) {
   };
 }
 
+function summarizeProgress(files: IndexedFile[]): FileProgressSummary {
+  const progressFiles = files as FileProgressRecord[];
+
+  return progressFiles.reduce<FileProgressSummary>((summary, file) => {
+    if (file.recovery_status === 'trashed') {
+      summary.trashed += 1;
+      return summary;
+    }
+
+    const hasIndexStatus = Boolean(file.index_status);
+    const hasExtractionStatus = Boolean(file.extraction_status);
+
+    if (file.index_status === 'failed' || file.extraction_status === 'failed') {
+      summary.failed += 1;
+      return summary;
+    }
+
+    if (file.extraction_status === 'extracted') {
+      summary.complete += 1;
+      return summary;
+    }
+
+    if (file.extraction_status === 'unsupported') {
+      summary.partial += 1;
+      return summary;
+    }
+
+    if (file.index_status === 'indexed' && !file.extraction_status) {
+      summary.running += 1;
+      return summary;
+    }
+
+    if (!hasIndexStatus && !hasExtractionStatus) {
+      summary.waiting += 1;
+      return summary;
+    }
+
+    if (hasIndexStatus || hasExtractionStatus) {
+      summary.waiting += 1;
+      return summary;
+    }
+
+    summary.noProgressData += 1;
+    return summary;
+  }, {
+    total: progressFiles.length,
+    complete: 0,
+    running: 0,
+    waiting: 0,
+    partial: 0,
+    failed: 0,
+    trashed: 0,
+    noProgressData: 0,
+  });
+}
+
 export function ExploreView({
   error, busy, status, baseUrl, setBaseUrl, token, setToken,
   query, setQuery, files, selectedFile, documentContext,
   refreshFiles, searchEverything, handleAskFromHero, loadDocumentContext, saveConnection,
 }: ExploreViewProps) {
   const summary = summarizeFiles(files);
+  const progressSummary = summarizeProgress(files);
   const selectedRecord = (documentContext?.file || selectedFile) as FileProgressRecord | undefined;
   const selectedProgress = getFileProgress(selectedRecord);
 
@@ -171,34 +239,36 @@ export function ExploreView({
       <div className="panel-title">
         <div>
           <h2><FileText /> Indexing & Extraction Progress</h2>
-          <p>Progress is inferred from the latest file index and extraction records so you can see what is complete, partial, or still waiting.</p>
+          <p>Progress is inferred from the latest file index and extraction records so you can see what is running, waiting, complete, partial, or failed.</p>
         </div>
         <span className="chip dark">{summary.total} file(s)</span>
       </div>
       <div className="settings-help-grid">
         <div>
-          <strong>Indexed</strong>
-          <p>{summary.indexed} file(s) are indexed and ready for follow-up extraction or review.</p>
+          <strong>Running</strong>
+          <p>{progressSummary.running} file(s) are indexed and still waiting for extraction to finish.</p>
         </div>
         <div>
-          <strong>Awaiting extraction</strong>
-          <p>{summary.awaitingExtraction} file(s) have been indexed but are still waiting for extracted text.</p>
+          <strong>Waiting</strong>
+          <p>{progressSummary.waiting} file(s) have not started or do not yet have enough progress data to classify further.</p>
         </div>
         <div>
           <strong>Complete</strong>
-          <p>{summary.extracted} file(s) have finished indexing and extraction.</p>
+          <p>{progressSummary.complete} file(s) have finished indexing and extraction.</p>
         </div>
         <div>
           <strong>Failures</strong>
-          <p>{summary.indexFailed + summary.extractionFailed} file(s) reported an index or extraction failure.</p>
+          <p>{progressSummary.failed} file(s) reported an index or extraction failure.</p>
         </div>
         <div>
           <strong>Unsupported</strong>
-          <p>{summary.unsupported} file(s) are indexed but unsupported for text extraction.</p>
+          <p>{progressSummary.partial} file(s) are indexed but unsupported for text extraction.</p>
         </div>
         <div>
           <strong>Next step</strong>
-          <p>Refresh the file list after the scanner or extractor finishes to see the latest state.</p>
+          <p>{progressSummary.running > 0
+            ? 'Refresh the file list after the scanner or extractor finishes to see the latest state.'
+            : 'If nothing is running, start a scan or open a file with missing progress data to inspect the next stage.'}</p>
         </div>
       </div>
     </section>
@@ -263,6 +333,7 @@ export function ExploreView({
           <p><strong>Path:</strong> {documentContext.file?.absolute_path}</p>
           <p><strong>Recovery:</strong> {(documentContext.file as any)?.recovery_status || 'active'}</p>
           <p><strong>Progress:</strong> {selectedProgress.label} — {selectedProgress.detail}</p>
+          <p><strong>Progress state:</strong> {selectedProgress.state}</p>
           <p><strong>Index status:</strong> {documentContext.file?.index_status || 'unknown'}</p>
           <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'pending'}</p>
           {(selectedRecord?.error_message || selectedRecord?.extraction_error_message) ? <p><strong>Reported issue:</strong> {selectedRecord?.error_message || selectedRecord?.extraction_error_message}</p> : null}
