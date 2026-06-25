@@ -70,4 +70,4 @@ Proceed to PM review. If approved, the next follow-up should be a connector enab
 
 ## Artifact commit SHA
 
-8fa26399bed2dd83b514f54feb19e9ad833224df
+99b41c69d9a619e1e34333ee6dda97286a7cb50f
