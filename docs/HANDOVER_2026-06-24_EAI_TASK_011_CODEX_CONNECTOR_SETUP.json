@@ -30,5 +30,5 @@
   },
   "blockers": [],
   "recommended_next_task": "Controlled connector-specific setup/testing for installed Claude Code.",
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA"
+  "artifact_commit_sha": "f736d8b"
 }
