@@ -177,6 +177,7 @@ export function SettingsView({
 
     <ProviderConfigurationPanel
       draft={activeDraft}
+      providerSettings={providerSettings}
       providerModels={providerModels}
       update={update}
     />

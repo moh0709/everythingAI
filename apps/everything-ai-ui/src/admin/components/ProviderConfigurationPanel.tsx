@@ -4,11 +4,12 @@ import { providerLabel } from '../../providerCatalog';
 
 type ProviderConfigurationPanelProps = {
   draft: ProviderSettings;
+  providerSettings: ProviderSettings | null;
   providerModels: ProviderModels | null;
   update: (path: string, value: unknown) => void;
 };
 
-export function ProviderConfigurationPanel({ draft, providerModels, update }: ProviderConfigurationPanelProps) {
+export function ProviderConfigurationPanel({ draft, providerSettings, providerModels, update }: ProviderConfigurationPanelProps) {
   const active = draft.activeProvider;
   const models = providerModels?.[active] || [];
 
@@ -45,28 +46,33 @@ export function ProviderConfigurationPanel({ draft, providerModels, update }: Pr
         Timeout MS
         <input type="number" value={draft.ollama.timeoutMs} onChange={(event) => update('ollama.timeoutMs', Number(event.target.value))} />
       </label>
-    </div> : <RemoteProviderConfiguration active={active} draft={draft} providerModels={providerModels} update={update} />}
+    </div> : <RemoteProviderConfiguration active={active} draft={draft} providerSettings={providerSettings} providerModels={providerModels} update={update} />}
   </div>;
 }
 
 type RemoteProviderConfigurationProps = {
   active: Exclude<ProviderName, 'ollama'>;
   draft: ProviderSettings;
+  providerSettings: ProviderSettings | null;
   providerModels: ProviderModels | null;
   update: (path: string, value: unknown) => void;
 };
 
-function RemoteProviderConfiguration({ active, draft, providerModels, update }: RemoteProviderConfigurationProps) {
+function RemoteProviderConfiguration({ active, draft, providerSettings, providerModels, update }: RemoteProviderConfigurationProps) {
   const activeBlock = draft[active];
+  const savedBlock = providerSettings?.[active];
   const models = providerModels?.[active] || [];
-  const hasSavedApiKey = activeBlock.apiKey === '__saved__';
+  const hasSavedApiKey = savedBlock?.apiKey === '__saved__';
   const hasDraftApiKey = Boolean(activeBlock.apiKey && !hasSavedApiKey);
-  const keyStatus = hasSavedApiKey ? 'Saved key present' : hasDraftApiKey ? 'Replacement key staged' : 'No key configured';
-  const keyGuidance = hasSavedApiKey
-    ? 'The saved secret is masked. Typing a new value replaces it on save; clearing it removes the saved key.'
-    : hasDraftApiKey
-      ? 'A replacement key is staged in this draft and will be stored only after Save AI Settings.'
-      : 'Paste a key to save one for this provider, or leave blank to keep this provider without credentials.';
+  const hasClearPending = hasSavedApiKey && activeBlock.apiKey === '';
+  const keyStatus = hasClearPending ? 'Clear pending' : hasSavedApiKey ? 'Saved key present' : hasDraftApiKey ? 'Replacement key staged' : 'No key configured';
+  const keyGuidance = hasClearPending
+    ? 'The saved secret is masked and will be removed when you save AI settings.'
+    : hasSavedApiKey
+      ? 'The saved secret is masked. Typing a new value replaces it on save; clearing it stages a remove-on-save action.'
+      : hasDraftApiKey
+        ? 'A replacement key is staged in this draft and will be stored only after Save AI Settings.'
+        : 'Paste a key to save one for this provider, or leave blank to keep this provider without credentials.';
 
   return <div className="settings-grid">
     <label>
@@ -81,7 +87,8 @@ function RemoteProviderConfiguration({ active, draft, providerModels, update }: 
       <span className="muted">API key lifecycle: {keyStatus}. {keyGuidance}</span>
       <div className="button-row">
         {hasSavedApiKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '')}>Clear saved key</button>}
-        {hasSavedApiKey && <span className="scope-pill">Saved / replace / clear visibility</span>}
+        {hasSavedApiKey && <span className="scope-pill">Saved key</span>}
+        {hasClearPending && <span className="scope-pill">Clear pending</span>}
         {hasDraftApiKey && <span className="scope-pill">Replacement staged</span>}
       </div>
     </label>
