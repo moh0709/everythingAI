@@ -1,0 +1,32 @@
+{
+  "issue_number": 33,
+  "issue_title": "EAI-TASK-011: Controlled Codex connector setup and safe probe verification",
+  "final_status": "PASS",
+  "codex_path": "/usr/bin/codex",
+  "codex_version": "codex-cli 0.142.0",
+  "detection_result": "Codex detected on PATH and marked command-safe.",
+  "version_probe_result": "Codex version probe completed successfully with bridge enabled.",
+  "backend_safety": {
+    "bridge_enabled_by_default": false,
+    "chat_enabled_by_default": false,
+    "arbitrary_shell_commands": false,
+    "codex_auth_strategy": "codex-app"
+  },
+  "ui_boundary": {
+    "admin_only": true,
+    "client_workspace_exposure": false,
+    "chat_kept_disabled": true
+  },
+  "validation": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "api_tests": "PASS",
+    "detect_agent_connectors": "PASS",
+    "probe_agent_versions_codex": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS"
+  },
+  "blockers": [],
+  "recommended_next_task": "Controlled connector-specific setup/testing for Claude Code.",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA"
+}
