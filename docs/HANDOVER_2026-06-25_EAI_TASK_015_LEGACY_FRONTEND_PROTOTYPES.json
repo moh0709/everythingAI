@@ -1,0 +1,42 @@
+{
+  "task": "EAI-TASK-015",
+  "status": "PASS",
+  "summary": "Reviewed legacy frontend prototype files and confirmed they are archived reference-only artifacts, not active runtime dependencies.",
+  "active_runtime_preserved": true,
+  "files_changed": [],
+  "reference_checks": {
+    "AppEnhanced": "No active runtime references found in the user/admin entrypoints or build config.",
+    "AppComplete": "No active runtime references found in the user/admin entrypoints or build config.",
+    "App import pattern": "No active entrypoint references found for from './App', from './App.tsx', or <App.",
+    "active_entrypoints": [
+      "apps/everything-ai-ui/index.html -> /src/main.tsx",
+      "apps/everything-ai-ui/admin.html -> /src/admin-main.tsx",
+      "apps/everything-ai-ui/src/main.tsx -> UserApp",
+      "apps/everything-ai-ui/src/admin-main.tsx -> AdminApp",
+      "apps/everything-ai-ui/vite.config.ts -> user/admin build inputs"
+    ],
+    "archive_context": [
+      "apps/everything-ai-ui/tsconfig.json excludes src/App.tsx, src/AppEnhanced.tsx, and src/AppComplete.tsx",
+      "apps/everything-ai-ui/src/admin/README.md documents the legacy prototype files as reference-only",
+      "apps/everything-ai-ui/src/admin/AdminApp.tsx only mentions AppComplete.tsx in a comment"
+    ]
+  },
+  "validation": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS on retry after a flaky first failure"
+  },
+  "artifacts": [
+    "LOGS/EAI-TASK-015-terminal.log",
+    "REPORTS/EAI-TASK-015-LEGACY-FRONTEND-PROTOTYPES.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_015_LEGACY_FRONTEND_PROTOTYPES.json",
+    ".hermes/state.json"
+  ],
+  "state_file_updated": true,
+  "state_file_note": "Updated because .hermes/state.json already existed in this checkout.",
+  "rollback": "No code rollback is needed. If the archived prototype files are later removed, restore them from version control.",
+  "recommended_next_task": "Extract admin/components/AdminHeader.tsx from the admin runtime boundary.",
+  "artifact_commit_sha": "pending final commit creation"
+}
