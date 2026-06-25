@@ -10,7 +10,7 @@
 - **Current branch:** `main`
 - **Starting commit SHA:** `e0cc706`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `b8c028f`
 - **Final SHA source of truth:** GitHub issue comment after artifact push
 
 ## Files changed
@@ -55,4 +55,4 @@ Proceed to the next open `pm:ready` + `hermes:ready` issue that does not already
 
 ## Artifact commit SHA
 
-`PENDING_COMMIT_SHA`
+`b8c028f`

@@ -4,7 +4,7 @@
   "taskId": "EAI-TASK-018",
   "issueNumber": 40,
   "finalStatus": "PASS",
-  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "artifactCommitSha": "b8c028f",
   "validationStatusSummary": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
