@@ -10,7 +10,7 @@ PASS
 
 ## Commit metadata
 - Starting commit SHA: 840a64a92d992089cbbf35ae50397e6809c737d6
-- Artifact commit SHA: 8645016d2b851f6c0e3f65af99f4335cf9a07fac
+- Artifact commit SHA: PENDING_FINAL_COMMIT_SHA
 
 ## Validation summary
 - `git pull --ff-only`: PASS
