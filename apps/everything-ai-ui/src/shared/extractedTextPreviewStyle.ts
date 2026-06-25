@@ -4,4 +4,5 @@ export const extractedTextPreviewStyle: CSSProperties = {
   margin: 0,
   fontFamily: 'inherit',
   overflowWrap: 'anywhere',
+  whiteSpace: 'normal',
 };
