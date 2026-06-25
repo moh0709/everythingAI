@@ -1,0 +1,44 @@
+{
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "task_id": "EAI-TASK-020",
+  "issue_number": 42,
+  "final_status": "PASS",
+  "validation": {
+    "git_pull": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "preview_behavior": [
+    "Whitespace-only preview text is ignored before falling back to richer extracted text sources.",
+    "Extracted content is rendered as structured preview blocks instead of one raw preformatted blob.",
+    "Headings, paragraphs, lists, and table-like rows are visually separated for easier scanning.",
+    "Long previews show a readability note when truncation is applied.",
+    "Sparse or low-confidence extraction is flagged in the preview note."
+  ],
+  "preserved_behavior": [
+    "User Explore preview still works.",
+    "Admin Explorer preview still works.",
+    "Existing file preview endpoint compatibility was not changed.",
+    "Existing extracted text storage was not changed.",
+    "Client Workspace remains read-only for inspection."
+  ],
+  "files_changed": [
+    "apps/everything-ai-ui/src/shared/ExtractedTextPreview.ts",
+    "apps/everything-ai-ui/src/shared/ExtractedTextPreviewImpl.tsx",
+    "apps/everything-ai-ui/src/shared/extractedTextPreview.css",
+    "apps/everything-ai-ui/src/shared/extractedTextPreviewStyle.ts",
+    "apps/everything-ai-ui/src/shared/selectExtractedPreviewText.ts",
+    "LOGS/EAI-TASK-020-terminal.log",
+    "REPORTS/EAI-TASK-020-EXTRACTED-DOCUMENT-PREVIEW-READABILITY.md"
+  ],
+  "risks": [
+    "Heading/list/table heuristics may occasionally over-classify unusual prose or OCR output.",
+    "The preview cap may hide content beyond the readability window for very long files."
+  ],
+  "rollback_note": "Revert the shared preview files and component-specific preview CSS if the new formatting needs to be removed.",
+  "recommended_next_task": "Review the next pm:ready / hermes:ready issue when it appears.",
+  "artifact_commit_sha": "d6fe236d4758b8b148071d38feefb6e5ec3434d2"
+}
