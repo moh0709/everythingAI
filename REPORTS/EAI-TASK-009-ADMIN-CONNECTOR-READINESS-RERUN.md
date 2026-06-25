@@ -53,21 +53,21 @@ No client workspace exposure or boundary weakening was observed in the inspected
 ## Command output summary
 
 - `git pull --ff-only`: already up to date
-- `command -v codex`: `/usr/bin/codex`
-- `codex --version`: `codex-cli 0.142.0`
-- `command -v claude`: `/usr/bin/claude`
-- `claude --version`: `2.1.191 (Claude Code)`
 - `node scripts/framework-doctor.mjs`: PASS
 - `cd services/api && npm test`: PASS
 - `cd services/api && node src/scripts/detectAgentConnectors.js`: PASS
 - `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode`: PASS
 - `cd apps/everything-ai-ui && npm run typecheck`: PASS
 - `cd apps/everything-ai-ui && npm run build`: PASS
+- `command -v codex`: `/usr/bin/codex`
+- `codex --version`: `codex-cli 0.142.0`
+- `command -v claude`: `/usr/bin/claude`
+- `claude --version`: `2.1.191 (Claude Code)`
 
 ## Recommendation
 
-Proceed to PM review. If approved, the next follow-up should be a connector enablement/usage task rather than another readiness rerun.
+Proceed to PM review. No additional connector readiness rerun is required unless the local CLI installation changes again.
 
 ## Artifact commit SHA
 
-99b41c69d9a619e1e34333ee6dda97286a7cb50f
+5c4e8d530a88b6bb9b396de0447daa2115e04104
