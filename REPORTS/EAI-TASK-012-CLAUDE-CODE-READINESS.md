@@ -10,7 +10,7 @@ Validated that Claude Code is available on PATH, reports the expected CLI versio
 - **Current branch:** `main`
 - **Starting commit SHA:** `427f289d14f79f2a2adda16e0b3c5905a8dd2fac`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `afbae7e`
 - **Final SHA source of truth:** `follow-up metadata commit`
 
 ## Validation results
@@ -61,4 +61,4 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Claude
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-012-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json`
-- Artifact commit SHA: `PENDING_COMMIT_SHA`
+- Artifact commit SHA: `afbae7e`
