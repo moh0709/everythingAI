@@ -95,4 +95,4 @@ This is the smallest safe cleanup step because it only rewires the admin bootstr
 
 ## Artifact commit SHA
 
-PENDING_COMMIT_SHA
+76de16fdb4fd1df049ef3759f02c9fe26fdd0a36

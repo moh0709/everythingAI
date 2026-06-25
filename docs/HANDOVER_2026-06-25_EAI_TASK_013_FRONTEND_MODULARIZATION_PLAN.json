@@ -20,5 +20,5 @@
     "The active admin bootstrap still points at the monolithic AdminAppV2 path.",
     "The required .hermes/state.json artifact is absent and cannot be created under the current worker rule."
   ],
-  "artifactCommitSha": "PENDING_COMMIT_SHA"
+  "artifactCommitSha": "76de16fdb4fd1df049ef3759f02c9fe26fdd0a36"
 }
