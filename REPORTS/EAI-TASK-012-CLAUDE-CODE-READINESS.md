@@ -1,55 +1,56 @@
-# EAI-TASK-012: Verify Claude Code CLI readiness
+# EAI-TASK-012: Claude Code Readiness Verification
 
-## Final status
-PASS
+**Final status:** PASS
 
-## Issue
-- Number: 34
-- Title: EAI-TASK-012: Verify Claude Code CLI readiness
-- URL: https://github.com/moh0709/everythingAI/issues/34
+## Summary
+Validated that Claude Code remains available on PATH, reports the expected CLI version, and is handled only through the safe admin/operator connector path. The repo stayed on `main`, no core product code was changed, framework doctor passed, the API test suite passed, Claude Code detection/probe commands succeeded, and the UI typecheck/build checks passed.
 
-## Commit metadata
-- Starting commit SHA: 840a64a92d992089cbbf35ae50397e6809c737d6
-- Artifact commit SHA: PENDING_FINAL_COMMIT_SHA
-
-## Validation summary
-- `git pull --ff-only`: PASS
-- `node scripts/framework-doctor.mjs`: PASS
-- `cd services/api && npm test`: PASS
-- `node services/api/src/scripts/detectAgentConnectors.js`: PASS
-- `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node services/api/src/scripts/probeAgentVersions.js claudeCode`: PASS
-- `cd apps/everything-ai-ui && npm run typecheck`: PASS
-- `cd apps/everything-ai-ui && npm run build`: PASS
-- `command -v claude`: PASS (`/usr/bin/claude`)
-- `claude --version`: PASS (`2.1.191 (Claude Code)`)
+## Validation results
+- `git pull --ff-only` — PASS
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd services/api && npm test` — PASS
+- `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
+- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js claudeCode` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `command -v claude` — PASS (`/usr/bin/claude`)
+- `claude --version` — PASS (`2.1.191 (Claude Code)`)
 
 ## Claude Code readiness summary
-- Claude Code is installed and visible on PATH at `/usr/bin/claude`.
-- The repository detection script reports `claudeCode` as found on PATH.
-- The safe version probe completed successfully with bridge opt-in enabled locally.
-- Version reported by the CLI: `2.1.191 (Claude Code)`.
-- The probe remained version-only and did not enable chat execution.
+- Command path: `/usr/bin/claude`
+- Version: `2.1.191 (Claude Code)`
+- Detection: PASS
+- Version probe: PASS
+- Result: Claude Code is usable for safe version/readiness probes on this machine.
 
 ## Backend safety findings
-- `services/api/src/agents/localAgentBridge.js` keeps bridge and chat execution disabled by default.
-- Safe probe actions are limited to `version` and `help`.
-- Unsafe shell characters are rejected before execution.
-- `services/api/src/scripts/probeAgentVersions.js` refuses chat-enabled probes and requires explicit local bridge opt-in.
-- The detection script is detection-only and does not run commands beyond PATH lookup.
+PASS. The backend bridge keeps execution constrained:
+- `services/api/src/agents/localAgentBridge.js` blocks arbitrary shell execution and only permits safe probe actions (`version`, `help`).
+- The bridge remains disabled unless `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true` is set locally.
+- Chat execution remains off unless both the bridge and chat flags are set locally.
+- `services/api/src/routes/agentBridge.routes.js` exposes only the controlled status, detect, probe, and chat endpoints; detection/probe routes do not execute arbitrary browser-supplied commands.
+- Detection/probe results stay limited to safe PATH checks and version probes.
 
 ## Admin UI boundary findings
-- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` is explicitly admin-only.
-- The panel states that Agent Connectors are not exposed in the Client Workspace.
-- The panel and Admin Header provide Admin navigation to Agent Connectors.
-- The UI copy continues to describe Client Workspace as provider-only, with connector controls reserved for Admin settings.
+PASS. The admin UI keeps connector controls scoped to Admin settings:
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx` routes `Agent Connectors` into Admin Settings using the `#agent-connectors` hash.
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` mounts `AgentConnectorsPanel` inside the admin settings experience.
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` documents Claude Code as an admin/operator target with chat disabled and readiness checks gated.
+- No Client Workspace connector controls were introduced.
+
+## Reported connector detection/probe results
+- Claude Code was detected on PATH.
+- Claude Code version probe succeeded with `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true`.
+- The safe-probe path stayed in version mode only; no chat execution was enabled.
+- No new connector exposure was introduced beyond the admin/operator boundary already present in the repo.
 
 ## Blockers
-- None.
+None.
 
-## Recommended next step
-- PM review of EAI-TASK-012 and, if accepted, continue with the next connector/readiness backlog item.
+## Recommended next task
+Proceed with the next PM-reviewed ready issue in the queue. No additional Claude Code setup work is required from this task.
 
-## Artifact notes
-- `LOGS/EAI-TASK-012-terminal.log` captured the validation run.
-- `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json` captures the machine-readable summary.
-- `.hermes/state.json` was updated as part of the workflow.
+## Artifacts
+- Terminal log: `LOGS/EAI-TASK-012-terminal.log`
+- Handover JSON: `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json`
+- Artifact commit SHA: `PENDING_ARTIFACT_COMMIT_SHA`

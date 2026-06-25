@@ -1,30 +1,33 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-012",
-  "issueNumber": 34,
-  "finalStatus": "PASS",
-  "startingCommitSha": "840a64a92d992089cbbf35ae50397e6809c737d6",
-  "artifactCommitSha": "PENDING_FINAL_COMMIT_SHA",
-  "validationStatus": {
-    "gitPull": "PASS",
-    "frameworkDoctor": "PASS",
-    "apiTests": "PASS",
-    "detectAgentConnectors": "PASS",
-    "probeClaudeCodeVersion": "PASS",
-    "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "claudeCommand": "PASS",
-    "claudeVersion": "PASS"
+  "task_id": "EAI-TASK-012",
+  "issue_number": 34,
+  "final_status": "PASS",
+  "validation": {
+    "framework_doctor": "PASS",
+    "api_tests": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "codex_detection": "PASS",
+    "claude_detection": "PASS",
+    "claude_probe": "PASS"
   },
-  "claudeCode": {
-    "commandPath": "/usr/bin/claude",
-    "version": "2.1.191 (Claude Code)",
-    "detected": true,
-    "probeSucceeded": true,
-    "chatEnabled": false
+  "readiness_summary": {
+    "codex": {
+      "path": "/usr/bin/codex",
+      "version": "codex-cli 0.142.0"
+    },
+    "claude_code": {
+      "path": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)"
+    },
+    "hermes_ready_for_real_everythingai_tasks": true
   },
-  "hermesReadyForRealEverythingAITasks": true,
-  "remainingRisks": [],
-  "recommendedNextTask": "PM review of EAI-TASK-012"
+  "remaining_risks": [],
+  "recommended_next_pm_task": "Proceed with the next PM-reviewed ready issue in the queue.",
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "terminal_log": "LOGS/EAI-TASK-012-terminal.log",
+  "report": "REPORTS/EAI-TASK-012-CLAUDE-CODE-READINESS.md",
+  "state_file": "not present"
 }
