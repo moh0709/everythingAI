@@ -1,95 +1,109 @@
-# EAI-TASK-013: Frontend Modularization Cleanup Plan for Admin UI
+# EAI-TASK-013: Frontend Modularization Cleanup Plan
 
 **Final status:** PASS
 
-## Scope reviewed
-I inspected the current admin/frontend structure and the following reference material:
-
-- `docs/NEXT_IMPLEMENTATION_BACKLOG_2026-06-24.md`
-- `docs/HANDOVER_2026-06-24_PHASE8_3_FINAL_CONNECTOR_GATE_CLEARED.json`
-- `REPORTS/EAI-TASK-010-PHASE8_3-CLOSEOUT-AND-NEXT-BACKLOG.md`
-- `apps/everything-ai-ui/src/admin/**`
-- `apps/everything-ai-ui/src/components/**`
-- `apps/everything-ai-ui/src/shared/**`
-- `apps/everything-ai-ui/src/user/**`
+## Summary
+I inspected the current admin and frontend structure and validated the repository with the required safe checks. No production behavior was changed, and no broad refactor was performed. The repo is in a good state for the next low-risk admin modularization cleanup step.
 
 ## Current admin UI entry points
-The active admin path is:
+Current browser entry flow:
 
-- `apps/everything-ai-ui/admin.html`
-- `apps/everything-ai-ui/src/admin-main.tsx`
-- `apps/everything-ai-ui/src/admin/AdminApp.tsx`
-- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
+```text
+admin.html
+  -> src/admin-main.tsx
+  -> src/admin/AdminAppV2.tsx
+```
 
-The Vite build input also points to `admin.html` as the admin entry.
+Current modular admin implementation already present in the repo:
+
+```text
+src/admin/AdminApp.tsx
+  -> src/admin/AdminRuntimeApp.tsx
+  -> src/admin/components/AdminViewRouter.tsx
+```
+
+User-facing entry flow remains separate and unchanged:
+
+```text
+index.html
+  -> src/main.tsx
+  -> src/UserApp.tsx
+```
 
 ## Active admin runtime boundary
-The active runtime boundary is the modular admin implementation:
+The active runtime boundary is still the legacy `AdminAppV2` path because `src/admin-main.tsx` imports `AdminAppV2` directly.
 
-- `src/admin/AdminApp.tsx` is the boundary component loaded by the admin entry.
-- `src/admin/AdminRuntimeApp.tsx` contains the working admin runtime.
-- `src/admin/components/*` contains the split admin views and panels.
+The modular replacement is already in place, but it is not wired to the admin entry yet:
 
-This is the runtime that `admin.html` actually reaches today.
+- `src/admin/AdminApp.tsx` wraps `AdminRuntimeApp`
+- `src/admin/AdminRuntimeApp.tsx` contains the modular admin state/runtime
+- `src/admin/components/AdminViewRouter.tsx` routes the modular admin sections
 
 ## Suspected legacy or redundant admin/frontend paths
-The following paths appear legacy, redundant, or migration-only:
+Likely cleanup targets, in priority order:
 
-- `apps/everything-ai-ui/src/admin/admin-main.tsx` — redundant nested admin entrypoint; not referenced by `admin.html` or Vite input.
-- `apps/everything-ai-ui/src/admin/AdminAppV2.tsx` — older monolithic admin implementation kept as a migration artifact.
-- `apps/everything-ai-ui/src/App.tsx`
-- `apps/everything-ai-ui/src/AppEnhanced.tsx`
-- `apps/everything-ai-ui/src/AppComplete.tsx`
+1. `apps/everything-ai-ui/src/admin/admin-main.tsx`
+   - still points at `AdminAppV2`
+   - appears to be the active legacy admin entry
 
-The current docs already describe the root admin entry as the active route, so the nested `src/admin/admin-main.tsx` is the clearest dead-path cleanup candidate.
+2. `apps/everything-ai-ui/src/admin/AdminAppV2.tsx`
+   - legacy admin implementation still used by the entry file
+   - duplicates the responsibilities already moved into `AdminApp.tsx` / `AdminRuntimeApp.tsx`
+
+3. `apps/everything-ai-ui/src/App.tsx`
+4. `apps/everything-ai-ui/src/AppEnhanced.tsx`
+5. `apps/everything-ai-ui/src/AppComplete.tsx`
+   - legacy operator prototypes retained for migration/reference
+   - explicitly excluded from strict frontend typechecking in `apps/everything-ai-ui/tsconfig.json`
+
+6. Documentation mismatch
+   - `apps/everything-ai-ui/src/admin/README.md` documents the modular boundary, but the actual entry still uses `AdminAppV2`
+   - this should be aligned after the entry switch
 
 ## Recommended first safe cleanup task
-**Remove the redundant nested admin entry file `apps/everything-ai-ui/src/admin/admin-main.tsx`.**
+**Switch the admin entry to the modular admin boundary**.
 
-Why this first:
-- It is not part of the admin HTML entry flow.
-- It is not referenced by Vite build input.
-- It is a low-risk dead-path deletion that does not alter production behavior.
-- It reduces confusion between the active modular admin entry and the older nested prototype entry.
+Concretely:
+- update `apps/everything-ai-ui/src/admin/admin-main.tsx` to render `AdminApp` instead of `AdminAppV2`
+- keep the existing runtime behavior unchanged
+- validate the build/typecheck after the wiring change
+
+This is the safest first step because it does not require a broad refactor and it makes the already-built modular admin path the real runtime entry.
 
 ## Files likely involved in that first task
-Primary file:
-
 - `apps/everything-ai-ui/src/admin/admin-main.tsx`
-
-Possibly update documentation if desired for clarity, but not required for runtime correctness:
-
+- `apps/everything-ai-ui/src/admin/AdminApp.tsx`
+- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
+- `apps/everything-ai-ui/src/admin/AdminAppV2.tsx`
 - `apps/everything-ai-ui/src/admin/README.md`
 - `apps/everything-ai-ui/README.md`
 
-## Exact acceptance criteria for the first cleanup task
-- `apps/everything-ai-ui/admin.html` still points to `src/admin-main.tsx`.
-- `apps/everything-ai-ui/src/admin/admin-main.tsx` is removed.
-- No build or typecheck references remain to the removed nested entry.
-- `npm run typecheck` passes in `apps/everything-ai-ui`.
-- `npm run build` passes in `apps/everything-ai-ui`.
-- Manual admin entry still loads through `http://localhost:5152/admin.html`.
-- No user-facing routing or admin-only boundary behavior changes.
+## Acceptance criteria for the first cleanup task
+- `admin.html` loads through `AdminApp` / `AdminRuntimeApp` rather than `AdminAppV2`
+- the admin UI still builds successfully
+- frontend typecheck still passes
+- the user-facing entry point (`main.tsx` / `UserApp.tsx`) remains untouched
+- no production behavior changes
+- no admin/operator functionality is removed during the entry wiring change
 
 ## Validation results
 - `git pull --ff-only` — PASS (`Already up to date.`)
 - `node scripts/framework-doctor.mjs` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS (`113` tests, `112` passed, `1` skipped, `0` failed)
+- `cd services/api && npm test` — PASS (`113` tests total, `112` passed, `1` skipped, `0` failed)
 
 ## Risks and non-goals
 ### Risks
-- Any external documentation or operator habit that still expects the nested admin entry would need correction, though no such active references were found in the repo scan.
-- The old monolithic `AdminAppV2.tsx` remains present as a migration artifact and should be retired only after the dead entrypoint cleanup is safely confirmed.
+- The admin docs currently describe the modular runtime, so a wiring mismatch could confuse future maintenance until the entry file is aligned.
+- Legacy admin prototypes are still present, so cleanup should be staged and validated one step at a time.
 
 ### Non-goals
-- No broad frontend refactor.
-- No production behavior change.
-- No user-facing route changes.
-- No changes to agent bridge policy or connector safety boundaries.
-- No state file update, because `.hermes/state.json` does not exist in this repository.
+- No broad refactor of admin components in this task.
+- No user-facing behavior changes.
+- No backend API changes.
+- No enablement of agent bridge execution or chat.
+- No changes to `.hermes/state.json` because that file does not exist in this repo checkout.
 
 ## Artifact commit SHA
-`3bc6de9`
+`03d1e6f`

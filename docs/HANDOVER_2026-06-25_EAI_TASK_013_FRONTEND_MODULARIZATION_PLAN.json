@@ -1,47 +1,36 @@
 {
-  "repository": "moh0709/everythingAI",
-  "branch": "main",
   "issue": 35,
-  "task": "EAI-TASK-013",
-  "finalStatus": "PASS",
-  "artifactCommitSha": "3bc6de9",
-  "validationSummary": {
+  "title": "EAI-TASK-013: Plan frontend modularization cleanup for admin UI",
+  "status": "PASS",
+  "artifactCommitSha": "03d1e6f",
+  "repoRoot": "/root/.hermes/projects/everythingAI",
+  "branch": "main",
+  "summary": "Inspected admin/frontend entry points, confirmed the modular admin runtime exists but is not yet the active entry, and produced a low-risk cleanup plan focused on wiring admin-main.tsx to AdminApp.",
+  "currentAdminEntry": [
+    "admin.html",
+    "src/admin-main.tsx",
+    "src/admin/AdminAppV2.tsx"
+  ],
+  "modularAdminBoundary": [
+    "src/admin/AdminApp.tsx",
+    "src/admin/AdminRuntimeApp.tsx",
+    "src/admin/components/AdminViewRouter.tsx"
+  ],
+  "recommendedFirstTask": "Switch src/admin-main.tsx to render AdminApp instead of AdminAppV2, then re-run frontend validation.",
+  "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
     "apiTests": "PASS"
   },
-  "currentAdminEntryPoints": [
-    "apps/everything-ai-ui/admin.html",
-    "apps/everything-ai-ui/src/admin-main.tsx",
-    "apps/everything-ai-ui/src/admin/AdminApp.tsx",
-    "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
-    "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx"
+  "artifacts": [
+    "LOGS/EAI-TASK-013-terminal.log",
+    "REPORTS/EAI-TASK-013-FRONTEND-MODULARIZATION-PLAN.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_013_FRONTEND_MODULARIZATION_PLAN.json"
   ],
-  "activeAdminRuntimeBoundary": "apps/everything-ai-ui/src/admin/AdminApp.tsx -> apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
-  "legacyOrRedundantPaths": [
-    "apps/everything-ai-ui/src/admin/admin-main.tsx",
-    "apps/everything-ai-ui/src/admin/AdminAppV2.tsx",
-    "apps/everything-ai-ui/src/App.tsx",
-    "apps/everything-ai-ui/src/AppEnhanced.tsx",
-    "apps/everything-ai-ui/src/AppComplete.tsx"
-  ],
-  "recommendedFirstSafeCleanupTask": "Remove the redundant nested admin entry file apps/everything-ai-ui/src/admin/admin-main.tsx.",
-  "filesLikelyInvolved": [
-    "apps/everything-ai-ui/src/admin/admin-main.tsx",
-    "apps/everything-ai-ui/src/admin/README.md",
-    "apps/everything-ai-ui/README.md"
-  ],
-  "acceptanceCriteria": [
-    "admin.html still points to src/admin-main.tsx",
-    "the nested admin entry file is removed",
-    "no remaining build/typecheck references point to the removed file",
-    "apps/everything-ai-ui npm run typecheck passes",
-    "apps/everything-ai-ui npm run build passes",
-    "admin.html still loads the modular admin dashboard",
-    "no user-facing routing or admin-only boundary behavior changes"
-  ],
-  "stateFileUpdated": false,
-  "notes": "No .hermes/state.json file existed, so no state update was made."
+  "notes": [
+    "No core application code was modified.",
+    "No .hermes/state.json file exists in this checkout, so it was not updated."
+  ]
 }
