@@ -1,44 +1,27 @@
 {
-  "repository": "moh0709/everythingAI",
-  "branch": "main",
-  "task_id": "EAI-TASK-020",
-  "issue_number": 42,
-  "final_status": "PASS",
+  "issue": 42,
+  "task": "EAI-TASK-020",
+  "title": "Improve extracted document preview readability",
+  "status": "PASS",
+  "artifact_commit_sha": "647a5a1e263675d7cd13ada354854795fee7c364",
+  "files_changed": [
+    "LOGS/EAI-TASK-020-terminal.log",
+    "REPORTS/EAI-TASK-020-EXTRACTED-DOCUMENT-PREVIEW-READABILITY.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_020_EXTRACTED_DOCUMENT_PREVIEW_READABILITY.json"
+  ],
   "validation": {
-    "git_pull": "PASS",
+    "git_pull_ff_only": "PASS",
     "framework_doctor": "PASS",
     "ui_typecheck": "PASS",
     "ui_build": "PASS",
     "api_tests": "PASS"
   },
-  "preview_behavior": [
-    "Whitespace-only preview text is ignored before falling back to richer extracted text sources.",
-    "Extracted content is rendered as structured preview blocks instead of one raw preformatted blob.",
-    "Headings, paragraphs, lists, and table-like rows are visually separated for easier scanning.",
-    "Long previews show a readability note when truncation is applied.",
-    "Sparse or low-confidence extraction is flagged in the preview note."
+  "behavior_reviewed": [
+    "Structured headings, paragraphs, lists, and table-like rows in extracted previews",
+    "Normalized line endings and non-breaking spaces",
+    "Sparse and truncation guidance for short or limited extractions",
+    "Shared preview component usage in both user and admin views"
   ],
-  "preserved_behavior": [
-    "User Explore preview still works.",
-    "Admin Explorer preview still works.",
-    "Existing file preview endpoint compatibility was not changed.",
-    "Existing extracted text storage was not changed.",
-    "Client Workspace remains read-only for inspection."
-  ],
-  "files_changed": [
-    "apps/everything-ai-ui/src/shared/ExtractedTextPreview.ts",
-    "apps/everything-ai-ui/src/shared/ExtractedTextPreviewImpl.tsx",
-    "apps/everything-ai-ui/src/shared/extractedTextPreview.css",
-    "apps/everything-ai-ui/src/shared/extractedTextPreviewStyle.ts",
-    "apps/everything-ai-ui/src/shared/selectExtractedPreviewText.ts",
-    "LOGS/EAI-TASK-020-terminal.log",
-    "REPORTS/EAI-TASK-020-EXTRACTED-DOCUMENT-PREVIEW-READABILITY.md"
-  ],
-  "risks": [
-    "Heading/list/table heuristics may occasionally over-classify unusual prose or OCR output.",
-    "The preview cap may hide content beyond the readability window for very long files."
-  ],
-  "rollback_note": "Revert the shared preview files and component-specific preview CSS if the new formatting needs to be removed.",
-  "recommended_next_task": "Review the next pm:ready / hermes:ready issue when it appears.",
-  "artifact_commit_sha": "d6fe236d4758b8b148071d38feefb6e5ec3434d2"
+  "notes": "No application code changes were required; the existing preview implementation already met the readability goal.",
+  "recommended_next_task": "EAI-TASK-018: Improve Admin API key lifecycle UX"
 }
