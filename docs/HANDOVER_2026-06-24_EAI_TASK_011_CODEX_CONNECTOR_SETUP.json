@@ -4,28 +4,24 @@
   "taskId": "EAI-TASK-011",
   "issueNumber": 33,
   "finalStatus": "PASS",
-  "validation": {
+  "validationSummary": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
+    "codexPath": "/usr/bin/codex",
+    "codexVersion": "codex-cli 0.142.0",
     "apiTests": "PASS",
-    "connectorDetection": "PASS",
-    "connectorVersionProbe": "PASS",
+    "detectionScript": "PASS",
+    "versionProbe": "PASS",
     "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "codexPath": "PASS",
-    "codexVersion": "PASS"
+    "uiBuild": "PASS"
   },
-  "codexReadiness": {
-    "command": "/usr/bin/codex",
-    "version": "codex-cli 0.142.0",
-    "detection": "PASS",
-    "probe": "PASS",
-    "safeProbeOnly": true
+  "safetyFindings": {
+    "backendBridgeSafe": true,
+    "chatExecutionDisabled": true,
+    "arbitraryShellExecutionBlocked": true,
+    "clientWorkspaceConnectorExposure": false
   },
-  "backendSafety": "The local agent bridge remains disabled by default, rejects arbitrary shell execution, and only permits safe probe actions or opt-in local chat execution.",
-  "adminUiBoundary": "Connector controls remain inside apps/everything-ai-ui/src/admin/** with Admin-only routing to the Agent Connectors panel.",
-  "blockers": [],
+  "remainingRisks": [],
   "recommendedNextTask": "Proceed with the next PM-reviewed ready issue in the queue.",
-  "artifactCommitSha": "25c00bd",
-  "updatedAt": "2026-06-25T06:51:56Z"
+  "artifactCommitSha": "PENDING_COMMIT_SHA"
 }

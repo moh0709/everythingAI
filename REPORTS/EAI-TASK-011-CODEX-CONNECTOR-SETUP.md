@@ -7,12 +7,12 @@ Validated that Codex remains available on PATH, reports the expected CLI version
 
 ## Validation results
 - `git pull --ff-only` — PASS
-- `command -v codex` — PASS
-- `codex --version` — PASS
 - `node scripts/framework-doctor.mjs` — PASS
+- `command -v codex` — PASS (`/usr/bin/codex`)
+- `codex --version` — PASS (`codex-cli 0.142.0`)
 - `cd services/api && npm test` — PASS
 - `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
-- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex` — PASS
+- `cd services/api && env EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
 
@@ -35,7 +35,7 @@ PASS. The backend bridge keeps execution constrained:
 PASS. The admin UI keeps connector controls scoped to Admin settings:
 - `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx` routes `Agent Connectors` into Admin Settings using the `#agent-connectors` hash.
 - `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` mounts `AgentConnectorsPanel` inside the admin settings experience.
-- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` documents Codex as a Phase 8.3A admin/operator target with chat disabled and readiness checks gated.
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` documents Codex as an admin/operator target with chat disabled and readiness checks gated.
 - No Client Workspace connector controls were introduced.
 
 ## Reported connector detection/probe results
@@ -53,4 +53,4 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Codex 
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-011-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_011_CODEX_CONNECTOR_SETUP.json`
-- Artifact commit SHA: `25c00bd`
+- Artifact commit SHA: `PENDING_COMMIT_SHA`
