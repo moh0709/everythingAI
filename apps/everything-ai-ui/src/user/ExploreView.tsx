@@ -6,6 +6,12 @@ import type { IndexedFile } from '../api';
 import { ExtractedTextPreview } from '../shared/ExtractedTextPreview';
 import './localSettingsHelp.css';
 
+type FileProgressRecord = IndexedFile & {
+  recovery_status?: string;
+  error_message?: string | null;
+  extraction_error_message?: string | null;
+};
+
 type ExploreViewProps = {
   error: string;
   busy: boolean;
@@ -26,11 +32,116 @@ type ExploreViewProps = {
   saveConnection: () => void;
 };
 
+type FileProgress = {
+  label: string;
+  tone: 'dark' | 'blue' | 'mint';
+  detail: string;
+  state: string;
+};
+
+function getFileProgress(file?: FileProgressRecord | null): FileProgress {
+  if (!file) {
+    return {
+      label: 'No file selected',
+      tone: 'dark',
+      detail: 'Choose a file to inspect indexing and extraction progress.',
+      state: 'idle',
+    };
+  }
+
+  if ((file as any).recovery_status === 'trashed') {
+    return {
+      label: 'Trashed',
+      tone: 'dark',
+      detail: 'This file is hidden from active processing and needs recovery before it can be indexed again.',
+      state: 'archived',
+    };
+  }
+
+  if (file.index_status === 'failed') {
+    return {
+      label: 'Index failed',
+      tone: 'dark',
+      detail: file.error_message || 'The indexer reported a failure for this file.',
+      state: 'failed',
+    };
+  }
+
+  if (file.extraction_status === 'failed') {
+    return {
+      label: 'Extraction failed',
+      tone: 'dark',
+      detail: file.extraction_error_message || 'The extractor could not produce text for this file.',
+      state: 'failed',
+    };
+  }
+
+  if (file.extraction_status === 'unsupported') {
+    return {
+      label: 'Unsupported',
+      tone: 'dark',
+      detail: 'The file type is indexed, but the extractor does not support text extraction for it.',
+      state: 'partial',
+    };
+  }
+
+  if (file.extraction_status === 'extracted') {
+    return {
+      label: 'Complete',
+      tone: 'mint',
+      detail: 'Indexing and extraction are complete. The extracted text preview is ready to read.',
+      state: 'complete',
+    };
+  }
+
+  if (file.index_status === 'indexed') {
+    return {
+      label: 'Awaiting extraction',
+      tone: 'blue',
+      detail: 'The file is indexed and is waiting for the extractor or a refresh cycle to finish.',
+      state: 'running',
+    };
+  }
+
+  return {
+    label: 'Indexing',
+    tone: 'blue',
+    detail: 'The file has not reached a completed index state yet.',
+    state: 'running',
+  };
+}
+
+function summarizeFiles(files: IndexedFile[]) {
+  const progressFiles = files as FileProgressRecord[];
+  const total = progressFiles.length;
+  const indexed = progressFiles.filter((file) => file.index_status === 'indexed').length;
+  const indexFailed = progressFiles.filter((file) => file.index_status === 'failed').length;
+  const extracted = progressFiles.filter((file) => file.extraction_status === 'extracted').length;
+  const extractionFailed = progressFiles.filter((file) => file.extraction_status === 'failed').length;
+  const unsupported = progressFiles.filter((file) => file.extraction_status === 'unsupported').length;
+  const awaitingExtraction = progressFiles.filter((file) => file.index_status === 'indexed' && !file.extraction_status).length;
+
+  return {
+    total,
+    indexed,
+    indexFailed,
+    extracted,
+    extractionFailed,
+    unsupported,
+    awaitingExtraction,
+    active: Math.max(total - extracted - extractionFailed - unsupported - indexFailed, 0),
+  };
+}
+
 export function ExploreView({
   error, busy, status, baseUrl, setBaseUrl, token, setToken,
   query, setQuery, files, selectedFile, documentContext,
   refreshFiles, searchEverything, handleAskFromHero, loadDocumentContext, saveConnection,
 }: ExploreViewProps) {
+  const summary = summarizeFiles(files);
+  const selectedRecord = (documentContext?.file || selectedFile) as FileProgressRecord | undefined;
+  const selectedProgress = getFileProgress(selectedRecord);
+
   return <>
     <section className="hero-row">
       <div>
@@ -55,6 +166,42 @@ export function ExploreView({
 
     {error && <div className="error">{error}</div>}
     <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
+
+    <section className="panel">
+      <div className="panel-title">
+        <div>
+          <h2><FileText /> Indexing & Extraction Progress</h2>
+          <p>Progress is inferred from the latest file index and extraction records so you can see what is complete, partial, or still waiting.</p>
+        </div>
+        <span className="chip dark">{summary.total} file(s)</span>
+      </div>
+      <div className="settings-help-grid">
+        <div>
+          <strong>Indexed</strong>
+          <p>{summary.indexed} file(s) are indexed and ready for follow-up extraction or review.</p>
+        </div>
+        <div>
+          <strong>Awaiting extraction</strong>
+          <p>{summary.awaitingExtraction} file(s) have been indexed but are still waiting for extracted text.</p>
+        </div>
+        <div>
+          <strong>Complete</strong>
+          <p>{summary.extracted} file(s) have finished indexing and extraction.</p>
+        </div>
+        <div>
+          <strong>Failures</strong>
+          <p>{summary.indexFailed + summary.extractionFailed} file(s) reported an index or extraction failure.</p>
+        </div>
+        <div>
+          <strong>Unsupported</strong>
+          <p>{summary.unsupported} file(s) are indexed but unsupported for text extraction.</p>
+        </div>
+        <div>
+          <strong>Next step</strong>
+          <p>Refresh the file list after the scanner or extractor finishes to see the latest state.</p>
+        </div>
+      </div>
+    </section>
 
     <section className="panel">
       <div className="panel-title">
@@ -91,12 +238,21 @@ export function ExploreView({
         </div>
         <table>
           <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
-          <tbody>{files.map((file) => <tr key={file.id} onClick={() => loadDocumentContext(file.id)} className={selectedFile?.id === file.id ? 'selected' : ''}>
-            <td>{file.filename}</td>
-            <td><span className="chip blue">{file.extension || 'file'}</span></td>
-            <td>{formatSize(file.size_bytes)}</td>
-            <td>{file.extraction_status || file.index_status || 'indexed'}</td>
-          </tr>)}</tbody>
+          <tbody>{files.map((file) => {
+            const progress = getFileProgress(file as FileProgressRecord);
+            return <tr key={file.id} onClick={() => loadDocumentContext(file.id)} className={selectedFile?.id === file.id ? 'selected' : ''}>
+              <td>{file.filename}</td>
+              <td><span className="chip blue">{file.extension || 'file'}</span></td>
+              <td>{formatSize(file.size_bytes)}</td>
+              <td>
+                <div className="chips">
+                  <span className={`chip ${progress.tone}`}>{progress.label}</span>
+                  <span className="chip dark">Index: {file.index_status || 'pending'}</span>
+                  <span className="chip dark">Extract: {file.extraction_status || 'pending'}</span>
+                </div>
+              </td>
+            </tr>;
+          })}</tbody>
         </table>
       </div>
 
@@ -106,7 +262,10 @@ export function ExploreView({
           <p><strong>View type:</strong> File content / source context</p>
           <p><strong>Path:</strong> {documentContext.file?.absolute_path}</p>
           <p><strong>Recovery:</strong> {(documentContext.file as any)?.recovery_status || 'active'}</p>
-          <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'unknown'}</p>
+          <p><strong>Progress:</strong> {selectedProgress.label} — {selectedProgress.detail}</p>
+          <p><strong>Index status:</strong> {documentContext.file?.index_status || 'unknown'}</p>
+          <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'pending'}</p>
+          {(selectedRecord?.error_message || selectedRecord?.extraction_error_message) ? <p><strong>Reported issue:</strong> {selectedRecord?.error_message || selectedRecord?.extraction_error_message}</p> : null}
           <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
           {documentContext.insight?.summary && <><h3>File Insight</h3><p>{documentContext.insight.summary}</p></>}
           <h3>Extracted File Text</h3>

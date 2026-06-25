@@ -1,0 +1,23 @@
+EAI-TASK-021 terminal log
+
+Repository: /root/.hermes/projects/everythingAI
+Branch: main
+Issue: #43
+Task: Improve indexing and extraction progress visibility
+
+Commands run:
+- git pull --ff-only
+  -> Already up to date.
+- node scripts/framework-doctor.mjs
+  -> PASS
+- npm run typecheck (apps/everything-ai-ui)
+  -> PASS
+- npm run build (apps/everything-ai-ui)
+  -> PASS
+- npm test (services/api)
+  -> PASS
+
+Notes:
+- Added progress snapshot and per-file progress labels to the user Explore view.
+- Added workspace progress summary and clearer file status labels to the admin Explorer view.
+- No .hermes/state.json file existed in this repository snapshot, so it was not modified.

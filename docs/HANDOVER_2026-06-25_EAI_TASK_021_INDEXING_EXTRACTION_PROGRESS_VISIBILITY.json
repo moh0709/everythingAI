@@ -1,0 +1,31 @@
+{
+  "task": "EAI-TASK-021",
+  "issue_number": 43,
+  "title": "Improve indexing and extraction progress visibility",
+  "status": "PASS",
+  "files_changed": [
+    "apps/everything-ai-ui/src/user/ExploreView.tsx",
+    "apps/everything-ai-ui/src/admin/components/ExplorerView.tsx",
+    "LOGS/EAI-TASK-021-terminal.log",
+    "REPORTS/EAI-TASK-021-INDEXING-EXTRACTION-PROGRESS-VISIBILITY.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_021_INDEXING_EXTRACTION_PROGRESS_VISIBILITY.json"
+  ],
+  "behavior": [
+    "Added workspace progress snapshot to the user Explore view.",
+    "Added clearer per-file progress labels for indexing and extraction states.",
+    "Added admin Explorer summary counts for complete, awaiting extraction, failed, and unsupported files.",
+    "Preserved read-only monitoring and existing search/filter/preview flows."
+  ],
+  "validation": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "notes": [
+    "No .hermes/state.json file existed in this repository snapshot, so it was not modified.",
+    "Final issue comment should include the real artifact commit SHA after push."
+  ]
+}
