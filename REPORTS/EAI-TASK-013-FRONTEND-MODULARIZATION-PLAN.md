@@ -82,4 +82,4 @@ This is the smallest low-risk cleanup that reduces confusion without touching th
 - No changes to backend behavior.
 
 ## Artifact commit SHA
-PENDING_COMMIT_SHA
+83e9002

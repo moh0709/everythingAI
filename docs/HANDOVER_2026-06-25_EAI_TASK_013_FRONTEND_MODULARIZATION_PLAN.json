@@ -31,5 +31,5 @@
     "Cleanup must preserve the active admin entry path from admin.html to src/admin-main.tsx."
   ],
   "recommendedNextPMTask": "Approve a targeted cleanup issue to remove the dead alternate admin entrypoint and its implementation.",
-  "artifactCommitSha": "PENDING_COMMIT_SHA"
+  "artifactCommitSha": "83e9002"
 }
