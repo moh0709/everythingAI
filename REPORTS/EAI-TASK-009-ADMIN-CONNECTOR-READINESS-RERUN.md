@@ -4,16 +4,9 @@
 
 PASS
 
-## Scope and validation summary
+## Summary
 
-Validation and reporting only. No product behavior was changed.
-
-## Environment checks
-
-- Codex command path: `/usr/bin/codex`
-- Codex version: `codex-cli 0.142.0`
-- Claude Code command path: `/usr/bin/claude`
-- Claude Code version: `2.1.191 (Claude Code)`
+The Admin connector readiness gate was rerun after CLI installation and validated safely. Codex and Claude Code are both present on PATH, both version probes succeeded with the bridge flag enabled, and the repository validation suite passed without product behavior changes.
 
 ## Validation results
 
@@ -25,49 +18,52 @@ Validation and reporting only. No product behavior was changed.
 - Codex version probe: PASS
 - Claude Code detection: PASS
 - Claude Code version probe: PASS
+- Admin UI boundary review: PASS
 
-## Connector readiness details
+## Connector details
 
-- Detection result: both target CLIs were detected on PATH.
-- Version probe result: both target CLIs returned version output successfully.
-- Connector gate cleared: yes.
+### Codex
+
+- Command path: `/usr/bin/codex`
+- Version: `codex-cli 0.142.0`
+- Detection result: found on PATH
+- Version probe result: passed with `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true`
+
+### Claude Code
+
+- Command path: `/usr/bin/claude`
+- Version: `2.1.191 (Claude Code)`
+- Detection result: found on PATH
+- Version probe result: passed with `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true`
+
+## Safe validation evidence
+
+- `node scripts/framework-doctor.mjs` passed.
+- `services/api` tests passed.
+- `apps/everything-ai-ui` typecheck passed.
+- `apps/everything-ai-ui` build passed.
+- Agent connector detection stayed in detection-only mode.
+- Agent version probing only used the safe `version` action.
+- Chat execution remained disabled.
 
 ## Admin UI boundary result
 
-PASS. The inspected Admin UI files keep Agent Connectors in the Admin Settings flow:
+PASS. The Agent Connectors feature remains in the admin boundary:
 
-- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
-- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
-- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` renders `AgentConnectorsPanel` inside admin settings.
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx` routes the Agent Connectors navigation item to the admin settings hash.
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` explicitly describes the connector controls as admin-only and warns that Client Workspace must not expose them.
+- `apps/everything-ai-ui/src/App.tsx` is the legacy user-facing app path and does not render the admin connector panel.
+- `apps/everything-ai-ui/src/admin/README.md` states that agent connector diagnostics are part of the admin/operator boundary and must stay admin-only.
 
-No client workspace exposure or boundary weakening was observed in the inspected files.
+## Connector gate conclusion
 
-## Inspected backend files
+The connector gate is now cleared for Codex and Claude Code from a machine-readiness perspective.
 
-- `services/api/src/agents/localAgentBridge.js`
-- `services/api/src/routes/agentBridge.routes.js`
-- `services/api/src/scripts/detectAgentConnectors.js`
-- `services/api/src/scripts/probeAgentVersions.js`
-- `.hermes/state.json`
+## Recommended next task
 
-## Command output summary
-
-- `git pull --ff-only`: already up to date
-- `node scripts/framework-doctor.mjs`: PASS
-- `cd services/api && npm test`: PASS
-- `cd services/api && node src/scripts/detectAgentConnectors.js`: PASS
-- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode`: PASS
-- `cd apps/everything-ai-ui && npm run typecheck`: PASS
-- `cd apps/everything-ai-ui && npm run build`: PASS
-- `command -v codex`: `/usr/bin/codex`
-- `codex --version`: `codex-cli 0.142.0`
-- `command -v claude`: `/usr/bin/claude`
-- `claude --version`: `2.1.191 (Claude Code)`
-
-## Recommendation
-
-Proceed to PM review. No additional connector readiness rerun is required unless the local CLI installation changes again.
+Create the next real EverythingAI product-development task now that the connector gate is clear.
 
 ## Artifact commit SHA
 
-e38f684ed69b389a2cfda4010044ec896cc18b78
+PENDING_ARTIFACT_COMMIT_SHA

@@ -4,21 +4,19 @@
   "taskId": "EAI-TASK-009",
   "issueNumber": 31,
   "finalStatus": "PASS",
-  "validationStatusSummary": {
+  "validation": {
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
     "codexDetection": "PASS",
-    "codexProbe": "PASS",
+    "codexVersionProbe": "PASS",
     "claudeCodeDetection": "PASS",
-    "claudeCodeProbe": "PASS"
+    "claudeCodeVersionProbe": "PASS",
+    "adminUiBoundary": "PASS"
   },
   "connectorGateCleared": true,
-  "remainingRisks": [
-    "Connector execution remains disabled by default until explicitly enabled on the local machine.",
-    "Chat execution remains disabled and was not exercised."
-  ],
-  "recommendedNextPMTask": "Review the connector readiness rerun and, if approved, move to the next connector enablement task.",
-  "artifactCommitSha": "e38f684ed69b389a2cfda4010044ec896cc18b78"
+  "remainingRisks": [],
+  "recommendedNextTask": "Create the next real EverythingAI product-development task now that the connector gate is clear.",
+  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA"
 }
