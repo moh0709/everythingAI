@@ -64,10 +64,10 @@ Proceed to the next PM-planned real EverythingAI product task. No further connec
 
 ## Commit metadata
 
-- Artifact commit SHA: `PENDING_COMMIT_SHA`
-- Metadata backfill: pending
+- Artifact commit SHA: `0f2060747674120c9f74ea2c07ee01e66f95ba5a`
+- Metadata backfill: completed
 
 ## Notes
 
 - Logs were written to `LOGS/EAI-TASK-009-terminal.log`.
-- The repository state file exists and remains valid JSON; it will be updated with the final artifact commit SHA after the artifact commit is created.
+- The repository state file exists and remains valid JSON.

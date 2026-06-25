@@ -22,6 +22,6 @@
     "Admin connector readiness still depends on the local machine having the CLIs on PATH."
   ],
   "recommendedNextPmTask": "Proceed to the next real EverythingAI product-development task.",
-  "artifactCommitSha": "PENDING_COMMIT_SHA",
-  "metadataBackfillPending": true
+  "artifactCommitSha": "0f2060747674120c9f74ea2c07ee01e66f95ba5a",
+  "metadataBackfillPending": false
 }
