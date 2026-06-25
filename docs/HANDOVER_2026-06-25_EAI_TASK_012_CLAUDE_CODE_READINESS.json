@@ -1,27 +1,31 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-012",
-  "issueNumber": 34,
-  "finalStatus": "PASS",
-  "validationStatus": {
-    "gitPull": "PASS",
-    "frameworkDoctor": "PASS",
-    "apiTests": "PASS",
-    "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "connectorDetection": "PASS",
-    "connectorProbe": "PASS"
+  "task_id": "EAI-TASK-012",
+  "issue_number": 34,
+  "final_status": "BLOCKED",
+  "validation_status_summary": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "api_tests": "PASS",
+    "agent_connector_detection": "PASS",
+    "claude_code_version_probe": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "claude_path_check": "PASS",
+    "claude_version_check": "PASS"
   },
-  "readiness": {
-    "claudeCode": {
-      "detected": true,
-      "commandPath": "/usr/bin/claude",
-      "version": "2.1.191 (Claude Code)",
-      "usableToday": true
-    }
+  "claude_code_readiness": {
+    "detected_on_path": true,
+    "command_path": "/usr/bin/claude",
+    "version": "2.1.191 (Claude Code)",
+    "safe_version_probe_passed": true,
+    "chat_execution_attempted": false
   },
-  "remainingRisks": [],
-  "recommendedNextPMTask": "Proceed with the next PM-reviewed ready issue in the queue.",
-  "artifactCommitSha": "afbae7e"
+  "ready_for_real_everythingai_tasks": false,
+  "remaining_risks": [
+    "`.hermes/state.json` is absent and could not be updated under the current workflow guard."
+  ],
+  "recommended_next_pm_task": "Add or restore `.hermes/state.json` in the repository, then rerun the Claude Code readiness task so the artifact set can be completed and accepted.",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA"
 }
