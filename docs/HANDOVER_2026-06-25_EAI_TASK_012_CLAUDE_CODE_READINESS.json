@@ -27,5 +27,5 @@
     "`.hermes/state.json` is absent and could not be updated under the current workflow guard."
   ],
   "recommended_next_pm_task": "Add or restore `.hermes/state.json` in the repository, then rerun the Claude Code readiness task so the artifact set can be completed and accepted.",
-  "artifact_commit_sha": "PENDING_COMMIT_SHA"
+  "artifact_commit_sha": "1ca1e71"
 }

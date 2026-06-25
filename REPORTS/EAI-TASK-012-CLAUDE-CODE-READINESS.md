@@ -79,4 +79,4 @@
 
 ## Artifact commit SHA
 
-- `PENDING_COMMIT_SHA`
+- `1ca1e71`
