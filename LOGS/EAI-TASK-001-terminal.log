@@ -1,21 +1,18 @@
-EAI-TASK-001 terminal log
-repo=/root/.hermes/projects/everythingAI
-branch=main
---- git status --short --branch ---
-## main...origin/main
- M LOGS/EAI-TASK-001-terminal.log
-\n### gh auth status -h github.com
+[INFO] date: 2026-06-25T14:04:56Z
+[INFO] repo: /root/.hermes/projects/everythingAI
+[INFO] start_sha: 9e3fade8ce689bdcebbec408a3ac17ce138592c9
+[INFO] gh_path: /usr/bin/gh
+gh version 2.45.0 (2025-07-18 Ubuntu 2.45.0-1ubuntu0.3)
+https://github.com/cli/cli/releases/tag/v2.45.0
 github.com
   ✓ Logged in to github.com account moh0709 (/root/.hermes/home/.config/gh/hosts.yml)
   - Active account: true
   - Git operations protocol: https
-  - Token: gho_************************************
+  - Token: [REDACTED]
   - Token scopes: 'gist', 'read:org', 'repo'
-[exit:0]
-\n### gh label list -R moh0709/everythingAI --limit 200 --json name
-[{"name":"bug"},{"name":"documentation"},{"name":"duplicate"},{"name":"enhancement"},{"name":"good first issue"},{"name":"help wanted"},{"name":"invalid"},{"name":"question"},{"name":"wontfix"},{"name":"must-have"},{"name":"mvp"},{"name":"stabilization"},{"name":"optimization"},{"name":"ui"},{"name":"ux"},{"name":"cleanup"},{"name":"governance"},{"name":"recovery"},{"name":"sprint-1"},{"name":"search"},{"name":"sprint-2"},{"name":"execution"},{"name":"planning"},{"name":"sprint-3"},{"name":"sprint-4"},{"name":"smoke-test"},{"name":"sprint-5"},{"name":"validation"},{"name":"frontend"},{"name":"sprint-6"},{"name":"backend"},{"name":"phase-1"},{"name":"watcher"},{"name":"future-track"},{"name":"product-design"},{"name":"mvp-finalization"},{"name":"phase-6"},{"name":"safe-refactor"},{"name":"hermes:ready"},{"name":"pm:ready"},{"name":"hermes:working"},{"name":"hermes:blocked"},{"name":"hermes:done"},{"name":"pm:review"}]
-[exit:0]
-\n### node scripts/framework-doctor.mjs
+[INFO] git pull --ff-only
+Already up to date.
+[INFO] node scripts/framework-doctor.mjs
 {
   "repoRoot": "/root/.hermes/projects/everythingAI/",
   "status": "PASS",
@@ -83,14 +80,12 @@ github.com
     }
   ]
 }
-[exit:0]
-\n### bash -lc cd apps/everything-ai-ui && npm run typecheck
+[INFO] cd apps/everything-ai-ui && npm run typecheck
 
 > everything-ai-ui@0.1.0 typecheck
 > tsc --noEmit
 
-[exit:0]
-\n### bash -lc cd apps/everything-ai-ui && npm run build
+[INFO] cd apps/everything-ai-ui && npm run build
 
 > everything-ai-ui@0.1.0 build
 > vite build
@@ -107,9 +102,8 @@ dist/assets/user-CU3OKBUQ.css     21.11 kB │ gzip:  4.46 kB
 dist/assets/admin-CoTsedJj.js     70.26 kB │ gzip: 18.58 kB
 dist/assets/user-BK16tvwU.js      80.85 kB │ gzip: 20.15 kB
 dist/assets/styles-BYkFVHgp.js   150.51 kB │ gzip: 48.42 kB
-✓ built in 11.09s
-[exit:0]
-\n### bash -lc cd services/api && npm test
+✓ built in 8.18s
+[INFO] cd services/api && npm test
 
 > everythingai-api@0.1.0 test
 > node --test
@@ -118,679 +112,679 @@ TAP version 13
 # Subtest: agent bridge defaults keep connector execution and chat disabled
 ok 1 - agent bridge defaults keep connector execution and chat disabled
   ---
-  duration_ms: 3.784941
+  duration_ms: 4.785904
   type: 'test'
   ...
 # Subtest: primary connector catalog contains expected safe commands and disabled flags
 ok 2 - primary connector catalog contains expected safe commands and disabled flags
   ---
-  duration_ms: 0.731797
+  duration_ms: 0.568463
   type: 'test'
   ...
 # Subtest: agent detection rejects unsafe connector command overrides before PATH lookup
 ok 3 - agent detection rejects unsafe connector command overrides before PATH lookup
   ---
-  duration_ms: 0.794064
+  duration_ms: 0.648302
   type: 'test'
   ...
 # Subtest: agent probes refuse to execute even when an integration is enabled unless backend bridge flag is set
 ok 4 - agent probes refuse to execute even when an integration is enabled unless backend bridge flag is set
   ---
-  duration_ms: 1.024543
+  duration_ms: 0.916082
   type: 'test'
   ...
 # Subtest: agent probes only allow explicit safe actions
 ok 5 - agent probes only allow explicit safe actions
   ---
-  duration_ms: 0.502538
+  duration_ms: 0.494665
   type: 'test'
   ...
 # Subtest: agent chat refuses to execute unless both backend bridge and chat flags are set
 ok 6 - agent chat refuses to execute unless both backend bridge and chat flags are set
   ---
-  duration_ms: 1.95376
+  duration_ms: 1.008926
   type: 'test'
   ...
 # Subtest: agent bridge security notice documents the browser command-execution boundary
 ok 7 - agent bridge security notice documents the browser command-execution boundary
   ---
-  duration_ms: 0.839689
+  duration_ms: 0.497248
   type: 'test'
   ...
 # Subtest: document context includes active file metadata, preview text, source reference, and insight
 ok 8 - document context includes active file metadata, preview text, source reference, and insight
   ---
-  duration_ms: 284.581055
+  duration_ms: 528.075005
   type: 'test'
   ...
 # Subtest: document context marks trashed files without hiding context
 ok 9 - document context marks trashed files without hiding context
   ---
-  duration_ms: 104.660913
+  duration_ms: 433.88009
   type: 'test'
   ...
 # Subtest: document context exposes failed stale file state clearly
 ok 10 - document context exposes failed stale file state clearly
   ---
-  duration_ms: 139.580345
+  duration_ms: 344.910279
   type: 'test'
   ...
 # Subtest: embedding generation accepts a custom synchronous provider while default search remains stable
 ok 11 - embedding generation accepts a custom synchronous provider while default search remains stable
   ---
-  duration_ms: 268.799263
+  duration_ms: 543.73303
   type: 'test'
   ...
 # Subtest: embedding generation skips unchanged extracted text and regenerates changed text
 ok 12 - embedding generation skips unchanged extracted text and regenerates changed text
   ---
-  duration_ms: 262.37415
+  duration_ms: 453.903794
   type: 'test'
   ...
 # Subtest: normal action execution keeps execution_batch_id null
 ok 13 - normal action execution keeps execution_batch_id null
   ---
-  duration_ms: 728.154452
+  duration_ms: 465.638376
   type: 'test'
   ...
 # Subtest: successful action execution stores execution_batch_id when provided
 ok 14 - successful action execution stores execution_batch_id when provided
   ---
-  duration_ms: 215.131808
+  duration_ms: 223.581724
   type: 'test'
   ...
 # Subtest: failed action execution stores execution_batch_id when provided
 ok 15 - failed action execution stores execution_batch_id when provided
   ---
-  duration_ms: 164.889092
+  duration_ms: 901.61324
   type: 'test'
   ...
 # Subtest: creates draft execution batch from selected ready preview IDs
 ok 16 - creates draft execution batch from selected ready preview IDs
   ---
-  duration_ms: 689.831783
+  duration_ms: 330.760806
   type: 'test'
   ...
 # Subtest: creates draft batch with blocked preview counts without executing anything
 ok 17 - creates draft batch with blocked preview counts without executing anything
   ---
-  duration_ms: 260.784429
+  duration_ms: 220.40713
   type: 'test'
   ...
 # Subtest: deduplicates preview IDs while preserving first-seen order
 ok 18 - deduplicates preview IDs while preserving first-seen order
   ---
-  duration_ms: 148.717302
+  duration_ms: 897.559506
   type: 'test'
   ...
 # Subtest: rejects empty or missing preview IDs
 ok 19 - rejects empty or missing preview IDs
   ---
-  duration_ms: 62.502769
+  duration_ms: 93.450434
   type: 'test'
   ...
 # Subtest: lists execution batches and returns batch detail with executions array
 ok 20 - lists execution batches and returns batch detail with executions array
   ---
-  duration_ms: 227.967867
+  duration_ms: 137.31753
   type: 'test'
   ...
 # Subtest: approves a draft execution batch with explicit approval
 ok 21 - approves a draft execution batch with explicit approval
   ---
-  duration_ms: 342.520747
+  duration_ms: 121.048343
   type: 'test'
   ...
 # Subtest: rejects batch approval without explicit approval
 ok 22 - rejects batch approval without explicit approval
   ---
-  duration_ms: 255.806371
+  duration_ms: 204.709192
   type: 'test'
   ...
 # Subtest: rejects approval for blocked-preview and missing batches
 ok 23 - rejects approval for blocked-preview and missing batches
   ---
-  duration_ms: 329.507118
+  duration_ms: 199.953664
   type: 'test'
   ...
 # Subtest: rejects approving a batch that is no longer draft
 ok 24 - rejects approving a batch that is no longer draft
   ---
-  duration_ms: 163.309691
+  duration_ms: 263.557577
   type: 'test'
   ...
 # Subtest: runs an approved execution batch through the safe executor
 ok 25 - runs an approved execution batch through the safe executor
   ---
-  duration_ms: 212.913484
+  duration_ms: 289.742705
   type: 'test'
   ...
 # Subtest: rejects running batch without explicit approval or from wrong status
 ok 26 - rejects running batch without explicit approval or from wrong status
   ---
-  duration_ms: 174.060194
+  duration_ms: 333.239478
   type: 'test'
   ...
 # Subtest: stops execution batch on first failure and marks completed_with_errors after partial success
 ok 27 - stops execution batch on first failure and marks completed_with_errors after partial success
   ---
-  duration_ms: 131.796714
+  duration_ms: 142.007375
   type: 'test'
   ...
 # Subtest: execution without approval is rejected without creating execution or snapshot
 ok 28 - execution without approval is rejected without creating execution or snapshot
   ---
-  duration_ms: 419.501623
+  duration_ms: 272.281962
   type: 'test'
   ...
 # Subtest: blocked preview cannot execute and is rejected before mutation
 ok 29 - blocked preview cannot execute and is rejected before mutation
   ---
-  duration_ms: 388.394113
+  duration_ms: 194.818497
   type: 'test'
   ...
 # Subtest: source missing creates failed execution, failed audit, and no snapshot
 ok 30 - source missing creates failed execution, failed audit, and no snapshot
   ---
-  duration_ms: 148.462917
+  duration_ms: 246.452778
   type: 'test'
   ...
 # Subtest: target exists creates failed execution, failed audit, and no snapshot
 ok 31 - target exists creates failed execution, failed audit, and no snapshot
   ---
-  duration_ms: 243.481978
+  duration_ms: 299.045902
   type: 'test'
   ...
 # Subtest: execution against active trashed file is rejected with failed audit and no snapshot
 ok 32 - execution against active trashed file is rejected with failed audit and no snapshot
   ---
-  duration_ms: 178.435508
+  duration_ms: 303.848968
   type: 'test'
   ...
 # Subtest: move execution creates and uses recovery snapshot before filesystem mutation
 ok 33 - move execution creates and uses recovery snapshot before filesystem mutation
   ---
-  duration_ms: 194.978311
+  duration_ms: 415.806421
   type: 'test'
   ...
 # Subtest: rename execution creates and uses recovery snapshot before filesystem mutation
 ok 34 - rename execution creates and uses recovery snapshot before filesystem mutation
   ---
-  duration_ms: 149.647761
+  duration_ms: 214.218083
   type: 'test'
   ...
 # Subtest: app-level label execution does not create filesystem recovery snapshot
 ok 35 - app-level label execution does not create filesystem recovery snapshot
   ---
-  duration_ms: 111.245995
+  duration_ms: 198.505557
   type: 'test'
   ...
 # Subtest: job runner records completed jobs
 ok 36 - job runner records completed jobs
   ---
-  duration_ms: 4.320861
+  duration_ms: 1272.165094
   type: 'test'
   ...
 # Subtest: job runner records failed jobs and rethrows errors
 ok 37 - job runner records failed jobs and rethrows errors
   ---
-  duration_ms: 1.705817
+  duration_ms: 2.447684
   type: 'test'
   ...
 # Subtest: knowledge ingestion can be wrapped as a job without creating planning suggestions
 ok 38 - knowledge ingestion can be wrapped as a job without creating planning suggestions
   ---
-  duration_ms: 267.587861
+  duration_ms: 1146.234118
   type: 'test'
   ...
 # Subtest: watcher cycles are recorded as jobs without automatic planning suggestions
 ok 39 - watcher cycles are recorded as jobs without automatic planning suggestions
   ---
-  duration_ms: 1728.498741
+  duration_ms: 1788.996642
   type: 'test'
   ...
 # Subtest: indexes recursively, skips unsafe folders, and hashes files stably
 ok 40 - indexes recursively, skips unsafe folders, and hashes files stably
   ---
-  duration_ms: 313.073429
+  duration_ms: 2340.793258
   type: 'test'
   ...
 # Subtest: extracts supported readable files and records failures without aborting
 ok 41 - extracts supported readable files and records failures without aborting
   ---
-  duration_ms: 631.400073
+  duration_ms: 773.632662
   type: 'test'
   ...
 # Subtest: searches filename, path, and extracted content with snippets
 ok 42 - searches filename, path, and extracted content with snippets
   ---
-  duration_ms: 298.323897
+  duration_ms: 1092.852334
   type: 'test'
   ...
 # Subtest: prepares chat retrieval and creates preview-only suggestions without mutating source files
 ok 43 - prepares chat retrieval and creates preview-only suggestions without mutating source files
   ---
-  duration_ms: 263.919807
+  duration_ms: 850.66847
   type: 'test'
   ...
 # Subtest: calls an Ollama-compatible provider when configured
 ok 44 - calls an Ollama-compatible provider when configured
   ---
-  duration_ms: 1.511103
+  duration_ms: 1.388756
   type: 'test'
   ...
 # Subtest: defaults provider settings to Ollama and updates model options
 ok 45 - defaults provider settings to Ollama and updates model options
   ---
-  duration_ms: 2.382802
+  duration_ms: 1.414332
   type: 'test'
   ...
 # Subtest: parses selected Windows folder path from the native folder picker
 ok 46 - parses selected Windows folder path from the native folder picker # SKIP Windows-only folder picker
   ---
-  duration_ms: 0.331559
+  duration_ms: 0.234297
   type: 'test'
   ...
 # Subtest: creates safe action previews without executing file actions
 ok 47 - creates safe action previews without executing file actions
   ---
-  duration_ms: 383.901152
+  duration_ms: 287.229958
   type: 'test'
   ...
 # Subtest: uses Organizor2-inspired content rules for organization suggestions
 ok 48 - uses Organizor2-inspired content rules for organization suggestions
   ---
-  duration_ms: 153.702487
+  duration_ms: 390.191749
   type: 'test'
   ...
 # Subtest: executes approved move previews and can undo filesystem changes
 ok 49 - executes approved move previews and can undo filesystem changes
   ---
-  duration_ms: 312.201832
+  duration_ms: 264.130719
   type: 'test'
   ...
 # Subtest: executes app-level label actions and lists applied labels
 ok 50 - executes app-level label actions and lists applied labels
   ---
-  duration_ms: 253.383837
+  duration_ms: 419.4672
   type: 'test'
   ...
 # Subtest: syncs extracted files to AnythingLLM upload API when configured
 ok 51 - syncs extracted files to AnythingLLM upload API when configured
   ---
-  duration_ms: 408.353611
+  duration_ms: 576.57468
   type: 'test'
   ...
 # Subtest: generates deterministic insights and semantic related search results
 ok 52 - generates deterministic insights and semantic related search results
   ---
-  duration_ms: 576.825337
+  duration_ms: 333.281893
   type: 'test'
   ...
 # Subtest: detects duplicate files by content hash
 ok 53 - detects duplicate files by content hash
   ---
-  duration_ms: 226.94586
+  duration_ms: 130.97855
   type: 'test'
   ...
 # Subtest: starts a watcher and indexes changed files without automatic planning suggestions
 ok 54 - starts a watcher and indexes changed files without automatic planning suggestions
   ---
-  duration_ms: 1633.968188
+  duration_ms: 1666.633892
   type: 'test'
   ...
 # Subtest: builds knowledge index from generated insights
 ok 55 - builds knowledge index from generated insights
   ---
-  duration_ms: 289.134672
+  duration_ms: 232.076134
   type: 'test'
   ...
 # Subtest: reports system status counts for the local dashboard
 ok 56 - reports system status counts for the local dashboard
   ---
-  duration_ms: 269.044423
+  duration_ms: 442.81345
   type: 'test'
   ...
 # Subtest: knowledge ingestion pipeline prepares searchable knowledge without organization suggestions
 ok 57 - knowledge ingestion pipeline prepares searchable knowledge without organization suggestions
   ---
-  duration_ms: 325.819153
+  duration_ms: 289.326187
   type: 'test'
   ...
 # Subtest: nested undo restores the original nested relative path after approved cross-folder move
 ok 58 - nested undo restores the original nested relative path after approved cross-folder move
   ---
-  duration_ms: 433.060924
+  duration_ms: 558.798355
   type: 'test'
   ...
 # Subtest: configured suggestions enforce action allow-list rules
 ok 59 - configured suggestions enforce action allow-list rules
   ---
-  duration_ms: 191.232074
+  duration_ms: 2434.261817
   type: 'test'
   ...
 # Subtest: configured suggestions enforce confidence threshold
 ok 60 - configured suggestions enforce confidence threshold
   ---
-  duration_ms: 219.931065
+  duration_ms: 236.483362
   type: 'test'
   ...
 # Subtest: configured suggestions can mark previews as not requiring approval
 ok 61 - configured suggestions can mark previews as not requiring approval
   ---
-  duration_ms: 210.371668
+  duration_ms: 302.720619
   type: 'test'
   ...
 # Subtest: dry-run-only planning rule blocks action previews from execution
 ok 62 - dry-run-only planning rule blocks action previews from execution
   ---
-  duration_ms: 134.370783
+  duration_ms: 261.773725
   type: 'test'
   ...
 # Subtest: creates and lists planning sessions
 ok 63 - creates and lists planning sessions
   ---
-  duration_ms: 244.155206
+  duration_ms: 290.79949
   type: 'test'
   ...
 # Subtest: runs a planning session and links generated suggestions to the session
 ok 64 - runs a planning session and links generated suggestions to the session
   ---
-  duration_ms: 215.65099
+  duration_ms: 274.302429
   type: 'test'
   ...
 # Subtest: session-aware dedupe does not let global suggestions block session suggestions
 ok 65 - session-aware dedupe does not let global suggestions block session suggestions
   ---
-  duration_ms: 196.194393
+  duration_ms: 497.347216
   type: 'test'
   ...
 # Subtest: rerunning the same planning session dedupes inside that session
 ok 66 - rerunning the same planning session dedupes inside that session
   ---
-  duration_ms: 146.052295
+  duration_ms: 450.289924
   type: 'test'
   ...
 # Subtest: previews and execution still work from session-linked suggestions
 ok 67 - previews and execution still work from session-linked suggestions
   ---
-  duration_ms: 164.82293
+  duration_ms: 440.779349
   type: 'test'
   ...
 # Subtest: provider planning sessions use the configured provider for suggestions
 ok 68 - provider planning sessions use the configured provider for suggestions
   ---
-  duration_ms: 397.029266
+  duration_ms: 380.821868
   type: 'test'
   ...
 # Subtest: configured provider can generate safe planning suggestions
 ok 69 - configured provider can generate safe planning suggestions
   ---
-  duration_ms: 314.822778
+  duration_ms: 273.63391
   type: 'test'
   ...
 # Subtest: configured provider suggestion generation falls back to deterministic suggestions when provider is unavailable
 ok 70 - configured provider suggestion generation falls back to deterministic suggestions when provider is unavailable
   ---
-  duration_ms: 114.864214
+  duration_ms: 256.952124
   type: 'test'
   ...
 # Subtest: provider runtime explains remote provider policy blocks
 ok 71 - provider runtime explains remote provider policy blocks
   ---
-  duration_ms: 211.303709
+  duration_ms: 324.227882
   type: 'test'
   ...
 # Subtest: provider runtime explains missing API keys
 ok 72 - provider runtime explains missing API keys
   ---
-  duration_ms: 107.312497
+  duration_ms: 359.606359
   type: 'test'
   ...
 # Subtest: provider runtime classifies provider HTTP authorization failures
 ok 73 - provider runtime classifies provider HTTP authorization failures
   ---
-  duration_ms: 163.197062
+  duration_ms: 448.133462
   type: 'test'
   ...
 # Subtest: moves a file to local recovery trash with retention metadata and audit event
 ok 74 - moves a file to local recovery trash with retention metadata and audit event
   ---
-  duration_ms: 112.482083
+  duration_ms: 388.535794
   type: 'test'
   ...
 # Subtest: prevents duplicate active trash records for the same file
 ok 75 - prevents duplicate active trash records for the same file
   ---
-  duration_ms: 141.005267
+  duration_ms: 471.357624
   type: 'test'
   ...
 # Subtest: restores a trashed file record and records recovery audit event
 ok 76 - restores a trashed file record and records recovery audit event
   ---
-  duration_ms: 209.216219
+  duration_ms: 220.832973
   type: 'test'
   ...
 # Subtest: prevents restoring a trash record more than once
 ok 77 - prevents restoring a trash record more than once
   ---
-  duration_ms: 355.601517
+  duration_ms: 174.997373
   type: 'test'
   ...
 # Subtest: prevents restoring when indexed file path changed after trashing
 ok 78 - prevents restoring when indexed file path changed after trashing
   ---
-  duration_ms: 92.531054
+  duration_ms: 351.541176
   type: 'test'
   ...
 # Subtest: blocks permanent purge in the local MVP and audits the denial
 ok 79 - blocks permanent purge in the local MVP and audits the denial
   ---
-  duration_ms: 135.397921
+  duration_ms: 246.64441
   type: 'test'
   ...
 # Subtest: hides active trash records from file list visibility by default
 ok 80 - hides active trash records from file list visibility by default
   ---
-  duration_ms: 182.19415
+  duration_ms: 313.953671
   type: 'test'
   ...
 # Subtest: hides active trash records from keyword search by default
 ok 81 - hides active trash records from keyword search by default
   ---
-  duration_ms: 99.190654
+  duration_ms: 145.231134
   type: 'test'
   ...
 # Subtest: creates recovery snapshot with replay metadata
 ok 82 - creates recovery snapshot with replay metadata
   ---
-  duration_ms: 167.286262
+  duration_ms: 514.742384
   type: 'test'
   ...
 # Subtest: lists recovery snapshots by file, preview, execution, and status
 ok 83 - lists recovery snapshots by file, preview, execution, and status
   ---
-  duration_ms: 340.267721
+  duration_ms: 211.693262
   type: 'test'
   ...
 # Subtest: marks recovery snapshot used and failed
 ok 84 - marks recovery snapshot used and failed
   ---
-  duration_ms: 174.936263
+  duration_ms: 208.167102
   type: 'test'
   ...
 # Subtest: rejects invalid recovery snapshot requests
 ok 85 - rejects invalid recovery snapshot requests
   ---
-  duration_ms: 89.79931
+  duration_ms: 355.310831
   type: 'test'
   ...
 # Subtest: content search results include stable source references
 ok 86 - content search results include stable source references
   ---
-  duration_ms: 230.159873
+  duration_ms: 269.589081
   type: 'test'
   ...
 # Subtest: filename and path search results include stable source references
 ok 87 - filename and path search results include stable source references
   ---
-  duration_ms: 138.748541
+  duration_ms: 207.930931
   type: 'test'
   ...
 # Subtest: normal search hides trashed files while includeTrashed returns explicit trashed state
 ok 88 - normal search hides trashed files while includeTrashed returns explicit trashed state
   ---
-  duration_ms: 530.652433
+  duration_ms: 486.721878
   type: 'test'
   ...
 # Subtest: failed extraction files remain searchable by filename with explicit failed extraction state
 ok 89 - failed extraction files remain searchable by filename with explicit failed extraction state
   ---
-  duration_ms: 301.650843
+  duration_ms: 238.801723
   type: 'test'
   ...
 # Subtest: unsupported files remain searchable by filename with explicit unsupported extraction state
 ok 90 - unsupported files remain searchable by filename with explicit unsupported extraction state
   ---
-  duration_ms: 203.408401
+  duration_ms: 152.468059
   type: 'test'
   ...
 # Subtest: stale missing files remain searchable by filename with explicit failed index state
 ok 91 - stale missing files remain searchable by filename with explicit failed index state
   ---
-  duration_ms: 122.850092
+  duration_ms: 174.799032
   type: 'test'
   ...
 # Subtest: scanner skips persisted unchanged files and re-indexes changed files
 ok 92 - scanner skips persisted unchanged files and re-indexes changed files
   ---
-  duration_ms: 139.949744
+  duration_ms: 435.236039
   type: 'test'
   ...
 # Subtest: persisted active source paths are selected for restart resume
 ok 93 - persisted active source paths are selected for restart resume
   ---
-  duration_ms: 119.819932
+  duration_ms: 202.444717
   type: 'test'
   ...
 # Subtest: resumePersistedWatchers restarts only persisted active source paths
 ok 94 - resumePersistedWatchers restarts only persisted active source paths
   ---
-  duration_ms: 164.854259
+  duration_ms: 101.115239
   type: 'test'
   ...
 # Subtest: resumePersistedWatchers reports failed persisted source paths without aborting remaining resumes
 ok 95 - resumePersistedWatchers reports failed persisted source paths without aborting remaining resumes
   ---
-  duration_ms: 77.203752
+  duration_ms: 143.73063
   type: 'test'
   ...
 # Subtest: marks missing indexed files as stale failures during extraction
 ok 96 - marks missing indexed files as stale failures during extraction
   ---
-  duration_ms: 236.782936
+  duration_ms: 260.962208
   type: 'test'
   ...
 # Subtest: undo without approval is rejected without audit or snapshot
 ok 97 - undo without approval is rejected without audit or snapshot
   ---
-  duration_ms: 227.596014
+  duration_ms: 175.967937
   type: 'test'
   ...
 # Subtest: successful filesystem undo creates used undo snapshot and audit includes snapshot id
 ok 98 - successful filesystem undo creates used undo snapshot and audit includes snapshot id
   ---
-  duration_ms: 290.752624
+  duration_ms: 146.318777
   type: 'test'
   ...
 # Subtest: undo source missing is rejected and audited without snapshot
 ok 99 - undo source missing is rejected and audited without snapshot
   ---
-  duration_ms: 222.835002
+  duration_ms: 416.145431
   type: 'test'
   ...
 # Subtest: undo target exists is rejected and audited without snapshot
 ok 100 - undo target exists is rejected and audited without snapshot
   ---
-  duration_ms: 183.980888
+  duration_ms: 125.812815
   type: 'test'
   ...
 # Subtest: semantic search hides trashed files by default and includes them when requested
 ok 101 - semantic search hides trashed files by default and includes them when requested
   ---
-  duration_ms: 177.601492
+  duration_ms: 478.136833
   type: 'test'
   ...
 # Subtest: unified search does not leak trashed file-linked rows by default
 ok 102 - unified search does not leak trashed file-linked rows by default
   ---
-  duration_ms: 118.956799
+  duration_ms: 424.4281
   type: 'test'
   ...
 # Subtest: watcher handles rapid file changes through debounced queued cycles
 ok 103 - watcher handles rapid file changes through debounced queued cycles
   ---
-  duration_ms: 2387.930509
+  duration_ms: 2748.249608
   type: 'test'
   ...
 # Subtest: wiki file pages do not use AI summaries as source-backed document body
 ok 104 - wiki file pages do not use AI summaries as source-backed document body
   ---
-  duration_ms: 133.582912
+  duration_ms: 410.963787
   type: 'test'
   ...
 # Subtest: wiki file pages populate document body from extracted source text when available
 ok 105 - wiki file pages populate document body from extracted source text when available
   ---
-  duration_ms: 112.548989
+  duration_ms: 123.359038
   type: 'test'
   ...
 # Subtest: wiki source chunks include page numbers when extraction metadata provides a page map
 ok 106 - wiki source chunks include page numbers when extraction metadata provides a page map
   ---
-  duration_ms: 205.758061
+  duration_ms: 358.136381
   type: 'test'
   ...
 # Subtest: persists durable wiki pages, sections, sources, chunks, relations, and rebuild records
 ok 107 - persists durable wiki pages, sections, sources, chunks, relations, and rebuild records
   ---
-  duration_ms: 144.484376
+  duration_ms: 424.361255
   type: 'test'
   ...
 # Subtest: durable wiki evidence routes expose pages, evidence, and source chunks
 ok 108 - durable wiki evidence routes expose pages, evidence, and source chunks
   ---
-  duration_ms: 322.801255
+  duration_ms: 783.947937
   type: 'test'
   ...
 # Subtest: wiki validation preview route returns advisory read-only preview for persisted page
 ok 109 - wiki validation preview route returns advisory read-only preview for persisted page
   ---
-  duration_ms: 169.709369
+  duration_ms: 272.521349
   type: 'test'
   ...
 # Subtest: wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history
 ok 110 - wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history
   ---
-  duration_ms: 185.677098
+  duration_ms: 433.983918
   type: 'test'
   ...
 # Subtest: wiki build persists generated wiki on first build when no persisted wiki exists
 ok 111 - wiki build persists generated wiki on first build when no persisted wiki exists
   ---
-  duration_ms: 187.167321
+  duration_ms: 217.76641
   type: 'test'
   ...
 # Subtest: wiki build no-op preserves persisted wiki pages after a real prior build
 ok 112 - wiki build no-op preserves persisted wiki pages after a real prior build
   ---
-  duration_ms: 201.258445
+  duration_ms: 402.598905
   type: 'test'
   ...
 # Subtest: wiki build detects changed extraction dependencies and selectively replaces affected pages
 ok 113 - wiki build detects changed extraction dependencies and selectively replaces affected pages
   ---
-  duration_ms: 292.287443
+  duration_ms: 402.387459
   type: 'test'
   ...
 1..113
@@ -801,11 +795,5 @@ ok 113 - wiki build detects changed extraction dependencies and selectively repl
 # cancelled 0
 # skipped 1
 # todo 0
-# duration_ms 14585.344761
-[exit:0]
-\n### bash -lc cd apps/everything-ai-ui && test -f scripts/clean-and-smoke.bat && file scripts/clean-and-smoke.bat
-scripts/clean-and-smoke.bat: DOS batch file, ASCII text, with CRLF line terminators
-[exit:0]
-\n### bash -lc cd apps/everything-ai-ui && test -f scripts/clean-and-smoke.bat && echo "Windows smoke helper exists but was not executed on Linux"
-Windows smoke helper exists but was not executed on Linux
-[exit:0]
+# duration_ms 221773.152229
+[INFO] end_sha: 9e3fade8ce689bdcebbec408a3ac17ce138592c9
