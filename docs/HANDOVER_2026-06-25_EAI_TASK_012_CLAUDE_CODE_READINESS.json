@@ -1,33 +1,27 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "task_id": "EAI-TASK-012",
-  "issue_number": 34,
-  "final_status": "PASS",
-  "validation": {
-    "framework_doctor": "PASS",
-    "api_tests": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "codex_detection": "PASS",
-    "claude_detection": "PASS",
-    "claude_probe": "PASS"
+  "taskId": "EAI-TASK-012",
+  "issueNumber": 34,
+  "finalStatus": "PASS",
+  "validationStatus": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "apiTests": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "connectorDetection": "PASS",
+    "connectorProbe": "PASS"
   },
-  "readiness_summary": {
-    "codex": {
-      "path": "/usr/bin/codex",
-      "version": "codex-cli 0.142.0"
-    },
-    "claude_code": {
-      "path": "/usr/bin/claude",
-      "version": "2.1.191 (Claude Code)"
-    },
-    "hermes_ready_for_real_everythingai_tasks": true
+  "readiness": {
+    "claudeCode": {
+      "detected": true,
+      "commandPath": "/usr/bin/claude",
+      "version": "2.1.191 (Claude Code)",
+      "usableToday": true
+    }
   },
-  "remaining_risks": [],
-  "recommended_next_pm_task": "Proceed with the next PM-reviewed ready issue in the queue.",
-  "artifact_commit_sha": "5994df3",
-  "terminal_log": "LOGS/EAI-TASK-012-terminal.log",
-  "report": "REPORTS/EAI-TASK-012-CLAUDE-CODE-READINESS.md",
-  "state_file": "not present"
+  "remainingRisks": [],
+  "recommendedNextPMTask": "Proceed with the next PM-reviewed ready issue in the queue.",
+  "artifactCommitSha": "PENDING_COMMIT_SHA"
 }

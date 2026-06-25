@@ -1,20 +1,28 @@
-# EAI-TASK-012: Claude Code Readiness Verification
+# EAI-TASK-012: Claude Code CLI Readiness
 
 **Final status:** PASS
 
 ## Summary
-Validated that Claude Code remains available on PATH, reports the expected CLI version, and is handled only through the safe admin/operator connector path. The repo stayed on `main`, no core product code was changed, framework doctor passed, the API test suite passed, Claude Code detection/probe commands succeeded, and the UI typecheck/build checks passed.
+Validated that Claude Code is available on PATH, reports the expected CLI version, and is handled only through the safe admin/operator connector path. The repo stayed on `main`, no core product code was changed, framework doctor passed, the API test suite passed, Claude Code detection/probe commands succeeded, and the UI typecheck/build checks passed.
+
+## Repository / environment
+- **Repository path used:** `/root/.hermes/projects/everythingAI`
+- **Current branch:** `main`
+- **Starting commit SHA:** `427f289d14f79f2a2adda16e0b3c5905a8dd2fac`
+- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Final SHA source of truth:** `follow-up metadata commit`
 
 ## Validation results
 - `git pull --ff-only` — PASS
 - `node scripts/framework-doctor.mjs` — PASS
-- `cd services/api && npm test` — PASS
-- `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
-- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js claudeCode` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
 - `command -v claude` — PASS (`/usr/bin/claude`)
 - `claude --version` — PASS (`2.1.191 (Claude Code)`)
+- `cd services/api && npm test` — PASS
+- `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
+- `cd services/api && env EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js claudeCode` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
 
 ## Claude Code readiness summary
 - Command path: `/usr/bin/claude`
@@ -53,4 +61,4 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Claude
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-012-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json`
-- Artifact commit SHA: `5994df3`
+- Artifact commit SHA: `PENDING_COMMIT_SHA`
