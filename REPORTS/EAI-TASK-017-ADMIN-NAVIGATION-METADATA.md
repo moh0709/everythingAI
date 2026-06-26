@@ -54,4 +54,4 @@ Extract the remaining admin view-router section mapping into a shared config/hel
 
 ## Artifact commit SHA
 
-PENDING_FINAL_COMMIT_SHA
+488c4e5

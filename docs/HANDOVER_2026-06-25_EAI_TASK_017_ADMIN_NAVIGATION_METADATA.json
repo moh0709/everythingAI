@@ -30,5 +30,5 @@
   "risk": "Low-risk admin UI refactor that consolidates shared navigation metadata and click behavior.",
   "rollbackNote": "Revert the three modified admin UI files to restore the previous navigation wiring.",
   "recommendedNextTask": "Extract the remaining admin view-router section map into a shared config/helper for even tighter navigation centralization.",
-  "artifactCommitSha": "PENDING_FINAL_COMMIT_SHA"
+  "artifactCommitSha": "488c4e5"
 }
