@@ -3,28 +3,17 @@ import { ExtractedTextPreview } from '../../shared/ExtractedTextPreview';
 import { FILE_STATUS_FILTER_OPTIONS } from '../../shared/fileStatusOptions';
 import { formatDate } from '../../shared/formatDate';
 import type { ExtractedPreviewSource } from '../../shared/selectExtractedPreviewText';
+import {
+  describeFileProgress,
+  summarizeFileProgress,
+  withInFlightSummary,
+  type FileProgressRecord,
+} from '../../shared/fileProgress';
 import { formatSize } from '../utils/format';
 import '../../user/localSettingsHelp.css';
 
 type FilePreview = NonNullable<ExtractedPreviewSource> & {
   insight?: { summary?: string; classification?: string } | null;
-};
-
-type FileProgressRecord = IndexedFile & {
-  recovery_status?: string;
-  error_message?: string | null;
-  extraction_error_message?: string | null;
-};
-
-type FileProgressSummary = {
-  total: number;
-  complete: number;
-  running: number;
-  waiting: number;
-  partial: number;
-  failed: number;
-  trashed: number;
-  noProgressData: number;
 };
 
 type ExplorerViewProps = {
@@ -58,78 +47,6 @@ function dynamicTags(file?: IndexedFile, preview?: FilePreview | null) {
   return Array.from(tags);
 }
 
-function getFileProgress(file?: FileProgressRecord | null) {
-  if (!file) {
-    return {
-      label: 'No file selected',
-      tone: 'dark',
-      detail: 'Choose a file to inspect indexing and extraction progress.',
-      state: 'idle',
-    } as const;
-  }
-
-  if (file.recovery_status === 'trashed') {
-    return {
-      label: 'Trashed',
-      tone: 'dark',
-      detail: 'This file is hidden from active processing and needs recovery before it can be indexed again.',
-      state: 'archived',
-    } as const;
-  }
-
-  if (file.index_status === 'failed') {
-    return {
-      label: 'Index failed',
-      tone: 'dark',
-      detail: file.error_message || 'The indexer reported a failure for this file.',
-      state: 'failed',
-    } as const;
-  }
-
-  if (file.extraction_status === 'failed') {
-    return {
-      label: 'Extraction failed',
-      tone: 'dark',
-      detail: file.extraction_error_message || 'The extractor could not produce text for this file.',
-      state: 'failed',
-    } as const;
-  }
-
-  if (file.extraction_status === 'unsupported') {
-    return {
-      label: 'Unsupported',
-      tone: 'dark',
-      detail: 'The file type is indexed, but the extractor does not support text extraction for it.',
-      state: 'partial',
-    } as const;
-  }
-
-  if (file.extraction_status === 'extracted') {
-    return {
-      label: 'Complete',
-      tone: 'mint',
-      detail: 'Indexing and extraction are complete. The extracted text preview is ready to read.',
-      state: 'complete',
-    } as const;
-  }
-
-  if (file.index_status === 'indexed') {
-    return {
-      label: 'Awaiting extraction',
-      tone: 'blue',
-      detail: 'The file is indexed and is waiting for the extractor or a refresh cycle to finish.',
-      state: 'running',
-    } as const;
-  }
-
-  return {
-    label: 'Indexing',
-    tone: 'blue',
-    detail: 'The file has not reached a completed index state yet.',
-    state: 'running',
-  } as const;
-}
-
 function summarizeFiles(files: IndexedFile[]) {
   const progressFiles = files as FileProgressRecord[];
   const total = progressFiles.length;
@@ -152,62 +69,6 @@ function summarizeFiles(files: IndexedFile[]) {
   };
 }
 
-function summarizeProgress(files: IndexedFile[]): FileProgressSummary {
-  const progressFiles = files as FileProgressRecord[];
-
-  return progressFiles.reduce<FileProgressSummary>((summary, file) => {
-    if (file.recovery_status === 'trashed') {
-      summary.trashed += 1;
-      return summary;
-    }
-
-    const hasIndexStatus = Boolean(file.index_status);
-    const hasExtractionStatus = Boolean(file.extraction_status);
-
-    if (file.index_status === 'failed' || file.extraction_status === 'failed') {
-      summary.failed += 1;
-      return summary;
-    }
-
-    if (file.extraction_status === 'extracted') {
-      summary.complete += 1;
-      return summary;
-    }
-
-    if (file.extraction_status === 'unsupported') {
-      summary.partial += 1;
-      return summary;
-    }
-
-    if (file.index_status === 'indexed' && !file.extraction_status) {
-      summary.running += 1;
-      return summary;
-    }
-
-    if (!hasIndexStatus && !hasExtractionStatus) {
-      summary.waiting += 1;
-      return summary;
-    }
-
-    if (hasIndexStatus || hasExtractionStatus) {
-      summary.waiting += 1;
-      return summary;
-    }
-
-    summary.noProgressData += 1;
-    return summary;
-  }, {
-    total: progressFiles.length,
-    complete: 0,
-    running: 0,
-    waiting: 0,
-    partial: 0,
-    failed: 0,
-    trashed: 0,
-    noProgressData: 0,
-  });
-}
-
 export function ExplorerView({
   files,
   allFiles,
@@ -227,8 +88,8 @@ export function ExplorerView({
 }: ExplorerViewProps) {
   const summary = summarizeFiles(allFiles);
   const visibleSummary = summarizeFiles(files);
-  const progressSummary = summarizeProgress(allFiles);
-  const selectedProgress = getFileProgress((selectedFile || selectedPreview?.file) as FileProgressRecord | undefined);
+  const progressSummary = withInFlightSummary(summarizeFileProgress(allFiles));
+  const selectedProgress = describeFileProgress((selectedFile || selectedPreview?.file) as FileProgressRecord | undefined);
 
   return <section>
     <div className="panel" style={{ marginBottom: '1rem' }}>
@@ -241,24 +102,32 @@ export function ExplorerView({
       </div>
       <div className="settings-help-grid">
         <div>
+          <strong>In flight</strong>
+          <p>{progressSummary.inFlight} file(s) are still moving through indexing or extraction.</p>
+        </div>
+        <div>
           <strong>Running</strong>
           <p>{progressSummary.running} file(s) are indexed and still waiting on extracted text.</p>
         </div>
         <div>
           <strong>Waiting</strong>
-          <p>{progressSummary.waiting} file(s) have not started or do not yet have enough progress data to classify further.</p>
+          <p>{progressSummary.waiting} file(s) have a progress record but are not yet in a clear active stage.</p>
         </div>
         <div>
           <strong>Complete</strong>
           <p>{progressSummary.complete} file(s) have finished indexing and extraction.</p>
         </div>
         <div>
+          <strong>Partial</strong>
+          <p>{progressSummary.partial} file(s) are indexed but unsupported for text extraction.</p>
+        </div>
+        <div>
           <strong>Failures</strong>
           <p>{progressSummary.failed} file(s) reported an index or extraction failure.</p>
         </div>
         <div>
-          <strong>Unsupported</strong>
-          <p>{progressSummary.partial} file(s) are indexed but unsupported for extraction.</p>
+          <strong>No progress data</strong>
+          <p>{progressSummary.noProgressData} file(s) have not reported indexing or extraction status yet.</p>
         </div>
         <div>
           <strong>Next step</strong>
@@ -313,7 +182,7 @@ export function ExplorerView({
         </thead>
         <tbody>
           {files.map((file) => {
-            const progress = getFileProgress(file as FileProgressRecord);
+            const progress = describeFileProgress(file as FileProgressRecord);
             return <tr
               key={file.id}
               onClick={() => setSelectedFileId(file.id)}
@@ -326,6 +195,7 @@ export function ExplorerView({
               <td>
                 <div className="chips">
                   <span className={`chip ${progress.tone}`}>{progress.label}</span>
+                  <span className="chip dark">Stage: {progress.stage}</span>
                   <span className="chip dark">Index: {file.index_status || 'pending'}</span>
                   <span className="chip dark">Extract: {file.extraction_status || 'pending'}</span>
                 </div>
@@ -342,7 +212,9 @@ export function ExplorerView({
           <p><strong>Type:</strong> {selectedFile.extension}</p>
           <p><strong>Size:</strong> {formatSize(selectedFile.size_bytes)}</p>
           <p><strong>Progress:</strong> {selectedProgress.label} — {selectedProgress.detail}</p>
+          <p><strong>Current stage:</strong> {selectedProgress.stage}</p>
           <p><strong>Progress state:</strong> {selectedProgress.state}</p>
+          <p><strong>Next step:</strong> {selectedProgress.nextStep}</p>
           <h3>Tags</h3>
           <div className="chips">
             {dynamicTags(selectedFile, selectedPreview).map((tag) => <span className="chip blue" key={tag}>{tag}</span>)}
