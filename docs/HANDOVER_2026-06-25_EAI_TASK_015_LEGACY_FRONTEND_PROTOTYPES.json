@@ -1,31 +1,25 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-015",
-  "issueNumber": 37,
+  "task_id": "EAI-TASK-015",
+  "issue_number": 37,
   "status": "PASS",
-  "artifactCommitSha": "887ad20",
-  "validationSummary": {
-    "gitPull": "PASS",
-    "frameworkDoctor": "PASS",
-    "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "apiTests": "PASS"
+  "validation": {
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
   },
-  "activeRuntimeConfirmation": {
-    "userEntry": "apps/everything-ai-ui/src/main.tsx -> UserApp.tsx",
-    "adminEntry": "apps/everything-ai-ui/src/admin-main.tsx -> AdminApp.tsx",
-    "viteBuildInputs": ["index.html", "admin.html"]
+  "reference_check": {
+    "client_workspace_affected": false,
+    "admin_boundary_intact": true,
+    "legacy_prototypes_active": false
   },
-  "referenceChecks": {
-    "AppEnhanced": "Referenced only by legacy README / excluded from strict typecheck",
-    "AppComplete": "Referenced only by legacy README / excluded from strict typecheck",
-    "App": "No active entrypoint references found"
-  },
-  "remainingRisks": [
-    "Archived prototype files may confuse future maintainers if they remain undocumented.",
-    "Legacy files are intentionally left in place to avoid unnecessary cleanup risk."
+  "next_task": "Split Agent Connectors into an explicit admin settings subsection instead of relying on hash-based navigation.",
+  "risks": [
+    "Legacy prototype files still exist for reference and typecheck coverage.",
+    "Hash-based Agent Connectors navigation is maintainability debt, not a functional defect."
   ],
-  "recommendedNextPmTask": "Create a targeted cleanup task to extract or retire the next admin runtime component, starting with AdminHeader.tsx.",
-  "notes": "No .hermes/state.json file existed in this repo, so it was not modified."
+  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "updatedAt": "2026-06-26T03:41:06Z"
 }

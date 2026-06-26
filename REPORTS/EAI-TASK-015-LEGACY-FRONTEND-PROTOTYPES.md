@@ -1,62 +1,68 @@
 # EAI-TASK-015: Review remaining legacy frontend prototypes
 
-## Status
-PASS
+**Final status:** PASS
 
 ## Summary
-I reviewed the remaining legacy frontend prototype files and verified that they are not part of the active runtime entry paths. The active user and admin entrypoints still resolve through `main.tsx` -> `UserApp.tsx` and `admin-main.tsx` -> `AdminApp.tsx`, while the older prototype files remain archived in the root `src/` folder for reference only.
-
-No production or user-facing behavior was changed for this task.
+This task reviewed the remaining legacy frontend prototype files and confirmed the active user/admin runtime paths are unchanged. No product behavior was modified.
 
 ## Reference-check results
-Checked the issue-specified paths and references.
+- `apps/everything-ai-ui/src/main.tsx` boots `UserApp`, so the Client Workspace entrypoint stays separate from admin runtime.
+- `apps/everything-ai-ui/src/admin-main.tsx` boots `AdminApp`, which delegates to `AdminRuntimeApp`.
+- `apps/everything-ai-ui/vite.config.ts` builds separate `user` and `admin` HTML inputs.
+- `apps/everything-ai-ui/index.html` points only at `/src/main.tsx`.
+- `apps/everything-ai-ui/admin.html` points only at `/src/admin-main.tsx`.
+- `apps/everything-ai-ui/src/UserApp.tsx` and `apps/everything-ai-ui/src/user/**` contain no admin connector imports.
+- `AppEnhanced.tsx` and `AppComplete.tsx` are still present as legacy/prototype material, but the active entrypoints do not import them.
+- `tsconfig.json` still includes `src/App.tsx`, `src/AppEnhanced.tsx`, and `src/AppComplete.tsx` for typechecking coverage.
 
-Reference search results:
+## Current Admin header usage map
+- `AdminApp.tsx` returns `AdminRuntimeApp`.
+- `AdminRuntimeApp.tsx` renders `AdminShell`, which renders `AdminHeader`.
+- `AdminHeader.tsx` drives navigation from `ADMIN_NAV_ITEMS` in `adminNavigation.ts`.
+- The `Agent Connectors` nav item maps to the `settings` section plus `#agent-connectors`, then scrolls to the connector panel.
+- `AdminViewRouter.tsx` routes the `settings` section to `SettingsView`.
+- `SettingsView.tsx` renders `AgentConnectorsPanel` inside the Settings section.
 
-- `AppEnhanced` — matches found only in `src/admin/README.md`, `src/AppEnhanced.tsx`, and a non-runtime note in `src/admin/AdminApp.tsx`.
-- `AppComplete` — matches found only in `src/admin/README.md`, `src/AppComplete.tsx`, and a non-runtime note in `src/admin/AdminApp.tsx`.
-- `from './App'`, `from './App.tsx'`, `<App` — no active entrypoint references found in `main.tsx`, `admin-main.tsx`, `index.html`, `admin.html`, or `vite.config.ts`.
+## Admin navigation boundary notes
+- `Agent Connectors` is an admin-only affordance.
+- `adminNavigation.ts` keeps it inside the admin settings flow rather than exposing it as a separate product route.
+- `AgentConnectorsPanel.tsx` explicitly says these connectors are not exposed in the Client Workspace and that the Client Workspace must remain provider-only.
+- `AdminHero.tsx` also tells normal users to use the Client Workspace.
+- The Client Workspace remains unaffected by this task.
 
-Active runtime confirmation:
+## Proposed next maintainability task
+**Recommended follow-up:** remove the hash-based special case for `Agent Connectors` by giving it an explicit settings subsection state or dedicated settings subpanel inside the admin shell.
 
-- `apps/everything-ai-ui/index.html` loads `/src/main.tsx`.
-- `apps/everything-ai-ui/admin.html` loads `/src/admin-main.tsx`.
-- `apps/everything-ai-ui/src/main.tsx` renders `UserApp`.
-- `apps/everything-ai-ui/src/admin-main.tsx` renders `AdminApp`.
-- `apps/everything-ai-ui/vite.config.ts` builds the user and admin entrypoints only.
-- `apps/everything-ai-ui/src/admin/README.md` explicitly documents `App.tsx`, `AppEnhanced.tsx`, and `AppComplete.tsx` as legacy reference-only migration artifacts.
+### Why this is the next safe task
+- The panel is already isolated in `SettingsView.tsx`.
+- The nav item currently uses hash scrolling as a hidden routing mechanism.
+- Making the subsection explicit would improve maintainability without changing behavior.
 
-Conclusion: the old prototype files are archived references, not active runtime dependencies.
+### Exact files likely involved later
+- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
+- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
+- `apps/everything-ai-ui/src/admin/types.ts`
 
-## Exact files changed
-None. No application source files were modified.
-
-## Validation
-Validation commands were run from the repo root.
-
-Results:
-
+## Validation results
 - `git pull --ff-only` — PASS
 - `node scripts/framework-doctor.mjs` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
 - `cd services/api && npm test` — PASS
 
-Additional notes:
+### Validation notes
+- Framework doctor confirmed `gh` is authenticated and the required framework files are present.
+- UI build completed successfully with separate `admin` and `user` bundles.
+- API tests passed: 114 tests total, 113 passed, 1 skipped.
 
-- `node scripts/framework-doctor.mjs` reported valid Hermes framework files and `gh authenticated`.
-- `npm run build` completed successfully and emitted both user and admin bundles.
-- `npm test` completed successfully with 112 passing tests and 1 skipped test.
-
-## Risks
-- Keeping legacy prototype files in place has low runtime risk because they are excluded from active entrypoints.
-- The main risk is future confusion from stale reference files if they remain undocumented.
-
-## Rollback note
-No rollback is required because no code or runtime entrypoint changes were made. If the archived prototype files are eventually removed, the rollback is simply to restore the deleted files from version control.
-
-## Recommended next task
-Continue the active admin runtime modularization work, starting with extracting `components/AdminHeader.tsx` from the admin boundary.
+## Risks and non-goals
+- No production behavior was changed.
+- No core application code was modified.
+- Legacy prototype files still exist for reference and typecheck coverage; removing them is a separate follow-up task.
+- This task did not change the Client Workspace/Admin boundary.
 
 ## Artifact commit SHA
-887ad20 (initial artifact commit containing the terminal log). This report was added in a follow-up metadata commit.
+PENDING_COMMIT_SHA
