@@ -20,6 +20,6 @@
     "Legacy prototype files still exist for reference and typecheck coverage.",
     "Hash-based Agent Connectors navigation is maintainability debt, not a functional defect."
   ],
-  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "34b4d19f57d0870b48f6b2780fbc8aadbf01b986",
   "updatedAt": "2026-06-26T03:41:06Z"
 }
