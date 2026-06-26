@@ -1,0 +1,54 @@
+{
+  "task": "EAI-TASK-029",
+  "title": "Add production identity workspace schema foundation",
+  "final_status": "PASS",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "starting_commit_sha": "248a15b",
+  "pre_commit_artifact_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "final_sha_source_of_truth": "GitHub issue comment after post-commit sync",
+  "issue_number": 51,
+  "evidence_reviewed": [
+    "REPORTS/EAI-TASK-028-AUTH-TENANT-WORKSPACE-MODEL.md",
+    "docs/HANDOVER_2026-06-26_AUTH_TENANT_WORKSPACE_MODEL.json",
+    "REPORTS/EAI-TASK-027-PRODUCTION-ARCHITECTURE-PLAN.md",
+    "docs/HANDOVER_2026-06-26_PRODUCTION_ARCHITECTURE_PLAN.json",
+    "services/api/src/db/schema.sql",
+    "services/api/src/middleware/auth.js",
+    "services/api/src/server.js",
+    "services/api/src/routes/providerSettings.routes.js",
+    "services/api/src/routes/agentBridge.routes.js",
+    "services/api/src/db/production/001_identity_workspace_schema.sql",
+    "services/api/src/middleware/requestContext.js",
+    "services/api/test/productionIdentityWorkspaceSchema.test.js"
+  ],
+  "missing_evidence": [
+    "services/api/src/db/schema.js was listed in the task brief, but the repository snapshot contains services/api/src/db/schema.sql instead."
+  ],
+  "validation": {
+    "git_pull": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "schema_foundation": {
+    "postgres_schema_file": "services/api/src/db/production/001_identity_workspace_schema.sql",
+    "request_context_file": "services/api/src/middleware/requestContext.js",
+    "validation_test": "services/api/test/productionIdentityWorkspaceSchema.test.js"
+  },
+  "preserves_local_mvp": true,
+  "notes": [
+    "The PostgreSQL foundation is draft-only and is not wired into the current SQLite runtime.",
+    "No login requirement or UI behavior change was introduced."
+  ],
+  "files_changed": [
+    "LOGS/EAI-TASK-029-terminal.log",
+    "REPORTS/EAI-TASK-029-PRODUCTION-IDENTITY-WORKSPACE-SCHEMA.md",
+    "docs/HANDOVER_2026-06-26_PRODUCTION_IDENTITY_WORKSPACE_SCHEMA.json",
+    "services/api/src/db/production/001_identity_workspace_schema.sql",
+    "services/api/src/middleware/requestContext.js",
+    "services/api/test/productionIdentityWorkspaceSchema.test.js"
+  ]
+}
