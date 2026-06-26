@@ -77,7 +77,7 @@ PASS
 - Implement the production identity repository and wire `workspaceContext` to tenant/workspace persistence lookup under an explicit production-mode guard.
 
 ## Artifact commit SHA
-- pending commit of task artifacts
+- 84ffb5f4f585d45e27d79b7e66bfd7e9c582a0e0
 
 ## Final pushed commit SHA
-- pending push of task artifacts
+- 84ffb5f4f585d45e27d79b7e66bfd7e9c582a0e0
