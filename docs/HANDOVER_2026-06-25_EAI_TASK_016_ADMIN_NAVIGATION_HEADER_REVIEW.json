@@ -1,24 +1,26 @@
 {
-  "issue": 38,
-  "title": "EAI-TASK-016: Review admin navigation header structure",
-  "status": "PASS",
-  "repository": "/root/.hermes/projects/everythingAI",
+  "repository": "everythingAI",
   "branch": "main",
-  "artifact_commit_sha": "865ec65",
-  "files": [
-    "LOGS/EAI-TASK-016-terminal.log",
-    "REPORTS/EAI-TASK-016-ADMIN-NAVIGATION-HEADER-REVIEW.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_016_ADMIN_NAVIGATION_HEADER_REVIEW.json"
-  ],
+  "task_id": "EAI-TASK-016",
+  "issue_number": 38,
+  "final_status": "PASS",
   "validation": {
-    "git_pull_ff_only": "PASS",
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
+    "git_pull_ff_only": "passed",
+    "framework_doctor": "passed",
+    "ui_typecheck": "passed",
+    "ui_build": "passed",
+    "api_tests": "passed"
   },
-  "notes": [
-    "Admin header stays scoped to the admin runtime boundary.",
-    "Agent Connectors remains nested under admin settings and is not exposed to the Client Workspace."
-  ]
+  "admin_header_usage": {
+    "renderer": "AdminShell",
+    "props_from": "AdminRuntimeApp",
+    "navigation_source": "ADMIN_NAV_ITEMS",
+    "special_actions": ["analytics -> loadAudit()", "agentConnectors -> settings#agent-connectors"]
+  },
+  "boundary_notes": {
+    "client_workspace_unchanged": true,
+    "agent_connectors_admin_only": true
+  },
+  "recommended_next_task": "Split Agent Connectors out of the overloaded settings view into a dedicated admin subsection/component boundary.",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA"
 }
