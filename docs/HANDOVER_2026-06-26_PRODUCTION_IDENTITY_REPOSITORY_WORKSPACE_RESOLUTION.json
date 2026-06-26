@@ -36,7 +36,7 @@
     "unresolved_fallbacks_supported": true
   },
   "artifact_commit_sha": "d3af520f34503973f04a557923ba5bf4fb287a98",
-  "final_pushed_commit_sha": "d3af520f34503973f04a557923ba5bf4fb287a98",
+  "final_pushed_commit_sha": "c2b91feb6c4b4ea0db256e8d5f1824802466ee59",
   "remaining_risks": [
     "The production identity repository is still a scaffold and not yet connected to live PostgreSQL persistence.",
     "Workspace persistence resolution remains opt-in and is disabled by default for the local MVP runtime."
