@@ -98,4 +98,4 @@ Non-goals:
 
 ## Artifact commit SHA
 
-PENDING_COMMIT_SHA
+865ec65
