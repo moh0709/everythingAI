@@ -1,60 +1,49 @@
-# EAI-TASK-009: Admin Connector Readiness Rerun
+# EAI-TASK-009: Rerun Admin Connector readiness after CLI install
 
 **Final status:** PASS
 
 ## Summary
-Reran the Admin Connector readiness gate after the Codex and Claude Code CLIs were verified on PATH. The repo remained on the `main` branch with no product behavior changes. Framework doctor passed, the API test suite passed, connector detection and safe version probes passed for Codex and Claude Code, and the UI typecheck/build checks passed.
+This task reran the admin connector readiness gate after the local CLI install. Validation passed for the framework doctor, API tests, UI typecheck, UI build, and safe Codex/Claude Code version probes. The admin/user runtime boundary remains intact and no production behavior was changed.
+
+## Reference-check results
+- `services/api/src/agents/localAgentBridge.js` keeps command execution behind `EVERYTHINGAI_AGENT_BRIDGE_ENABLED`, restricts probes to safe actions, and blocks arbitrary shell execution.
+- `services/api/src/scripts/detectAgentConnectors.js` only performs PATH detection and does not run version probes or chat execution.
+- `services/api/src/scripts/probeAgentVersions.js` only performs safe version probes when the bridge flag is enabled.
+- `apps/everything-ai-ui/src/main.tsx` boots `UserApp`, so the Client Workspace path stays separate.
+- `apps/everything-ai-ui/src/admin-main.tsx` boots `AdminApp`, so the admin runtime stays separate.
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx` renders `AgentConnectorsPanel` inside Admin Settings only.
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx` documents connector setup as an admin-only diagnostic flow.
+
+## Active runtime boundary confirmation
+- User runtime: `main.tsx` → `UserApp`.
+- Admin runtime: `admin-main.tsx` → `AdminApp` → `SettingsView` → `AgentConnectorsPanel`.
+- No Client Workspace connector controls were introduced.
+- No admin boundary weakening was observed.
 
 ## Validation results
 - `git pull --ff-only` — PASS
 - `node scripts/framework-doctor.mjs` — PASS
-- `cd services/api && npm test` — PASS
+- `cd services/api && npm test` — PASS (`114` tests total, `113` passed, `1` skipped)
 - `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
-- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode` — PASS
+- `EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
-- `command -v codex` — PASS
-- `codex --version` — PASS
-- `command -v claude` — PASS
-- `claude --version` — PASS
+- `command -v codex` / `codex --version` — PASS (`/usr/bin/codex`, `codex-cli 0.142.0`)
+- `command -v claude` / `claude --version` — PASS (`/usr/bin/claude`, `2.1.191 (Claude Code)`)
 
-## Connector verification
-### Codex
-- Command: `/usr/bin/codex`
-- Version: `codex-cli 0.142.0`
-- Detection: PASS
-- Version probe: PASS
+## Exact files changed
+- `LOGS/EAI-TASK-009-terminal.log`
+- `REPORTS/EAI-TASK-009-ADMIN-CONNECTOR-READINESS-RERUN.md`
+- `docs/HANDOVER_2026-06-24_EAI_TASK_009_CONNECTORS_READY.json`
+- `.hermes/state.json`
 
-### Claude Code
-- Command: `/usr/bin/claude`
-- Version: `2.1.191 (Claude Code)`
-- Detection: PASS
-- Version probe: PASS
-
-## Detection/probe notes
-- Detection script reported Codex and Claude Code as found on PATH.
-- Safe version probe completed successfully for both targets.
-- The bridge stayed in the safe version-probe mode; chat execution remained disabled.
-- Other default connector targets were either missing on PATH or not part of the requested rerun targets.
-
-## Admin UI boundary result
-PASS. The connector controls remain admin-scoped:
-- `AdminHeader.tsx` routes `Agent Connectors` to the Admin Settings view using `#agent-connectors`.
-- `SettingsView.tsx` mounts `AgentConnectorsPanel` inside the admin settings experience.
-- Repository search showed connector UI references only under `apps/everything-ai-ui/src/admin/**`, with no client workspace connector controls exposed.
-
-## Framework doctor result
-PASS. `node scripts/framework-doctor.mjs` reported `status: PASS`, valid `.hermes/state.json`, and all required framework artifacts present.
-
-## Connector gate status
-Cleared. Codex and Claude Code are detected on PATH and both version probes succeeded.
+## Risks and rollback note
+- No product code was changed.
+- Risk is limited to task artifacts and metadata.
+- Rollback is a normal git revert of the artifact commit.
 
 ## Recommended next task
-Proceed with the next PM-reviewed open task in the EverythingAI queue, currently `EAI-TASK-007` / issue #29 if it is being revalidated, or the next newly posted ready issue.
+**EAI-TASK-011: Controlled Codex connector setup and safe probe verification**
 
-## Artifacts
-- Terminal log: `LOGS/EAI-TASK-009-terminal.log`
-- Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_009_CONNECTORS_READY.json`
-- State file: `.hermes/state.json`
-- Artifact bundle commit SHA: `5af0b5b76be601334cb78544d8082503a7d16aae`
-- Finalization commit SHA: `2fed0e08ae91e835c7aa6ecfcc375545afa34f0a`
+## Artifact commit SHA
+`d83975021d57ec267a5ad3ca9f9819ba77a0eba1`

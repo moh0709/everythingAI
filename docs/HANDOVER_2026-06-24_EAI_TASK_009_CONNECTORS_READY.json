@@ -1,35 +1,33 @@
 {
-  "repository": "moh0709/everythingAI",
+  "repo": "moh0709/everythingAI",
   "branch": "main",
   "taskId": "EAI-TASK-009",
   "issueNumber": 31,
   "finalStatus": "PASS",
+  "artifactCommitSha": "d83975021d57ec267a5ad3ca9f9819ba77a0eba1",
+  "startingCommitSha": "21df57bef4c9761875f5b70357c497231a2ace45",
   "validation": {
-    "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
-    "connectorDetection": "PASS",
-    "connectorVersionProbe": "PASS",
     "uiTypecheck": "PASS",
-    "uiBuild": "PASS"
+    "uiBuild": "PASS",
+    "connectorDetection": "PASS",
+    "connectorVersionProbes": "PASS",
+    "codexVersion": "codex-cli 0.142.0",
+    "claudeVersion": "2.1.191 (Claude Code)"
   },
-  "connectorReadiness": {
-    "codex": {
-      "command": "/usr/bin/codex",
-      "version": "codex-cli 0.142.0",
-      "detection": "PASS",
-      "probe": "PASS"
-    },
-    "claudeCode": {
-      "command": "/usr/bin/claude",
-      "version": "2.1.191 (Claude Code)",
-      "detection": "PASS",
-      "probe": "PASS"
-    },
-    "gateCleared": true
+  "boundaryChecks": {
+    "userRuntime": "UserApp via main.tsx",
+    "adminRuntime": "AdminApp via admin-main.tsx",
+    "agentConnectorsScope": "Admin Settings only",
+    "clientWorkspaceExposure": "none"
   },
-  "adminUiBoundary": "Connector controls remain admin-scoped under apps/everything-ai-ui/src/admin/**.",
-  "artifactBundleCommitSha": "5af0b5b76be601334cb78544d8082503a7d16aae",
-  "finalizationCommitSha": "2fed0e08ae91e835c7aa6ecfcc375545afa34f0a",
-  "updatedAt": "2026-06-25T05:40:47Z"
+  "risks": [
+    "No application code was changed.",
+    "Rollback is limited to reverting the artifact commit if needed."
+  ],
+  "recommendedNextTask": "EAI-TASK-011: Controlled Codex connector setup and safe probe verification",
+  "reportPath": "REPORTS/EAI-TASK-009-ADMIN-CONNECTOR-READINESS-RERUN.md",
+  "logPath": "LOGS/EAI-TASK-009-terminal.log",
+  "updatedAt": "2026-06-26T06:45:23Z"
 }
