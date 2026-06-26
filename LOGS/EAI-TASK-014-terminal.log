@@ -1,22 +1,44 @@
 EAI-TASK-014 terminal log
 =========================
-Repo: /root/.hermes/projects/everythingAI
-Branch: main
-HEAD before task: febbb83
 
+Repo root: /root/.hermes/projects/everythingAI
+Issue: #36
+Task: EAI-TASK-014 - Targeted cleanup of redundant admin entry files
+
+Reference checks
+----------------
 Commands run:
-1) gh issue list --state open --label 'pm:ready' --label 'hermes:ready' --json number,title,labels,assignees,url
-   - Open ready issues found; issue 36 selected as first runnable candidate.
-2) gh issue view 36 --json number,title,body,labels,url
-   - Issue body requested checks for refs to src/admin/admin-main.tsx and AdminAppV2.
-3) Reference checks under apps/everything-ai-ui
-   - No matches for AdminAppV2.
-   - No matches for src/admin/admin-main.
-   - Matches found for admin-main in:
-     * apps/everything-ai-ui/README.md
-     * apps/everything-ai-ui/admin.html
-   - admin.html loads /src/admin-main.tsx, so the active admin entry remains in use.
-4) git pull --ff-only
-   - Already up to date.
+- gh issue view 36 --json number,title,body,labels,url
+- grep-style repository searches for:
+  - AdminAppV2
+  - src/admin/admin-main
+  - admin/admin-main
 
-Result: BLOCKED; no file changes were made to application code.
+Results:
+- No matches were found for AdminAppV2 in apps/everything-ai-ui, vite.config.ts, or admin HTML files.
+- No matches were found for src/admin/admin-main.
+- No matches were found for admin/admin-main.
+- The checked redundant admin entry file paths are not present in this checkout.
+
+Validation
+----------
+Commands run from repo root:
+- git pull --ff-only
+- node scripts/framework-doctor.mjs
+- cd apps/everything-ai-ui && npm run typecheck
+- cd apps/everything-ai-ui && npm run build
+- cd ../../services/api && npm test
+
+Results:
+- git pull --ff-only: PASS (Already up to date.)
+- framework doctor: PASS
+- UI typecheck: PASS
+- UI build: PASS
+- API tests: PASS (114 tests total; 113 passed, 1 skipped, 0 failed)
+
+Safety / boundary notes
+-----------------------
+- Active admin path preserved: apps/everything-ai-ui/admin.html -> src/admin-main.tsx -> src/admin/AdminApp.tsx -> src/admin/AdminRuntimeApp.tsx
+- No core application code was modified.
+- No secrets or environment variables were exposed.
+

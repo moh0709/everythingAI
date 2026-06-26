@@ -1,31 +1,36 @@
 {
   "task": "EAI-TASK-014",
+  "issue": 36,
+  "title": "Targeted cleanup of redundant admin entry files",
   "status": "PASS",
-  "summary": "Removed redundant nested admin entry files after confirming there were no active references outside the files themselves.",
-  "active_admin_path_preserved": true,
-  "deleted_files": [
-    "apps/everything-ai-ui/src/admin/admin-main.tsx",
-    "apps/everything-ai-ui/src/admin/AdminAppV2.tsx"
+  "summary": "Reference checks found no matches for the redundant admin entry paths, and the active admin path remained unchanged. No source files were modified.",
+  "referenceChecks": {
+    "AdminAppV2": "no matches",
+    "src/admin/admin-main": "no matches",
+    "admin/admin-main": "no matches"
+  },
+  "activeAdminPath": [
+    "apps/everything-ai-ui/admin.html",
+    "apps/everything-ai-ui/src/admin-main.tsx",
+    "apps/everything-ai-ui/src/admin/AdminApp.tsx",
+    "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
+    "apps/everything-ai-ui/src/admin/components/AdminShell.tsx",
+    "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx"
   ],
-  "reference_checks": {
-    "AdminAppV2": "Only matched the deleted implementation files themselves.",
-    "src/admin/admin-main": "No matches outside the deleted file path.",
-    "admin/admin-main": "No matches outside the deleted file path."
-  },
-  "validation": {
-    "git_pull_ff_only": "PASS",
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
-  },
+  "filesChanged": [],
   "artifacts": [
     "LOGS/EAI-TASK-014-terminal.log",
     "REPORTS/EAI-TASK-014-REDUNDANT-ADMIN-ENTRY-CLEANUP.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_014_ADMIN_ENTRY_CLEANUP.json"
+    "docs/HANDOVER_2026-06-25_EAI_TASK_014_ADMIN_ENTRY_CLEANUP.json",
+    ".hermes/state.json"
   ],
-  "state_file_updated": false,
-  "state_file_reason": ".hermes/state.json did not exist in this checkout.",
-  "rollback": "Restore the deleted files from commit 5a0b871 if required.",
-  "artifact_commit_sha": "5a0b871"
+  "validation": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "apiTests": "PASS"
+  },
+  "artifactCommitSha": "9489e4d006428a1ff32b792a6e91df827b036c74",
+  "updatedAt": "2026-06-26T01:58:52Z"
 }
