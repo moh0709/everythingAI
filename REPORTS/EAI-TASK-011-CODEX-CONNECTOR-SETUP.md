@@ -65,15 +65,12 @@ PASS
 - Repeat the same controlled readiness verification pattern for Claude Code, keeping connector chat disabled unless explicitly approved.
 
 ## Artifact commit SHA
-- PENDING_COMMIT_SHA
-
-## Final pushed commit SHA
-- PENDING_COMMIT_SHA
+- f7357c2
 
 ## Lifecycle notes
 - Issue comment: pending
 - Labels updated: `hermes:working` added; will transition to `pm:review` and `hermes:done`
-- Final SHA handling: follow-up metadata synchronization commit will update `.hermes/state.json` and this report once the artifact commit SHA is known.
+- Final SHA handling: the artifact commit SHA is `f7357c2`; a follow-up metadata synchronization commit will keep `.hermes/state.json` aligned with the committed artifact state.
 
 ## Skipped commands / reasons
 - None.

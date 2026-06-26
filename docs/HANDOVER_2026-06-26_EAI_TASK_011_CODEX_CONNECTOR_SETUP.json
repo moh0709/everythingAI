@@ -21,12 +21,12 @@
     "clientWorkspaceExposure": "unchanged",
     "adminOnlyBoundary": "preserved"
   },
-  "artifactCommitSha": "PENDING_COMMIT_SHA",
-  "finalCommitSha": "PENDING_COMMIT_SHA",
+  "artifactCommitSha": "f7357c2",
+  "finalCommitSha": "f7357c2",
   "updatedAt": "2026-06-26T18:40:12Z",
   "notes": [
     "Connector version probe remained version-only.",
     "No production app code was modified.",
-    "Follow-up metadata sync will replace the placeholder SHA after the artifact commit exists."
+    "Follow-up metadata sync will keep the state file aligned with the artifact commit SHA."
   ]
 }
