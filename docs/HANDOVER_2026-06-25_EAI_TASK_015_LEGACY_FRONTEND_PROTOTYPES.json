@@ -1,25 +1,41 @@
 {
-  "repository": "moh0709/everythingAI",
-  "branch": "main",
-  "task_id": "EAI-TASK-015",
-  "issue_number": 37,
+  "task": "EAI-TASK-015",
+  "title": "Review remaining legacy frontend prototypes",
   "status": "PASS",
+  "repository": "/root/.hermes/projects/everythingAI",
+  "branch": "main",
+  "startingCommitSha": "57d92930f36b0599ddaacb5d664979180812c27d",
+  "artifactCommitSha": "c1728687c962dd3a2dcc89cc2c6e0e5660dad07a",
+  "syncNote": "This JSON file is part of a follow-up metadata sync commit; the artifact commit SHA above is the source of truth for the validated task result.",
+  "referenceChecks": {
+    "AppEnhanced": "Not imported by active runtime entrypoints; only referenced by tsconfig exclusion and admin README history.",
+    "AppComplete": "Not imported by active runtime entrypoints; only referenced by tsconfig exclusion and admin README history.",
+    "App": "Standalone prototype file not imported by main.tsx or admin-main.tsx.",
+    "activeEntrypoints": [
+      "apps/everything-ai-ui/src/main.tsx",
+      "apps/everything-ai-ui/src/admin-main.tsx"
+    ]
+  },
   "validation": {
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "apiTests": "PASS"
   },
-  "reference_check": {
-    "client_workspace_affected": false,
-    "admin_boundary_intact": true,
-    "legacy_prototypes_active": false
+  "runtimeConfirmation": {
+    "user": "src/main.tsx renders <UserApp />",
+    "admin": "src/admin-main.tsx renders <AdminApp />",
+    "viteInputs": [
+      "index.html",
+      "admin.html"
+    ]
   },
-  "next_task": "Split Agent Connectors into an explicit admin settings subsection instead of relying on hash-based navigation.",
-  "risks": [
-    "Legacy prototype files still exist for reference and typecheck coverage.",
-    "Hash-based Agent Connectors navigation is maintainability debt, not a functional defect."
+  "filesChanged": [
+    "LOGS/EAI-TASK-015-terminal.log",
+    "REPORTS/EAI-TASK-015-LEGACY-FRONTEND-PROTOTYPES.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_015_LEGACY_FRONTEND_PROTOTYPES.json",
+    ".hermes/state.json"
   ],
-  "artifact_commit_sha": "34b4d19f57d0870b48f6b2780fbc8aadbf01b986",
-  "updatedAt": "2026-06-26T03:41:06Z"
+  "rollback": "Restore the legacy prototype files and keep the active entrypoints untouched."
 }
