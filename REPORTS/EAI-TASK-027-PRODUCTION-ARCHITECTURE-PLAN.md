@@ -10,7 +10,7 @@ PASS
 - **Current branch:** `main`
 - **Starting commit SHA:** `4eda30a`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `3b743e0`
 - **Final SHA source of truth:** GitHub issue comment after post-commit sync
 
 ## Evidence reviewed

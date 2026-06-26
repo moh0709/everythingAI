@@ -796,3 +796,7 @@ ok 114 - wiki build detects changed extraction dependencies and selectively repl
 # todo 0
 # duration_ms 14747.378603
 == validation run complete ==
+
+== post-commit metadata ==
+Artifact commit SHA: 3b743e0
+Report and handover updated to record the committed artifact SHA.
