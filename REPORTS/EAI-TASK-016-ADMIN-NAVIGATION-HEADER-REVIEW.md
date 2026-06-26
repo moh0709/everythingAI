@@ -1,107 +1,105 @@
-# EAI-TASK-016: Review admin navigation header structure
+# EAI-TASK-016: Admin navigation header structure review
 
-**Final status:** PASS
+## Final status
 
-## Scope reviewed
+PASS
 
-Inspected:
+## Scope checked
 
-- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
-- `apps/everything-ai-ui/src/admin/AdminApp.tsx`
-- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminShell.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
-- `apps/everything-ai-ui/src/admin/types.ts`
-- supporting navigation and boundary files in `apps/everything-ai-ui/src/admin/**`
-- user entrypoint files `apps/everything-ai-ui/src/main.tsx` and `apps/everything-ai-ui/src/UserApp.tsx`
+Inspection-only task. No product behavior was changed.
 
 ## Current Admin header usage map
 
-- `AdminRuntimeApp` owns the active `section` state and passes it into `AdminShell`.
-- `AdminShell` renders `AdminHeader` at the top of the admin layout.
-- `AdminHeader` renders buttons from `ADMIN_NAV_ITEMS` and forwards clicks to `activateAdminNavItem`.
-- `AdminHeader` also shows the active provider pill via `providerLabel(activeProvider)`.
-- `AdminRuntimeApp` provides `loadAudit`, `setSection`, and `activeProvider` to the header boundary.
-- `AdminHeader` is only used inside the admin shell path, not by the user workspace.
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
+  - Renders the top admin nav bar and provider pill.
+  - Maps `ADMIN_NAV_ITEMS` into nav buttons.
+  - Uses `activateAdminNavItem()` and `isAdminNavItemActive()` from `adminNavigation.ts`.
+- `apps/everything-ai-ui/src/admin/components/AdminShell.tsx`
+  - Mounts `AdminHeader` above the rest of the admin page chrome.
+- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
+  - Owns admin section state and passes `setSection` / `loadAudit` into the shell.
+  - Keeps admin-only connector actions inside the admin runtime.
+- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
+  - Defines the admin nav items and the special `agentConnectors` nav target.
+  - Routes `Agent Connectors` to the `settings` section with `#agent-connectors` and scrolls to the panel.
+- `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
+  - Routes `settings` to `SettingsView`.
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
+  - Renders `AgentConnectorsPanel` inside the settings page.
 
-## Admin navigation sections
+## Admin navigation boundary notes
 
-`ADMIN_NAV_ITEMS` defines these admin navigation targets:
+- `Agent Connectors` remains an Admin-only path.
+- The nav item does not open a separate workspace route; it targets `settings` inside the admin shell and anchors to the connectors panel.
+- The client workspace entry remains separate:
+  - `apps/everything-ai-ui/src/main.tsx` renders `UserApp` + `ToastProvider`.
+  - `apps/everything-ai-ui/src/admin-main.tsx` renders `AdminApp`.
+- `UserApp` is the client workspace entry and stays outside the admin navigation boundary.
 
-- Dashboard
-- Files & Content
-- Planning
-- Ask AI
-- Agent Connectors
-- Analytics
-- Settings
+## Client Workspace impact check
 
-Boundary behavior:
+Confirmed unaffected by this admin review:
 
-- `analytics` triggers `loadAudit()` instead of only changing section.
-- `agentConnectors` uses the `settings` section plus `#agent-connectors` hash and scrolls to the connector panel.
-- `settings` remains the general settings page when the connector hash is absent.
+- `apps/everything-ai-ui/src/main.tsx`
+- `apps/everything-ai-ui/src/UserApp.tsx`
 
-## Client Workspace boundary confirmation
+Those files continue to drive the user-facing workspace path and do not import admin navigation or admin connector components.
 
-Confirmed unaffected:
+## Agent Connectors boundary check
 
-- `apps/everything-ai-ui/src/main.tsx` renders `UserApp`, not any admin component.
-- `apps/everything-ai-ui/src/UserApp.tsx` is the user workspace entrypoint and does not import admin UI.
-- The admin runtime is isolated behind `src/admin-main.tsx` / `src/admin/AdminApp.tsx`.
-- No client workspace navigation or rendering path was changed.
-
-## Agent Connectors boundary confirmation
-
-Confirmed admin-only:
-
-- `ADMIN_NAV_ITEMS` exposes `Agent Connectors` only inside admin navigation.
-- `AdminViewRouter` routes connector UI through the admin `SettingsView` path.
-- `AgentConnectorsPanel` explicitly states the connectors are not exposed in the Client Workspace.
-- The connector panel copy and guardrails reinforce that normal users remain provider-only.
-
-## Recommended next maintainability task
-
-**Proposed next task:** split the Agent Connectors experience out of the overloaded settings view into a dedicated admin subsection/component boundary.
-
-Why this is the next safe step:
-
-- The header already treats Agent Connectors as a special admin destination.
-- The current implementation still routes through `settings` internally, which makes the boundary less obvious.
-- A dedicated subsection would make the admin navigation structure easier to maintain without changing user-facing behavior.
-
-## Exact files likely involved later
+Confirmed still inside Admin-only navigation/settings:
 
 - `apps/everything-ai-ui/src/admin/adminNavigation.ts`
-- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
 - `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
 - `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
+
+No client workspace connector exposure was observed.
+
+## Proposed next maintainability task
+
+Extract the admin navigation/configuration into a more declarative single source of truth and then split the connectors section into a dedicated nested settings subsection if the UI needs to grow.
+
+### Likely files involved later
+
+- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
+- `apps/everything-ai-ui/src/admin/components/AdminShell.tsx`
+- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
+- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
+- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
+- `apps/everything-ai-ui/src/admin/AdminViewRouter.tsx`
 - `apps/everything-ai-ui/src/admin/types.ts`
 
-## Validation command results
+## Recommended acceptance criteria for the next task
 
-- `git pull --ff-only` — passed, repository already up to date.
-- `node scripts/framework-doctor.mjs` — passed.
-- `cd apps/everything-ai-ui && npm run typecheck` — passed.
-- `cd apps/everything-ai-ui && npm run build` — passed.
-- `cd services/api && npm test` — passed, 114 tests passed, 1 skipped.
+- Admin nav items are declared in one place.
+- `Agent Connectors` remains admin-only.
+- Client workspace files remain untouched.
+- Typecheck and build still pass.
+- No routing or behavior changes outside the admin settings subtree.
+
+## Validation results
+
+- `git pull --ff-only` — PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `cd services/api && npm test` — PASS
 
 ## Risks and non-goals
 
-Risks:
+### Risks
 
-- The admin navigation currently uses a special hash-based path for Agent Connectors, which is easy to miss during future cleanup.
-- `SettingsView` still carries multiple admin settings responsibilities, so regressions are possible if it is split carelessly.
+- `Agent Connectors` is currently embedded within the admin settings page, so future expansion could make the settings page harder to scan.
+- Navigation state is split between header routing, hash handling, and settings-panel rendering.
 
-Non-goals:
+### Non-goals
 
-- No product behavior was changed.
-- No client workspace UI was modified.
-- No admin routing behavior was changed.
-- No core application logic was edited for this inspection task.
+- No product behavior changes.
+- No admin/client boundary changes.
+- No core application code changes.
+- No `.hermes/state.json` update was made because the file does not exist in this repo.
 
 ## Artifact commit SHA
 
-a1f8353e57795ef9db3eeb12e98015f8dd2a891e
+858e5f3
