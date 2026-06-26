@@ -48,4 +48,4 @@ Continue the frontend cleanup by consolidating or retiring the remaining legacy 
 
 ## Artifact commit SHA
 
-PENDING_ARTIFACT_COMMIT_SHA
+2142a06ac1145ac83e020efb9641edb3461cde10
