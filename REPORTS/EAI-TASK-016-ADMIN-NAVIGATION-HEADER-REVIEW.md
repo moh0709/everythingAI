@@ -80,7 +80,7 @@ Additional notes:
 
 - `framework-doctor` reported `gh authenticated` and a valid Hermes state file.
 - UI build completed successfully and emitted the admin and user bundles.
-- API tests completed successfully with 112 passing tests and 1 skipped test.
+- API tests completed successfully with 113 passing tests and 1 skipped test.
 
 ## Risks and non-goals
 
@@ -98,4 +98,4 @@ Non-goals:
 
 ## Artifact commit SHA
 
-67e2ae7 (initial artifact commit containing the terminal log).
+PENDING_COMMIT_SHA
