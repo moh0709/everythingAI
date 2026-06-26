@@ -1,53 +1,62 @@
-# EAI-TASK-018: Improve Admin API key lifecycle UX
+# EAI-TASK-018 — Improve Admin API key lifecycle UX
 
-## Final status
+## Result
 
-PASS
+**Final status:** PASS
+
+## Repository / environment
+
+- **Repository path used:** `/root/.hermes/projects/everythingAI`
+- **Current branch:** `main`
+- **Starting commit SHA:** `bc2a0e62dcb7b129b5f5e45a8c38d8ad21e6ae2a`
+- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Final SHA source of truth:** `GitHub issue comment after artifact push`
 
 ## Files changed
 
-- `apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx`
-- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
 - `LOGS/EAI-TASK-018-terminal.log`
 - `REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md`
 - `docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json`
 
 ## UX behavior implemented
 
-- The admin provider configuration panel now clearly distinguishes saved, replace, clear-pending, new-key, and no-key states.
-- Saved remote API keys remain masked in the input while still allowing a staged replacement to be typed.
-- Operators can explicitly keep the saved key or clear it with separate actions.
-- The selected-provider connection check is labeled as a saved-connection test so the saved-vs-staged distinction is obvious.
-- A helper note explains that staged changes must be saved before the saved connection is tested.
+- Saved remote API keys remain masked through the `__saved__` preservation flow.
+- The admin provider UI distinguishes `not configured`, `saved`, `being replaced`, and `being cleared` states.
+- Saved-key status is shown with explicit pills and guidance text.
+- Operators can keep the saved key, clear it intentionally, or stage a replacement key before saving.
+- The connection test action remains separate from save behavior and still tests the last saved provider config.
+- Client Workspace API-key controls are not exposed by this admin-only settings view.
 
 ## Backend behavior preserved
 
-- Saved remote API keys remain masked.
-- The `__saved__` preservation flow remains intact.
-- Empty-string clear behavior remains available for intentional clears.
-- Provider settings remain admin-only.
-- Client Workspace remains free of API-key controls.
-- Provider connection testing still works against the saved provider settings.
-- No backend route or persistence logic was changed.
+- `services/api/src/routes/providerSettings.routes.js` still masks stored remote API keys as `__saved__` in public responses.
+- `preserveSavedKeys()` still restores saved keys when the draft submits `__saved__`.
+- Empty-string clearing remains an intentional action through the clear-key flow.
+- Provider connection tests still operate through the existing provider settings test route.
+- Admin-only provider settings boundaries remain intact.
 
-## Validation results
+## Validation summary
 
-- `git pull --ff-only` — PASS (`Already up to date.`)
-- `node scripts/framework-doctor.mjs` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS
+- Git pull: PASS (`Already up to date.`)
+- Framework doctor: PASS
+- UI typecheck: PASS
+- UI build: PASS
+- API tests: PASS
 
-## Risks and rollback note
+## Risks and rollback
 
-- Risk: the admin key section is slightly denser because it now surfaces the saved/replace/clear states explicitly.
-- Mitigation: the change is UI-only and keeps the underlying save/preserve/clear backend contract unchanged.
-- Rollback: revert `apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx` and `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`.
+- Risk: the admin provider key UX relies on the existing `__saved__` sentinel and the clear/replace controls staying consistent.
+- Mitigation: validation passed, and the backend masking/preservation logic was reviewed alongside the UI behavior.
+- Rollback: revert the artifact commit once it is created, or revert any future UI refinement that changes the provider key control flow.
 
 ## Recommended next task
 
-- Poll the next open issue with `pm:ready` and `hermes:ready` labels that does not already have a matching report artifact.
+- Review the next ready admin-maintenance issue, likely the remaining admin navigation cleanup work, since the provider key lifecycle UX is now documented and validated.
 
-## Artifact commit SHA
+## Lifecycle notes
 
-- `PENDING_COMMIT_SHA`
+- No production code changes were required for this task; the active UI already implements the requested saved/replace/clear distinction.
+- Issue comment will record the final PASS status, validation summary, files changed, and artifact commit SHA.
+- Labels to finish: `hermes:working -> pm:review + hermes:done`.
+- Final SHA handling: this report uses a pre-commit placeholder until the artifact commit is created and the GitHub issue comment posts the final SHA.

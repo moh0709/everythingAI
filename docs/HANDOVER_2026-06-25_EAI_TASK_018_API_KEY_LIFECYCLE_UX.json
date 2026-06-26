@@ -3,6 +3,7 @@
   "branch": "main",
   "taskId": "EAI-TASK-018",
   "issueNumber": 40,
+  "issueTitle": "Improve Admin API key lifecycle UX",
   "finalStatus": "PASS",
   "validation": {
     "gitPull": "PASS",
@@ -11,28 +12,17 @@
     "uiBuild": "PASS",
     "apiTests": "PASS"
   },
-  "uxBehavior": [
-    "The admin provider settings panel now distinguishes saved, replace, clear-pending, new-key, and no-key states.",
-    "Saved API keys remain masked while staged replacements can still be typed.",
-    "The selected-provider connection check is labeled as a saved-connection test, with a note explaining that staged changes must be saved first."
+  "changeSummary": {
+    "productCodeChanged": false,
+    "artifactFiles": [
+      "LOGS/EAI-TASK-018-terminal.log",
+      "REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md",
+      "docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json"
+    ]
+  },
+  "remainingRisks": [
+    "Report uses a pre-commit artifact SHA placeholder until the final artifact commit is recorded in the GitHub issue comment."
   ],
-  "preservedBehavior": [
-    "Saved remote API keys remain masked.",
-    "The __saved__ preservation flow remains intact.",
-    "Empty-string clear behavior still works when the operator intentionally clears a key.",
-    "Provider settings remain admin-only.",
-    "Client Workspace remains unaffected.",
-    "Provider connection testing still works against the saved provider settings."
-  ],
-  "filesChanged": [
-    "apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx",
-    "apps/everything-ai-ui/src/admin/components/SettingsView.tsx"
-  ],
-  "risks": [
-    "The admin key section is slightly denser because it now surfaces the saved/replace/clear states explicitly.",
-    "No backend route or persistence logic was changed."
-  ],
-  "rollbackNote": "Revert the two admin UI files if the explicit key-lifecycle controls need to be removed.",
-  "recommendedNextTask": "Poll the next open issue with pm:ready and hermes:ready labels that does not already have a matching report artifact.",
+  "recommendedNextTask": "Review the next ready admin-maintenance issue, likely the remaining admin navigation cleanup work.",
   "artifactCommitSha": "PENDING_COMMIT_SHA"
 }
