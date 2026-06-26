@@ -1,0 +1,39 @@
+{
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "task_id": "EAI-TASK-031",
+  "issue_number": 53,
+  "title": "EAI-TASK-031: Add explicit production migration runner and persisted workspace resolution plan",
+  "final_status": "PASS",
+  "generated_at": "2026-06-26T16:05:08Z",
+  "validation_status_summary": {
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "local_mvp_preserved": true,
+  "production_foundation_created": true,
+  "artifact_commit_sha": "33afe26",
+  "migration_runner": {
+    "present": true,
+    "file": "services/api/src/db/production/migrationRunner.js",
+    "auto_run_disabled": true,
+    "plan_modes": ["plan", "list", "dry-run"],
+    "explicit_execution_guard": ["EAI_ALLOW_PRODUCTION_MIGRATIONS", "confirmExecution"],
+    "guarded_execution": true
+  },
+  "workspace_resolution_plan": {
+    "present": true,
+    "file": "services/api/src/middleware/workspaceContext.js",
+    "read_only": true,
+    "consumes_request_context": true,
+    "persistence_backed_next_step": "Resolve tenant/workspace records from durable production storage using stable IDs first, then slug fallback, and attach canonical identities without mutating request source data."
+  },
+  "remaining_risks": [
+    "Production migration execution remains scaffolding-only until a real executor is introduced.",
+    "Workspace resolution is still a design plan and not yet backed by production persistence."
+  ],
+  "recommended_next_task": "Introduce a production persistence adapter that resolves tenant/workspace records and wires canonical identities into the request/workspace context path."
+}
