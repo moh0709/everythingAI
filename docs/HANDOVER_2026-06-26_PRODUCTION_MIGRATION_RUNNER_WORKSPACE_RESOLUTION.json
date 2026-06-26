@@ -1,39 +1,24 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "task_id": "EAI-TASK-031",
-  "issue_number": 53,
-  "title": "EAI-TASK-031: Add explicit production migration runner and persisted workspace resolution plan",
-  "final_status": "PASS",
-  "generated_at": "2026-06-26T00:00:00Z",
-  "validation_status_summary": {
-    "git_pull_ff_only": "PASS",
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
+  "taskId": "EAI-TASK-031",
+  "issueNumber": 53,
+  "finalStatus": "PASS",
+  "validation": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "apiTests": "PASS",
+    "migrationRunnerDryRun": "PASS"
   },
-  "local_mvp_preserved": true,
-  "production_migration_runner_present": true,
-  "production_workspace_resolution_plan_present": true,
-  "artifact_commit_sha": "72f7ece9389f6d96412b458344c6e710d9d5d4f5",
-  "final_pushed_commit_sha": "72f7ece9389f6d96412b458344c6e710d9d5d4f5",
-  "migration_runner": {
-    "file": "services/api/src/db/production/migrationRunner.js",
-    "auto_run_disabled": true,
-    "explicit_modes": ["plan", "list", "dry-run", "apply"],
-    "apply_requires_explicit_guard": true
-  },
-  "workspace_context": {
-    "file": "services/api/src/middleware/workspaceContext.js",
-    "read_only_local_path": true,
-    "production_resolution_opt_in": true,
-    "tenant_scoped_lookup": true,
-    "workspace_scoped_lookup": true
-  },
-  "remaining_risks": [
-    "Production execution remains disabled until an explicit opt-in is provided.",
-    "Workspace resolution still depends on a future production persistence adapter."
+  "readyForProductionMigrationPlanning": true,
+  "remainingRisks": [
+    "Production migration execution remains disabled unless explicit guards are provided.",
+    "Workspace persistence resolution is still scaffolding, not a live PostgreSQL adapter."
   ],
-  "recommended_next_task": "Connect the guarded runner to a live production execution backend and back the workspace-resolution scaffold with persisted tenant/workspace records."
+  "recommendedNextTask": "Add a guarded production persistence adapter for tenant/workspace resolution.",
+  "artifactCommitSha": "9c278840888455722b91748a3188ba31d2066dd3",
+  "finalPushedCommitSha": "9c278840888455722b91748a3188ba31d2066dd3",
+  "updatedAt": "2026-06-26T20:34:57Z"
 }
