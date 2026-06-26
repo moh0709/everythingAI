@@ -7,6 +7,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDatabase } from './db/client.js';
 import { requireApiToken } from './middleware/auth.js';
+import { attachRequestContext } from './middleware/requestContext.js';
+import { attachWorkspaceContext } from './middleware/workspaceContext.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { createFilesRouter } from './routes/files.routes.js';
 import { createSearchRouter } from './routes/search.routes.js';
@@ -63,21 +65,23 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.use('/api', requireApiToken, createFilesRouter());
-app.use('/api', requireApiToken, createSourcePathsRouter());
-app.use('/api', requireApiToken, createProviderSettingsRouter());
-app.use('/api', requireApiToken, createAgentBridgeRouter());
-app.use('/api', requireApiToken, createJobsRouter());
-app.use('/api', requireApiToken, createPlanningRouter());
-app.use('/api', requireApiToken, createExecutionBatchesRouter());
-app.use('/api', requireApiToken, createSearchRouter());
-app.use('/api', requireApiToken, createWikiRouter());
-app.use('/api', requireApiToken, createIntelligenceRouter());
-app.use('/api', requireApiToken, createWatchRouter());
-app.use('/api', requireApiToken, createActionsRouter());
-app.use('/api', requireApiToken, createRecoveryRouter());
-app.use('/api', requireApiToken, createIntegrationsRouter());
-app.use('/api', requireApiToken, createSystemRouter());
+app.use('/api', attachRequestContext, attachWorkspaceContext, requireApiToken);
+
+app.use('/api', createFilesRouter());
+app.use('/api', createSourcePathsRouter());
+app.use('/api', createProviderSettingsRouter());
+app.use('/api', createAgentBridgeRouter());
+app.use('/api', createJobsRouter());
+app.use('/api', createPlanningRouter());
+app.use('/api', createExecutionBatchesRouter());
+app.use('/api', createSearchRouter());
+app.use('/api', createWikiRouter());
+app.use('/api', createIntelligenceRouter());
+app.use('/api', createWatchRouter());
+app.use('/api', createActionsRouter());
+app.use('/api', createRecoveryRouter());
+app.use('/api', createIntegrationsRouter());
+app.use('/api', createSystemRouter());
 
 app.use('/api', notFoundHandler);
 app.use(errorHandler);
