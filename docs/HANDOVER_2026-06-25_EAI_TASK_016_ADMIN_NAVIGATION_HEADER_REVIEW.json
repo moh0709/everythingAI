@@ -22,5 +22,5 @@
     "agent_connectors_admin_only": true
   },
   "recommended_next_task": "Split Agent Connectors out of the overloaded settings view into a dedicated admin subsection/component boundary.",
-  "artifact_commit_sha": "PENDING_COMMIT_SHA"
+  "artifact_commit_sha": "a1f8353e57795ef9db3eeb12e98015f8dd2a891e"
 }

@@ -104,4 +104,4 @@ Non-goals:
 
 ## Artifact commit SHA
 
-PENDING_COMMIT_SHA
+a1f8353e57795ef9db3eeb12e98015f8dd2a891e
