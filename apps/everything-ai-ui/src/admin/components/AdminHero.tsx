@@ -1,5 +1,9 @@
 import { Brain, Search, Zap } from 'lucide-react';
 import type { AdminSection } from '../types';
+import {
+  ADMIN_SECTION_ACTIONS,
+  activateAdminSection,
+} from '../adminNavigation';
 
 type AdminHeroProps = {
   query: string;
@@ -22,9 +26,14 @@ export function AdminHero({ query, setQuery, searchEverything, setSection, loadA
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search indexed files and extracted content" />
       </div>
       <button className="purple" onClick={searchEverything}>Search Files</button>
-      <button className="purple" onClick={() => setSection('planning')}>Planning Rules</button>
+      {ADMIN_SECTION_ACTIONS.map((action) => <button
+        key={action.id}
+        className="purple"
+        onClick={() => activateAdminSection(action.target, { setSection, loadAudit })}
+      >
+        {action.label}
+      </button>)}
       <button className="toggle" aria-label="Automation status"><Zap size={16} /></button>
-      <button className="outline" onClick={loadAudit}>Analytics</button>
     </div>
   </div>;
 }

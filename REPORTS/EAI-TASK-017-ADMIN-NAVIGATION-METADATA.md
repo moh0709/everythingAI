@@ -1,59 +1,57 @@
-# EAI-TASK-017 — Centralize admin navigation metadata
+# EAI-TASK-017: Centralize admin navigation metadata
 
-## Result
+## Status
+PASS
 
-**Final status:** PASS
-
-## Repository / environment
-
-- **Repository path used:** `/root/.hermes/projects/everythingAI`
-- **Current branch:** `main`
-- **Starting commit SHA:** `f29f273`
-- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `667aa54`
-- **Final SHA source of truth:** `GitHub issue comment after artifact push`
-
-## Files changed
-
-- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
-- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
-- `LOGS/EAI-TASK-017-terminal.log`
-- `REPORTS/EAI-TASK-017-ADMIN-NAVIGATION-METADATA.md`
-- `docs/HANDOVER_2026-06-25_EAI_TASK_017_ADMIN_NAVIGATION_METADATA.json`
-- `.hermes/state.json`
-
-## Behavior preserved
+## Summary
+I centralized the admin navigation metadata and section activation behavior so the Admin header and Admin hero both rely on shared navigation helpers instead of duplicating click logic. The visible admin behavior remains unchanged:
 
 - Dashboard still opens dashboard.
 - Files & Content still opens explorer.
 - Planning still opens planning.
 - Ask AI still opens askai.
-- Analytics still triggers audit loading before analytics.
+- Analytics still loads audit data before switching to analytics.
 - Settings still opens settings.
 - Agent Connectors still opens Settings with the `#agent-connectors` subsection.
 - Client Workspace remains unaffected.
 - Agent Connectors remains admin-only.
 
-## Validation summary
+## Files changed
 
-- Git pull: PASS (`Already up to date.`)
-- Framework doctor: PASS
-- UI typecheck: PASS
-- UI build: PASS
-- API tests: PASS
+- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
+- `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
+- `apps/everything-ai-ui/src/admin/components/AdminHero.tsx`
 
-## Risks and rollback
+## Behavior preserved
 
-- Risk: the new shared navigation helper adds one more import boundary inside the admin UI.
-- Mitigation: the helper only centralizes existing strings and navigation behavior; validation passed across UI and API layers.
-- Rollback: revert commit `667aa54` to restore the prior inline navigation constants.
+- The admin header still renders the same navigation destinations.
+- Agent Connectors still uses the dedicated hash-based subsection behavior.
+- Analytics still triggers `loadAudit()` before switching views.
+- The Admin hero still exposes Planning and Analytics shortcuts, now from shared action metadata.
+- Client Workspace routing and behavior were not modified.
+
+## Validation results
+
+- `git pull --ff-only` — PASS
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `cd services/api && npm test` — PASS
+
+Validation details:
+
+- `framework-doctor` reported `gh authenticated` and a valid Hermes state file.
+- UI build completed successfully.
+- API tests completed successfully with 114 passing tests and 1 skipped test.
+
+## Risks and rollback note
+
+Risk is low. This change only consolidates navigation metadata and button handling in the admin UI. If a rollback is needed, revert the three changed admin UI files in a single commit.
 
 ## Recommended next task
 
-- Review the next admin-maintenance issue that can reuse the centralized navigation helper, or continue with the next ready EverythingAI task if no follow-up is queued.
+Extract the remaining admin view-router section mapping into a shared config/helper so the section definitions, labels, and transition behavior live in one place.
 
-## Lifecycle notes
+## Artifact commit SHA
 
-- Issue comment will record the final PASS status, validation summary, changed files, and artifact commit SHA.
-- Labels updated: `hermes:working -> pm:review + hermes:done`
-- Final SHA handling: the report, issue comment, and `.hermes/state.json` all reference the artifact commit SHA `667aa54`.
+PENDING_FINAL_COMMIT_SHA

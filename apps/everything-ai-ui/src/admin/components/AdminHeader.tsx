@@ -4,10 +4,8 @@ import type { ProviderName } from '../../providerSettingsApi';
 import type { AdminSection } from '../types';
 import {
   ADMIN_NAV_ITEMS,
-  AGENT_CONNECTORS_HASH,
-  clearAdminHash,
+  activateAdminNavItem,
   isAdminNavItemActive,
-  scrollToAgentConnectorsPanel,
 } from '../adminNavigation';
 
 type AdminHeaderProps = {
@@ -19,19 +17,7 @@ type AdminHeaderProps = {
 
 export function AdminHeader({ section, setSection, loadAudit, activeProvider }: AdminHeaderProps) {
   function handleNavClick(item: (typeof ADMIN_NAV_ITEMS)[number]) {
-    if (item.id === 'agentConnectors') {
-      window.location.hash = AGENT_CONNECTORS_HASH;
-      setSection('settings');
-      scrollToAgentConnectorsPanel();
-      return;
-    }
-
-    clearAdminHash();
-    if (item.target === 'analytics') {
-      loadAudit();
-      return;
-    }
-    setSection(item.target);
+    activateAdminNavItem(item, { setSection, loadAudit });
   }
 
   return <header className="top-nav">
