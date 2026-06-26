@@ -1,0 +1,110 @@
+{
+  "task": "EAI-TASK-028",
+  "title": "Design production auth users tenants and workspace model",
+  "final_status": "PASS",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "starting_commit_sha": "248a15b",
+  "pre_commit_artifact_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "final_sha_source_of_truth": "GitHub issue comment after post-commit sync",
+  "issue_number": 50,
+  "evidence_reviewed": [
+    "REPORTS/EAI-TASK-027-PRODUCTION-ARCHITECTURE-PLAN.md",
+    "docs/HANDOVER_2026-06-26_PRODUCTION_ARCHITECTURE_PLAN.json",
+    "REPORTS/EAI-TASK-026-FINAL-LOCAL-MVP-ACCEPTANCE.md",
+    "docs/HANDOVER_2026-06-26_FINAL_LOCAL_MVP_ACCEPTANCE.json",
+    "docs/ROADMAP.md",
+    "docs/IMPLEMENTATION_ROADMAP.md",
+    "services/api/src/db/schema.sql",
+    "services/api/src/server.js",
+    "services/api/src/routes/files.routes.js",
+    "services/api/src/routes/search.routes.js",
+    "services/api/src/routes/wiki.routes.js",
+    "services/api/src/routes/intelligence.routes.js",
+    "services/api/src/routes/watch.routes.js",
+    "services/api/src/routes/actions.routes.js",
+    "services/api/src/routes/recovery.routes.js",
+    "services/api/src/routes/integrations.routes.js",
+    "services/api/src/routes/system.routes.js",
+    "services/api/src/routes/sourcePaths.routes.js",
+    "services/api/src/routes/providerSettings.routes.js",
+    "services/api/src/routes/agentBridge.routes.js",
+    "services/api/src/routes/jobs.routes.js",
+    "services/api/src/routes/planning.routes.js",
+    "services/api/src/routes/executionBatches.routes.js",
+    "services/api/src/middleware/auth.js"
+  ],
+  "missing_evidence": [
+    "services/api/src/db/schema.js was listed in the issue brief, but the repository snapshot contains services/api/src/db/schema.sql instead."
+  ],
+  "validation": {
+    "git_pull": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "model_summary": {
+    "user_identity": "Single canonical users table with provider-backed auth identities.",
+    "tenant_model": "Tenants are the top-level business container; memberships connect users to tenants.",
+    "workspace_model": "Workspaces are the operational boundary for files, search, wiki, jobs, and actions.",
+    "role_model": "RBAC with platform_admin, tenant_admin, workspace_admin, workspace_editor, workspace_viewer, agent_service, connector_runtime.",
+    "boundary_rules": [
+      "Admins and clients remain separated in both data model and routes.",
+      "Agents/connectors act as service principals with narrow, auditable permissions.",
+      "Local client-agent access remains approval-gated and workspace-scoped."
+    ]
+  },
+  "postgres_schema_outline": [
+    "users",
+    "auth_identities",
+    "tenants",
+    "tenant_memberships",
+    "workspaces",
+    "workspace_memberships",
+    "roles",
+    "role_permissions",
+    "permission_grants",
+    "audit_events",
+    "service_principals",
+    "service_principal_permissions",
+    "workspace_sources",
+    "workspace_documents",
+    "workspace_jobs",
+    "workspace_job_events",
+    "workspace_connector_links",
+    "secrets_metadata"
+  ],
+  "migration_notes": [
+    "Keep SQLite for the current local MVP while introducing PostgreSQL for production.",
+    "Use forward-only schema migrations and a default tenant/workspace backfill path.",
+    "Do not copy SQLite tables blindly; normalize them into workspace-scoped production tables.",
+    "Migrate identity and workspace ownership before moving the rest of the app data model."
+  ],
+  "route_boundary_impact": [
+    "Add auth/session/invite routes for production identity.",
+    "Split admin, tenant, and workspace route groups.",
+    "Make provider settings and system controls admin-only.",
+    "Require workspace context for files/search/wiki/planning/actions/recovery/jobs.",
+    "Scope agent bridge and connector routes to explicit approvals and service principals."
+  ],
+  "phased_plan": [
+    "Identity foundation",
+    "Workspace RBAC",
+    "PostgreSQL schema and migrations",
+    "API refactor",
+    "Connector and agent security",
+    "Production readiness hardening"
+  ],
+  "immediate_next_task": "Implement PostgreSQL-backed identity, tenant, workspace, and membership tables plus request-context middleware, then refactor the highest-risk admin-only route groups to consume workspace-scoped authorization.",
+  "files_changed": [
+    "LOGS/EAI-TASK-028-terminal.log",
+    "REPORTS/EAI-TASK-028-AUTH-TENANT-WORKSPACE-MODEL.md",
+    "docs/HANDOVER_2026-06-26_AUTH_TENANT_WORKSPACE_MODEL.json"
+  ],
+  "notes": [
+    "This task is design-and-schema planning only.",
+    "No runtime auth changes were implemented in this pass."
+  ]
+}
