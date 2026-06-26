@@ -1,85 +1,94 @@
-# EAI-TASK-031: Add explicit production migration runner and persisted workspace resolution plan
+# EAI-TASK-031: Production Migration Runner / Persisted Workspace Resolution Plan
 
 ## Final status
 PASS
 
 ## Evidence reviewed
+- `REPORTS/EAI-TASK-030-PRODUCTION-MIGRATION-LOADER-WORKSPACE-CONTEXT.md`
+- `docs/HANDOVER_2026-06-26_PRODUCTION_MIGRATION_LOADER_WORKSPACE_CONTEXT.json`
 - `services/api/src/db/production/index.js`
 - `services/api/src/db/production/migrationLoader.js`
 - `services/api/src/db/production/migrationRunner.js`
 - `services/api/src/db/production/identityRepository.js`
-- `services/api/src/db/production/001_identity_workspace_schema.sql`
+- `services/api/src/middleware/requestContext.js`
 - `services/api/src/middleware/workspaceContext.js`
 - `services/api/test/productionMigrationRunner.test.js`
-- `services/api/test/productionMigrationLoader.test.js`
 - `services/api/test/workspaceContext.test.js`
-- `LOGS/EAI-TASK-031-terminal.log`
-- `node scripts/framework-doctor.mjs` output
-- `npm run typecheck` output
-- `npm run build` output
-- `npm test` output
+- Repo-wide validation output captured in `LOGS/EAI-TASK-031-terminal.log`
 
 ## Files changed
 - `LOGS/EAI-TASK-031-terminal.log`
 - `REPORTS/EAI-TASK-031-PRODUCTION-MIGRATION-RUNNER-WORKSPACE-RESOLUTION.md`
 - `docs/HANDOVER_2026-06-26_PRODUCTION_MIGRATION_RUNNER_WORKSPACE_RESOLUTION.json`
-- `.hermes/state.json`
 
 ## Migration runner behavior
-- The production migration runner already exists under `services/api/src/db/production/migrationRunner.js`.
-- It is disabled by default for execution.
-- `plan`, `list`, and `dry-run` modes only summarize the catalog and mark migrations as planned.
-- `apply` requires both `EAI_ALLOW_PRODUCTION_MIGRATIONS` and `confirmExecution: true`.
-- The direct CLI entrypoint also requires `--apply` plus `--confirm-production-migrations` before any execution path is attempted.
-- In this scaffolding build, the CLI apply path still throws before SQL execution, so no production SQL can run accidentally.
+- A production migration runner scaffold already exists in `services/api/src/db/production/migrationRunner.js` and is exported from `services/api/src/db/production/index.js`.
+- The runner exposes explicit `plan`, `list`, `dryRun`, and `apply` entry points.
+- Plan/list/dry-run paths only summarize the migration catalog and mark migrations as planned.
+- Execution remains disabled by default.
+- `apply` requires both `confirmExecution: true` and `EAI_ALLOW_PRODUCTION_MIGRATIONS=1`-style opt-in before any SQL execution path is even attempted.
+- The CLI entry path also keeps the runner in plan/list/dry-run mode unless an explicit `--apply` flag is provided.
 
-## Proof that the runner does not auto-run
-- The runner exposes explicit `plan`, `list`, `dryRun`, and `apply` methods only.
-- The default `runProductionMigrationRunner()` path resolves to planning, not execution.
-- The execution guard throws unless the environment gate and explicit confirmation are both present.
-- The test suite verifies that safe modes do not call SQL execution and that `apply` rejects without the guard.
+## Proof that runner does not auto-run
+- `services/api/test/productionMigrationRunner.test.js` verifies plan/list/dry-run summaries do not execute SQL.
+- The same test file verifies `apply` rejects execution without the explicit guard.
+- `loadProductionMigrationCatalog()` reports `autoRun: false`.
+- The runner module does not trigger execution on import or server startup.
 
-## Dry-run / list / plan behavior
-- `plan`, `list`, and `dry-run` all return catalog summaries built from discovered `.sql` files.
-- The catalog includes `autoRun: false`, `requiresExplicitExecution: true`, and `executionEnabled: false` in safe modes.
-- The tests confirm that the discovered migration IDs are ordered and that no execution callback is invoked during safe planning.
+## Dry-run/list/plan behavior
+- `plan`, `list`, and `dryRun` return catalog metadata only.
+- The returned steps are labeled `planned`.
+- Summary fields report total and planned migration counts with `appliedMigrations: 0`.
+- The catalog loader recursively discovers `.sql` files without executing them.
 
 ## Persisted tenant/workspace resolution plan
-- `services/api/src/middleware/workspaceContext.js` already separates read-only request-context derivation from an explicit production-resolution path.
-- The production path is injected through an identity repository abstraction rather than hard-coded database access.
-- `services/api/src/db/production/identityRepository.js` provides tenant/workspace lookup hooks that can later be wired to real persistence.
-- The workspace context can resolve tenant and workspace records by stable ID or slug, scoped by tenant, and falls back to unresolved states for missing or ambiguous records.
-- The current local path remains read-only and request-context-based unless production resolution is explicitly enabled.
+- `services/api/src/middleware/workspaceContext.js` already contains the explicit production-resolution scaffold.
+- The current local MVP path remains read-only and derives scope from request context only.
+- The production-resolution path is gated behind `productionResolution: true` and an injected `identityRepository`.
+- Resolution flow:
+  1. derive request context,
+  2. resolve tenant by stable ID or slug,
+  3. resolve workspace scoped to the resolved tenant by stable ID or slug,
+  4. expose `resolvedTenant` and `resolvedWorkspace` only when both lookups succeed.
+- `services/api/src/db/production/identityRepository.js` provides the lookup shape the future production persistence layer can implement.
+- The plan keeps tenant/workspace lookup tenant-scoped and read-only, so later production persistence can be attached without changing local MVP request handling.
 
 ## How local MVP runtime behavior was preserved
-- No SQLite runtime was replaced.
-- No PostgreSQL connection is required for local startup.
+- SQLite/local MVP persistence remains unchanged.
+- No PostgreSQL connection is required for startup.
 - No login wall was introduced.
-- The client workspace and admin dashboard behavior were not changed.
+- Client Workspace and Admin Dashboard behavior remain unchanged.
 - Provider/connector admin-only boundaries remain intact.
-- All work stayed within production scaffolding, tests, and task artifacts.
+- The runner and production resolution logic stay opt-in and do not change normal API boot behavior.
 
-## Tests and validation
+## Tests or validation added
+- Existing test coverage already exercises the task’s required behaviors:
+  - `services/api/test/productionMigrationRunner.test.js`
+  - `services/api/test/workspaceContext.test.js`
+- Repo-wide validation was executed successfully:
+  - `git pull --ff-only`
+  - `node scripts/framework-doctor.mjs`
+  - `cd apps/everything-ai-ui && npm run typecheck`
+  - `cd apps/everything-ai-ui && npm run build`
+  - `cd services/api && npm test`
+
+## Validation command results
 - `git pull --ff-only` — PASS (`Already up to date.`)
 - `node scripts/framework-doctor.mjs` — PASS
 - `cd apps/everything-ai-ui && npm run typecheck` — PASS
 - `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS (`127 passed, 1 skipped, 0 failed`)
+- `cd services/api && npm test` — PASS
 
 ## Risks and rollback note
-- Risk: the production runner scaffolding is intentionally inert and does not yet execute SQL in this build.
-- Risk: production workspace resolution still depends on an injected repository and is not wired to live production storage.
-- Rollback is simple: keep the environment gate disabled and leave the existing request-context-only runtime path unchanged.
+- Risk: production execution remains intentionally blocked until an explicit opt-in is supplied.
+- Risk: the workspace-resolution path is still a scaffold and depends on a future production identity persistence adapter.
+- Rollback is straightforward because the local MVP runtime did not change; removing the opt-in runner and production-resolution wiring would not affect current SQLite behavior.
 
 ## Immediate next implementation task
-- Wire the production identity repository and workspace context scaffolding to a real production persistence adapter once PM approves production database connectivity.
+- Attach the runner to a real production migration execution backend and wire `identityRepository` to actual persisted tenant/workspace records in the production environment.
 
 ## Artifact commit SHA
-- 18b6516865129d2412b93dd0964983658b0102d4
+72f7ece9389f6d96412b458344c6e710d9d5d4f5
 
-## Validation command results
-- All required validation commands passed.
-
-## Handover notes
-- No product code was modified for this task.
-- The repository already contained the requested runner and workspace-scoping scaffolding, so the task completed as a validation/reporting pass.
+## Final pushed commit SHA
+72f7ece9389f6d96412b458344c6e710d9d5d4f5
