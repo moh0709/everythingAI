@@ -1,0 +1,103 @@
+{
+  "task": "EAI-TASK-027",
+  "title": "Production architecture and release-hardening plan",
+  "final_status": "PASS",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "starting_commit_sha": "4eda30a",
+  "pre_commit_artifact_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "PENDING_COMMIT_SHA",
+  "final_sha_source_of_truth": "GitHub issue comment after post-commit sync",
+  "issue_number": 49,
+  "evidence_reviewed": [
+    "docs/HANDOVER_2026-06-26_FINAL_LOCAL_MVP_ACCEPTANCE.json",
+    "REPORTS/EAI-TASK-026-FINAL-LOCAL-MVP-ACCEPTANCE.md",
+    "docs/ROADMAP.md",
+    "docs/IMPLEMENTATION_ROADMAP.md",
+    "docs/NEXT_IMPLEMENTATION_BACKLOG_2026-06-24.md",
+    "docs/AGENT_ACCESS_CONTROL_MODEL.md",
+    "docs/AI_AGENT_PROJECT_PLAN.md",
+    "docs/AI_ORGANIZATION_ENGINE.md",
+    "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx",
+    "services/api/src/agents/localAgentBridge.js",
+    "services/api/src/scripts/detectAgentConnectors.js",
+    "services/api/src/scripts/probeAgentVersions.js"
+  ],
+  "missing_evidence": [
+    "docs/PRODUCTION_HARDENING.md"
+  ],
+  "validation": {
+    "git_pull": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
+  },
+  "production_target_architecture": [
+    "client browser UI -> authenticated API gateway -> tenant/workspace authorization layer -> central application services -> PostgreSQL/search storage -> object/file storage -> async job queue -> observability/backups/migrations",
+    "client-agent mediated filesystem access only for approved local operations",
+    "admin-only controls remain separate from client workspace controls"
+  ],
+  "gap_analysis": [
+    "local MVP is validated and reviewable",
+    "production authentication and user identity management are still missing",
+    "multi-tenant/workspace authorization is still missing",
+    "production database and migration strategy are still missing",
+    "object storage and backup/restore strategy are still missing",
+    "production observability and deployment hardening are still missing"
+  ],
+  "security_and_credentials": [
+    "control all state-changing operations through backend APIs and workflow checks",
+    "store secrets server-side only",
+    "keep API keys masked and out of logs/comments",
+    "do not expose shell execution or raw credentials in the browser UI",
+    "use explicit approval for any filesystem or external-tool execution"
+  ],
+  "migration_plan": [
+    "introduce PostgreSQL as the production source of truth",
+    "add schema versioning and forward-only migrations",
+    "move durable uploads/documents to object storage",
+    "add backup/restore verification before production rollout",
+    "stage migration from local SQLite artifacts to production services"
+  ],
+  "client_agent_strategy": [
+    "keep filesystem access local and approval-gated",
+    "do not allow direct server-side filesystem control",
+    "preserve preview/approve/execute/undo flows for mutations"
+  ],
+  "deployment_observability": [
+    "containerize production services",
+    "require health checks and rollback paths",
+    "add structured logs, metrics, and audit trails",
+    "validate backups, restore drills, and migration dry-runs"
+  ],
+  "release_gates": [
+    "framework doctor",
+    "UI typecheck and build",
+    "API tests",
+    "security review",
+    "migration dry-run and restore verification",
+    "deployment smoke test",
+    "post-deploy health confirmation"
+  ],
+  "phased_sequence": [
+    "auth, users, tenants, and workspace model",
+    "PostgreSQL schema and migration framework",
+    "object/file storage and durable uploads",
+    "background job queue and retries",
+    "observability and audit pipeline",
+    "backups, retention, and restore drills",
+    "deployment automation and environment configuration",
+    "production release gates and preflight validation"
+  ],
+  "immediate_next_task": "Create a follow-up Hermes task for auth, users, tenants, and workspace model design plus first PostgreSQL schema and migration outline.",
+  "files_changed": [
+    "LOGS/EAI-TASK-027-terminal.log",
+    "REPORTS/EAI-TASK-027-PRODUCTION-ARCHITECTURE-PLAN.md",
+    "docs/HANDOVER_2026-06-26_PRODUCTION_ARCHITECTURE_PLAN.json"
+  ],
+  "notes": [
+    "docs/PRODUCTION_HARDENING.md was listed in the task brief but is not present in the repository snapshot.",
+    "The local MVP acceptance remains valid and is not equivalent to production readiness."
+  ]
+}
