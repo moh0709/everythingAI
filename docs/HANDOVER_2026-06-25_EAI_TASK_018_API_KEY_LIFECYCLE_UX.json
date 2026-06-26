@@ -1,28 +1,26 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "taskId": "EAI-TASK-018",
-  "issueNumber": 40,
-  "issueTitle": "Improve Admin API key lifecycle UX",
-  "finalStatus": "PASS",
+  "task_id": "EAI-TASK-018",
+  "issue_number": 40,
+  "final_status": "PASS",
   "validation": {
-    "gitPull": "PASS",
-    "frameworkDoctor": "PASS",
-    "uiTypecheck": "PASS",
-    "uiBuild": "PASS",
-    "apiTests": "PASS"
+    "git_pull": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS",
+    "api_tests": "PASS"
   },
-  "changeSummary": {
-    "productCodeChanged": false,
-    "artifactFiles": [
-      "LOGS/EAI-TASK-018-terminal.log",
-      "REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md",
-      "docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json"
-    ]
-  },
-  "remainingRisks": [
-    "The issue comment will record the final synchronized metadata commit SHA after push."
+  "files_changed": [
+    "LOGS/EAI-TASK-018-terminal.log",
+    "REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json"
   ],
-  "recommendedNextTask": "Review the next ready admin-maintenance issue, likely the remaining admin navigation cleanup work.",
-  "artifactCommitSha": "e835326"
+  "risk_notes": [
+    "UX depends on the existing __saved__ sentinel and clear/replace controls staying consistent.",
+    "No application source changes were required because the active UI already satisfied the requested lifecycle distinctions."
+  ],
+  "rollback_note": "Revert the artifact commits if future review requires a different report or handover record.",
+  "recommended_next_task": "Review the next ready admin-maintenance issue, likely EAI-TASK-016, unless it is intentionally rerun.",
+  "artifact_commit_sha": "98a10d5"
 }

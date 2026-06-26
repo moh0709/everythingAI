@@ -1,4 +1,4 @@
-# EAI-TASK-018 — Improve Admin API key lifecycle UX
+# EAI-TASK-018: Improve Admin API key lifecycle UX
 
 ## Result
 
@@ -8,9 +8,9 @@
 
 - **Repository path used:** `/root/.hermes/projects/everythingAI`
 - **Current branch:** `main`
-- **Starting commit SHA:** `bc2a0e62dcb7b129b5f5e45a8c38d8ad21e6ae2a`
+- **Starting commit SHA:** `8ec22354e6121140f6021b03dc4bf89a33c57e33`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `e835326`
+- **Artifact commit SHA:** `98a10d5`
 - **Final SHA source of truth:** `GitHub issue comment after artifact push`
 
 ## Files changed
@@ -21,9 +21,8 @@
 
 ## UX behavior implemented
 
+- The admin provider settings UI already distinguishes `not configured`, `saved`, `being replaced`, and `being cleared` states.
 - Saved remote API keys remain masked through the `__saved__` preservation flow.
-- The admin provider UI distinguishes `not configured`, `saved`, `being replaced`, and `being cleared` states.
-- Saved-key status is shown with explicit pills and guidance text.
 - Operators can keep the saved key, clear it intentionally, or stage a replacement key before saving.
 - The connection test action remains separate from save behavior and still tests the last saved provider config.
 - Client Workspace API-key controls are not exposed by this admin-only settings view.
@@ -38,25 +37,33 @@
 
 ## Validation summary
 
-- Git pull: PASS (`Already up to date.`)
-- Framework doctor: PASS
-- UI typecheck: PASS
-- UI build: PASS
-- API tests: PASS
+All requested validation commands passed:
+
+- `git pull --ff-only` — PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `cd services/api && npm test` — PASS
+
+Additional notes:
+
+- `framework-doctor` reported `gh authenticated` and a valid Hermes framework state.
+- UI build completed successfully and emitted both admin and user bundles.
+- API tests completed successfully with 113 passing tests and 1 skipped test.
 
 ## Risks and rollback
 
 - Risk: the admin provider key UX relies on the existing `__saved__` sentinel and the clear/replace controls staying consistent.
 - Mitigation: validation passed, and the backend masking/preservation logic was reviewed alongside the UI behavior.
-- Rollback: revert the artifact commit once it is created, or revert any future UI refinement that changes the provider key control flow.
+- Rollback: revert the artifact commit if needed, or revert any future UI refinement that changes the provider key control flow.
 
 ## Recommended next task
 
-- Review the next ready admin-maintenance issue, likely the remaining admin navigation cleanup work, since the provider key lifecycle UX is now documented and validated.
+- Review the next ready admin-maintenance issue, likely the remaining admin navigation/header cleanup work, since this provider key lifecycle UX is already documented and validated.
 
 ## Lifecycle notes
 
 - No production code changes were required for this task; the active UI already implements the requested saved/replace/clear distinction.
 - Issue comment will record the final PASS status, validation summary, files changed, and artifact commit SHA.
 - Labels to finish: `hermes:working -> pm:review + hermes:done`.
-- Final SHA handling: this report records the initial artifact commit SHA `e835326`; the GitHub issue comment will record the final synchronized metadata commit SHA after push.
+- Final SHA handling: this report records the initial artifact commit SHA `98a10d5`; the GitHub issue comment will record the final synchronized metadata commit SHA after push.
