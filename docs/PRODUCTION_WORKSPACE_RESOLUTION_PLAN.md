@@ -4,8 +4,8 @@ This note captures the next-stage plan for resolving tenant/workspace records fr
 
 ## Current state
 - `services/api/src/middleware/requestContext.js` derives request-scoped identity from headers.
-- `services/api/src/middleware/workspaceContext.js` consumes that request context and remains read-only.
-- `services/api/src/db/production/migrationLoader.js` and `services/api/src/db/production/migrationRunner.js` provide catalog/runner scaffolding only.
+- `services/api/src/middleware/workspaceContext.js` consumes that request context and remains read-only by default.
+- `services/api/src/db/production/migrationLoader.js`, `services/api/src/db/production/migrationRunner.js`, and `services/api/src/db/production/identityRepository.js` provide catalog, runner, and repository scaffolding only.
 - Local MVP persistence stays on SQLite.
 
 ## Intended production resolution flow
@@ -23,6 +23,6 @@ This note captures the next-stage plan for resolving tenant/workspace records fr
 - Do not relax provider or connector admin-only boundaries.
 
 ## Follow-up implementation shape
-- Add a dedicated production identity repository with explicit lookup methods for tenants and workspaces.
-- Add resolution tests for exact ID lookup, tenant-scoped slug lookup, and unresolved fallbacks.
-- Keep local MVP middleware behavior unchanged until production mode is explicitly enabled.
+- Expand the production identity repository to a real production adapter when the persistence layer is ready.
+- Keep the middleware guard explicit so production persistence is never used unless the runtime opts in.
+- Continue adding resolution tests for exact ID lookup, tenant-scoped slug lookup, workspace scoping, and unresolved fallbacks.

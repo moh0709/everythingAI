@@ -6,6 +6,10 @@ export {
 } from './migrationLoader.js';
 
 export {
+  createProductionIdentityRepository,
+} from './identityRepository.js';
+
+export {
   createProductionMigrationRunner,
   createProductionMigrationPlan,
   runProductionMigrationRunner,
