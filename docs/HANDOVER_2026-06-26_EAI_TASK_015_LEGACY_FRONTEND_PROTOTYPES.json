@@ -1,0 +1,39 @@
+{
+  "task": "EAI-TASK-015",
+  "title": "Review remaining legacy frontend prototypes",
+  "status": "PASS",
+  "repository": "/root/.hermes/projects/everythingAI",
+  "branch": "main",
+  "startingCommitSha": "66555a8ca53455945b92dbc35fdd1e8ed088a5b2",
+  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "referenceChecks": {
+    "AppEnhanced": "Not imported by active runtime entrypoints; only referenced by tsconfig exclusion and admin README migration notes.",
+    "AppComplete": "Not imported by active runtime entrypoints; only referenced by tsconfig exclusion and admin README migration notes.",
+    "App": "Standalone legacy prototype file not imported by main.tsx or admin-main.tsx.",
+    "activeEntrypoints": [
+      "apps/everything-ai-ui/src/main.tsx",
+      "apps/everything-ai-ui/src/admin-main.tsx"
+    ]
+  },
+  "validation": {
+    "gitPull": "PASS",
+    "frameworkDoctor": "PASS",
+    "uiTypecheck": "PASS",
+    "uiBuild": "PASS",
+    "apiTests": "PASS"
+  },
+  "runtimeConfirmation": {
+    "user": "src/main.tsx renders <UserApp />",
+    "admin": "src/admin-main.tsx renders <AdminApp />",
+    "viteInputs": [
+      "index.html",
+      "admin.html"
+    ]
+  },
+  "filesChanged": [
+    "LOGS/EAI-TASK-015-terminal.log",
+    "REPORTS/EAI-TASK-015-LEGACY-FRONTEND-PROTOTYPES.md",
+    "docs/HANDOVER_2026-06-26_EAI_TASK_015_LEGACY_FRONTEND_PROTOTYPES.json"
+  ],
+  "rollback": "Restore the legacy prototype files and keep the active entrypoints untouched."
+}

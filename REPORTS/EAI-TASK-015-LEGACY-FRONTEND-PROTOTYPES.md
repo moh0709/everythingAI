@@ -1,70 +1,51 @@
-# EAI-TASK-015 — Review remaining legacy frontend prototypes
+# EAI-TASK-015: Review remaining legacy frontend prototypes
 
-## Result
+Status: PASS
 
-**Final status:** PASS
+## Summary
+I reviewed the remaining legacy frontend prototype files and verified that the active runtime paths stay on the dedicated entrypoints:
 
-## Repository / environment
+- `apps/everything-ai-ui/src/main.tsx` -> `UserApp`
+- `apps/everything-ai-ui/src/admin-main.tsx` -> `AdminApp`
+- `apps/everything-ai-ui/vite.config.ts` only builds `index.html` and `admin.html`
 
-- **Repository path used:** `/root/.hermes/projects/everythingAI`
-- **Current branch:** `main`
-- **Starting commit SHA:** `57d92930f36b0599ddaacb5d664979180812c27d`
-- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `c1728687c962dd3a2dcc89cc2c6e0e5660dad07a`
-- **Final SHA source of truth:** GitHub issue comment; this report is a follow-up metadata sync artifact.
+The prototype files are not imported by the active entrypoints. Their current references are limited to repo history/docs and a TypeScript exclusion list.
+
+## Reference checks
+
+- `AppEnhanced`: not imported by active runtime code; referenced only by `tsconfig.json` exclusion and admin README migration notes.
+- `AppComplete`: not imported by active runtime code; referenced only by `tsconfig.json` exclusion and admin README migration notes.
+- `App.tsx`: standalone legacy prototype; not imported by `main.tsx` or `admin-main.tsx`.
+
+## Validation results
+
+- `git pull --ff-only`: PASS
+- `node scripts/framework-doctor.mjs`: PASS
+- `apps/everything-ai-ui npm run typecheck`: PASS
+- `apps/everything-ai-ui npm run build`: PASS
+- `services/api npm test`: PASS
 
 ## Files changed
 
-- `LOGS/EAI-TASK-015-terminal.log` updated and committed in the artifact commit.
-- `REPORTS/EAI-TASK-015-LEGACY-FRONTEND-PROTOTYPES.md` created in the metadata sync commit.
-- `docs/HANDOVER_2026-06-25_EAI_TASK_015_LEGACY_FRONTEND_PROTOTYPES.json` created in the metadata sync commit.
-- `.hermes/state.json` updated in the metadata sync commit.
+- `LOGS/EAI-TASK-015-terminal.log`
+- `REPORTS/EAI-TASK-015-LEGACY-FRONTEND-PROTOTYPES.md`
+- `docs/HANDOVER_2026-06-26_EAI_TASK_015_LEGACY_FRONTEND_PROTOTYPES.json`
 
-## Validation summary
+No runtime or application source files were modified.
 
-- Dry run: not required; inspection-only task.
-- Framework doctor: PASS.
-- UI typecheck: PASS.
-- UI build: PASS.
-- API tests: PASS.
+## Risks
 
-## Reference-check results
+- The legacy prototype files still exist in the repository for reference, so they can continue to create confusion for future cleanup work.
+- `tsconfig.json` intentionally excludes the legacy files; changing that list should be treated as a separate task because it can expand the strict typecheck surface.
 
-- `AppEnhanced` and `AppComplete` are not imported by the active runtime entrypoints.
-- The only references found were documentation / tsconfig exclusions:
-  - `apps/everything-ai-ui/tsconfig.json` excludes `src/App.tsx`, `src/AppEnhanced.tsx`, and `src/AppComplete.tsx` from compilation.
-  - `apps/everything-ai-ui/src/admin/README.md` references `AppEnhanced.tsx` and `AppComplete.tsx` as historical migration artifacts.
-- Active runtime entrypoints remain unchanged:
-  - `apps/everything-ai-ui/src/main.tsx` renders `UserApp`.
-  - `apps/everything-ai-ui/src/admin-main.tsx` renders `AdminApp`.
-  - `apps/everything-ai-ui/vite.config.ts` builds the `index.html` and `admin.html` entrypoints only.
+## Rollback note
 
-## Active user/admin runtime confirmation
-
-- User runtime: `src/main.tsx -> <UserApp />`.
-- Admin runtime: `src/admin-main.tsx -> <AdminApp />`.
-- `vite build` completed successfully and produced both user and admin bundles, confirming the current entrypoints still work.
-
-## Risks and rollback note
-
-- Risk is limited to future cleanup changes if the archived prototype files are deleted without updating the docs/tsconfig exclusions first.
-- Rollback is straightforward: restore the prototype files and keep the current entrypoints untouched.
+If a future cleanup needs to be reversed, restore the legacy prototype files and keep the active entrypoints unchanged.
 
 ## Recommended next task
 
-- If cleanup is approved, retire the legacy prototype files in a dedicated change after one last docs sweep:
-  - `apps/everything-ai-ui/src/App.tsx`
-  - `apps/everything-ai-ui/src/AppEnhanced.tsx`
-  - `apps/everything-ai-ui/src/AppComplete.tsx`
-
-## Validation command results
-
-- `git pull --ff-only` — PASS
-- `node scripts/framework-doctor.mjs` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS (`113` passing, `1` skipped, `0` failed)
+Continue the frontend cleanup by consolidating or retiring the remaining legacy prototype references in docs/config only after the migration plan is confirmed.
 
 ## Artifact commit SHA
 
-`c1728687c962dd3a2dcc89cc2c6e0e5660dad07a`
+PENDING_ARTIFACT_COMMIT_SHA
