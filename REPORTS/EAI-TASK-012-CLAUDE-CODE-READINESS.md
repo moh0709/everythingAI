@@ -53,5 +53,5 @@ Proceed with the next PM-reviewed ready issue in the queue. No additional Claude
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-012-terminal.log`
 - Handover JSON: `docs/HANDOVER_2026-06-25_EAI_TASK_012_CLAUDE_CODE_READINESS.json`
-- Artifact commit SHA: `PENDING_COMMIT_SHA`
-- Finalization note: the artifact SHA will be synchronized after the initial artifact bundle commit.
+- Artifact commit SHA: `2bf592b0b13e38d6fdb559b5a6c2c93d8dba0c90`
+- Finalization note: the artifact SHA was synchronized in a follow-up metadata commit after the initial artifact bundle commit.
