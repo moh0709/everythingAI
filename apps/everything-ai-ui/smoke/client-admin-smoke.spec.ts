@@ -41,6 +41,21 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await saveScreenshot(page, '04-client-ask-ai');
   });
 
+  test('client knowledge base search and trust panels render', async ({ page }) => {
+    await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Knowledge Base' }).click();
+    await expect(page.getByRole('heading', { name: 'Knowledge Base' })).toBeVisible();
+    await expect(page.getByText('File Sources')).toBeVisible();
+    await expect(page.getByLabel('Citation inspector summary')).toBeVisible();
+    await expect(page.getByText('Workspace Trust Health')).toBeVisible();
+
+    const knowledgeSearch = page.getByPlaceholder('Search inside this knowledge page...');
+    await knowledgeSearch.fill('Workspace');
+    await expect(page.getByLabel('Clear knowledge page search')).toBeVisible();
+    await expect(page.getByText(/\d+ match\(es\)/)).toBeVisible();
+    await saveScreenshot(page, '05-client-knowledge-search');
+  });
+
   test('client ask view keeps the latest message visible after submit', async ({ page }) => {
     await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
     await page.getByRole('navigation').getByRole('button', { name: 'Ask AI' }).click();
@@ -66,9 +81,16 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Normal users should use the Client Workspace', { exact: false })).toBeVisible();
     await saveScreenshot(page, '06-admin-dashboard');
 
+    const searchBox = page.getByPlaceholder('Search indexed files and extracted content');
+    await searchBox.fill('README.md');
+    await page.getByRole('button', { name: 'Search Files' }).click();
+    await expect(page.getByRole('heading', { name: 'Indexing & Extraction Progress' })).toBeVisible();
+    await expect(page.getByText('1/1 visible')).toBeVisible();
+    await saveScreenshot(page, '07-admin-search-results');
+
     await expect(page.getByRole('button', { name: 'Files & Content' })).toBeVisible();
     await page.getByRole('button', { name: 'Files & Content' }).click();
-    await saveScreenshot(page, '07-admin-files-content');
+    await saveScreenshot(page, '08-admin-files-content');
 
     await page.getByRole('button', { name: 'Settings' }).click();
     await expect(page.getByRole('heading', { name: 'Advanced Settings' })).toBeVisible();
@@ -114,9 +136,9 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('API key lifecycle')).toBeVisible();
     await expect(page.getByText('No key configured')).toBeVisible();
     await page.getByLabel('OpenAI API key').fill('smoke-test-replacement-key');
-    await expect(page.getByText('Replacement key staged')).toBeVisible();
+    await expect(page.getByText('New key staged', { exact: true })).toBeVisible();
 
-    await saveScreenshot(page, '08-admin-settings-providers-agents');
+    await saveScreenshot(page, '09-admin-settings-providers-agents');
   });
 
   test('backend API is reachable for real smoke testing', async ({ request }) => {

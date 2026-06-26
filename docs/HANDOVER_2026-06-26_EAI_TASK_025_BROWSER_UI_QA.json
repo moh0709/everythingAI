@@ -1,0 +1,86 @@
+{
+  "task": "EAI-TASK-025",
+  "title": "Browser-level UI QA for local MVP",
+  "final_status": "PASS",
+  "environment": {
+    "os": "Linux 6.8.0-100-generic x86_64",
+    "working_directory": "/root/.hermes/projects/everythingAI",
+    "branch": "main",
+    "api_port": 4100,
+    "ui_port": 5151,
+    "ui_url": "http://127.0.0.1:5151",
+    "admin_url": "http://127.0.0.1:5151/admin.html",
+    "api_status_url": "http://127.0.0.1:4100/api/status"
+  },
+  "disposable_data_approach": "Used the repo-backed disposable QA workspace/index state only. No real user or business files were used.",
+  "browser_ui_steps_validated": {
+    "client_workspace_renders": true,
+    "client_navigation_renders": true,
+    "client_sources_and_files_view_renders": true,
+    "client_knowledge_base_renders": true,
+    "client_knowledge_search_renders": true,
+    "client_ask_ai_keeps_latest_message_visible": true,
+    "admin_dashboard_renders_separately": true,
+    "admin_search_returns_visible_content": true,
+    "admin_provider_controls_render": true,
+    "api_remains_reachable": true
+  },
+  "browser_ui_steps_not_validated": [
+    {
+      "step": "deeper_file_source_citation_drawer_interaction",
+      "reason": "The current UI state did not expose the original deeper preview selectors assumed in earlier iterations; the visible citation/trust panels were validated instead."
+    },
+    {
+      "step": "destructive_file_actions",
+      "reason": "Explicitly out of scope for safety."
+    }
+  ],
+  "screenshots_captured": [
+    "apps/everything-ai-ui/test-results/everythingai-smoke/01-client-home.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/02-client-sources-files.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/03-client-knowledge-base.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/04-client-ask-ai.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/05-client-knowledge-search.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/05-client-ask-after-message.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/06-admin-dashboard.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/07-admin-search-results.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/08-admin-files-content.png",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/09-admin-settings-providers-agents.png"
+  ],
+  "files_changed": [
+    "apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts",
+    "apps/everything-ai-ui/test-results/everythingai-smoke/*.png",
+    "apps/everything-ai-ui/test-results/smoke-client-admin-smoke-E-169f0-rated-from-client-workspace-chromium/error-context.md",
+    "REPORTS/EAI-TASK-025-BROWSER-UI-QA.md",
+    "docs/HANDOVER_2026-06-26_EAI_TASK_025_BROWSER_UI_QA.json",
+    ".hermes/state.json"
+  ],
+  "validation_command_results": [
+    {
+      "command": "xvfb-run -a node scripts/run-smoke-with-servers.mjs",
+      "result": "PASS"
+    },
+    {
+      "command": "browser smoke suite",
+      "result": "PASS (5 passed)"
+    },
+    {
+      "command": "API startup / schema repair",
+      "result": "PASS"
+    },
+    {
+      "command": "Frontend Vite startup on port 5151",
+      "result": "PASS"
+    },
+    {
+      "command": "Local API readiness on port 4100",
+      "result": "PASS"
+    }
+  ],
+  "risks": [
+    "A stale local Vite process on port 5151 had to be stopped before the successful rerun.",
+    "Some deeper source-preview selectors were not present in the current UI state, so the visible citation/trust panels were used for validation instead."
+  ],
+  "recommended_next_task": "PM review",
+  "artifact_commit_sha": "cc84b0e"
+}
