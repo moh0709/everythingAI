@@ -10,7 +10,7 @@
 - **Current branch:** `main`
 - **Starting commit SHA:** `bc2a0e62dcb7b129b5f5e45a8c38d8ad21e6ae2a`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `e835326`
 - **Final SHA source of truth:** `GitHub issue comment after artifact push`
 
 ## Files changed
@@ -59,4 +59,4 @@
 - No production code changes were required for this task; the active UI already implements the requested saved/replace/clear distinction.
 - Issue comment will record the final PASS status, validation summary, files changed, and artifact commit SHA.
 - Labels to finish: `hermes:working -> pm:review + hermes:done`.
-- Final SHA handling: this report uses a pre-commit placeholder until the artifact commit is created and the GitHub issue comment posts the final SHA.
+- Final SHA handling: this report records the initial artifact commit SHA `e835326`; the GitHub issue comment will record the final synchronized metadata commit SHA after push.

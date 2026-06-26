@@ -21,8 +21,8 @@
     ]
   },
   "remainingRisks": [
-    "Report uses a pre-commit artifact SHA placeholder until the final artifact commit is recorded in the GitHub issue comment."
+    "The issue comment will record the final synchronized metadata commit SHA after push."
   ],
   "recommendedNextTask": "Review the next ready admin-maintenance issue, likely the remaining admin navigation cleanup work.",
-  "artifactCommitSha": "PENDING_COMMIT_SHA"
+  "artifactCommitSha": "e835326"
 }
