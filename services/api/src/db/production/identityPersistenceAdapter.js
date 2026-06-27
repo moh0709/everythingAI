@@ -1,5 +1,3 @@
-import { createProductionIdentityPersistenceAdapter } from './identityPersistenceAdapter.js';
-
 function normalizeString(value) {
   if (typeof value !== 'string') {
     return null;
@@ -88,71 +86,31 @@ function normalizeWorkspaceRecord(record) {
   };
 }
 
-function normalizeRepositoryResult(outcome, normalizer) {
-  const normalized = normalizeLookupOutcome(outcome);
-
-  if (normalized.status !== 'found') {
-    return normalized;
-  }
-
-  return {
-    status: 'found',
-    record: normalizer(normalized.record),
-  };
+function invokeDelegatedLookup(delegate, methodName, args, fallbackLookup) {
+  const method = delegate && typeof delegate[methodName] === 'function' ? delegate[methodName] : null;
+  const outcome = method ? method(...args) : fallbackLookup();
+  return normalizeLookupOutcome(outcome);
 }
 
-function resolveAdapter(options, productionMode) {
-  if (!productionMode) {
-    return null;
-  }
-
-  if (options.adapter) {
-    return options.adapter;
-  }
-
-  if (typeof options.adapterFactory === 'function') {
-    return options.adapterFactory(options);
-  }
-
-  return createProductionIdentityPersistenceAdapter({
-    delegate: options.delegate,
-    tenantRecords: options.tenantRecords,
-    workspaceRecords: options.workspaceRecords,
-  });
-}
-
-export function createProductionIdentityRepository(options = {}) {
-  const productionMode = options.productionMode === true;
-  const adapter = resolveAdapter(options, productionMode);
-  const tenants = Array.isArray(options.tenants) ? options.tenants : [];
-  const workspaces = Array.isArray(options.workspaces) ? options.workspaces : [];
-
-  function invokeLookup(adapterMethodName, adapterArgs, fallbackLookup, normalizer) {
-    if (adapter && typeof adapter[adapterMethodName] === 'function') {
-      return normalizeRepositoryResult(adapter[adapterMethodName](...adapterArgs), normalizer);
-    }
-
-    if (productionMode) {
-      return { status: 'missing', record: null };
-    }
-
-    return normalizeRepositoryResult(fallbackLookup(), normalizer);
-  }
+export function createProductionIdentityPersistenceAdapter(options = {}) {
+  const delegate = options.delegate ?? {};
+  const tenantRecords = Array.isArray(options.tenantRecords) ? options.tenantRecords : [];
+  const workspaceRecords = Array.isArray(options.workspaceRecords) ? options.workspaceRecords : [];
 
   return {
-    productionMode,
-    adapter,
+    adapterType: 'production-identity-persistence-adapter',
+    explicitProductionOnly: true,
     findTenantByStableId(stableId) {
       const normalizedStableId = toStableId(stableId);
       if (!normalizedStableId) {
         return { status: 'missing', record: null };
       }
 
-      return invokeLookup(
+      return invokeDelegatedLookup(
+        delegate,
         'findTenantByStableId',
         [normalizedStableId],
-        () => selectUniqueRecord(tenants, (tenant) => toStableId(tenant?.id) === normalizedStableId),
-        normalizeTenantRecord,
+        () => selectUniqueRecord(tenantRecords, (tenant) => toStableId(tenant?.id) === normalizedStableId),
       );
     },
     findTenantBySlug(slug) {
@@ -161,11 +119,11 @@ export function createProductionIdentityRepository(options = {}) {
         return { status: 'missing', record: null };
       }
 
-      return invokeLookup(
+      return invokeDelegatedLookup(
+        delegate,
         'findTenantBySlug',
         [normalizedSlug],
-        () => selectUniqueRecord(tenants, (tenant) => toSlug(tenant?.slug) === normalizedSlug),
-        normalizeTenantRecord,
+        () => selectUniqueRecord(tenantRecords, (tenant) => toSlug(tenant?.slug) === normalizedSlug),
       );
     },
     findWorkspaceByStableId({ tenantId, workspaceId } = {}) {
@@ -175,15 +133,15 @@ export function createProductionIdentityRepository(options = {}) {
         return { status: 'missing', record: null };
       }
 
-      return invokeLookup(
+      return invokeDelegatedLookup(
+        delegate,
         'findWorkspaceByStableId',
         [{ tenantId: normalizedTenantId, workspaceId: normalizedWorkspaceId }],
         () => selectUniqueRecord(
-          workspaces,
+          workspaceRecords,
           (workspace) => toStableId(workspace?.tenantId ?? workspace?.tenant_id) === normalizedTenantId
             && toStableId(workspace?.id) === normalizedWorkspaceId,
         ),
-        normalizeWorkspaceRecord,
       );
     },
     findWorkspaceBySlug({ tenantId, workspaceSlug } = {}) {
@@ -193,24 +151,18 @@ export function createProductionIdentityRepository(options = {}) {
         return { status: 'missing', record: null };
       }
 
-      return invokeLookup(
+      return invokeDelegatedLookup(
+        delegate,
         'findWorkspaceBySlug',
         [{ tenantId: normalizedTenantId, workspaceSlug: normalizedWorkspaceSlug }],
         () => selectUniqueRecord(
-          workspaces,
+          workspaceRecords,
           (workspace) => toStableId(workspace?.tenantId ?? workspace?.tenant_id) === normalizedTenantId
             && toSlug(workspace?.slug) === normalizedWorkspaceSlug,
         ),
-        normalizeWorkspaceRecord,
       );
     },
+    normalizeTenantRecord,
+    normalizeWorkspaceRecord,
   };
-}
-
-export function createProductionIdentityRepositoryFactory(factoryOptions = {}) {
-  return (repositoryOptions = {}) => createProductionIdentityRepository({
-    ...factoryOptions,
-    ...repositoryOptions,
-    productionMode: repositoryOptions.productionMode ?? factoryOptions.productionMode,
-  });
 }

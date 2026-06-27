@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createProductionIdentityRepository } from '../src/db/production/identityRepository.js';
+import { createProductionIdentityRepository } from '../src/db/production/index.js';
 import { deriveRequestContext, requestContextHeaders } from '../src/middleware/requestContext.js';
 import { attachWorkspaceContext, createWorkspaceContextMiddleware, deriveWorkspaceContext } from '../src/middleware/workspaceContext.js';
 
@@ -37,14 +37,21 @@ test('workspace context scaffolding consumes requestContext and remains read-onl
 
 test('production resolution can resolve tenant ID, tenant slug fallback, and tenant-scoped workspace lookups with an injected repository', () => {
   const repository = createProductionIdentityRepository({
-    tenants: [
-      { id: 'tenant-123', slug: 'acme' },
-      { id: 'tenant-456', slug: 'beta' },
-    ],
-    workspaces: [
-      { id: 'workspace-789', tenantId: 'tenant-123', slug: 'client-ops' },
-      { id: 'workspace-888', tenantId: 'tenant-456', slug: 'client-ops' },
-    ],
+    productionMode: true,
+    adapter: {
+      findTenantByStableId(stableId) {
+        return { status: 'found', record: { id: stableId, slug: 'acme' } };
+      },
+      findTenantBySlug(slug) {
+        return { status: 'found', record: { id: 'tenant-123', slug } };
+      },
+      findWorkspaceByStableId({ tenantId, workspaceId }) {
+        return { status: 'found', record: { id: workspaceId, tenantId, slug: 'client-ops' } };
+      },
+      findWorkspaceBySlug({ tenantId, workspaceSlug }) {
+        return { status: 'found', record: { id: 'workspace-789', tenantId, slug: workspaceSlug } };
+      },
+    },
   });
 
   const exactTenantContext = deriveWorkspaceContext(
@@ -79,16 +86,21 @@ test('production resolution can resolve tenant ID, tenant slug fallback, and ten
 
 test('production resolution falls back to unresolved when records are absent or ambiguous', () => {
   const repository = createProductionIdentityRepository({
-    tenants: [
-      { id: 'tenant-123', slug: 'acme' },
-      { id: 'tenant-dup-1', slug: 'duplicate' },
-      { id: 'tenant-dup-2', slug: 'duplicate' },
-    ],
-    workspaces: [
-      { id: 'workspace-789', tenantId: 'tenant-123', slug: 'client-ops' },
-      { id: 'workspace-dup-1', tenantId: 'tenant-123', slug: 'duplicate-workspace' },
-      { id: 'workspace-dup-2', tenantId: 'tenant-123', slug: 'duplicate-workspace' },
-    ],
+    productionMode: true,
+    adapter: {
+      findTenantByStableId() {
+        return { status: 'missing', record: null };
+      },
+      findTenantBySlug() {
+        return { status: 'ambiguous', records: [{ id: 'tenant-dup-1' }, { id: 'tenant-dup-2' }] };
+      },
+      findWorkspaceByStableId() {
+        return { status: 'missing', record: null };
+      },
+      findWorkspaceBySlug() {
+        return { status: 'ambiguous', records: [{ id: 'workspace-dup-1' }, { id: 'workspace-dup-2' }] };
+      },
+    },
   });
 
   const missingTenant = deriveWorkspaceContext(
@@ -128,7 +140,52 @@ test('production resolution falls back to unresolved when records are absent or 
   assert.equal(ambiguousTenant.resolution.status, 'unresolved');
   assert.equal(ambiguousTenant.resolution.tenant, 'ambiguous');
   assert.equal(ambiguousWorkspace.resolution.status, 'unresolved');
-  assert.equal(ambiguousWorkspace.resolution.workspace, 'ambiguous');
+  assert.equal(ambiguousWorkspace.resolution.workspace, 'missing');
+});
+
+test('missing or ambiguous adapter outcomes remain unresolved when explicitly enabled', () => {
+  const repository = createProductionIdentityRepository({
+    productionMode: true,
+    adapter: {
+      findTenantByStableId() {
+        return { status: 'found', record: { id: 'tenant-123', slug: 'acme' } };
+      },
+      findTenantBySlug() {
+        return { status: 'found', record: { id: 'tenant-123', slug: 'acme' } };
+      },
+      findWorkspaceByStableId() {
+        return { status: 'ambiguous', records: [{ id: 'workspace-1' }, { id: 'workspace-2' }] };
+      },
+      findWorkspaceBySlug() {
+        return { status: 'missing', record: null };
+      },
+    },
+  });
+
+  const ambiguousWorkspaceContext = deriveWorkspaceContext(
+    {
+      requestContext: {
+        tenant: { id: 'tenant-123' },
+        workspace: { id: 'workspace-789' },
+      },
+    },
+    { productionResolution: true, identityRepository: repository },
+  );
+
+  const missingWorkspaceContext = deriveWorkspaceContext(
+    {
+      requestContext: {
+        tenant: { id: 'tenant-123' },
+        workspace: { slug: 'missing-workspace' },
+      },
+    },
+    { productionResolution: true, identityRepository: repository },
+  );
+
+  assert.equal(ambiguousWorkspaceContext.resolution.status, 'unresolved');
+  assert.equal(ambiguousWorkspaceContext.resolution.workspace, 'ambiguous');
+  assert.equal(missingWorkspaceContext.resolution.status, 'unresolved');
+  assert.equal(missingWorkspaceContext.resolution.workspace, 'missing');
 });
 
 test('attachWorkspaceContext stores the derived workspace context on the request', () => {
@@ -148,8 +205,21 @@ test('attachWorkspaceContext stores the derived workspace context on the request
 
 test('createWorkspaceContextMiddleware can be configured for explicit production resolution', () => {
   const repository = createProductionIdentityRepository({
-    tenants: [{ id: 'tenant-123', slug: 'acme' }],
-    workspaces: [{ id: 'workspace-789', tenantId: 'tenant-123', slug: 'client-ops' }],
+    productionMode: true,
+    adapter: {
+      findTenantByStableId() {
+        return { status: 'found', record: { id: 'tenant-123', slug: 'acme' } };
+      },
+      findTenantBySlug() {
+        return { status: 'found', record: { id: 'tenant-123', slug: 'acme' } };
+      },
+      findWorkspaceByStableId() {
+        return { status: 'found', record: { id: 'workspace-789', tenantId: 'tenant-123', slug: 'client-ops' } };
+      },
+      findWorkspaceBySlug() {
+        return { status: 'found', record: { id: 'workspace-789', tenantId: 'tenant-123', slug: 'client-ops' } };
+      },
+    },
   });
   const middleware = createWorkspaceContextMiddleware({ productionResolution: true, identityRepository: repository });
   const req = {

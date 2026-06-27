@@ -5,7 +5,7 @@ This note captures the next-stage plan for resolving tenant/workspace records fr
 ## Current state
 - `services/api/src/middleware/requestContext.js` derives request-scoped identity from headers.
 - `services/api/src/middleware/workspaceContext.js` consumes that request context and remains read-only by default.
-- `services/api/src/db/production/migrationLoader.js`, `services/api/src/db/production/migrationRunner.js`, and `services/api/src/db/production/identityRepository.js` provide catalog, runner, and repository scaffolding only.
+- `services/api/src/db/production/migrationLoader.js`, `services/api/src/db/production/migrationRunner.js`, `services/api/src/db/production/identityPersistenceAdapter.js`, and `services/api/src/db/production/identityRepository.js` provide catalog, runner, adapter, and repository scaffolding only.
 - Local MVP persistence stays on SQLite.
 
 ## Intended production resolution flow
