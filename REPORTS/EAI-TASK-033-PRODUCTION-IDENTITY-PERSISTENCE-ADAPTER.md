@@ -69,7 +69,7 @@ PASS
 - Connect the guarded production identity adapter to a real PostgreSQL-backed persistence implementation when the production database layer is ready.
 
 ## Artifact commit SHA
-- PENDING_COMMIT_SHA
+- 1eb88cd4f0d7edff1a0d1b2c28e2e9adab4d0e5b
 
 ## Final pushed commit SHA
-- PENDING_COMMIT_SHA
+- 1eb88cd4f0d7edff1a0d1b2c28e2e9adab4d0e5b

@@ -42,8 +42,8 @@
     "injected_repository_supported": true,
     "unresolved_fallbacks_supported": true
   },
-  "artifact_commit_sha": "PENDING_COMMIT_SHA",
-  "final_pushed_commit_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "1eb88cd4f0d7edff1a0d1b2c28e2e9adab4d0e5b",
+  "final_pushed_commit_sha": "1eb88cd4f0d7edff1a0d1b2c28e2e9adab4d0e5b",
   "remaining_risks": [
     "The production identity persistence adapter is still a scaffold and not yet connected to live PostgreSQL persistence.",
     "Production resolution remains opt-in and disabled by default for the local MVP runtime."
