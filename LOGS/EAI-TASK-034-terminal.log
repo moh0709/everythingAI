@@ -1,0 +1,20 @@
+# EAI-TASK-034 terminal log
+
+## Summary
+- Repo pulled cleanly from `origin/main`.
+- Framework doctor passed.
+- UI typecheck passed.
+- UI build passed.
+- API test suite passed.
+
+## Key validation commands
+- `git pull --ff-only` → `Already up to date.`
+- `node scripts/framework-doctor.mjs` → `PASS`
+- `cd apps/everything-ai-ui && npm run typecheck` → `PASS`
+- `cd apps/everything-ai-ui && npm run build` → `PASS`
+- `cd services/api && npm test` → `PASS`
+
+## Implementation notes
+- Added a PostgreSQL-oriented identity persistence adapter behind explicit injection.
+- Default local MVP behavior remains opt-in and does not create or call PostgreSQL helpers.
+- Tests use injected fake/query-spy functions only; no real PostgreSQL server is required.
