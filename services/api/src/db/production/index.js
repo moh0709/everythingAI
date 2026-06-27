@@ -3,6 +3,10 @@ export {
 } from './identityPersistenceAdapter.js';
 
 export {
+  createProductionIdentityPostgresAdapter,
+} from './postgresIdentityPersistenceAdapter.js';
+
+export {
   createProductionIdentityRepository,
   createProductionIdentityRepositoryFactory,
 } from './identityRepository.js';

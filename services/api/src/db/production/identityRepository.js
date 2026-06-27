@@ -1,4 +1,5 @@
 import { createProductionIdentityPersistenceAdapter } from './identityPersistenceAdapter.js';
+import { createProductionIdentityPostgresAdapter } from './postgresIdentityPersistenceAdapter.js';
 
 function normalizeString(value) {
   if (typeof value !== 'string') {
@@ -108,6 +109,26 @@ function resolveAdapter(options, productionMode) {
 
   if (options.adapter) {
     return options.adapter;
+  }
+
+  if (typeof options.productionAdapterFactory === 'function') {
+    return options.productionAdapterFactory(options);
+  }
+
+  if (options.postgresAdapter) {
+    return options.postgresAdapter;
+  }
+
+  if (typeof options.postgresAdapterFactory === 'function') {
+    return options.postgresAdapterFactory(options);
+  }
+
+  if (options.postgresQuery || options.postgresClient || options.pool) {
+    return createProductionIdentityPostgresAdapter({
+      query: options.postgresQuery,
+      client: options.postgresClient,
+      pool: options.pool,
+    });
   }
 
   if (typeof options.adapterFactory === 'function') {
