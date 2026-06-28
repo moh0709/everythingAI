@@ -77,7 +77,7 @@ PASS
 - Connect the guarded production adapter to the live PostgreSQL client/pool wiring in the production deployment layer when that integration is ready.
 
 ## Artifact commit SHA
-- 074a390
+- 074a39006d5d420d4a5147a0a02366f2450e29d7
 
 ## Final pushed commit SHA
-- 074a390
+- cc5310795ce738e5a1a9a6cf47d7a6c047d81441

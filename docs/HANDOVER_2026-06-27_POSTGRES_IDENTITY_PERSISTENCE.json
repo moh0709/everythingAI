@@ -44,8 +44,8 @@
     "injected_repository_supported": true,
     "unresolved_fallbacks_supported": true
   },
-  "artifact_commit_sha": "074a390",
-  "final_pushed_commit_sha": "074a390",
+  "artifact_commit_sha": "074a39006d5d420d4a5147a0a02366f2450e29d7",
+  "final_pushed_commit_sha": "cc5310795ce738e5a1a9a6cf47d7a6c047d81441",
   "remaining_risks": [
     "The PostgreSQL adapter is explicit and injectable, but still needs live production client/pool wiring to talk to a real database.",
     "Production resolution remains opt-in and disabled by default for the local MVP runtime."
