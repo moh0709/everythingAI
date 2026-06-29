@@ -1,0 +1,123 @@
+{
+  "handover_report": {
+    "title": "EverythingAI Agent Takeover Report — Post EAI-TASK-034",
+    "date": "2026-06-29",
+    "repository": "moh0709/everythingAI",
+    "branch_policy": "Work directly on main unless Moe explicitly changes this rule.",
+    "current_status": {
+      "local_mvp": "accepted / product-reviewable",
+      "production_readiness": "not complete",
+      "production_identity_foundation": "accepted through EAI-TASK-034",
+      "next_task_created": false
+    },
+    "latest_accepted_task": {
+      "task_id": "EAI-TASK-034",
+      "github_issue": 56,
+      "title": "Connect guarded production identity adapter to PostgreSQL persistence",
+      "decision": "PASS / fully accepted",
+      "artifact_commit_sha": "074a39006d5d420d4a5147a0a02366f2450e29d7",
+      "final_pushed_commit_sha": "cc5310795ce738e5a1a9a6cf47d7a6c047d81441",
+      "metadata_correction_commit_sha": "6dcfd263cab3c1670093fcee466bb9fc029f403d"
+    },
+    "read_first": [
+      "docs/DOCUMENTATION_STATUS_2026-06-29_POST_EAI_TASK_034.md",
+      "docs/HANDOVER_2026-06-29_POST_EAI_TASK_034_AGENT_TAKEOVER.md",
+      "docs/HANDOVER_2026-06-29_POST_EAI_TASK_034_AGENT_TAKEOVER.json",
+      "docs/PRODUCTION_WORKSPACE_RESOLUTION_PLAN.md",
+      "REPORTS/EAI-TASK-034-POSTGRES-IDENTITY-PERSISTENCE.md",
+      "docs/HANDOVER_2026-06-27_POSTGRES_IDENTITY_PERSISTENCE.json"
+    ],
+    "historical_references": [
+      "docs/ROADMAP.md",
+      "docs/IMPLEMENTATION_ROADMAP.md"
+    ],
+    "completed_task_chain": [
+      { "task": "EAI-TASK-026", "issue": 48, "status": "PASS", "summary": "Final local MVP acceptance" },
+      { "task": "EAI-TASK-027", "issue": 49, "status": "PASS", "summary": "Production architecture and release hardening plan" },
+      { "task": "EAI-TASK-028", "issue": 50, "status": "PASS", "summary": "Auth/users/tenants/workspaces model" },
+      { "task": "EAI-TASK-029", "issue": 51, "status": "PASS", "summary": "Production identity/workspace schema foundation" },
+      { "task": "EAI-TASK-030", "issue": 52, "status": "PASS", "summary": "Guarded production migration loader and read-only workspace context" },
+      { "task": "EAI-TASK-031", "issue": 53, "status": "PASS after metadata correction", "summary": "Explicit production migration runner and workspace resolution plan" },
+      { "task": "EAI-TASK-032", "issue": 54, "status": "PASS after metadata correction", "summary": "Production identity repository and guarded workspace persistence resolution" },
+      { "task": "EAI-TASK-033", "issue": 55, "status": "PASS after metadata/label correction", "summary": "Guarded production identity persistence adapter scaffold" },
+      { "task": "EAI-TASK-034", "issue": 56, "status": "PASS after metadata correction", "summary": "PostgreSQL-backed production identity persistence adapter" }
+    ],
+    "important_files": [
+      "services/api/src/db/production/001_identity_workspace_schema.sql",
+      "services/api/src/db/production/migrationLoader.js",
+      "services/api/src/db/production/migrationRunner.js",
+      "services/api/src/db/production/identityPersistenceAdapter.js",
+      "services/api/src/db/production/postgresIdentityPersistenceAdapter.js",
+      "services/api/src/db/production/identityRepository.js",
+      "services/api/src/db/production/index.js",
+      "services/api/src/middleware/requestContext.js",
+      "services/api/src/middleware/workspaceContext.js",
+      "services/api/test/productionIdentityRepository.test.js",
+      "services/api/test/workspaceContext.test.js"
+    ],
+    "accepted_behavior_after_task_034": [
+      "PostgreSQL adapter is explicit and injectable.",
+      "Adapter can use injected query function, client.query, or pool.query.",
+      "Adapter exposes tenant and workspace lookup methods.",
+      "Workspace queries are tenant-scoped.",
+      "Missing rows return missing.",
+      "Duplicate rows return ambiguous.",
+      "No real PostgreSQL server is required by tests.",
+      "Repository only uses PostgreSQL adapter when productionMode is explicitly enabled or a production adapter/query/client/pool is explicitly supplied."
+    ],
+    "safety_boundaries": [
+      "Do not break local SQLite MVP startup.",
+      "Do not require PostgreSQL during default local startup.",
+      "Do not run production migrations automatically.",
+      "Do not introduce login requirements yet.",
+      "Do not change Client Workspace behavior.",
+      "Do not change Admin Dashboard behavior unless explicitly requested.",
+      "Do not expose provider settings, API-key controls, or Agent Connector controls in Client Workspace.",
+      "Do not enable local agent bridge/chat by default.",
+      "Do not allow arbitrary browser-submitted shell commands.",
+      "Do not add private runtime configuration values to the repository.",
+      "Do not perform broad refactors.",
+      "Do not modify unrelated files.",
+      "Do not claim completion without validation evidence."
+    ],
+    "hermes_queue_rule": {
+      "process_only_open_issues_with_labels": ["pm:ready", "hermes:ready"],
+      "skip_if_any_label_or_state_present": ["hermes:done", "pm:review", "pm:accepted", "closed"],
+      "skip_if_matching_report_artifact_exists": true,
+      "important_note": "EAI-TASK numbers and GitHub issue numbers are not the same thing. EAI-TASK-034 was GitHub issue #56."
+    },
+    "required_validation_commands": [
+      "git pull --ff-only",
+      "node scripts/framework-doctor.mjs",
+      "cd apps/everything-ai-ui && npm run typecheck",
+      "cd apps/everything-ai-ui && npm run build",
+      "cd services/api && npm test"
+    ],
+    "next_recommended_task": {
+      "task_id": "EAI-TASK-035",
+      "title": "Wire live PostgreSQL client/pool injection for guarded production identity resolution",
+      "purpose": "Connect the accepted PostgreSQL identity adapter to a live production client/pool injection path in the production deployment layer, while keeping local MVP startup free of PostgreSQL requirements.",
+      "must_preserve": [
+        "No PostgreSQL during default local startup.",
+        "No automatic migrations.",
+        "No login wall yet.",
+        "No Client Workspace/Admin Dashboard behavior change.",
+        "No provider/API-key/connector exposure in Client Workspace.",
+        "No real PostgreSQL server required for unit tests."
+      ]
+    },
+    "new_agent_startup_sequence": [
+      "Read docs/HANDOVER_2026-06-29_POST_EAI_TASK_034_AGENT_TAKEOVER.md.",
+      "Read docs/DOCUMENTATION_STATUS_2026-06-29_POST_EAI_TASK_034.md.",
+      "Read docs/PRODUCTION_WORKSPACE_RESOLUTION_PLAN.md.",
+      "Read REPORTS/EAI-TASK-034-POSTGRES-IDENTITY-PERSISTENCE.md.",
+      "Read docs/HANDOVER_2026-06-27_POSTGRES_IDENTITY_PERSISTENCE.json.",
+      "Inspect services/api/src/db/production/postgresIdentityPersistenceAdapter.js.",
+      "Inspect services/api/src/db/production/identityRepository.js.",
+      "Inspect services/api/src/middleware/workspaceContext.js.",
+      "Inspect services/api/test/productionIdentityRepository.test.js.",
+      "Inspect services/api/test/workspaceContext.test.js.",
+      "Only then create or process EAI-TASK-035."
+    ]
+  }
+}
