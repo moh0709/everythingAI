@@ -69,8 +69,8 @@ EAI-TASK-034: PostgreSQL-backed production identity persistence adapter.
 
 ```text
 Local MVP: accepted / product-reviewable.
-Production identity foundation: accepted through EAI-TASK-034.
-Live PostgreSQL client/pool wiring: not done.
+Production identity foundation: accepted through EAI-TASK-035.
+Live PostgreSQL client/pool wiring: available through an explicit guarded helper.
 Auth/login enforcement: not introduced.
 Tenant/workspace runtime enforcement: not fully live.
 Production deployment model: not complete.
@@ -79,22 +79,12 @@ Production deployment model: not complete.
 ## Immediate next priority
 
 ```text
-EAI-TASK-035:
-Wire live PostgreSQL client/pool injection for guarded production identity resolution.
+Production identity/workspace foundation is now past EAI-TASK-035.
 ```
 
-This next task must preserve:
-
-```text
-- no PostgreSQL connection during normal local MVP startup
-- no automatic migration execution
-- no login wall yet
-- no broad route refactor
-- no Client Workspace/Admin Dashboard behavior change
-- no provider/API-key/connector controls in Client Workspace
-- no private runtime configuration values added to the repository
-```
+This guarded PostgreSQL client/pool injection helper is complete and preserved the local MVP runtime.
+No next task has been approved yet.
 
 ## Roadmap conclusion
 
-EverythingAI is stable for a new AI agent takeover after EAI-TASK-034. The correct next move is not broad production launch; it is the narrow guarded production PostgreSQL client/pool injection task.
+EverythingAI is stable for a new AI agent takeover after EAI-TASK-035. The correct next move will be a separately approved follow-up task, not a broad production launch.

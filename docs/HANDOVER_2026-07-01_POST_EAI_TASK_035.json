@@ -1,0 +1,38 @@
+{
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "task_id": "EAI-TASK-035",
+  "title": "Wire live PostgreSQL client/pool injection for guarded production identity resolution",
+  "final_status": "PASS",
+  "generated_at": "2026-07-01T00:00:00Z",
+  "implementation_summary": {
+    "helper_added": "services/api/src/db/production/workspaceContextMiddleware.js",
+    "exports_updated": [
+      "services/api/src/db/production/index.js"
+    ],
+    "tests_added": [
+      "services/api/test/productionWorkspaceContextMiddleware.test.js"
+    ]
+  },
+  "behavior": {
+    "default_startup_unchanged": true,
+    "production_mode_required": true,
+    "supports_identity_repository_injection": true,
+    "supports_postgres_client_injection": true,
+    "supports_postgres_pool_injection": true,
+    "supports_query_injection": true,
+    "does_not_require_real_postgres_server": true,
+    "does_not_run_migrations_automatically": true
+  },
+  "validation_status_summary": {
+    "single_test_file": "PASS",
+    "full_service_test_suite": "PASS",
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "ui_typecheck": "PASS",
+    "ui_build": "PASS"
+  },
+  "artifact_commit_sha": "PENDING",
+  "final_pushed_commit_sha": "PENDING",
+  "report_file": "REPORTS/EAI-TASK-035-GUARDED-PRODUCTION-POSTGRES-INJECTION.md"
+}

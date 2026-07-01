@@ -12,6 +12,10 @@ export {
 } from './identityRepository.js';
 
 export {
+  createProductionWorkspaceContextMiddleware,
+} from './workspaceContextMiddleware.js';
+
+export {
   discoverProductionMigrationFiles,
   getProductionMigrationsRoot,
   loadProductionMigrationCatalog,

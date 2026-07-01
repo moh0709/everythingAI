@@ -50,6 +50,7 @@ EAI-TASK-031: Explicit migration runner and workspace resolution plan — accept
 EAI-TASK-032: Production identity repository and guarded persistence resolution — accepted.
 EAI-TASK-033: Guarded production identity persistence adapter scaffold — accepted.
 EAI-TASK-034: PostgreSQL-backed production identity persistence adapter — accepted.
+EAI-TASK-035: Live PostgreSQL client/pool injection for guarded production identity resolution — accepted.
 ```
 
 ## Current accepted production behavior
@@ -70,10 +71,11 @@ EAI-TASK-034: PostgreSQL-backed production identity persistence adapter — acce
 
 ```text
 EAI-TASK-035:
-Wire live PostgreSQL client/pool injection for guarded production identity resolution.
+Live PostgreSQL client/pool injection for guarded production identity resolution — accepted.
 ```
 
-The task should not be created or started until the new AI agent has read the takeover report.
+The task is complete and documented in `REPORTS/EAI-TASK-035-GUARDED-PRODUCTION-POSTGRES-INJECTION.md`.
+The next implementation task has not yet been established.
 
 ## Non-negotiable safety boundaries
 

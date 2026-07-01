@@ -2,12 +2,12 @@
 
 ## Status
 
-Current state after EAI-TASK-034:
+Current state after EAI-TASK-035:
 
 ```text
 Production identity/workspace persistence foundation is implemented as a guarded, opt-in foundation.
 Local SQLite MVP runtime remains unchanged.
-Live production PostgreSQL client/pool wiring is not connected yet.
+Live production PostgreSQL client/pool wiring is now available through an explicit guarded helper.
 ```
 
 Latest accepted task:
@@ -116,20 +116,15 @@ EAI-TASK-031: Explicit production migration runner and workspace resolution plan
 EAI-TASK-032: Production identity repository and guarded workspace persistence resolution accepted.
 EAI-TASK-033: Guarded production identity persistence adapter accepted.
 EAI-TASK-034: PostgreSQL-backed identity persistence adapter accepted.
+EAI-TASK-035: Guarded live PostgreSQL client/pool injection helper accepted.
 ```
 
 ---
 
 ## Next approved implementation step
 
-Recommended next task:
-
-```text
-EAI-TASK-035:
-Wire live PostgreSQL client/pool injection for guarded production identity resolution.
-```
-
-The next task should do only the production deployment-layer wiring. It must not introduce login, switch local MVP persistence, run migrations automatically, or require PostgreSQL for default local startup.
+The guarded PostgreSQL client/pool injection helper is complete.
+A future task may extend the production deployment layer further, but no next task has been approved yet.
 
 ---
 
