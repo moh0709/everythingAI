@@ -34,6 +34,5 @@
   },
   "artifact_commit_sha": "3ab4ea378ed2b2e986caa07ff5d9dbbadf3496ae",
   "final_pushed_commit_sha": "3ab4ea378ed2b2e986caa07ff5d9dbbadf3496ae",
-  "metadata_finalization_commit_sha": "PENDING",
   "report_file": "REPORTS/EAI-TASK-035-GUARDED-PRODUCTION-POSTGRES-INJECTION.md"
 }
