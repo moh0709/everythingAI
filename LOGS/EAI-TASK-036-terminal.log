@@ -1,0 +1,19 @@
+# EAI-TASK-036 terminal log
+
+## Scope
+Add an explicit server wiring gate for the guarded production workspace context helper while preserving default local SQLite startup behavior.
+
+## Key validation commands and results
+- `git pull --ff-only` — PASS
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `cd services/api && npm test` — PASS
+
+## Focused tests added/ran
+- `node --test test/serverWorkspaceContextGate.test.js test/productionWorkspaceContextMiddleware.test.js test/workspaceContext.test.js` — PASS
+
+## Notes
+- Default server composition keeps the read-only workspace context path.
+- Explicit `productionWorkspaceResolution` options are passed through the server gate only when provided.
+- No PostgreSQL server was required for validation.

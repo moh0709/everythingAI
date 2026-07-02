@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDatabase } from './db/client.js';
+import { createProductionWorkspaceContextMiddleware } from './db/production/index.js';
 import { requireApiToken } from './middleware/auth.js';
 import { attachRequestContext } from './middleware/requestContext.js';
 import { attachWorkspaceContext } from './middleware/workspaceContext.js';
@@ -29,62 +30,82 @@ import { resumePersistedWatchers } from './watcher/watchService.js';
 
 dotenv.config();
 
-const app = express();
 const PORT = process.env.PORT || 4100;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.resolve(__dirname, '../public');
 const operatorUiEntry = path.join(publicDir, 'index.html');
 
-app.use(helmet());
-app.use(cors());
-app.use(express.json({ limit: '25mb' }));
-app.use(morgan('dev'));
+export function resolveWorkspaceContextMiddleware(options = {}, dependencies = {}) {
+  const productionWorkspaceResolution = options.productionWorkspaceResolution;
 
-app.get('/admin', (_req, res) => {
-  res.sendFile(operatorUiEntry);
-});
+  if (!productionWorkspaceResolution) {
+    return attachWorkspaceContext;
+  }
 
-app.get('/admin/', (_req, res) => {
-  res.sendFile(operatorUiEntry);
-});
+  const createProductionWorkspaceContextMiddlewareImpl =
+    dependencies.createProductionWorkspaceContextMiddleware ?? createProductionWorkspaceContextMiddleware;
+  const productionWorkspaceContextMiddleware = createProductionWorkspaceContextMiddlewareImpl(productionWorkspaceResolution);
 
-app.use(express.static(publicDir, {
-  setHeaders(res) {
-    if (process.env.NODE_ENV !== 'production') {
-      res.setHeader('Cache-Control', 'no-store');
-    }
-  },
-}));
+  return productionWorkspaceContextMiddleware ?? attachWorkspaceContext;
+}
 
-app.get('/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'everythingai-api',
-    timestamp: new Date().toISOString(),
+export function createApiApp(options = {}, dependencies = {}) {
+  const app = express();
+  const workspaceContextMiddleware = resolveWorkspaceContextMiddleware(options, dependencies);
+
+  app.use(helmet());
+  app.use(cors());
+  app.use(express.json({ limit: '25mb' }));
+  app.use(morgan('dev'));
+
+  app.get('/admin', (_req, res) => {
+    res.sendFile(operatorUiEntry);
   });
-});
 
-app.use('/api', attachRequestContext, attachWorkspaceContext, requireApiToken);
+  app.get('/admin/', (_req, res) => {
+    res.sendFile(operatorUiEntry);
+  });
 
-app.use('/api', createFilesRouter());
-app.use('/api', createSourcePathsRouter());
-app.use('/api', createProviderSettingsRouter());
-app.use('/api', createAgentBridgeRouter());
-app.use('/api', createJobsRouter());
-app.use('/api', createPlanningRouter());
-app.use('/api', createExecutionBatchesRouter());
-app.use('/api', createSearchRouter());
-app.use('/api', createWikiRouter());
-app.use('/api', createIntelligenceRouter());
-app.use('/api', createWatchRouter());
-app.use('/api', createActionsRouter());
-app.use('/api', createRecoveryRouter());
-app.use('/api', createIntegrationsRouter());
-app.use('/api', createSystemRouter());
+  app.use(express.static(publicDir, {
+    setHeaders(res) {
+      if (process.env.NODE_ENV !== 'production') {
+        res.setHeader('Cache-Control', 'no-store');
+      }
+    },
+  }));
 
-app.use('/api', notFoundHandler);
-app.use(errorHandler);
+  app.get('/health', (_req, res) => {
+    res.json({
+      status: 'ok',
+      service: 'everythingai-api',
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  app.use('/api', attachRequestContext, workspaceContextMiddleware, requireApiToken);
+
+  app.use('/api', createFilesRouter());
+  app.use('/api', createSourcePathsRouter());
+  app.use('/api', createProviderSettingsRouter());
+  app.use('/api', createAgentBridgeRouter());
+  app.use('/api', createJobsRouter());
+  app.use('/api', createPlanningRouter());
+  app.use('/api', createExecutionBatchesRouter());
+  app.use('/api', createSearchRouter());
+  app.use('/api', createWikiRouter());
+  app.use('/api', createIntelligenceRouter());
+  app.use('/api', createWatchRouter());
+  app.use('/api', createActionsRouter());
+  app.use('/api', createRecoveryRouter());
+  app.use('/api', createIntegrationsRouter());
+  app.use('/api', createSystemRouter());
+
+  app.use('/api', notFoundHandler);
+  app.use(errorHandler);
+
+  return app;
+}
 
 async function bootstrapPersistedWatchers() {
   const db = openDatabase();
@@ -100,7 +121,8 @@ async function bootstrapPersistedWatchers() {
   }
 }
 
-function startServer(retries = 5) {
+export function startServer(retries = 5, options = {}, dependencies = {}) {
+  const app = createApiApp(options, dependencies);
   const server = app.listen(PORT, () => {
     console.log(`EverythingAI API listening on port ${PORT}`);
     bootstrapPersistedWatchers();
@@ -110,7 +132,7 @@ function startServer(retries = 5) {
     if (err.code === 'EADDRINUSE' && retries > 0) {
       console.warn(`Port ${PORT} in use, retrying in 1s… (${retries} retries left)`);
       server.close();
-      setTimeout(() => startServer(retries - 1), 1000);
+      setTimeout(() => startServer(retries - 1, options, dependencies), 1000);
     } else {
       throw err;
     }
@@ -121,6 +143,13 @@ function startServer(retries = 5) {
   };
   process.once('SIGTERM', shutdown);
   process.once('SIGINT', shutdown);
+
+  return server;
 }
 
-startServer();
+const isDirectExecution = process.argv[1]
+  && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+
+if (isDirectExecution) {
+  startServer();
+}
