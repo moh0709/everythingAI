@@ -29,8 +29,12 @@
   },
   "artifact_commit_sha": "fe279fa751e97c7484d98493748041a3d060a8c8",
   "final_pushed_commit_sha": "fe279fa751e97c7484d98493748041a3d060a8c8",
-  "report_metadata_finalization_commit_sha": "d6320d36b438e8309470432cfe3947385d6b8df4",
-  "handover_metadata_finalization_commit_sha": "1241aa53aedd8fe1fe760b600bb30ab340ca2121",
-  "handover_metadata_sync_commit_sha": "a3de5b441e88367de01c920e80af0a7d5bae74a1",
+  "metadata_correction_commits": [
+    "d6320d36b438e8309470432cfe3947385d6b8df4",
+    "eaf272ab15ade69e478f78832c37e28153c70b35",
+    "1241aa53aedd8fe1fe760b600bb30ab340ca2121",
+    "a3de5b441e88367de01c920e80af0a7d5bae74a1",
+    "f276978228e4448ce6831a7d65553cf8e75d242b"
+  ],
   "report_file": "REPORTS/EAI-TASK-036-SERVER-WIRING-GATE-PRODUCTION-WORKSPACE-CONTEXT.md"
 }
