@@ -27,7 +27,8 @@
     "api_tests": "PASS",
     "focused_gate_tests": "PASS"
   },
-  "artifact_commit_sha": "PENDING_COMMIT_SHA",
-  "final_pushed_commit_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "fe279fa751e97c7484d98493748041a3d060a8c8",
+  "final_pushed_commit_sha": "fe279fa751e97c7484d98493748041a3d060a8c8",
+  "metadata_finalization_commit_sha": "d6320d36b438e8309470432cfe3947385d6b8df4",
   "report_file": "REPORTS/EAI-TASK-036-SERVER-WIRING-GATE-PRODUCTION-WORKSPACE-CONTEXT.md"
 }
