@@ -29,6 +29,7 @@
   },
   "artifact_commit_sha": "fe279fa751e97c7484d98493748041a3d060a8c8",
   "final_pushed_commit_sha": "fe279fa751e97c7484d98493748041a3d060a8c8",
-  "metadata_finalization_commit_sha": "d6320d36b438e8309470432cfe3947385d6b8df4",
+  "report_metadata_finalization_commit_sha": "d6320d36b438e8309470432cfe3947385d6b8df4",
+  "handover_metadata_finalization_commit_sha": "eaf272ab15ade69e478f78832c37e28153c70b35",
   "report_file": "REPORTS/EAI-TASK-036-SERVER-WIRING-GATE-PRODUCTION-WORKSPACE-CONTEXT.md"
 }
