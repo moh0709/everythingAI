@@ -39,5 +39,5 @@ Added a small, explicit API server wiring gate that only enables the guarded pro
 - Handover: `docs/HANDOVER_2026-07-01_POST_EAI_TASK_036.json`
 
 ## Commit metadata
-- Artifact commit SHA: PENDING_COMMIT_SHA
-- Final pushed commit SHA: PENDING_COMMIT_SHA
+- Artifact commit SHA: `fe279fa751e97c7484d98493748041a3d060a8c8`
+- Final pushed commit SHA: `fe279fa751e97c7484d98493748041a3d060a8c8`
