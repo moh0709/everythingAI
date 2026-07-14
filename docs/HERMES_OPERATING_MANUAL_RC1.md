@@ -1,0 +1,185 @@
+# Hermes Operating Manual RC1
+
+## Purpose
+
+This manual defines the implementation-ready operating contract for Hermes on the EverythingAI repository.
+It turns the current queue-driven scaffolding into an explicit operating procedure for autonomous task pickup, claim, execution, validation, reporting, and return to the queue.
+
+## Source of truth
+
+Primary runtime source of truth:
+
+- GitHub issues state on `moh0709/everythingAI`
+- `.hermes/state.json`
+- `REPORTS/` artifacts
+- current worker/poller implementation in:
+  - `scripts/task-poller.mjs`
+  - `scripts/task-worker.mjs`
+  - `src/task-queue.js`
+  - `templates/REPORT_TEMPLATE.md`
+
+Important note:
+
+- `docs/ENGINEERINGOS_RC1.md` was referenced by the task but is not present in this checkout.
+- This RC1 manual is therefore synthesized from the available framework docs and source files.
+
+## Mission and authority
+
+Hermes is allowed to autonomously pick up EverythingAI tasks when:
+
+- the GitHub issue is open,
+- the issue has both `pm:ready` and `hermes:ready`,
+- the issue has no matching completed report artifact,
+- the issue is not already claimed or completed in `.hermes/state.json`,
+- the issue is the next runnable task after duplicate-prevention checks.
+
+Hermes must not ask for confirmation again once the issue is known runnable.
+If the issue is not runnable, Hermes exits silently.
+
+## Startup and initialization
+
+On startup, Hermes should:
+
+1. Read `.hermes/state.json`.
+2. Query GitHub for open issues labeled `pm:ready` and `hermes:ready`.
+3. Skip any issue that already has a matching report artifact in `REPORTS/`.
+4. Re-check the current state file and issue labels before claiming.
+5. Read the relevant task documents and source files.
+6. If no runnable issue exists, stop silently.
+7. If a runnable issue exists, claim it atomically and begin execution.
+
+## Task discovery eligibility rules
+
+A task is runnable only when all of the following are true:
+
+- the GitHub issue is open,
+- the issue currently has both `pm:ready` and `hermes:ready`,
+- the issue is not already in progress in `.hermes/state.json`,
+- there is no matching report artifact already present,
+- the task has not already been finalized.
+
+Additional queue hygiene rules:
+
+- issue numbers and EAI-TASK identifiers are not interchangeable,
+- process at most one issue at a time,
+- always prefer live GitHub state over stale webhook payload assumptions,
+- if a later poll shows the issue is already claimed or completed, no-op.
+
+## Atomic claim and duplicate prevention
+
+Claiming must be atomic and visible before execution begins.
+The claim sequence is:
+
+1. Re-read live issue state.
+2. Switch `hermes:ready` to `hermes:working`.
+3. Leave `pm:ready` in place while work is underway unless the workflow explicitly removes it.
+4. Update `.hermes/state.json` to `IN_PROGRESS`.
+5. Record the current issue number, task ID, starting commit SHA, and claim timestamp.
+6. Post a claim comment containing the task ID, timestamp, starting SHA, and planned deliverable.
+7. Begin execution only after the claim comment is posted successfully.
+
+If any claim step fails, stop and surface the blocker instead of silently continuing.
+
+## Execution lifecycle
+
+The expected lifecycle is:
+
+1. Observe the issue and repository state.
+2. Plan the work from the live source artifacts.
+3. Implement the requested change or artifact.
+4. Validate the result.
+5. Commit and push the work.
+6. Report back on the issue.
+7. Return to the queue.
+
+For docs-only work, implementation means writing the documentation artifact and validating it.
+For code work, implementation means changing the requested source files, then validating the behavior.
+
+## Required task-state transitions
+
+Recommended transitions:
+
+- Ready: `pm:ready` + `hermes:ready`
+- Claimed: `pm:ready` + `hermes:working`
+- Blocked: `pm:ready` + `hermes:blocked`
+- Complete: `pm:review` + `hermes:done`
+
+Guidance:
+
+- Remove `hermes:working` when the task is finished.
+- Move the task into the PM review state on completion.
+- Keep blocked tasks open so they can be resumed after the blocker is fixed.
+- Do not leave a completed task looking runnable.
+
+## Validation and quality gates
+
+Validation must match the task type and the repository area being changed.
+For this RC1 manual task, the minimum checks are:
+
+- markdown sanity by inspection,
+- JSON parsing for the handover artifact,
+- `git diff --check`,
+- `git status --short`.
+
+For code tasks in this repository, also run the repo-appropriate validation commands from the current docs.
+Do not claim a validation result that was not actually executed.
+
+## Branch, commit, and push safety
+
+- Work on `main` unless the task explicitly says otherwise.
+- Keep changes narrowly scoped.
+- Record the starting commit SHA at claim time.
+- Record the artifact commit SHA and final pushed commit SHA once the work is committed and pushed.
+- Keep the report, handover, state file, and issue comment synchronized.
+- If a later metadata sync commit is needed, note that separately and keep the artifact SHA stable.
+
+## Failure handling and escalation
+
+If Hermes cannot complete the task:
+
+- leave the issue open,
+- set the issue to a blocked state if the blocker is real,
+- explain the blocker in the issue comment,
+- do not fabricate validation or completion evidence.
+
+If a required source artifact is missing, use the closest available live source and note the gap explicitly.
+
+## Completion reporting
+
+On completion, Hermes should produce:
+
+- a report in `REPORTS/`,
+- a handover JSON in `docs/`,
+- a log file in `LOGS/`,
+- a final issue comment summarizing status, validation, and SHAs.
+
+The completion comment should include:
+
+- final status,
+- files changed,
+- validation results,
+- artifact commit SHA,
+- final pushed commit SHA,
+- blocker notes if any,
+- next recommended task.
+
+## Interaction rules
+
+- The CEO/PM should not need to manually continue a runnable GitHub issue.
+- Runnable issues should be claimed automatically.
+- Non-runnable events should exit silently.
+- Future agents should read the live issue, state file, report, and handover before making changes.
+
+## Known gaps between target behavior and the current worker
+
+- The current worker is lifecycle-oriented and writes claim/report artifacts, but it does not implement a full product-specific execution engine.
+- `docs/ENGINEERINGOS_RC1.md` was not available in this checkout, so this RC1 manual is derived from the existing framework docs instead.
+- The current worker still uses placeholder-style report fields until finalization data is filled in.
+- The repository currently relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service.
+
+## Operating summary
+
+If the issue is runnable, claim it.
+If it is not runnable, do nothing.
+If it is claimed, work it to completion.
+If it is blocked, say so clearly and stop.
