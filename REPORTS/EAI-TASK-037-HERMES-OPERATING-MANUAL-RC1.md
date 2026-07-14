@@ -33,8 +33,8 @@ Created the Hermes Operating Manual RC1, aligned it with the current issue-queue
 - `gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label hermes:ready --limit 20 --json number,title,labels,assignees,url` — PASS
 - `gh issue view 59 --repo moh0709/everythingAI --json number,title,body,labels,assignees,url,state` — PASS
 - `git status --short --branch` — PASS
-- `git diff --check` — pending before commit finalization
-- `python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_037.json` — pending before commit finalization
+- `git diff --check` — PASS
+- `python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_037.json` — PASS
 
 ## Proof points
 - Issue #59 was claimed automatically.
@@ -48,5 +48,5 @@ Created the Hermes Operating Manual RC1, aligned it with the current issue-queue
 - Handover: `docs/HANDOVER_2026-07-14_EAI_TASK_037.json`
 
 ## Commit metadata
-- Artifact commit SHA: PENDING_COMMIT_SHA
-- Final pushed commit SHA: PENDING_COMMIT_SHA
+- Artifact commit SHA: 2d5cbef9dfe5e51ad65919a9576c923a719ea023
+- Final pushed commit SHA: recorded in the final issue comment

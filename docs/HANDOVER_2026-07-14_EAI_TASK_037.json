@@ -5,7 +5,7 @@
   "issue_number": 59,
   "title": "Create Hermes Operating Manual RC1 and verify autonomous task pickup",
   "final_status": "PASS",
-  "generated_at": "2026-07-14T15:02:11Z",
+  "generated_at": "2026-07-14T15:08:41Z",
   "source_of_truth": {
     "issue_queue": "GitHub Issues",
     "state_file": ".hermes/state.json",
@@ -30,10 +30,10 @@
     "issue_list_check": "PASS",
     "issue_view_check": "PASS",
     "git_status_check": "PASS",
-    "json_validation": "PENDING",
-    "git_diff_check": "PENDING"
+    "json_validation": "PASS",
+    "git_diff_check": "PASS"
   },
-  "artifact_commit_sha": "PENDING_COMMIT_SHA",
-  "final_pushed_commit_sha": "PENDING_COMMIT_SHA",
+  "artifact_commit_sha": "2d5cbef9dfe5e51ad65919a9576c923a719ea023",
+  "final_pushed_commit_sha": "recorded in the final issue comment",
   "report_file": "REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md"
 }
