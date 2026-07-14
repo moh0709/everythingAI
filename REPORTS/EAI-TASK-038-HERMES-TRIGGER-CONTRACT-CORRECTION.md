@@ -10,7 +10,7 @@
 - **Current branch:** `main`
 - **Starting commit SHA:** `968b9ae366b805f2564385536596ff6e1ba84a89`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `recorded after commit`
+- **Artifact commit SHA:** `a4df9b9302b28b5ff82ef94a77aa0472907457d2`
 - **Final SHA source of truth:** `GitHub issue comment after push`
 
 ## Files changed

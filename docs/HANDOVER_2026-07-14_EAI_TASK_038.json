@@ -8,7 +8,7 @@
   "currentTask": "EAI-TASK-038",
   "result": "PASS",
   "startingCommitSha": "968b9ae366b805f2564385536596ff6e1ba84a89",
-  "artifactCommitSha": "recorded after commit",
+  "artifactCommitSha": "a4df9b9302b28b5ff82ef94a77aa0472907457d2",
   "finalCommitSha": "recorded in the final issue comment",
   "updatedAt": "2026-07-14T16:34:05Z",
   "summary": "Corrected the Hermes Operating Manual RC1, added a narrow webhook-event dispatcher helper, exported poll-loop helpers, and added deterministic contract/queue-return tests.",
