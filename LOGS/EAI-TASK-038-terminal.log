@@ -1,0 +1,11 @@
+[2026-07-14T16:34:05Z] Claimed EAI-TASK-038 from GitHub issue #60 via polling mode.
+[2026-07-14T16:34:05Z] Starting commit SHA: 968b9ae366b805f2564385536596ff6e1ba84a89
+[2026-07-14T16:34:05Z] Labels transitioned to hermes:working on claim.
+[2026-07-14T16:34:05Z] Implemented docs/HERMES_OPERATING_MANUAL_RC1.md trigger contract section.
+[2026-07-14T16:34:05Z] Added scripts/webhook-event-dispatcher.mjs as a bounded webhook classifier.
+[2026-07-14T16:34:05Z] Exported pollLoop helpers in scripts/task-poller.mjs.
+[2026-07-14T16:34:05Z] Added tests/webhook-event-dispatcher.test.mjs and tests/task-poller-watch-loop.test.mjs.
+[2026-07-14T16:34:05Z] Validation PASS: node scripts/framework-doctor.mjs
+[2026-07-14T16:34:05Z] Validation PASS: node --test tests/*.test.mjs
+[2026-07-14T16:34:05Z] Validation PASS: git diff --check
+[2026-07-14T16:34:05Z] Next: finalize metadata sync, commit, push, and update issue labels/comment.

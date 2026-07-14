@@ -9,6 +9,7 @@ It turns the current queue-driven scaffolding into an explicit operating procedu
 
 Primary runtime source of truth:
 
+- `docs/ENGINEERINGOS_RC1.md`
 - GitHub issues state on `moh0709/everythingAI`
 - `.hermes/state.json`
 - `REPORTS/` artifacts
@@ -20,8 +21,8 @@ Primary runtime source of truth:
 
 Important note:
 
-- `docs/ENGINEERINGOS_RC1.md` was referenced by the task but is not present in this checkout.
-- This RC1 manual is therefore synthesized from the available framework docs and source files.
+- `docs/ENGINEERINGOS_RC1.md` is present in this checkout and is the governing operating standard.
+- This RC1 manual is reconciled to that document and the current queue/runtime files.
 
 ## Mission and authority
 
@@ -35,6 +36,50 @@ Hermes is allowed to autonomously pick up EverythingAI tasks when:
 
 Hermes must not ask for confirmation again once the issue is known runnable.
 If the issue is not runnable, Hermes exits silently.
+
+## Trigger and Event Input Contract
+
+This contract separates the always-on polling queue from the optional webhook intake path.
+
+### Polling mode — primary autonomous mode
+
+- Responsible process: `node scripts/task-poller.mjs` and the worker it dispatches.
+- Eligibility source of truth: live GitHub issue labels plus `.hermes/state.json` plus report duplicate-prevention checks.
+- Required labels: `pm:ready` and `hermes:ready`.
+- Polling mode does **not** require a webhook payload.
+- Missing webhook data must never block polling-mode execution.
+- After one task completes, the poller returns to queue watching.
+- Polling mode continues until no runnable work remains or the process is intentionally stopped.
+
+### Webhook mode — optional event-driven mode
+
+Webhook mode exists only when a webhook receiver or invoking process supplies an actual GitHub event payload.
+
+Payload discovery precedence is exactly:
+
+1. `GITHUB_EVENT_PATH`
+2. `--event-path <file>`
+3. STDIN only when the invoking process explicitly guarantees JSON input
+
+The runtime/receiver owns payload delivery.
+Hermes must never ask the CEO where the payload is stored.
+
+Machine-readable outcomes for the contract:
+
+- `EXECUTE`
+- `IGNORED_EVENT`
+- `IGNORED_INELIGIBLE`
+- `BLOCKED_RUNTIME_CONTRACT`
+- `INVALID_EVENT_PAYLOAD`
+- `CLAIM_CONFLICT`
+
+Contract notes:
+
+- `BLOCKED_RUNTIME_CONTRACT` is only for webhook mode when no valid payload source exists.
+- `IGNORED_EVENT` is for non-`issues` events or payloads that do not represent a GitHub issue event.
+- `IGNORED_INELIGIBLE` is for issue events missing one or both readiness labels.
+- `CLAIM_CONFLICT` is for duplicate or stale runnable events that fail live queue revalidation.
+- `EXECUTE` only follows live revalidation against the current queue; it never fabricates a task.
 
 ## Startup and initialization
 

@@ -21,8 +21,8 @@ function runWorker(issueNumber) {
   return result.status ?? 0;
 }
 
-async function pollOnce() {
-  const issues = await listRunnableIssues();
+export async function pollOnce({ listIssues = listRunnableIssues, dispatchWorker = runWorker } = {}) {
+  const issues = await listIssues();
   if (issues.length === 0) {
     console.log('[task-poller] No runnable issues found.');
     return null;
@@ -35,18 +35,28 @@ async function pollOnce() {
 
   if (watch) {
     console.log(`[task-poller] Dispatching worker for ${summarizeIssue(issues[0])}`);
-    runWorker(issues[0].number);
+    dispatchWorker(issues[0].number);
   }
 
   return issues[0];
 }
 
-if (!watch) {
-  await pollOnce();
-  process.exitCode = 0;
-} else {
-  while (true) {
+export async function watchLoop({ iterations = Infinity, pauseMs = intervalMs, listIssues, dispatchWorker } = {}) {
+  let count = 0;
+  while (count < iterations) {
+    await pollOnce({ listIssues, dispatchWorker });
+    count += 1;
+    if (count < iterations) {
+      await delay(pauseMs);
+    }
+  }
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  if (!watch) {
     await pollOnce();
-    await delay(intervalMs);
+    process.exitCode = 0;
+  } else {
+    await watchLoop();
   }
 }
