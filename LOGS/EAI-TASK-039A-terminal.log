@@ -1,0 +1,11 @@
+2026-07-15T17:24:55Z | Claimed issue #70 with hermes:working and removed hermes:ready.
+2026-07-15T17:24:55Z | Updated .hermes/state.json to IN_PROGRESS for EAI-TASK-039A.
+2026-07-15T17:24:55Z | Added src/runtime-mode.js and wired explicit runtime-mode checks into scripts/task-poller.mjs, scripts/task-worker.mjs, and scripts/webhook-event-dispatcher.mjs.
+2026-07-15T17:24:55Z | Updated package.json scripts to use explicit --mode polling / --mode webhook.
+2026-07-15T17:24:55Z | Updated docs/HERMES_OPERATING_MANUAL_RC1.md with explicit runtime-mode, polling, and webhook startup guidance.
+2026-07-15T17:24:55Z | Added deterministic tests for runtime detection, polling gating, worker gating, and webhook gating.
+2026-07-15T17:24:55Z | Validation PASS: node --test tests/*.test.mjs
+2026-07-15T17:24:55Z | Validation PASS: npm test
+2026-07-15T17:24:55Z | Validation PASS: node scripts/framework-doctor.mjs
+2026-07-15T17:24:55Z | Validation PASS: git diff --check
+2026-07-15T17:24:55Z | First commit pushed: 3d2d1c1 (code + docs + tests + in-progress state).

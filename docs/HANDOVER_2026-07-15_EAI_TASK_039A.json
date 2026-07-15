@@ -1,0 +1,52 @@
+{
+  "repo": "moh0709/everythingAI",
+  "branch": "main",
+  "issue": 70,
+  "task": "EAI-TASK-039A",
+  "status": "PASS",
+  "currentIssue": 70,
+  "currentTask": "EAI-TASK-039A",
+  "result": "PASS",
+  "startingCommitSha": "1d456883fb8469fbba059a23df95c892594970f7",
+  "artifactCommitSha": "3d2d1c1",
+  "finalCommitSha": "recorded in the final issue comment",
+  "updatedAt": "2026-07-15T17:24:55Z",
+  "summary": "Added an explicit runtime-mode detector, wired it into polling and webhook entry paths, updated the operating manual and package scripts, and added deterministic tests that prove polling and webhook separation.",
+  "deliverables": [
+    "src/runtime-mode.js",
+    "scripts/task-poller.mjs",
+    "scripts/task-worker.mjs",
+    "scripts/webhook-event-dispatcher.mjs",
+    "docs/HERMES_OPERATING_MANUAL_RC1.md",
+    "package.json",
+    "tests/runtime-mode.test.mjs",
+    "tests/task-poller-runtime-mode.test.mjs",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "tests/webhook-event-dispatcher.test.mjs",
+    "REPORTS/EAI-TASK-039A-RUNTIME-MODE-SEPARATION.md",
+    "LOGS/EAI-TASK-039A-terminal.log"
+  ],
+  "validations": [
+    {
+      "command": "node scripts/framework-doctor.mjs",
+      "result": "PASS"
+    },
+    {
+      "command": "node --test tests/*.test.mjs",
+      "result": "PASS"
+    },
+    {
+      "command": "npm test",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    }
+  ],
+  "notes": [
+    "Polling mode now explicitly requires --mode polling before queue access.",
+    "Webhook mode now explicitly requires --mode webhook before payload discovery.",
+    "Unknown runtime mode performs no GitHub mutation and no payload inspection."
+  ]
+}
