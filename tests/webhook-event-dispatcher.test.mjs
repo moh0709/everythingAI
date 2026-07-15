@@ -8,6 +8,7 @@ import {
   classifyWebhookEvent,
   discoverWebhookPayload
 } from '../scripts/webhook-event-dispatcher.mjs';
+import { RUNTIME_MODES } from '../src/runtime-mode.js';
 
 function makeTempJson(name, content) {
   const dir = mkdtempSync(join(tmpdir(), 'hermes-webhook-'));
@@ -20,7 +21,7 @@ test('discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources', () =
   const path = makeTempJson('event.json', '{"source":"file"}');
   const result = discoverWebhookPayload({
     env: { GITHUB_EVENT_PATH: path },
-    argv: ['--event-path', '/tmp/ignored.json', '--stdin-json'],
+    argv: ['--mode', 'webhook', '--event-path', '/tmp/ignored.json', '--stdin-json'],
     stdinText: '{"source":"stdin"}'
   });
 
@@ -30,7 +31,7 @@ test('discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources', () =
 });
 
 test('discoverWebhookPayload blocks when no payload source exists', () => {
-  const result = discoverWebhookPayload({ env: {}, argv: [], stdinText: '' });
+  const result = discoverWebhookPayload({ env: {}, argv: ['--mode', 'webhook'], stdinText: '' });
 
   assert.equal(result.ok, false);
   assert.equal(result.result, DECISIONS.BLOCKED_RUNTIME_CONTRACT);
@@ -40,7 +41,7 @@ test('discoverWebhookPayload blocks when no payload source exists', () => {
 test('classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON', async () => {
   const result = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
-    argv: ['--stdin-json'],
+    argv: ['--mode', 'webhook', '--stdin-json'],
     stdinText: '{not-json'
   });
 
@@ -51,7 +52,7 @@ test('classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON', as
 test('classifyWebhookEvent ignores non-issues events', async () => {
   const result = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'push' },
-    argv: ['--stdin-json'],
+    argv: ['--mode', 'webhook', '--stdin-json'],
     stdinText: '{"issue":{"number":60,"labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}'
   });
 
@@ -62,7 +63,7 @@ test('classifyWebhookEvent ignores non-issues events', async () => {
 test('classifyWebhookEvent ignores issue events missing readiness labels', async () => {
   const result = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
-    argv: ['--stdin-json'],
+    argv: ['--mode', 'webhook', '--stdin-json'],
     stdinText: '{"issue":{"number":60,"labels":[{"name":"pm:ready"}]}}'
   });
 
@@ -73,7 +74,7 @@ test('classifyWebhookEvent ignores issue events missing readiness labels', async
 test('classifyWebhookEvent executes only after live queue revalidation', async () => {
   const result = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
-    argv: ['--stdin-json'],
+    argv: ['--mode', 'webhook', '--stdin-json'],
     stdinText: '{"issue":{"number":60,"title":"EAI-TASK-038","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
     issueLister: async () => [{ number: 60, title: 'EAI-TASK-038: Correct Hermes trigger contract and complete Operating Manual RC1', labels: [{ name: 'pm:ready' }, { name: 'hermes:ready' }] }],
     reportExists: () => false,
@@ -89,7 +90,7 @@ test('classifyWebhookEvent executes only after live queue revalidation', async (
 test('classifyWebhookEvent reports claim conflict when live revalidation fails', async () => {
   const result = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
-    argv: ['--stdin-json'],
+    argv: ['--mode', 'webhook', '--stdin-json'],
     stdinText: '{"issue":{"number":60,"title":"EAI-TASK-038","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
     issueLister: async () => [],
     reportExists: () => false,
@@ -99,4 +100,33 @@ test('classifyWebhookEvent reports claim conflict when live revalidation fails',
   assert.equal(result.ok, true);
   assert.equal(result.result, DECISIONS.CLAIM_CONFLICT);
   assert.match(result.evidence.join(' | '), /state=currentIssue:60/);
+});
+
+test('unknown runtime mode causes no payload inspection or GitHub lookup', async () => {
+  let payloadReads = 0;
+  let issueLookups = 0;
+  const result = await classifyWebhookEvent({
+    env: {},
+    argv: [],
+    stdinText: '{"issue":{"number":60}}',
+    runtimeDetector: () => ({
+      mode: RUNTIME_MODES.UNKNOWN,
+      source: 'none',
+      evidence: ['no explicit runtime mode found'],
+      remediation: 'set a mode'
+    }),
+    readFile: () => {
+      payloadReads += 1;
+      throw new Error('should not read');
+    },
+    issueLister: async () => {
+      issueLookups += 1;
+      return [];
+    }
+  });
+
+  assert.equal(result.ok, false);
+  assert.equal(result.result, DECISIONS.UNKNOWN_RUNTIME_MODE);
+  assert.equal(payloadReads, 0);
+  assert.equal(issueLookups, 0);
 });

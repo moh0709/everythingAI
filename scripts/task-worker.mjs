@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import {
   claimRunnableIssue,
   ensureDir,
@@ -17,7 +18,6 @@ import {
 } from '../src/task-queue.js';
 
 const argv = process.argv.slice(2);
-const dryRun = argv.includes('--dry-run');
 const issueNumberArg = argv.find((value) => /^\d+$/.test(value));
 const issueNumber = issueNumberArg ? Number(issueNumberArg) : null;
 const reportTemplatePath = resolve(repoRoot, 'templates/REPORT_TEMPLATE.md');
@@ -63,9 +63,9 @@ function getCommitSha() {
   return result.stdout.trim();
 }
 
-function selectIssue() {
-  return Number.isFinite(issueNumber) && issueNumber > 0
-    ? claimRunnableIssue({ issueNumber })
+function selectIssue(selectedIssueNumber = issueNumber) {
+  return Number.isFinite(selectedIssueNumber) && selectedIssueNumber > 0
+    ? claimRunnableIssue({ issueNumber: selectedIssueNumber })
     : claimRunnableIssue();
 }
 
@@ -124,26 +124,57 @@ function writeLifecycleArtifacts(issue, status, details) {
   return { logPath, reportPath };
 }
 
-const issue = await selectIssue();
+export async function runTaskWorker({
+  runtimeDetector = detectRuntimeMode,
+  env = process.env,
+  argv = process.argv.slice(2),
+  issueSelector = selectIssue,
+  ghRunner = runGh,
+  stateWriter = updateState,
+  artifactWriter = writeLifecycleArtifacts
+} = {}) {
+  const runtime = runtimeDetector({ env, argv });
+  if (runtime.mode !== RUNTIME_MODES.POLLING) {
+    const result = {
+      ok: false,
+      result: 'UNKNOWN_RUNTIME_MODE',
+      source: runtime.source,
+      mode: runtime.mode,
+      evidence: runtime.evidence,
+      remediation: runtime.remediation
+    };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
+  }
 
-if (!issue) {
-  console.log('[task-worker] No runnable issue found.');
-  process.exitCode = 0;
-} else if (dryRun) {
-  console.log(`[task-worker] Dry run selected: ${summarizeIssue(issue)}`);
-  console.log(`[task-worker] Matching report exists: ${matchingReportExists(issue) ? 'yes' : 'no'}`);
-  console.log(`[task-worker] Would write report: ${reportPathForIssue(issue)}`);
-  console.log(`[task-worker] Would write log: ${logPathForIssue(issue)}`);
-  process.exitCode = 0;
-} else {
+  const dryRun = argv.includes('--dry-run');
+  const issueNumberArg = argv.find((value) => /^\d+$/.test(value));
+  const issueNumberFromArgs = issueNumberArg ? Number(issueNumberArg) : null;
+  const issue = await issueSelector(issueNumberFromArgs);
+
+  if (!issue) {
+    console.log('[task-worker] No runnable issue found.');
+    process.exitCode = 0;
+    return null;
+  }
+
+  if (dryRun) {
+    console.log(`[task-worker] Dry run selected: ${summarizeIssue(issue)}`);
+    console.log(`[task-worker] Matching report exists: ${matchingReportExists(issue) ? 'yes' : 'no'}`);
+    console.log(`[task-worker] Would write report: ${reportPathForIssue(issue)}`);
+    console.log(`[task-worker] Would write log: ${logPathForIssue(issue)}`);
+    process.exitCode = 0;
+    return issue;
+  }
+
   const startSha = getCommitSha();
   const startTime = nowIso();
   const taskId = issueTaskId(issue);
   const reportPath = reportPathForIssue(issue);
   const logPath = logPathForIssue(issue);
-  const labelChange = runGh(['issue', 'edit', String(issue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'hermes:working', '--remove-label', 'hermes:ready']);
+  const labelChange = ghRunner(['issue', 'edit', String(issue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'hermes:working', '--remove-label', 'hermes:ready']);
 
-  updateState(issue, 'IN_PROGRESS', {
+  stateWriter(issue, 'IN_PROGRESS', {
     startingCommitSha: startSha,
     artifactCommitSha: null,
     finalCommitSha: null,
@@ -179,12 +210,12 @@ if (!issue) {
     followUp: '- PM review should inspect the selected issue, generated report, and terminal log.'
   };
 
-  writeLifecycleArtifacts(issue, 'PASS', { ...details, logLines });
-  updateState(issue, 'PASS', {
+  artifactWriter(issue, 'PASS', { ...details, logLines });
+  stateWriter(issue, 'PASS', {
     startingCommitSha: startSha,
     artifactCommitSha: 'recorded in the final issue comment',
     finalCommitSha: 'recorded in the final issue comment',
-    finalizationPattern: 'Two-step post-commit finalization: commit artifacts first, then record the artifact commit SHA in the issue comment and state update.',
+    finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.',
     startedAt: startTime,
     completedAt: nowIso()
   });
@@ -198,13 +229,21 @@ if (!issue) {
     finalCommitSha: 'recorded in the final issue comment',
     finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.'
   };
-  const commentResult = runGh(['issue', 'comment', String(issue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)]);
+  const commentResult = ghRunner(['issue', 'comment', String(issue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)]);
 
-  const finishLabels = runGh(['issue', 'edit', String(issue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'pm:review', '--add-label', 'hermes:done', '--remove-label', 'hermes:working']);
+  const finishLabels = ghRunner(['issue', 'edit', String(issue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'pm:review', '--add-label', 'hermes:done', '--remove-label', 'hermes:working']);
   console.log(`[task-worker] ${summarizeIssue(issue)}`);
   console.log(`[task-worker] Report: ${reportPath}`);
   console.log(`[task-worker] Log: ${logPath}`);
   console.log(`[task-worker] Commented: ${Boolean(commentResult)}`);
   console.log(`[task-worker] Labels updated: ${Boolean(finishLabels)}`);
   process.exitCode = 0;
+  return { issue, reportPath, logPath };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const result = await runTaskWorker();
+  if (result && result.ok === false) {
+    process.exitCode = 1;
+  }
 }

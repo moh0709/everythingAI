@@ -41,19 +41,44 @@ If the issue is not runnable, Hermes exits silently.
 
 This contract separates the always-on polling queue from the optional webhook intake path.
 
+### Explicit runtime-mode selection
+
+Runtime mode must be determined before any payload discovery or queue mutation.
+There are exactly three runtime outcomes:
+
+- `POLLING`
+- `WEBHOOK`
+- `UNKNOWN`
+
+Primary runtime contract:
+
+- CLI flag: `--mode polling` or `--mode webhook`
+- Environment fallback: `HERMES_RUNTIME_MODE=polling` or `HERMES_RUNTIME_MODE=webhook`
+- CLI wins over environment when both are present
+- conflicting or invalid explicit values return `UNKNOWN`
+- no explicit mode returns `UNKNOWN`
+
+Remediation for `UNKNOWN`:
+
+- set `--mode polling` for the polling queue launcher
+- set `--mode webhook` for the webhook dispatcher
+- never infer webhook mode from missing payload variables
+
 ### Polling mode — primary autonomous mode
 
-- Responsible process: `node scripts/task-poller.mjs` and the worker it dispatches.
+- Responsible process: `node scripts/task-poller.mjs --mode polling` and the worker it dispatches.
 - Eligibility source of truth: live GitHub issue labels plus `.hermes/state.json` plus report duplicate-prevention checks.
 - Required labels: `pm:ready` and `hermes:ready`.
 - Polling mode does **not** require a webhook payload.
 - Missing webhook data must never block polling-mode execution.
+- Polling mode must never call webhook payload discovery.
+- The Telegram/chat gateway remains a conversation context and is not a task-execution entry path.
 - After one task completes, the poller returns to queue watching.
 - Polling mode continues until no runnable work remains or the process is intentionally stopped.
 
 ### Webhook mode — optional event-driven mode
 
-Webhook mode exists only when a webhook receiver or invoking process supplies an actual GitHub event payload.
+Webhook mode exists only when a webhook receiver or invoking process supplies an actual GitHub event payload and explicitly starts in webhook mode.
 
 Payload discovery precedence is exactly:
 
@@ -72,6 +97,7 @@ Machine-readable outcomes for the contract:
 - `BLOCKED_RUNTIME_CONTRACT`
 - `INVALID_EVENT_PAYLOAD`
 - `CLAIM_CONFLICT`
+- `UNKNOWN_RUNTIME_MODE`
 
 Contract notes:
 
@@ -80,18 +106,32 @@ Contract notes:
 - `IGNORED_INELIGIBLE` is for issue events missing one or both readiness labels.
 - `CLAIM_CONFLICT` is for duplicate or stale runnable events that fail live queue revalidation.
 - `EXECUTE` only follows live revalidation against the current queue; it never fabricates a task.
+- `UNKNOWN_RUNTIME_MODE` means no task execution or GitHub mutation should occur.
 
 ## Startup and initialization
 
 On startup, Hermes should:
 
-1. Read `.hermes/state.json`.
-2. Query GitHub for open issues labeled `pm:ready` and `hermes:ready`.
-3. Skip any issue that already has a matching report artifact in `REPORTS/`.
-4. Re-check the current state file and issue labels before claiming.
-5. Read the relevant task documents and source files.
-6. If no runnable issue exists, stop silently.
-7. If a runnable issue exists, claim it atomically and begin execution.
+1. Resolve runtime mode explicitly with `--mode polling` or `--mode webhook`.
+2. Read `.hermes/state.json`.
+3. Query GitHub for open issues labeled `pm:ready` and `hermes:ready` when in polling mode.
+4. Skip any issue that already has a matching report artifact in `REPORTS/`.
+5. Re-check the current state file and issue labels before claiming.
+6. Read the relevant task documents and source files.
+7. If no runnable issue exists, stop silently.
+8. If a runnable issue exists, claim it atomically and begin execution.
+
+Polling startup command example:
+
+```bash
+node scripts/task-poller.mjs --mode polling --watch
+```
+
+Webhook startup command example:
+
+```bash
+node scripts/webhook-event-dispatcher.mjs --mode webhook
+```
 
 ## Task discovery eligibility rules
 

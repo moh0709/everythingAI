@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import { listRunnableIssues, matchingReportExists, readStateIfPresent, summarizeIssue } from '../src/task-queue.js';
 
 export const DECISIONS = {
@@ -9,7 +9,8 @@ export const DECISIONS = {
   IGNORED_INELIGIBLE: 'IGNORED_INELIGIBLE',
   BLOCKED_RUNTIME_CONTRACT: 'BLOCKED_RUNTIME_CONTRACT',
   INVALID_EVENT_PAYLOAD: 'INVALID_EVENT_PAYLOAD',
-  CLAIM_CONFLICT: 'CLAIM_CONFLICT'
+  CLAIM_CONFLICT: 'CLAIM_CONFLICT',
+  UNKNOWN_RUNTIME_MODE: 'UNKNOWN_RUNTIME_MODE'
 };
 
 function normalizeArgs(argv) {
@@ -33,7 +34,45 @@ function stdinPayload(stdinText, explicit) {
   return stdinText?.trim() ? stdinText : null;
 }
 
-export function discoverWebhookPayload({ env = process.env, argv = process.argv.slice(2), stdinText = '', readFile = readFileSync } = {}) {
+function unknownRuntimeResponse(runtime, context) {
+  return {
+    ok: false,
+    result: DECISIONS.UNKNOWN_RUNTIME_MODE,
+    source: runtime.source,
+    mode: runtime.mode,
+    evidence: [
+      ...runtime.evidence,
+      ...context
+    ],
+    remediation: runtime.remediation
+  };
+}
+
+export function discoverWebhookPayload({
+  env = process.env,
+  argv = process.argv.slice(2),
+  stdinText = '',
+  readFile = readFileSync,
+  runtime = null
+} = {}) {
+  const activeRuntime = runtime ?? detectRuntimeMode({ env, argv });
+  if (activeRuntime.mode === RUNTIME_MODES.UNKNOWN) {
+    return unknownRuntimeResponse(activeRuntime, ['webhook payload discovery skipped until runtime mode is explicit']);
+  }
+  if (activeRuntime.mode !== RUNTIME_MODES.WEBHOOK) {
+    return {
+      ok: false,
+      result: DECISIONS.BLOCKED_RUNTIME_CONTRACT,
+      source: activeRuntime.source,
+      mode: activeRuntime.mode,
+      evidence: [
+        ...activeRuntime.evidence,
+        'webhook payload discovery disabled outside explicit webhook mode'
+      ],
+      remediation: 'Run the webhook entry path with --mode webhook or HERMES_RUNTIME_MODE=webhook.'
+    };
+  }
+
   const args = normalizeArgs(argv);
   const evidence = [];
 
@@ -101,9 +140,28 @@ export async function classifyWebhookEvent({
   readFile = readFileSync,
   issueLister = listRunnableIssues,
   reportExists = matchingReportExists,
-  stateReader = readStateIfPresent
+  stateReader = readStateIfPresent,
+  runtimeDetector = detectRuntimeMode
 } = {}) {
-  const discovery = discoverWebhookPayload({ env, argv, stdinText, readFile });
+  const runtime = runtimeDetector({ env, argv });
+  if (runtime.mode === RUNTIME_MODES.UNKNOWN) {
+    return unknownRuntimeResponse(runtime, ['payload discovery and queue inspection skipped in unknown runtime mode']);
+  }
+  if (runtime.mode !== RUNTIME_MODES.WEBHOOK) {
+    return {
+      ok: false,
+      result: DECISIONS.BLOCKED_RUNTIME_CONTRACT,
+      source: runtime.source,
+      mode: runtime.mode,
+      evidence: [
+        ...runtime.evidence,
+        'webhook entry path requires explicit webhook mode before payload discovery'
+      ],
+      remediation: 'Run the webhook entry path with --mode webhook or HERMES_RUNTIME_MODE=webhook.'
+    };
+  }
+
+  const discovery = discoverWebhookPayload({ env, argv, stdinText, readFile, runtime });
   if (!discovery.ok) {
     return discovery;
   }
@@ -193,8 +251,12 @@ export async function classifyWebhookEvent({
   };
 }
 
+export async function runWebhookEntry(options = {}) {
+  return classifyWebhookEvent(options);
+}
+
 async function main() {
-  const result = await classifyWebhookEvent();
+  const result = await runWebhookEntry();
   console.log(JSON.stringify(result, null, 2));
 }
 

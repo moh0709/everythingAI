@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
+import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import { listRunnableIssues, summarizeIssue } from '../src/task-queue.js';
 
-const watch = process.argv.includes('--watch');
 const intervalMs = 60_000;
 
 function runWorker(issueNumber) {
-  const args = ['scripts/task-worker.mjs'];
+  const args = ['scripts/task-worker.mjs', '--mode', 'polling'];
   if (issueNumber) {
     args.push(String(issueNumber));
   }
@@ -21,7 +21,7 @@ function runWorker(issueNumber) {
   return result.status ?? 0;
 }
 
-export async function pollOnce({ listIssues = listRunnableIssues, dispatchWorker = runWorker } = {}) {
+export async function pollOnce({ listIssues = listRunnableIssues, dispatchWorker = runWorker, watch = false } = {}) {
   const issues = await listIssues();
   if (issues.length === 0) {
     console.log('[task-poller] No runnable issues found.');
@@ -44,7 +44,7 @@ export async function pollOnce({ listIssues = listRunnableIssues, dispatchWorker
 export async function watchLoop({ iterations = Infinity, pauseMs = intervalMs, listIssues, dispatchWorker } = {}) {
   let count = 0;
   while (count < iterations) {
-    await pollOnce({ listIssues, dispatchWorker });
+    await pollOnce({ listIssues, dispatchWorker, watch: true });
     count += 1;
     if (count < iterations) {
       await delay(pauseMs);
@@ -52,11 +52,40 @@ export async function watchLoop({ iterations = Infinity, pauseMs = intervalMs, l
   }
 }
 
+export async function runPollingEntry({
+  env = process.env,
+  argv = process.argv.slice(2),
+  runtimeDetector = detectRuntimeMode,
+  listIssues = listRunnableIssues,
+  dispatchWorker = runWorker,
+  pauseMs = intervalMs,
+  iterations = Infinity
+} = {}) {
+  const runtime = runtimeDetector({ env, argv });
+  if (runtime.mode !== RUNTIME_MODES.POLLING) {
+    const result = {
+      ok: false,
+      result: 'UNKNOWN_RUNTIME_MODE',
+      source: runtime.source,
+      mode: runtime.mode,
+      evidence: runtime.evidence,
+      remediation: runtime.remediation
+    };
+    console.log(JSON.stringify(result, null, 2));
+    return result;
+  }
+
+  const watch = argv.includes('--watch');
+  if (watch) {
+    return watchLoop({ iterations, pauseMs, listIssues, dispatchWorker });
+  }
+
+  return pollOnce({ listIssues, dispatchWorker, watch: false });
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
-  if (!watch) {
-    await pollOnce();
-    process.exitCode = 0;
-  } else {
-    await watchLoop();
+  const result = await runPollingEntry();
+  if (result && result.ok === false) {
+    process.exitCode = 1;
   }
 }

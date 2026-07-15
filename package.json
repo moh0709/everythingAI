@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "framework:doctor": "node scripts/framework-doctor.mjs",
-    "worker:once": "node scripts/task-worker.mjs",
-    "worker:watch": "node scripts/task-poller.mjs --watch",
+    "worker:once": "node scripts/task-worker.mjs --mode polling",
+    "worker:watch": "node scripts/task-poller.mjs --mode polling --watch",
+    "webhook:dispatch": "node scripts/webhook-event-dispatcher.mjs --mode webhook",
     "test": "node --test tests/*.test.mjs"
   }
 }
