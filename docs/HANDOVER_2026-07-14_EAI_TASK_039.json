@@ -7,21 +7,15 @@
   "currentIssue": 61,
   "currentTask": "EAI-TASK-039",
   "result": "PASS",
-  "startingCommitSha": "8fef06c324fba90ec876784d23c8566c80f74a97",
-  "artifactCommitSha": "7d325317c091185c394d2edfa5041af83a929eb1",
+  "startingCommitSha": "12bb036a1e7d07eefd3dc8e308a40db629fc1329",
+  "artifactCommitSha": "8c585b2c9ced9da0aea07385fbe3fc939db0a6cd",
   "finalCommitSha": "recorded in the final issue comment",
-  "updatedAt": "2026-07-18T13:34:52Z",
-  "summary": "Hardened atomic task claiming with a shared polling/webhook execution handoff, added deterministic duplicate-delivery tests, and documented the claim lifecycle in the operating manual.",
+  "updatedAt": "2026-07-18T14:12:17Z",
+  "summary": "Verified the existing atomic claim hardening, captured the terminal log, and published the task report and handover metadata.",
   "deliverables": [
-    "scripts/task-worker.mjs",
-    "scripts/webhook-event-dispatcher.mjs",
-    "tests/task-worker-runtime-mode.test.mjs",
-    "tests/webhook-event-dispatcher.test.mjs",
-    "docs/HERMES_OPERATING_MANUAL_RC1.md",
-    ".hermes/state.json",
+    "LOGS/EAI-TASK-039-terminal.log",
     "REPORTS/EAI-TASK-039-ATOMIC-CLAIM-HARDENING.md",
-    "docs/HANDOVER_2026-07-14_EAI_TASK_039.json",
-    "LOGS/EAI-TASK-039-terminal.log"
+    "docs/HANDOVER_2026-07-14_EAI_TASK_039.json"
   ],
   "validations": [
     {
@@ -29,7 +23,7 @@
       "result": "PASS"
     },
     {
-      "command": "node --test tests/task-claim.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs tests/task-poller-watch-loop.test.mjs",
+      "command": "node --test tests/runtime-mode.test.mjs tests/task-claim.test.mjs tests/task-poller-runtime-mode.test.mjs tests/task-poller-watch-loop.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs",
       "result": "PASS"
     },
     {
@@ -50,8 +44,8 @@
     }
   ],
   "notes": [
-    "The polling worker now accepts an injected stateReader and no longer fails with an undefined stateReader ReferenceError.",
-    "Webhook execution now uses runWebhookEntry() to claim once and hand the owned issue to the shared execution helper.",
-    "The repository snapshot includes .hermes/state.json, so the claim path updated it to PASS after completion."
+    "The checked-out main branch already included the shared claim authority, conservative lock handling, and duplicate-delivery tests required by the issue.",
+    "No source code changes were necessary in this run.",
+    ".hermes/state.json is absent in this checkout, so state updates were skipped as required."
   ]
 }
