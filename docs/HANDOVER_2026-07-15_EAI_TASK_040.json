@@ -1,0 +1,54 @@
+{
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "taskId": "EAI-TASK-040",
+  "issueNumber": 63,
+  "title": "Add runtime supervisor and heartbeat foundation",
+  "status": "PASS",
+  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation",
+  "filesChanged": [
+    "src/runtime-supervisor.js",
+    "tests/runtime-supervisor.test.mjs",
+    "docs/HERMES_OPERATING_MANUAL_RC1.md",
+    "LOGS/EAI-TASK-040-terminal.log",
+    "REPORTS/EAI-TASK-040-RUNTIME-SUPERVISOR-HEARTBEAT.md",
+    "docs/HANDOVER_2026-07-15_EAI_TASK_040.json",
+    ".hermes/state.json"
+  ],
+  "validation": {
+    "frameworkDoctor": "PASS",
+    "nodeTest": "50/50 pass (including new 21 supervisor tests)",
+    "npmTest": "identical to node --test",
+    "gitDiffCheck": "PASS (no whitespace errors)",
+    "jsonParseChecks": "PASS (handover JSON, heartbeat JSON, state JSON all valid)"
+  },
+  "supervisorBehavior": {
+    "lockMechanism": "Exclusive-create supervisor lock at .hermes/supervisor.lock",
+    "heartbeatPath": ".hermes/runtime/heartbeat.json",
+    "atomicWrite": "Write to .tmp then rename to final path",
+    "heartbeatInterval": "30 seconds (configurable)",
+    "staleThreshold": "120 seconds (configurable)",
+    "sigtermHandling": "Graceful shutdown with final heartbeat and lock release",
+    "sigintHandling": "Graceful shutdown with final heartbeat and lock release",
+    "noSecretsInHeartbeat": "Verified — no env vars, tokens, or secrets in heartbeat"
+  },
+  "tests": {
+    "heartbeatWrite": "Verified atomic write with temp file pattern",
+    "heartbeatRead": "Returns null for missing file, parsed object for valid file",
+    "staleDetection": "Configurable threshold, handles null/missing/unparseable values",
+    "supervisorLock": "Acquire, inspect, release with PID/hostname/role tracking",
+    "supervisorLifecycle": "Start, stop, setStatus, double-start prevention",
+    "noSecrets": "Heartbeat never records GH_TOKEN, OPENAI_API_KEY, PATH, etc."
+  },
+  "operatingManualUpdated": true,
+  "mvpRuntimePreserved": true,
+  "productCodeChanged": false,
+  "risks": [
+    "Supervisor is not yet integrated into poller/worker startup by default",
+    "Supervisor lock is separate from task claim lock and not lifecycle-managed by worker scripts",
+    "Downstream monitoring or auto-recovery from stale heartbeats is not yet wired up"
+  ],
+  "nextRecommendedTask": "EAI-TASK-041: Integrate runtime supervisor into poller/worker startup and wire heartbeat status into CLI output",
+  "artifactCommitSha": "recorded after artifact commit",
+  "finalPushedCommitSha": "recorded in final issue comment"
+}

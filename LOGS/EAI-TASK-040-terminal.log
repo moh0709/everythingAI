@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "result": "DRY_RUN",
+  "mode": "POLLING",
+  "interval": 30000,
+  "heartbeatPath": "/root/.hermes/projects/everythingAI/.hermes/runtime/heartbeat.json",
+  "lockPath": "/root/.hermes/projects/everythingAI/.hermes/supervisor.lock"
+}
+=== Test 1: Write heartbeat ===
+Heartbeat written: {
+  "pid": 4109131,
+  "processStartTime": "2026-07-18T14:34:19.995Z",
+  "lastHeartbeat": "2026-07-18T14:34:19.995Z",
+  "mode": "POLLING",
+  "currentIssue": 63,
+  "currentTask": "EAI-TASK-040",
+  "lastResult": "CLAIMED",
+  "hostname": "test-runner"
+}
+Heartbeat file exists: true
+
+=== Test 2: Read heartbeat ===
+Read heartbeat: {
+  "pid": 4109131,
+  "processStartTime": "2026-07-18T14:34:19.995Z",
+  "lastHeartbeat": "2026-07-18T14:34:19.995Z",
+  "mode": "POLLING",
+  "currentIssue": 63,
+  "currentTask": "EAI-TASK-040",
+  "lastResult": "CLAIMED",
+  "hostname": "test-runner"
+}
+
+=== Test 3: Supervisor start and stop ===
+Start result: {
+  "ok": true,
+  "result": "STARTED",
+  "lock": {
+    "pid": 4109131,
+    "hostname": "test-sv",
+    "role": "supervisor",
+    "createdAt": "2026-07-18T14:34:19.998Z"
+  },
+  "heartbeat": {
+    "pid": 4109131,
+    "processStartTime": "2026-07-18T14:34:19.998Z",
+    "lastHeartbeat": "2026-07-18T14:34:19.998Z",
+    "mode": "POLLING",
+    "currentIssue": null,
+    "currentTask": null,
+    "lastResult": null,
+    "hostname": "test-sv"
+  }
+}
+Status updated
+Stop result: {
+  "ok": true,
+  "result": "STOPPED"
+}
+
+=== All supervisor tests completed ===

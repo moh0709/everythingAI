@@ -292,12 +292,164 @@ The completion comment should include:
 - Non-runnable events should exit silently.
 - Future agents should read the live issue, state file, report, and handover before making changes.
 
+## Runtime supervisor and heartbeat
+
+### Purpose
+
+The runtime supervisor (`src/runtime-supervisor.js`) provides a narrow liveness and
+process-lifecycle foundation for the Hermes poller/worker runtime without changing
+product application behavior.
+
+### Supervisor startup
+
+Start the supervisor with:
+
+```bash
+node src/runtime-supervisor.js --mode polling
+```
+
+Or with a custom heartbeat interval (default: 30 seconds):
+
+```bash
+node src/runtime-supervisor.js --mode polling --interval 15000
+```
+
+Options:
+- `--mode polling|webhook` — sets the runtime mode reported in heartbeats
+- `--interval <ms>` — heartbeat interval in milliseconds (default: 30000)
+- `--dry-run` — print the configuration and exit without starting
+
+### Supervisor lock
+
+The supervisor uses an exclusive file lock at `.hermes/supervisor.lock` to prevent
+two supervisor processes from managing the same runtime simultaneously. The lock
+mechanism follows the same patterns established by the task claim/lock foundation
+in `src/task-claim.js`:
+
+- The lock is created with exclusive-create semantics (`flag: 'wx'`).
+- It records PID, hostname, role (`supervisor`), and creation timestamp.
+- A second supervisor is rejected while a valid lock exists.
+- Stale locks are detected when the recorded PID is no longer alive on the same host.
+- Locks from different hosts are treated conservatively unless they exceed the stale threshold.
+- The lock is released on graceful shutdown.
+
+### Heartbeat file
+
+The supervisor emits a heartbeat file at `.hermes/runtime/heartbeat.json` using atomic
+replacement (write to `.heartbeat.tmp`, then rename to `heartbeat.json`).
+
+Schema:
+
+```json
+{
+  "pid": 12345,
+  "hostname": "host-abc",
+  "processStartTime": "2026-07-18T14:00:00.000Z",
+  "lastHeartbeat": "2026-07-18T14:05:00.000Z",
+  "mode": "POLLING",
+  "currentIssue": 63,
+  "currentTask": "EAI-TASK-040",
+  "lastResult": "CLAIMED"
+}
+```
+
+Fields:
+- `pid` (number) — process ID of the supervisor
+- `hostname` (string, optional) — machine hostname, only recorded when explicitly provided
+- `processStartTime` (ISO 8601) — when the supervisor was started
+- `lastHeartbeat` (ISO 8601) — timestamp of the most recent heartbeat write
+- `mode` (string) — runtime mode: `POLLING`, `WEBHOOK`, or `IDLE`
+- `currentIssue` (number|null) — the GitHub issue currently being worked, if any
+- `currentTask` (string|null) — the EAI-TASK identifier currently being worked, if any
+- `lastResult` (string|null) — the result of the last completed operation (e.g., `CLAIMED`, `SHUTDOWN`, `STOPPED`)
+
+Security rule: The heartbeat file never records environment variables, tokens, secrets,
+or private configuration.
+
+### Heartbeat interval and stale threshold
+
+Default configuration:
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| Heartbeat interval | 30,000 ms (30 s) | How often the heartbeat is refreshed |
+| Stale threshold | 120,000 ms (2 min) | Age after which a heartbeat is considered stale |
+
+The stale threshold is expected to be at least 2× the heartbeat interval to
+account for normal timing variation and transient delays.
+
+### Stale heartbeat interpretation
+
+A heartbeat is stale when:
+
+1. No heartbeat file exists, or
+2. The `lastHeartbeat` field is missing or unparseable, or
+3. The elapsed time since `lastHeartbeat` exceeds the stale threshold.
+
+When a heartbeat is stale, downstream consumers should treat the runtime as
+unhealthy. The supervisor process may have crashed, been killed, or lost its
+scheduled heartbeat write.
+
+### Graceful shutdown
+
+The supervisor handles `SIGTERM` and `SIGINT` by:
+
+1. Clearing the heartbeat interval timer.
+2. Writing a final heartbeat with `lastResult: "SHUTDOWN"`.
+3. Releasing the supervisor lock.
+4. Calling an optional shutdown callback.
+
+This ensures that surviving processes or monitoring can detect an intentional
+shutdown vs. a crash.
+
+### Programmatic API
+
+The supervisor is implemented as a controller object returned by `createSupervisor()`:
+
+```js
+import { createSupervisor, HEARTBEAT_MODES } from '../src/runtime-supervisor.js';
+
+const supervisor = createSupervisor({ mode: HEARTBEAT_MODES.POLLING });
+await supervisor.start();
+
+// Update tracked status
+supervisor.setStatus({ issue: 63, task: 'EAI-TASK-040', result: 'WORKING' });
+
+// Stop gracefully
+supervisor.stop();
+```
+
+Individual functions:
+
+| Function | Purpose |
+|----------|---------|
+| `writeHeartbeat(options)` | Write a heartbeat file atomically |
+| `readHeartbeat()` | Read and parse the current heartbeat |
+| `isHeartbeatStale(options)` | Check if a heartbeat is stale |
+| `createSupervisor(options)` | Create a supervisor controller |
+
+### Supervisor programmatic API options
+
+`createSupervisor()` accepts:
+
+- `mode` — initial runtime mode (default: `IDLE`)
+- `heartbeatIntervalMs` — milliseconds between heartbeats (default: 30000)
+- `staleThresholdMs` — threshold for stale detection (default: 120000)
+- `hostname` — hostname to include in heartbeats (optional, for security)
+- `pid` — process ID (default: `process.pid`)
+- `now` — clock function (for test injection)
+- `onHeartbeat` — callback called after each heartbeat write
+- `onShutdown` — callback called with the signal name on shutdown
+
 ## Known gaps between target behavior and the current worker
 
 - The current worker is lifecycle-oriented and writes claim/report artifacts, but it does not implement a full product-specific execution engine.
 - The repository still relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service, and state writes are skipped if the file is absent.
 - Production webhook execution now uses the same claim authority and worker execution helper as polling, but direct calls to the classification helper remain eligibility-only.
 - If a stale lock cannot be proven stale on the current host, Hermes intentionally leaves it in place and returns `CLAIM_CONFLICT`.
+- The runtime supervisor (`src/runtime-supervisor.js`) is now present with heartbeat and supervisor lock support, but it is not yet integrated into the poller/worker startup by default — it must be started explicitly.
+- The supervisor lock path (`.hermes/supervisor.lock`) is separate from the task claim lock (`.hermes/claim.lock`) and is not yet lifecycle-managed by the worker scripts.
+- Heartbeat stale detection is implemented in the module but downstream monitoring or auto-recovery is not yet wired up.
 
 ## Operating summary
 
