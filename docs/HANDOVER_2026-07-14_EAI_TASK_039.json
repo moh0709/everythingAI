@@ -8,9 +8,9 @@
   "currentTask": "EAI-TASK-039",
   "result": "PASS",
   "startingCommitSha": "8fef06c324fba90ec876784d23c8566c80f74a97",
-  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "artifactCommitSha": "7d325317c091185c394d2edfa5041af83a929eb1",
   "finalCommitSha": "recorded in the final issue comment",
-  "updatedAt": "2026-07-18T13:31:51Z",
+  "updatedAt": "2026-07-18T13:34:52Z",
   "summary": "Hardened atomic task claiming with a shared polling/webhook execution handoff, added deterministic duplicate-delivery tests, and documented the claim lifecycle in the operating manual.",
   "deliverables": [
     "scripts/task-worker.mjs",
@@ -52,6 +52,6 @@
   "notes": [
     "The polling worker now accepts an injected stateReader and no longer fails with an undefined stateReader ReferenceError.",
     "Webhook execution now uses runWebhookEntry() to claim once and hand the owned issue to the shared execution helper.",
-    "The repository snapshot includes .hermes/state.json, so the claim path updated it to IN_PROGRESS during active work."
+    "The repository snapshot includes .hermes/state.json, so the claim path updated it to PASS after completion."
   ]
 }
