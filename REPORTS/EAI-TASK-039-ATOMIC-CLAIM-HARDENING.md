@@ -1,4 +1,4 @@
-# EAI-TASK-039 — Atomic claim hardening and duplicate-dispatch prevention
+# EAI-TASK-039 — Harden atomic task claiming and duplicate-dispatch prevention
 
 ## Result
 
@@ -8,16 +8,16 @@
 
 - **Repository path used:** `/root/.hermes/projects/everythingAI`
 - **Current branch:** `main`
-- **Starting commit SHA:** `1036d52afd3b731b03619f208f0f7842e6b4eeb7`
-- **Artifact commit SHA:** pending final commit
-- **Final pushed SHA:** recorded in GitHub issue comment
+- **Starting commit SHA:** `0f1962c3a1de3e4147004161a9ef3c77e282da61`
+- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
+- **Artifact commit SHA:** `ba6388d2d69e7f23af6ed5f16dc6a99a3f537393`
+- **Final SHA source of truth:** `GitHub issue comment after final push`
 
 ## Files changed
 
-- `scripts/task-worker.mjs`
-- `scripts/webhook-event-dispatcher.mjs`
-- `tests/task-worker-runtime-mode.test.mjs`
-- `tests/webhook-event-dispatcher.test.mjs`
+- `src/task-claim.js`
+- `tests/task-claim.test.mjs`
+- `tests/task-poller-watch-loop.test.mjs`
 - `docs/HERMES_OPERATING_MANUAL_RC1.md`
 - `REPORTS/EAI-TASK-039-ATOMIC-CLAIM-HARDENING.md`
 - `docs/HANDOVER_2026-07-14_EAI_TASK_039.json`
@@ -25,31 +25,43 @@
 
 ## Validation summary
 
+- Dry run: N/A
 - Framework doctor: PASS (`node scripts/framework-doctor.mjs`)
-- Full test suite: PASS (`node --test tests/*.test.mjs`)
-- npm test: PASS (`npm test`)
+- Test suite: PASS (`node --test tests/runtime-mode.test.mjs tests/task-claim.test.mjs tests/task-poller-runtime-mode.test.mjs tests/task-poller-watch-loop.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs`)
+- NPM test: PASS (`npm test`)
 - Git diff check: PASS (`git diff --check`)
-- JSON handover parse: PASS (`python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_039.json`)
+- Handover JSON parse: PASS (`python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_039.json`)
 
-## Claim authority corrections
+## Lifecycle notes
 
-Implemented and verified the shared claim authority flow with the following corrections:
+- Issue comment: claim acknowledgement posted before implementation; final completion comment pending
+- Labels updated: `hermes:ready` -> `hermes:working` for claim; completion labels will be applied after final validation and push
+- Final SHA handling: artifact commit SHA is fixed at `ba6388d2d69e7f23af6ed5f16dc6a99a3f537393`; the final pushed SHA will be recorded in the GitHub issue comment after the metadata-sync commit
 
-- `scripts/task-worker.mjs` now passes `readStateIfPresent` into `claimRunnableIssue`, fixing the worker runtime ReferenceError.
-- `scripts/webhook-event-dispatcher.mjs` now routes webhook eligibility through the shared claim authority instead of returning EXECUTE from readiness alone.
-- Webhook execution now returns `EXECUTE` only after the shared authority reports `CLAIMED` ownership.
-- Repeated webhook delivery is now covered by a deterministic claim/lock test and returns a non-executable result after the first claim updates live state.
-- The worker test proves the polling path reaches the shared claim authority without throwing a ReferenceError.
+## Scope summary
 
-## Queue and duplicate-delivery behavior
+Implemented the claim-hardening follow-up by:
 
-- The polling worker claims through the shared authority before lifecycle artifact handling.
-- The webhook dispatcher performs live claim ownership checks before returning an executable decision.
-- Duplicate delivery is prevented by the shared claim authority and by the live issue label transition to `hermes:working`.
-- Polling continues after claim conflicts and other non-fatal duplicate detections.
+- adding a stronger live claim precondition check for Hermes-owned labels;
+- treating any `IN_PROGRESS` state as a claim conflict;
+- keeping the exclusive local claim lock path under `.hermes/claim.lock`;
+- expanding deterministic tests for claimed/done label rejection and poll-loop continuation;
+- updating the operating manual to reflect the claim preconditions and duplicate-delivery behavior.
 
-## Notes / limitations
+## Known limitations
 
-- `.hermes/state.json` does not exist in this checkout, so state updates were skipped rather than synthesized.
-- The lock file is ignored by Git and is not committed.
-- The repository remains on the lifecycle-artifact workflow; product application code was not modified.
+- `.hermes/state.json` does not exist in this repository snapshot, so no state update was written.
+- The runtime remains queue-driven; the worker still relies on the GitHub issue queue plus local claim metadata.
+- Report, handover, and log artifacts are being finalized in a metadata sync step after the code/test commit.
+
+## Follow-up
+
+- Run final validation checks, commit the report/hand-over/log artifacts, push, and comment the issue with the final pushed SHA.
+
+## Commit SHA rule
+
+The report, GitHub issue comment, and state file must describe the same artifact commit SHA even when the workflow uses a follow-up metadata commit.
+
+- Before the artifact commit exists, `PENDING_COMMIT_SHA` is acceptable only as a temporary placeholder.
+- After the artifact commit exists, update the final issue comment, report, and `.hermes/state.json` so they all reference the real artifact SHA.
+- If a follow-up metadata sync commit is used, the report must explicitly state that the GitHub issue comment is the source of truth for the artifact commit SHA and that the metadata commit is a separate synchronization step.

@@ -1,31 +1,51 @@
 {
-  "task_id": "EAI-TASK-039",
-  "title": "Atomic claim hardening and duplicate-dispatch prevention",
-  "repository": "moh0709/everythingAI",
+  "repo": "moh0709/everythingAI",
   "branch": "main",
-  "start_sha": "1036d52afd3b731b03619f208f0f7842e6b4eeb7",
-  "artifact_commit_sha": "pending final commit",
-  "final_pushed_sha": "recorded in GitHub issue comment",
+  "issue": 61,
+  "task": "EAI-TASK-039",
   "status": "PASS",
-  "files_changed": [
-    "scripts/task-worker.mjs",
-    "scripts/webhook-event-dispatcher.mjs",
-    "tests/task-worker-runtime-mode.test.mjs",
-    "tests/webhook-event-dispatcher.test.mjs",
+  "currentIssue": 61,
+  "currentTask": "EAI-TASK-039",
+  "result": "PASS",
+  "startingCommitSha": "0f1962c3a1de3e4147004161a9ef3c77e282da61",
+  "artifactCommitSha": "ba6388d2d69e7f23af6ed5f16dc6a99a3f537393",
+  "finalCommitSha": "recorded in the final issue comment",
+  "updatedAt": "2026-07-18T00:00:00Z",
+  "summary": "Hardened claim preconditions so Hermes-owned labels block duplicate claims, preserved exclusive claim locking, expanded tests, and documented the claim contract in the operating manual.",
+  "deliverables": [
+    "src/task-claim.js",
+    "tests/task-claim.test.mjs",
+    "tests/task-poller-watch-loop.test.mjs",
     "docs/HERMES_OPERATING_MANUAL_RC1.md",
     "REPORTS/EAI-TASK-039-ATOMIC-CLAIM-HARDENING.md",
+    "docs/HANDOVER_2026-07-14_EAI_TASK_039.json",
     "LOGS/EAI-TASK-039-terminal.log"
   ],
-  "validation": {
-    "framework_doctor": "PASS",
-    "unit_tests": "PASS",
-    "npm_test": "PASS",
-    "git_diff_check": "PASS",
-    "json_parse": "PASS"
-  },
+  "validations": [
+    {
+      "command": "node scripts/framework-doctor.mjs",
+      "result": "PASS"
+    },
+    {
+      "command": "node --test tests/runtime-mode.test.mjs tests/task-claim.test.mjs tests/task-poller-runtime-mode.test.mjs tests/task-poller-watch-loop.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs",
+      "result": "PASS"
+    },
+    {
+      "command": "npm test",
+      "result": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS"
+    },
+    {
+      "command": "python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_039.json",
+      "result": "PASS"
+    }
+  ],
   "notes": [
-    ".hermes/state.json does not exist in this checkout, so state updates were skipped.",
-    "The local claim lock is ignored by Git and released on normal completion/failure paths.",
-    "Webhook classification now routes through the shared claim authority before returning EXECUTE."
+    "The shared claim authority now rejects issues that already carry hermes:working or hermes:done before ownership is granted.",
+    "The repository snapshot does not contain .hermes/state.json, so the claim path correctly skipped state writes.",
+    "The final pushed SHA will be posted in the GitHub issue comment after the metadata-sync commit."
   ]
 }
