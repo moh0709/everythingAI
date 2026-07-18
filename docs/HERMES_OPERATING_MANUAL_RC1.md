@@ -139,6 +139,7 @@ A task is runnable only when all of the following are true:
 
 - the GitHub issue is open,
 - the issue currently has both `pm:ready` and `hermes:ready`,
+- the issue does not already carry `hermes:working` or `hermes:done`,
 - the issue is not already in progress in `.hermes/state.json`,
 - there is no matching report artifact already present,
 - the task has not already been finalized.

@@ -208,6 +208,33 @@ test('losing hermes:ready between discovery and claim returns NOT_RUNNABLE', asy
   assert.equal(result.result, CLAIM_RESULTS.NOT_RUNNABLE);
 });
 
+test('an issue already marked hermes:working or hermes:done is not runnable', async () => {
+  const workingResult = await claimRunnableIssue({
+    issue: makeIssue({ labels: ['pm:ready', 'hermes:ready', 'hermes:working'] }),
+    ghRunner: makeGhHarness().runner,
+    lockPath: join(mkdtempSync(join(tmpdir(), 'hermes-working-')), 'claim.lock'),
+    hostname: 'test-host',
+    pid: process.pid,
+    stateReader: () => null,
+    stateWriter: () => true,
+    reportExists: () => false
+  });
+
+  const doneResult = await claimRunnableIssue({
+    issue: makeIssue({ labels: ['pm:ready', 'hermes:ready', 'hermes:done'] }),
+    ghRunner: makeGhHarness().runner,
+    lockPath: join(mkdtempSync(join(tmpdir(), 'hermes-done-')), 'claim.lock'),
+    hostname: 'test-host',
+    pid: process.pid,
+    stateReader: () => null,
+    stateWriter: () => true,
+    reportExists: () => false
+  });
+
+  assert.equal(workingResult.result, CLAIM_RESULTS.NOT_RUNNABLE);
+  assert.equal(doneResult.result, CLAIM_RESULTS.NOT_RUNNABLE);
+});
+
 test('a matching report short-circuits with ALREADY_COMPLETED', async () => {
   const result = await claimRunnableIssue({
     issue: makeIssue(),

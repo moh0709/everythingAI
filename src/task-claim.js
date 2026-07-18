@@ -196,11 +196,8 @@ async function ghIssueComment(issueNumber, body, ghRunner = runGh) {
   return Promise.resolve(ghRunner(['issue', 'comment', String(issueNumber), '--repo', 'moh0709/everythingAI', '--body', body]));
 }
 
-function stateConflictForIssue(currentState, issueNumber) {
-  if (!currentState || currentState.result !== 'IN_PROGRESS') {
-    return false;
-  }
-  return Number(currentState.currentIssue) === Number(issueNumber) || Number.isFinite(Number(currentState.currentIssue));
+function stateConflictForIssue(currentState) {
+  return Boolean(currentState && currentState.result === 'IN_PROGRESS');
 }
 
 async function assessClaimReadiness({
@@ -264,6 +261,15 @@ async function assessClaimReadiness({
     };
   }
 
+  if (labels.includes('hermes:working') || labels.includes('hermes:done')) {
+    return {
+      ok: false,
+      result: CLAIM_RESULTS.NOT_RUNNABLE,
+      issue: liveIssue,
+      evidence: [`labels=${labels.join(', ')}`, 'issue already claimed or completed by Hermes']
+    };
+  }
+
   if (reportExists(liveIssue)) {
     return {
       ok: false,
@@ -274,7 +280,7 @@ async function assessClaimReadiness({
   }
 
   const currentState = stateReader();
-  if (stateConflictForIssue(currentState, targetIssueNumber)) {
+  if (stateConflictForIssue(currentState)) {
     return {
       ok: false,
       result: CLAIM_RESULTS.CLAIM_CONFLICT,

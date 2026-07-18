@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { watchLoop } from '../scripts/task-poller.mjs';
 
-test('watchLoop resumes queue watching after a poll cycle', async () => {
+test('watchLoop continues queue watching after a claim conflict', async () => {
   let calls = 0;
   const seen = [];
+  const dispatchCalls = [];
 
   await watchLoop({
     iterations: 2,
@@ -17,9 +18,13 @@ test('watchLoop resumes queue watching after a poll cycle', async () => {
       }
       return [];
     },
-    dispatchWorker: async () => 'CLAIM_CONFLICT'
+    dispatchWorker: async (issueNumber) => {
+      dispatchCalls.push(issueNumber);
+      return 'CLAIM_CONFLICT';
+    }
   });
 
   assert.equal(calls, 2);
   assert.deepEqual(seen, [1, 2]);
+  assert.deepEqual(dispatchCalls, [60]);
 });
