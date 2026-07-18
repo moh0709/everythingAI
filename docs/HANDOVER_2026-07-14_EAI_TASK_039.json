@@ -7,16 +7,18 @@
   "currentIssue": 61,
   "currentTask": "EAI-TASK-039",
   "result": "PASS",
-  "startingCommitSha": "0f1962c3a1de3e4147004161a9ef3c77e282da61",
-  "artifactCommitSha": "ba6388d2d69e7f23af6ed5f16dc6a99a3f537393",
+  "startingCommitSha": "8fef06c324fba90ec876784d23c8566c80f74a97",
+  "artifactCommitSha": "PENDING_COMMIT_SHA",
   "finalCommitSha": "recorded in the final issue comment",
-  "updatedAt": "2026-07-18T00:00:00Z",
-  "summary": "Hardened claim preconditions so Hermes-owned labels block duplicate claims, preserved exclusive claim locking, expanded tests, and documented the claim contract in the operating manual.",
+  "updatedAt": "2026-07-18T13:31:51Z",
+  "summary": "Hardened atomic task claiming with a shared polling/webhook execution handoff, added deterministic duplicate-delivery tests, and documented the claim lifecycle in the operating manual.",
   "deliverables": [
-    "src/task-claim.js",
-    "tests/task-claim.test.mjs",
-    "tests/task-poller-watch-loop.test.mjs",
+    "scripts/task-worker.mjs",
+    "scripts/webhook-event-dispatcher.mjs",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "tests/webhook-event-dispatcher.test.mjs",
     "docs/HERMES_OPERATING_MANUAL_RC1.md",
+    ".hermes/state.json",
     "REPORTS/EAI-TASK-039-ATOMIC-CLAIM-HARDENING.md",
     "docs/HANDOVER_2026-07-14_EAI_TASK_039.json",
     "LOGS/EAI-TASK-039-terminal.log"
@@ -27,7 +29,11 @@
       "result": "PASS"
     },
     {
-      "command": "node --test tests/runtime-mode.test.mjs tests/task-claim.test.mjs tests/task-poller-runtime-mode.test.mjs tests/task-poller-watch-loop.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs",
+      "command": "node --test tests/task-claim.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs tests/task-poller-watch-loop.test.mjs",
+      "result": "PASS"
+    },
+    {
+      "command": "node --test tests/*.test.mjs",
       "result": "PASS"
     },
     {
@@ -44,8 +50,8 @@
     }
   ],
   "notes": [
-    "The shared claim authority now rejects issues that already carry hermes:working or hermes:done before ownership is granted.",
-    "The repository snapshot does not contain .hermes/state.json, so the claim path correctly skipped state writes.",
-    "The final pushed SHA will be posted in the GitHub issue comment after the metadata-sync commit."
+    "The polling worker now accepts an injected stateReader and no longer fails with an undefined stateReader ReferenceError.",
+    "Webhook execution now uses runWebhookEntry() to claim once and hand the owned issue to the shared execution helper.",
+    "The repository snapshot includes .hermes/state.json, so the claim path updated it to IN_PROGRESS during active work."
   ]
 }

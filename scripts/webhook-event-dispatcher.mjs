@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import { claimRunnableIssue, CLAIM_RESULTS } from '../src/task-claim.js';
+import { executeClaimedTask } from './task-worker.mjs';
 import { readStateIfPresent, summarizeIssue } from '../src/task-queue.js';
 
 export const DECISIONS = {
@@ -248,6 +249,7 @@ export async function classifyWebhookEvent({
       issue: claim.issue ?? payload.issue,
       liveIssue: summarizeIssue(claim.issue ?? payload.issue),
       claimDecision: CLAIM_RESULTS.CLAIMED,
+      claimHandle: claim,
       evidence: [
         `labels=${labels.join(', ')}`,
         ...(claim.evidence ?? [])
@@ -277,8 +279,26 @@ export async function classifyWebhookEvent({
   };
 }
 
-export async function runWebhookEntry(options = {}) {
-  return classifyWebhookEvent(options);
+export async function runWebhookEntry({ executionRunner = executeClaimedTask, ...options } = {}) {
+  const classification = await classifyWebhookEvent(options);
+  if (!classification.ok || classification.result !== DECISIONS.EXECUTE) {
+    return classification;
+  }
+
+  const execution = await executionRunner({
+    issue: classification.issue,
+    claim: classification.claimHandle,
+    ghRunner: options.ghRunner,
+    stateReader: options.stateReader,
+    stateWriter: options.stateWriter,
+    artifactWriter: options.artifactWriter
+  });
+
+  return {
+    ...classification,
+    executionResult: execution,
+    result: 'EXECUTED'
+  };
 }
 
 async function main() {

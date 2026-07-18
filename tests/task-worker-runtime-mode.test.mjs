@@ -99,6 +99,7 @@ test('polling worker claims through shared authority without a ReferenceError', 
       return issue;
     },
     ghRunner,
+    stateReader: () => null,
     stateWriter: () => {
       stateWrites += 1;
       return true;

@@ -8,55 +8,57 @@
 
 - **Repository path used:** `/root/.hermes/projects/everythingAI`
 - **Current branch:** `main`
-- **Starting commit SHA:** `0f1962c3a1de3e4147004161a9ef3c77e282da61`
+- **Starting commit SHA:** `8fef06c324fba90ec876784d23c8566c80f74a97`
 - **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `ba6388d2d69e7f23af6ed5f16dc6a99a3f537393`
+- **Artifact commit SHA:** `PENDING_COMMIT_SHA`
 - **Final SHA source of truth:** `GitHub issue comment after final push`
 
 ## Files changed
 
-- `src/task-claim.js`
-- `tests/task-claim.test.mjs`
-- `tests/task-poller-watch-loop.test.mjs`
+- `scripts/task-worker.mjs`
+- `scripts/webhook-event-dispatcher.mjs`
+- `tests/task-worker-runtime-mode.test.mjs`
+- `tests/webhook-event-dispatcher.test.mjs`
 - `docs/HERMES_OPERATING_MANUAL_RC1.md`
+- `.hermes/state.json`
 - `REPORTS/EAI-TASK-039-ATOMIC-CLAIM-HARDENING.md`
 - `docs/HANDOVER_2026-07-14_EAI_TASK_039.json`
 - `LOGS/EAI-TASK-039-terminal.log`
 
 ## Validation summary
 
-- Dry run: N/A
-- Framework doctor: PASS (`node scripts/framework-doctor.mjs`)
-- Test suite: PASS (`node --test tests/runtime-mode.test.mjs tests/task-claim.test.mjs tests/task-poller-runtime-mode.test.mjs tests/task-poller-watch-loop.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs`)
-- NPM test: PASS (`npm test`)
-- Git diff check: PASS (`git diff --check`)
-- Handover JSON parse: PASS (`python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_039.json`)
+- `node scripts/framework-doctor.mjs` — PASS
+- `node --test tests/task-claim.test.mjs tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs tests/task-poller-watch-loop.test.mjs` — PASS
+- `node --test tests/*.test.mjs` — PASS
+- `npm test` — PASS
+- `git diff --check` — PASS
+- `python3 -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_039.json` — PASS
 
 ## Lifecycle notes
 
-- Issue comment: claim acknowledgement posted before implementation; final completion comment pending
-- Labels updated: `hermes:ready` -> `hermes:working` for claim; completion labels will be applied after final validation and push
-- Final SHA handling: artifact commit SHA is fixed at `ba6388d2d69e7f23af6ed5f16dc6a99a3f537393`; the final pushed SHA will be recorded in the GitHub issue comment after the metadata-sync commit
+- Issue #61 was claimed with `hermes:working` and `hermes:ready` removed.
+- The claim acknowledgement comment was posted before implementation.
+- `.hermes/state.json` was updated because it exists in this checkout.
 
 ## Scope summary
 
 Implemented the claim-hardening follow-up by:
 
-- adding a stronger live claim precondition check for Hermes-owned labels;
-- treating any `IN_PROGRESS` state as a claim conflict;
-- keeping the exclusive local claim lock path under `.hermes/claim.lock`;
-- expanding deterministic tests for claimed/done label rejection and poll-loop continuation;
-- updating the operating manual to reflect the claim preconditions and duplicate-delivery behavior.
+- fixing the polling worker so it explicitly injects `stateReader` and can execute claimed work without a `ReferenceError`;
+- adding a shared `executeClaimedTask()` helper so webhook and polling paths can hand off the same ownership context;
+- having the webhook entry path claim once, then execute using the returned claim handle instead of returning a bare eligibility decision;
+- expanding deterministic tests for production webhook handoff, repeated delivery, and concurrent delivery behavior;
+- updating the operating manual to document the claim handoff and duplicate-delivery behavior.
 
 ## Known limitations
 
-- `.hermes/state.json` does not exist in this repository snapshot, so no state update was written.
-- The runtime remains queue-driven; the worker still relies on the GitHub issue queue plus local claim metadata.
-- Report, handover, and log artifacts are being finalized in a metadata sync step after the code/test commit.
+- The repository still relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service, and state writes are skipped if the file is absent.
+- Direct calls to the classification helper remain eligibility-only; production webhook execution uses `runWebhookEntry()`.
+- The local claim lock remains conservative and only clears stale same-host locks with dead PIDs.
 
 ## Follow-up
 
-- Run final validation checks, commit the report/hand-over/log artifacts, push, and comment the issue with the final pushed SHA.
+- Finalize the metadata sync commit, push, and post the closing issue comment with the artifact SHA and final pushed SHA.
 
 ## Commit SHA rule
 

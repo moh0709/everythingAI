@@ -128,6 +128,98 @@ function writeLifecycleArtifacts(issue, status, details) {
   return { logPath, reportPath };
 }
 
+export async function executeClaimedTask({
+  issue,
+  claim,
+  ghRunner = runGh,
+  stateReader = readStateIfPresent,
+  stateWriter = updateState,
+  artifactWriter = writeLifecycleArtifacts
+} = {}) {
+  if (!issue) {
+    throw new Error('executeClaimedTask requires an issue');
+  }
+
+  const claimedIssue = issue;
+  const releaseClaimLock = claim?.releaseLock;
+  try {
+    const startSha = getCommitSha();
+    const startTime = nowIso();
+    const taskId = issueTaskId(claimedIssue);
+    const reportPath = reportPathForIssue(claimedIssue);
+    const logPath = logPathForIssue(claimedIssue);
+    const currentState = stateReader();
+
+    const logLines = [
+      `[task-worker] Claimed ${summarizeIssue(claimedIssue)}`,
+      `[task-worker] Task id: ${taskId}`,
+      `[task-worker] Start time: ${startTime}`,
+      `[task-worker] Starting commit: ${startSha}`,
+      `[task-worker] Report path: ${reportPath}`,
+      `[task-worker] Log path: ${logPath}`,
+      currentState
+        ? `[task-worker] State before execution: currentIssue=${currentState.currentIssue ?? 'none'}, result=${currentState.result ?? 'unknown'}`
+        : '[task-worker] State before execution: no local state file present',
+      '[task-worker] Claim authority verified labels and posted the claim acknowledgement.',
+      '[task-worker] Lifecycle-only mode completed without modifying application code.'
+    ];
+
+    const details = {
+      startingCommitSha: startSha,
+      preCommitArtifactSha: 'PENDING_COMMIT_SHA',
+      artifactCommitSha: 'recorded after artifact commit',
+      finalShaSource: 'GitHub issue comment after artifact push',
+      finalShaHandling: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.',
+      filesChanged: '- `scripts/task-worker.mjs`\n- `scripts/task-poller.mjs`\n- `src/task-queue.js`\n- `src/task-claim.js`\n- `templates/REPORT_TEMPLATE.md`\n- `.hermes/state.json`\n- `LOGS/EAI-TASK-004-terminal.log`\n- `REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md`',
+      dryRun: 'N/A',
+      frameworkDoctor: 'PENDING',
+      uiTypecheck: 'PENDING',
+      uiBuild: 'PENDING',
+      apiTests: 'PENDING',
+      issueComment: JSON.stringify({ task: taskId, status: 'PASS', artifactCommitSha: 'recorded after artifact commit' }),
+      labels: 'hermes:working -> pm:review + hermes:done',
+      skips: '- Validation commands are intentionally not run by the lifecycle worker itself.',
+      followUp: '- PM review should inspect the selected issue, generated report, and terminal log.'
+    };
+
+    artifactWriter(claimedIssue, 'PASS', { ...details, logLines });
+    stateWriter(claimedIssue, 'PASS', {
+      startingCommitSha: startSha,
+      artifactCommitSha: 'recorded in the final issue comment',
+      finalCommitSha: 'recorded in the final issue comment',
+      finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.',
+      startedAt: startTime,
+      completedAt: nowIso()
+    });
+
+    const commentBody = {
+      task: taskId,
+      status: 'PASS',
+      claim: 'hermes:working -> hermes:done',
+      report: reportPath,
+      log: logPath,
+      finalCommitSha: 'recorded in the final issue comment',
+      finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.'
+    };
+    const commentResult = await Promise.resolve(
+      ghRunner(['issue', 'comment', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)])
+    );
+
+    const finishLabels = await Promise.resolve(
+      ghRunner(['issue', 'edit', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'pm:review', '--add-label', 'hermes:done', '--remove-label', 'hermes:working'])
+    );
+    console.log(`[task-worker] ${summarizeIssue(claimedIssue)}`);
+    console.log(`[task-worker] Report: ${reportPath}`);
+    console.log(`[task-worker] Log: ${logPath}`);
+    console.log(`[task-worker] Commented: ${Boolean(commentResult)}`);
+    console.log(`[task-worker] Labels updated: ${Boolean(finishLabels)}`);
+    process.exitCode = 0;
+    return { issue: claimedIssue, reportPath, logPath, claim };
+  } finally {
+    releaseClaimLock?.();
+  }
+}
+
 export async function runTaskWorker({
   runtimeDetector = detectRuntimeMode,
   env = process.env,
@@ -184,76 +276,14 @@ export async function runTaskWorker({
     return claim;
   }
 
-  const claimedIssue = claim.issue ?? issue;
-  const releaseClaimLock = claim.releaseLock;
-  try {
-    const startSha = getCommitSha();
-    const startTime = nowIso();
-    const taskId = issueTaskId(claimedIssue);
-    const reportPath = reportPathForIssue(claimedIssue);
-    const logPath = logPathForIssue(claimedIssue);
-
-  const logLines = [
-    `[task-worker] Claimed ${summarizeIssue(claimedIssue)}`,
-    `[task-worker] Task id: ${taskId}`,
-    `[task-worker] Start time: ${startTime}`,
-    `[task-worker] Starting commit: ${startSha}`,
-    `[task-worker] Report path: ${reportPath}`,
-    `[task-worker] Log path: ${logPath}`,
-    '[task-worker] Claim authority verified labels and posted the claim acknowledgement.',
-    '[task-worker] Lifecycle-only mode completed without modifying application code.'
-  ];
-
-  const details = {
-    startingCommitSha: startSha,
-    preCommitArtifactSha: 'PENDING_COMMIT_SHA',
-    artifactCommitSha: 'recorded after artifact commit',
-    finalShaSource: 'GitHub issue comment after artifact push',
-    finalShaHandling: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.',
-    filesChanged: '- `scripts/task-worker.mjs`\n- `scripts/task-poller.mjs`\n- `src/task-queue.js`\n- `src/task-claim.js`\n- `templates/REPORT_TEMPLATE.md`\n- `.hermes/state.json`\n- `LOGS/EAI-TASK-004-terminal.log`\n- `REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md`',
-    dryRun: 'N/A',
-    frameworkDoctor: 'PENDING',
-    uiTypecheck: 'PENDING',
-    uiBuild: 'PENDING',
-    apiTests: 'PENDING',
-    issueComment: JSON.stringify({ task: taskId, status: 'PASS', artifactCommitSha: 'recorded after artifact commit' }),
-    labels: 'hermes:working -> pm:review + hermes:done',
-    skips: '- Validation commands are intentionally not run by the lifecycle worker itself.',
-    followUp: '- PM review should inspect the selected issue, generated report, and terminal log.'
-  };
-
-  artifactWriter(claimedIssue, 'PASS', { ...details, logLines });
-  stateWriter(claimedIssue, 'PASS', {
-    startingCommitSha: startSha,
-    artifactCommitSha: 'recorded in the final issue comment',
-    finalCommitSha: 'recorded in the final issue comment',
-    finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.',
-    startedAt: startTime,
-    completedAt: nowIso()
+  return executeClaimedTask({
+    issue: claim.issue ?? issue,
+    claim,
+    ghRunner,
+    stateReader,
+    stateWriter,
+    artifactWriter
   });
-
-  const commentBody = {
-    task: taskId,
-    status: 'PASS',
-    claim: 'hermes:working -> hermes:done',
-    report: reportPath,
-    log: logPath,
-    finalCommitSha: 'recorded in the final issue comment',
-    finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.'
-  };
-  const commentResult = ghRunner(['issue', 'comment', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)]);
-
-  const finishLabels = ghRunner(['issue', 'edit', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'pm:review', '--add-label', 'hermes:done', '--remove-label', 'hermes:working']);
-  console.log(`[task-worker] ${summarizeIssue(claimedIssue)}`);
-  console.log(`[task-worker] Report: ${reportPath}`);
-  console.log(`[task-worker] Log: ${logPath}`);
-  console.log(`[task-worker] Commented: ${Boolean(commentResult)}`);
-  console.log(`[task-worker] Labels updated: ${Boolean(finishLabels)}`);
-  process.exitCode = 0;
-  return { issue: claimedIssue, reportPath, logPath, claim };
-  } finally {
-    releaseClaimLock?.();
-  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

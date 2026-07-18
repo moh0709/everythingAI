@@ -190,7 +190,8 @@ Stale-lock policy:
 
 Duplicate-delivery behavior:
 
-- The webhook classifier invokes the shared claim authority before returning `EXECUTE`.
+- The webhook classifier records claim eligibility and claim conflict evidence.
+- The production webhook entry path invokes the shared claim authority and then hands the owned issue to the worker execution helper using the same release handle.
 - Repeated webhook delivery usually re-sees the updated labels or lock state and returns a non-executable result instead of dispatching again.
 - Polling continues after claim conflicts and other non-fatal duplicate detections.
 
@@ -295,7 +296,7 @@ The completion comment should include:
 
 - The current worker is lifecycle-oriented and writes claim/report artifacts, but it does not implement a full product-specific execution engine.
 - The repository still relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service, and state writes are skipped if the file is absent.
-- Webhook classification can identify a claimable event, but the actual ownership transition still happens in the polling worker path.
+- Production webhook execution now uses the same claim authority and worker execution helper as polling, but direct calls to the classification helper remain eligibility-only.
 - If a stale lock cannot be proven stale on the current host, Hermes intentionally leaves it in place and returns `CLAIM_CONFLICT`.
 
 ## Operating summary

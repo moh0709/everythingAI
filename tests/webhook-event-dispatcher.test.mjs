@@ -7,7 +7,8 @@ import { claimRunnableIssue } from '../src/task-claim.js';
 import {
   DECISIONS,
   classifyWebhookEvent,
-  discoverWebhookPayload
+  discoverWebhookPayload,
+  runWebhookEntry
 } from '../scripts/webhook-event-dispatcher.mjs';
 import { RUNTIME_MODES } from '../src/runtime-mode.js';
 
@@ -87,6 +88,7 @@ function makeWebhookClaimHarness(issue = makeIssue({ number: 999, title: 'EAI-TA
   return {
     issue,
     ghRunner,
+    lockPath,
     claimRunner,
     releaseLock: () => releaseLock?.()
   };
@@ -146,23 +148,113 @@ test('classifyWebhookEvent ignores issue events missing readiness labels', async
   assert.equal(result.result, DECISIONS.IGNORED_INELIGIBLE);
 });
 
-test('classifyWebhookEvent returns EXECUTE only after shared claim authority claims the issue', async () => {
+test('runWebhookEntry claims exactly once and executes using the claimed ownership', async () => {
   const harness = makeWebhookClaimHarness();
-  const result = await classifyWebhookEvent({
+  let executionCalls = 0;
+  let releaseCalls = 0;
+
+  const result = await runWebhookEntry({
     env: { GITHUB_EVENT_NAME: 'issues' },
     argv: ['--mode', 'webhook', '--stdin-json'],
     stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
-    claimRunner: harness.claimRunner
+    claimRunner: harness.claimRunner,
+    executionRunner: async ({ issue, claim }) => {
+      executionCalls += 1;
+      assert.equal(issue.number, 999);
+      assert.equal(claim.result, 'CLAIMED');
+      assert.equal(typeof claim.releaseLock, 'function');
+      claim.releaseLock();
+      releaseCalls += 1;
+      return { ok: true, result: 'PASS', issueNumber: issue.number };
+    }
   });
 
   assert.equal(result.ok, true);
-  assert.equal(result.result, DECISIONS.EXECUTE);
+  assert.equal(result.result, 'EXECUTED');
   assert.equal(result.claimDecision, 'CLAIMED');
-  assert.equal(result.issueNumber, 999);
-  assert.equal(result.nextAction, 'claim-and-execute');
-  assert.match(result.evidence.join(' | '), /labels=pm:ready, hermes:ready/);
+  assert.equal(executionCalls, 1);
+  assert.equal(releaseCalls, 1);
   assert.equal(harness.issue.labels.some((entry) => entry.name === 'hermes:working'), true);
-  harness.releaseLock();
+  assert.equal(harness.issue.labels.some((entry) => entry.name === 'hermes:ready'), false);
+  assert.equal(result.executionResult.ok, true);
+  assert.equal(result.executionResult.result, 'PASS');
+});
+
+test('concurrent identical webhook deliveries dispatch at most one worker', async () => {
+  const harness = makeWebhookClaimHarness();
+  let executionCalls = 0;
+  let releaseExecution;
+  const executionGate = new Promise((resolve) => {
+    releaseExecution = resolve;
+  });
+
+  const first = runWebhookEntry({
+    env: { GITHUB_EVENT_NAME: 'issues' },
+    argv: ['--mode', 'webhook', '--stdin-json'],
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner,
+    executionRunner: async ({ claim }) => {
+      executionCalls += 1;
+      await executionGate;
+      claim.releaseLock();
+      return { ok: true, result: 'PASS' };
+    }
+  });
+
+  await new Promise((resolve) => setImmediate(resolve));
+
+  const second = await runWebhookEntry({
+    env: { GITHUB_EVENT_NAME: 'issues' },
+    argv: ['--mode', 'webhook', '--stdin-json'],
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner,
+    executionRunner: async () => {
+      executionCalls += 10;
+      return { ok: true, result: 'SHOULD_NOT_RUN' };
+    }
+  });
+
+  releaseExecution();
+  const firstResult = await first;
+
+  assert.equal(firstResult.result, 'EXECUTED');
+  assert.equal(second.result === DECISIONS.CLAIM_CONFLICT || second.result === DECISIONS.IGNORED_INELIGIBLE, true);
+  assert.equal(executionCalls, 1);
+  assert.equal(harness.issue.labels.some((entry) => entry.name === 'hermes:working'), true);
+});
+
+test('runWebhookEntry rejects repeated delivery after the first execution', async () => {
+  const harness = makeWebhookClaimHarness();
+  let executionCalls = 0;
+
+  const first = await runWebhookEntry({
+    env: { GITHUB_EVENT_NAME: 'issues' },
+    argv: ['--mode', 'webhook', '--stdin-json'],
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner,
+    executionRunner: async ({ claim }) => {
+      executionCalls += 1;
+      claim.releaseLock();
+      return { ok: true, result: 'PASS' };
+    }
+  });
+
+  const second = await runWebhookEntry({
+    env: { GITHUB_EVENT_NAME: 'issues' },
+    argv: ['--mode', 'webhook', '--stdin-json'],
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner,
+    executionRunner: async () => {
+      executionCalls += 10;
+      return { ok: true, result: 'SHOULD_NOT_RUN' };
+    }
+  });
+
+  assert.equal(first.result, 'EXECUTED');
+  assert.equal(executionCalls, 1);
+  assert.equal(second.result, DECISIONS.IGNORED_INELIGIBLE);
+  assert.equal(second.claimDecision, 'NOT_RUNNABLE');
+  assert.equal(harness.issue.labels.some((entry) => entry.name === 'hermes:working'), true);
 });
 
 test('classifyWebhookEvent rejects repeated delivery after the first shared claim', async () => {
