@@ -441,6 +441,116 @@ Individual functions:
 - `onHeartbeat` — callback called after each heartbeat write
 - `onShutdown` — callback called with the signal name on shutdown
 
+### Crash recovery and stale task reconciliation
+
+The crash recovery module (`src/crash-recovery.js`) provides a startup reconciliation
+routine that inspects all local runtime state sources, cross-references with GitHub
+issue state and existing reports, and produces a machine-readable recovery outcome.
+
+#### Purpose
+
+The reconciliation step runs before any new task claim or execution begins. It
+detects leftover artifacts from a previous worker or supervisor that may have
+crashed, been killed, or exited without cleanup. It never silently resumes code
+changes after an ambiguous crash.
+
+#### Machine-readable outcomes
+
+| Outcome | Meaning |
+|---------|---------|
+| `NO_ACTION` | Clean state — nothing needed recovery |
+| `RECOVERED` | Stale state detected and successfully cleaned up |
+| `RESUME_REQUIRED` | Task was in progress and can be safely resumed (rare, conservative) |
+| `MANUAL_REVIEW_REQUIRED` | Ambiguous state — human operator must review and decide |
+| `RUNTIME_ERROR` | Unexpected error during reconciliation |
+
+#### Reconciliation procedure
+
+On startup (or on demand), the `reconcile()` function:
+
+1. **Reads all local state sources:**
+   - Heartbeat file (`.hermes/runtime/heartbeat.json`)
+   - Claim lock (`.hermes/claim.lock`)
+   - Supervisor lock (`.hermes/supervisor.lock`)
+   - State file (`.hermes/state.json`)
+
+2. **Assesses liveness of each artifact:**
+   - Checks if the recorded PID is alive on the current host
+   - Checks if the recorded hostname matches the current host
+   - Checks if the heartbeat exceeds the stale threshold (5 minutes)
+
+3. **Evaluates scenarios in priority order:**
+   - **Active process still running** → `NO_ACTION` (never interfere with live processes)
+   - **Intentional shutdown** → `NO_ACTION` (clean up leftover heartbeat)
+   - **All clean** → `NO_ACTION` (no artifacts present)
+   - **Stale artifacts with matching report on GitHub** → `RECOVERED` (task was completed, clean up)
+   - **Stale artifacts with IN_PROGRESS state + no report + open issue** → `MANUAL_REVIEW_REQUIRED` (ambiguous crash)
+   - **Stale claim lock with no IN_PROGRESS state** → `RECOVERED` (clean up orphaned lock)
+   - **Cross-host artifacts** → `MANUAL_REVIEW_REQUIRED` (cannot verify across hosts)
+
+4. **Corrects GitHub labels when appropriate:**
+   - If a matching report exists but the issue still shows `hermes:working`, the
+     reconciliation adds `pm:review` and `hermes:done`, then removes `hermes:working`.
+   - Labels are only modified after live revalidation against the current GitHub issue state.
+
+5. **Preserves evidence:**
+   - All evidence is appended to `.hermes/recovery/recovery-evidence.log` (never overwrites)
+   - Each entry is timestamped with ISO 8601
+
+#### Operator remediation guidelines
+
+When the reconciliation outcome is `MANUAL_REVIEW_REQUIRED`:
+
+1. **Inspect the evidence log** at `.hermes/recovery/recovery-evidence.log`
+2. **Check the stale artifacts:**
+   - `.hermes/claim.lock` — which issue was claimed?
+   - `.hermes/runtime/heartbeat.json` — what was the last known status?
+   - `.hermes/state.json` — what was the recorded state?
+3. **Check GitHub** for the issue referenced in the claim lock or state
+4. **Determine whether the task was completed:**
+   - If a report exists in `REPORTS/`, the task was completed — remove stale artifacts and update labels
+   - If no report exists and the issue is still open, the worker may have crashed during execution
+5. **Manual actions:**
+   - If the task was completed: remove `.hermes/claim.lock` and `.hermes/runtime/heartbeat.json`
+   - If the task was not completed: update GitHub labels back to `hermes:ready` so the worker can retry
+   - If the state is ambiguous: preserve all artifacts and document the finding
+
+#### Programmatic API
+
+```js
+import { reconcile, RECONCILE_OUTCOMES } from '../src/crash-recovery.js';
+
+const result = await reconcile({
+  repoRoot: '/path/to/repo',
+  hostname: 'my-host',
+  pid: process.pid
+});
+
+console.log(result.outcome);   // 'NO_ACTION' | 'RECOVERED' | 'MANUAL_REVIEW_REQUIRED' | ...
+console.log(result.outcomeCode);  // Machine-readable sub-code (e.g., 'ALL_CLEAN', 'STALE_LOCK_CLEANED')
+console.log(result.evidence);  // Array of human-readable evidence strings
+console.log(result.actions);   // Array of actions taken
+console.log(result.issueNumber);  // Issue number of the affected task, if any
+console.log(result.taskId);    // Task ID of the affected task, if any
+```
+
+Options:
+
+- `repoRoot` — Repository root path (default: auto-detected)
+- `now` — Clock function (for deterministic testing)
+- `hostname` — Hostname (default: `os.hostname()`)
+- `pid` — Current PID (default: `process.pid`)
+- `ghRunner` — Custom GitHub CLI runner (for test injection)
+
+CLI usage:
+
+```bash
+node src/crash-recovery.js
+node src/crash-recovery.js --json
+node src/crash-recovery.js --dry-run
+node src/crash-recovery.js --repo-root /path/to/repo
+```
+
 ## Known gaps between target behavior and the current worker
 
 - The current worker is lifecycle-oriented and writes claim/report artifacts, but it does not implement a full product-specific execution engine.
@@ -450,6 +560,7 @@ Individual functions:
 - The runtime supervisor (`src/runtime-supervisor.js`) is now present with heartbeat and supervisor lock support, but it is not yet integrated into the poller/worker startup by default — it must be started explicitly.
 - The supervisor lock path (`.hermes/supervisor.lock`) is separate from the task claim lock (`.hermes/claim.lock`) and is not yet lifecycle-managed by the worker scripts.
 - Heartbeat stale detection is implemented in the module but downstream monitoring or auto-recovery is not yet wired up.
+- Crash recovery reconciliation is implemented in `src/crash-recovery.js` but is not yet integrated into the worker startup lifecycle — it must be invoked explicitly via `reconcile()`.
 
 ## Operating summary
 
