@@ -6,11 +6,11 @@
   "title": "Add runtime supervisor and heartbeat foundation",
   "status": "PASS",
   "passType": "CORRECTION_PASS",
-  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation. Correction pass fixed CLI async/await, single-use lifecycle, and signal handler detachment per PM rejection.",
+  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation. Correction pass 2 added real subprocess SIGTERM/SIGINT tests with isolated working directories, signal handler lifecycle verification, and fresh-instance-after-stop proving no stale handlers.",
   "correctionDetails": {
-    "defect1": "CLI entry point now properly awaits supervisor.start() with try/catch and top-level .catch() on module entry",
-    "defect2": "Supervisor instances are now single-use (SINGLE_USE on second start). Signal handlers tracked via Map and properly detached on stop()",
-    "defect3": "4 new CLI boundary smoke tests added including dry-run and live SIGTERM test"
+    "defect1": "Real subprocess SIGTERM test — spawns CLI in isolated temp dir, sends SIGTERM, verifies heartbeat.json exists with lastResult=SHUTDOWN, verifies lock is released",
+    "defect2": "Real subprocess SIGINT test — same as SIGTERM but with SIGINT",
+    "defect3": "Signal handler cleanup tests — uses process.listeners() to prove handlers are attached on start and detached on stop; fresh instance works after stop in same process"
   },
   "filesChanged": [
     "src/runtime-supervisor.js",
@@ -23,7 +23,7 @@
   ],
   "validation": {
     "frameworkDoctor": "PASS",
-    "nodeTest": "55/55 pass (including 26 supervisor tests)",
+    "nodeTest": "60/60 pass (including 31 supervisor tests)",
     "npmTest": "identical to node --test",
     "gitDiffCheck": "PASS (no whitespace errors)",
     "jsonParseChecks": "PASS (handover JSON, state JSON all valid)"
@@ -46,6 +46,8 @@
     "supervisorLock": "Acquire, inspect, release with PID/hostname/role tracking",
     "supervisorLifecycle": "Start, stop, setStatus, single-use enforcement, signal handler lifecycle",
     "cliBoundary": "4 CLI tests including dry-run JSON, mode/interval flags, live start/SIGTERM",
+    "realSubprocessSignals": "2 tests: SIGTERM and SIGINT with isolated temp dirs verifying heartbeat creation, lastResult=SHUTDOWN, lock release",
+    "signalHandlerCleanup": "3 tests: listener count before/after stop, fresh instance after stop, full lifecycle",
     "noSecrets": "Heartbeat never records GH_TOKEN, OPENAI_API_KEY, PATH, etc."
   },
   "operatingManualUpdated": true,

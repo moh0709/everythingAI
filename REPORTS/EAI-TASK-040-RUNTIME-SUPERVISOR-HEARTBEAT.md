@@ -14,10 +14,10 @@ Added a narrow supervisor/heartbeat foundation to expose machine-readable livene
 and process lifecycle state for the Hermes poller/worker runtime. No product
 application code was changed.
 
-**Correction pass** fixed the following defects identified in PM rejection:
-1. CLI entry path now properly awaits `supervisor.start()` with try/catch
-2. Supervisor instances are single-use with detachable signal handlers
-3. CLI boundary smoke tests added (dry-run and live SIGTERM tests)
+This correction pass added real subprocess signal verification:
+1. Real SIGTERM/SIGINT subprocess tests with isolated working directories
+2. Signal handler lifecycle and stale-handler cleanup verification
+3. Fresh instance after stop in same process
 
 ## Changes from original submission
 
@@ -48,6 +48,11 @@ New tests added to `tests/runtime-supervisor.test.mjs`:
 | `CLI --dry-run --mode webhook outputs correct mode` | Verifies `WEBHOOK` mode propagation through CLI |
 | `CLI --dry-run --interval 5000 outputs correct interval` | Verifies interval CLI argument parsing |
 | `CLI without --dry-run starts supervisor and writes heartbeat` | Spawns supervisor with short interval, sends SIGTERM after 3s; verifies startup and shutdown messages in stdout |
+|| `subprocess SIGTERM creates heartbeat, exits cleanly, releases lock` | **NEW** — Spawns CLI in isolated temp dir, waits for startup, sends SIGTERM, verifies heartbeat file exists with `lastResult: SHUTDOWN`, verifies supervisor lock is released |
+|| `subprocess SIGINT creates heartbeat, exits cleanly, releases lock` | **NEW** — Same as SIGTERM but with SIGINT |
+|| `signal handlers are detached after supervisor stop` | **NEW** — Uses `process.listeners('SIGTERM')` to prove handlers are attached on start and removed on stop |
+|| `fresh supervisor instance works after stop in same process` | **NEW** — Start, stop, create fresh `createSupervisor()`, start again — proves no stale state |
+|| `stop after SIGTERM-like shutdown does not leave stale handlers` | **NEW** — Full lifecycle cycle with listener count verification + fresh instance |
 
 ## Evidence reviewed
 
@@ -115,7 +120,7 @@ wired into the poller or worker by default.
 
 ## Tests
 
-26 deterministic tests in `tests/runtime-supervisor.test.mjs` (was 21):
+31 deterministic tests in `tests/runtime-supervisor.test.mjs` (was 26):
 
 | Test area | Tests | Description |
 |-----------|-------|-------------|
@@ -125,13 +130,15 @@ wired into the poller or worker by default.
 | Supervisor lock | 1 | Acquire with metadata verification |
 | Supervisor lifecycle | 6 | Controller shape, SINGLE_USE enforcement, NOT_RUNNING stop, setStatus, used getter, fresh instance |
 | CLI boundary | 4 | Dry-run JSON output, mode flag, interval flag, live start/SIGTERM |
+| Real subprocess signals | 2 | SIGTERM with isolated dir (heartbeat + lock), SIGINT with isolated dir |
+| Signal handler cleanup | 3 | Listener count before/after stop, fresh instance after stop, full lifecycle |
 
 ## Validation results
 
 | Command | Result |
 |---------|--------|
 | `node scripts/framework-doctor.mjs` | **PASS** (gh authenticated, state valid, all files present) |
-| `node --test tests/*.test.mjs` | **PASS** (55/55 — 29 pre-existing + 26 supervisor tests) |
+| `node --test tests/*.test.mjs` | **PASS** (60/60 — 29 pre-existing + 31 supervisor tests) |
 | `npm test` | **PASS** (same as `node --test`) |
 | `git diff --check` | **PASS** (no whitespace errors) |
 | JSON parse checks | **PASS** (handover JSON, state JSON all valid) |

@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, mkdirSync, writeFileSync, unlinkSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import {
   writeHeartbeat,
   readHeartbeat,
@@ -11,6 +11,7 @@ import {
   createSupervisor,
   inspectSupervisorLock,
   acquireSupervisorLock,
+  releaseSupervisorLock,
   HEARTBEAT_MODES,
   DEFAULT_HEARTBEAT_INTERVAL_MS,
   DEFAULT_STALE_THRESHOLD_MS,
@@ -405,4 +406,207 @@ test('HEARTBEAT_MODES has all expected modes', () => {
   assert.equal(HEARTBEAT_MODES.WEBHOOK, 'WEBHOOK');
   assert.equal(HEARTBEAT_MODES.IDLE, 'IDLE');
   assert.equal(Object.keys(HEARTBEAT_MODES).length, 3);
+});
+
+// ---------------------------------------------------------------------------
+// Real subprocess SIGTERM / SIGINT tests with isolated working directories
+// ---------------------------------------------------------------------------
+
+function spawnSupervisorInIsolatedDir() {
+  const base = mkdtempSync(join(tmpdir(), 'subproc-signal-test-'));
+  mkdirSync(join(base, '.hermes', 'runtime'), { recursive: true });
+
+  const modulePath = join(import.meta.dirname, '..', 'src', 'runtime-supervisor.js');
+
+  const proc = spawn(process.execPath, [
+    modulePath,
+    '--mode', 'polling',
+    '--interval', '50000' // long interval so test controls shutdown
+  ], {
+    cwd: base,
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+
+  return { base, proc };
+}
+
+async function waitForSupervisorStdout(proc, marker, timeoutMs = 10000) {
+  return new Promise((resolve, reject) => {
+    let stdout = '';
+    const timer = setTimeout(() => {
+      proc.stdout.removeAllListeners('data');
+      reject(new Error(`Timeout waiting for '${marker}' in stdout. Got: ${stdout.slice(-200)}`));
+    }, timeoutMs);
+
+    proc.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+      if (stdout.includes(marker)) {
+        clearTimeout(timer);
+        resolve(stdout);
+      }
+    });
+
+    proc.on('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+async function waitForProcessExit(proc, timeoutMs = 6000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      resolve({ timedOut: true });
+    }, timeoutMs);
+
+    proc.on('close', (code, signal) => {
+      clearTimeout(timer);
+      resolve({ code, signal });
+    });
+
+    proc.on('error', (err) => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
+}
+
+test('subprocess SIGTERM creates heartbeat, exits cleanly, releases lock', async () => {
+  const { base, proc } = spawnSupervisorInIsolatedDir();
+
+  // Wait for startup
+  await waitForSupervisorStdout(proc, 'Supervisor started');
+
+  // Send SIGTERM
+  proc.kill('SIGTERM');
+
+  // Wait for exit
+  const exit = await waitForProcessExit(proc);
+  if (exit.timedOut) {
+    proc.kill('SIGKILL');
+    assert.fail('SIGTERM test timed out waiting for process exit');
+  }
+
+  // Check heartbeat was written in isolated temp dir
+  const hbPath = join(base, '.hermes', 'runtime', 'heartbeat.json');
+  const lockPath = join(base, '.hermes', 'supervisor.lock');
+
+  assert.ok(existsSync(hbPath), `heartbeat should exist at ${hbPath}`);
+  const hb = JSON.parse(readFileSync(hbPath, 'utf8'));
+  assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on SIGTERM');
+
+  // Lock should have been released
+  assert.ok(!existsSync(lockPath), `lock should be released after SIGTERM at ${lockPath}`);
+});
+
+test('subprocess SIGINT creates heartbeat, exits cleanly, releases lock', async () => {
+  const { base, proc } = spawnSupervisorInIsolatedDir();
+
+  await waitForSupervisorStdout(proc, 'Supervisor started');
+
+  // Send SIGINT
+  proc.kill('SIGINT');
+
+  const exit = await waitForProcessExit(proc);
+  if (exit.timedOut) {
+    proc.kill('SIGKILL');
+    assert.fail('SIGINT test timed out waiting for process exit');
+  }
+
+  const hbPath = join(base, '.hermes', 'runtime', 'heartbeat.json');
+  const lockPath = join(base, '.hermes', 'supervisor.lock');
+
+  assert.ok(existsSync(hbPath), `heartbeat should exist at ${hbPath}`);
+  const hb = JSON.parse(readFileSync(hbPath, 'utf8'));
+  assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on SIGINT');
+
+  assert.ok(!existsSync(lockPath), `lock should be released after SIGINT at ${lockPath}`);
+});
+
+// ---------------------------------------------------------------------------
+// Signal handler cleanup tests
+// ---------------------------------------------------------------------------
+
+test('signal handlers are detached after supervisor stop', async () => {
+  const supervisor = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'signal-cleanup-test'
+  });
+
+  // Count existing SIGTERM/SIGINT listeners before start
+  const beforeSigtermCount = process.listeners('SIGTERM').length;
+  const beforeSigintCount = process.listeners('SIGINT').length;
+
+  const startResult = await supervisor.start();
+  assert.equal(startResult.ok, true, 'supervisor should start');
+
+  // After start, there should be extra listeners
+  assert.ok(
+    process.listeners('SIGTERM').length > beforeSigtermCount,
+    'SIGTERM handler should be attached after start'
+  );
+
+  supervisor.stop();
+
+  // After stop, listeners should return to original count
+  assert.equal(
+    process.listeners('SIGTERM').length,
+    beforeSigtermCount,
+    'SIGTERM handler should be detached after stop'
+  );
+  assert.equal(
+    process.listeners('SIGINT').length,
+    beforeSigintCount,
+    'SIGINT handler should be detached after stop'
+  );
+});
+
+test('fresh supervisor instance works after stop in same process', async () => {
+  const s1 = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'fresh-instance-test'
+  });
+
+  const start1 = await s1.start();
+  assert.equal(start1.ok, true, 'first start should succeed');
+
+  s1.stop();
+
+  // Create a fresh instance in the same process
+  const s2 = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'fresh-instance-test-2'
+  });
+
+  const start2 = await s2.start();
+  assert.equal(start2.ok, true, 'fresh instance start after stop should succeed');
+
+  s2.stop();
+});
+
+test('stop after SIGTERM-like shutdown does not leave stale handlers', async () => {
+  // Simulate: start -> stop (as if SIGTERM was handled) -> verify no stale handlers
+  const supervisor = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'stale-handler-test'
+  });
+
+  const beforeSigterm = process.listeners('SIGTERM').length;
+  const beforeSigint = process.listeners('SIGINT').length;
+
+  await supervisor.start();
+  supervisor.stop();
+
+  // Verify handler count is back to original
+  assert.equal(process.listeners('SIGTERM').length, beforeSigterm);
+  assert.equal(process.listeners('SIGINT').length, beforeSigint);
+
+  // Verify a new instance can start (lock was also released)
+  const s2 = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'stale-handler-test-2'
+  });
+  const start = await s2.start();
+  assert.equal(start.ok, true, 'fresh instance should start after cleanup');
+  s2.stop();
 });
