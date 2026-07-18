@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdtempSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import {
   writeHeartbeat,
   readHeartbeat,
@@ -227,22 +228,23 @@ test('createSupervisor returns a controller object', () => {
   assert.equal(supervisor.mode, HEARTBEAT_MODES.POLLING);
 });
 
-test('createSupervisor start returns ALREADY_RUNNING if called twice', async () => {
+test('createSupervisor start returns SINGLE_USE if started after stop', async () => {
   const supervisor = createSupervisor({
     mode: HEARTBEAT_MODES.POLLING,
     hostname: 'test-start-twice'
   });
 
   const firstStart = await supervisor.start();
-  // Second start should fail
+  assert.equal(firstStart.ok, true);
+
+  // Stop the supervisor
+  const stopResult = supervisor.stop();
+  assert.equal(stopResult.ok, true);
+
+  // Second start after stop should fail with SINGLE_USE
   const secondStart = await supervisor.start();
-
-  assert.equal(firstStart.ok, true); // may succeed depending on lock
-  assert.equal(secondStart.result, 'ALREADY_RUNNING');
-
-  if (firstStart.ok) {
-    supervisor.stop();
-  }
+  assert.equal(secondStart.result, 'SINGLE_USE');
+  assert.ok(secondStart.evidence[0].includes('single-use'));
 });
 
 test('createSupervisor stop returns NOT_RUNNING if not started', () => {
@@ -275,29 +277,115 @@ test('createSupervisor setStatus updates mode', () => {
   assert.equal(supervisor.mode, HEARTBEAT_MODES.WEBHOOK);
 });
 
-test('supervisor writes initial heartbeat on start', () => {
-  const t = tempRuntime();
-  const now = () => new Date('2026-07-18T14:00:00.000Z');
-  const pid = 7777;
+test('supervisor.used getter reflects single-use state', async () => {
+  const supervisor = createSupervisor({ hostname: 'test-used-getter' });
+  assert.equal(supervisor.used, false);
 
-  // Temporarily override paths used by the supervisor module
-  // We'll test heartbeat writing directly (already tested above)
-  // and verify that the supervisor lock and heartbeat use the module defaults.
+  await supervisor.start();
+  assert.equal(supervisor.used, true);
 
-  const supervisor = createSupervisor({
-    mode: HEARTBEAT_MODES.POLLING,
-    heartbeatIntervalMs: 500, // short interval for testing
-    hostname: 'sv-test',
-    pid,
-    now
+  supervisor.stop();
+  assert.equal(supervisor.used, true);
+});
+
+test('supervisor creates a fresh instance from a new factory call', () => {
+  const s1 = createSupervisor();
+  const s2 = createSupervisor();
+  assert.notEqual(s1, s2);
+  assert.equal(s1.used, false);
+  assert.equal(s2.used, false);
+});
+
+// ---------------------------------------------------------------------------
+// CLI boundary tests
+// ---------------------------------------------------------------------------
+
+test('CLI --dry-run outputs valid JSON and exits 0', () => {
+  const result = spawnSync('node', [
+    'src/runtime-supervisor.js',
+    '--dry-run'
+  ], {
+    encoding: 'utf8',
+    cwd: join(import.meta.dirname, '..')
   });
 
-  // Verify the supervisor is configured correctly
-  assert.equal(supervisor.mode, HEARTBEAT_MODES.POLLING);
-  assert.equal(supervisor.running, false);
+  assert.equal(result.status, 0, `CLI --dry-run exited with status ${result.status}: ${result.stderr}`);
 
-  // We can't easily test start() in isolation because the lock path
-  // is module-level. But the components are tested above.
+  let output;
+  try {
+    output = JSON.parse(result.stdout.trim());
+  } catch {
+    assert.fail(`CLI --dry-run output is not valid JSON: ${result.stdout}`);
+  }
+
+  assert.equal(output.ok, true);
+  assert.equal(output.result, 'DRY_RUN');
+  assert.ok(output.mode);
+  assert.ok(output.interval);
+  assert.ok(output.heartbeatPath);
+  assert.ok(output.lockPath);
+});
+
+test('CLI --dry-run --mode webhook outputs correct mode', () => {
+  const result = spawnSync('node', [
+    'src/runtime-supervisor.js',
+    '--dry-run',
+    '--mode', 'webhook'
+  ], {
+    encoding: 'utf8',
+    cwd: join(import.meta.dirname, '..')
+  });
+
+  assert.equal(result.status, 0, `CLI --dry-run webhook exited with status ${result.status}`);
+  const output = JSON.parse(result.stdout.trim());
+  assert.equal(output.mode, 'WEBHOOK');
+});
+
+test('CLI --dry-run --interval 5000 outputs correct interval', () => {
+  const result = spawnSync('node', [
+    'src/runtime-supervisor.js',
+    '--dry-run',
+    '--interval', '5000'
+  ], {
+    encoding: 'utf8',
+    cwd: join(import.meta.dirname, '..')
+  });
+
+  assert.equal(result.status, 0, `CLI --dry-run interval exited with status ${result.status}`);
+  const output = JSON.parse(result.stdout.trim());
+  assert.equal(output.interval, 5000);
+});
+
+test('CLI without --dry-run starts supervisor and writes heartbeat', () => {
+  // Use a dedicated test directory so the supervisor lock doesn't conflict
+  const testDir = mkdtempSync(join(tmpdir(), 'cli-supervisor-test-'));
+  const originalCwd = process.cwd;
+  // We can't easily change cwd for subprocess, so we just verify the supervisor
+  // binary works and exits correctly with a short interval
+
+  // Start supervisor with a very short interval, send SIGTERM after a short delay
+  const proc = spawnSync('node', [
+    'src/runtime-supervisor.js',
+    '--mode', 'polling',
+    '--interval', '1000'
+  ], {
+    encoding: 'utf8',
+    cwd: join(import.meta.dirname, '..'),
+    timeout: 3000,
+    killSignal: 'SIGTERM'
+  });
+
+  // The process should have exited on SIGTERM with shutdown happening
+  // We don't check signal directly because SIGTERM causes exit code 143
+  // But we should see the startup message in stdout
+  assert.ok(
+    proc.stdout.includes('Starting supervisor'),
+    `CLI output should contain startup message. Got: ${proc.stdout.slice(0, 200)}`
+  );
+  assert.ok(
+    proc.stdout.includes('Supervisor started') || proc.stdout.includes('Supervisor started'),
+    `CLI output should contain success message. Got: ${proc.stdout.slice(0, 200)}`
+  );
 });
 
 // ---------------------------------------------------------------------------

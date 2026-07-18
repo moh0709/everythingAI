@@ -273,7 +273,66 @@ export function createSupervisor({
   let currentIssue = null;
   let currentTask = null;
   let lastResult = null;
-  let signalHandlerAttached = false;
+  let supervisorUsed = false;   // single-use enforcement
+  let lockRef = null;           // captured lock for signal handler
+
+  const signalHandlers = new Map();
+
+  function getSafeLockData() {
+    return lockRef ? { pid: lockRef.pid, hostname: lockRef.hostname } : { pid, hostname };
+  }
+
+  function attachSignalHandlers(lockAttempt) {
+    if (signalHandlers.size > 0) {
+      detachSignalHandlers();
+    }
+    lockRef = lockAttempt.lock;
+
+    const handleSignal = (signal) => {
+      if (shutdownHappened) return;
+      shutdownHappened = true;
+      running = false;
+
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+
+      writeHeartbeat({
+        mode,
+        pid,
+        hostname,
+        processStartTime,
+        currentIssue,
+        currentTask,
+        lastResult: 'SHUTDOWN',
+        now
+      });
+
+      releaseSupervisorLock(getSafeLockData());
+
+      if (onShutdown) {
+        onShutdown(signal);
+      }
+    };
+
+    const onSigterm = () => handleSignal('SIGTERM');
+    const onSigint = () => handleSignal('SIGINT');
+
+    process.on('SIGTERM', onSigterm);
+    process.on('SIGINT', onSigint);
+
+    signalHandlers.set('SIGTERM', onSigterm);
+    signalHandlers.set('SIGINT', onSigint);
+  }
+
+  function detachSignalHandlers() {
+    for (const [signal, handler] of signalHandlers) {
+      process.removeListener(signal, handler);
+    }
+    signalHandlers.clear();
+    lockRef = null;
+  }
 
   const supervisor = {
     get running() { return running; },
@@ -281,6 +340,7 @@ export function createSupervisor({
     get currentIssue() { return currentIssue; },
     get currentTask() { return currentTask; },
     get lastResult() { return lastResult; },
+    get used() { return supervisorUsed; },
 
     setStatus({ issue, task, result, newMode } = {}) {
       if (issue !== undefined) currentIssue = issue;
@@ -290,6 +350,9 @@ export function createSupervisor({
     },
 
     async start() {
+      if (supervisorUsed) {
+        return { ok: false, result: 'SINGLE_USE', evidence: ['supervisor instances are single-use; create a new instance to restart'] };
+      }
       if (running) {
         return { ok: false, result: 'ALREADY_RUNNING', evidence: ['supervisor is already running'] };
       }
@@ -300,6 +363,7 @@ export function createSupervisor({
         return lockAttempt;
       }
 
+      supervisorUsed = true;
       running = true;
       shutdownHappened = false;
       processStartTime = nowIso(now);
@@ -334,42 +398,8 @@ export function createSupervisor({
         }
       }, heartbeatIntervalMs);
 
-      // Handle graceful shutdown signals
-      if (!signalHandlerAttached) {
-        signalHandlerAttached = true;
-        const handleSignal = (signal) => {
-          if (shutdownHappened) return;
-          shutdownHappened = true;
-          running = false;
-
-          if (timerId) {
-            clearInterval(timerId);
-            timerId = null;
-          }
-
-          // Write final heartbeat before shutdown
-          writeHeartbeat({
-            mode,
-            pid,
-            hostname,
-            processStartTime,
-            currentIssue,
-            currentTask,
-            lastResult: 'SHUTDOWN',
-            now
-          });
-
-          // Release supervisor lock
-          releaseSupervisorLock(lockAttempt.lock);
-
-          if (onShutdown) {
-            onShutdown(signal);
-          }
-        };
-
-        process.on('SIGTERM', () => handleSignal('SIGTERM'));
-        process.on('SIGINT', () => handleSignal('SIGINT'));
-      }
+      // Attach signal handlers with correct lock reference
+      attachSignalHandlers(lockAttempt);
 
       return {
         ok: true,
@@ -402,8 +432,10 @@ export function createSupervisor({
       });
 
       // Release supervisor lock
-      const lockData = { pid, hostname };
-      releaseSupervisorLock(lockData);
+      releaseSupervisorLock(getSafeLockData());
+
+      // Detach signal handlers so they don't fire with stale lock data
+      detachSignalHandlers();
 
       return { ok: true, result: 'STOPPED' };
     }
@@ -432,7 +464,7 @@ function parseArgs(args = process.argv.slice(2)) {
   return parsed;
 }
 
-function runSupervisorCli() {
+async function runSupervisorCli() {
   const args = parseArgs();
   const mode = args.mode === 'WEBHOOK' ? HEARTBEAT_MODES.WEBHOOK : HEARTBEAT_MODES.POLLING;
   const interval = Number.isFinite(args.interval) && args.interval > 0 ? args.interval : DEFAULT_HEARTBEAT_INTERVAL_MS;
@@ -451,30 +483,38 @@ function runSupervisorCli() {
 
   console.log(`[runtime-supervisor] Starting supervisor in ${mode} mode (interval=${interval}ms)`);
 
-  const supervisor = createSupervisor({ mode, heartbeatIntervalMs: interval });
-  const result = supervisor.start();
+  try {
+    const supervisor = createSupervisor({ mode, heartbeatIntervalMs: interval });
+    const result = await supervisor.start();
 
-  if (!result.ok) {
-    console.error(`[runtime-supervisor] Failed to start: ${result.result}`);
-    if (result.evidence) {
-      for (const line of result.evidence) {
-        console.error(`[runtime-supervisor]   ${line}`);
+    if (!result.ok) {
+      console.error(`[runtime-supervisor] Failed to start: ${result.result}`);
+      if (result.evidence) {
+        for (const line of result.evidence) {
+          console.error(`[runtime-supervisor]   ${line}`);
+        }
       }
+      process.exit(1);
     }
+
+    console.log(`[runtime-supervisor] Supervisor started (pid=${result.lock.pid}, lock=${SUPERVISOR_LOCK_PATH})`);
+    console.log(`[runtime-supervisor] Initial heartbeat: ${HEARTBEAT_PATH}`);
+
+    // Keep process alive — signals will handle shutdown
+    process.on('beforeExit', () => {
+      supervisor.stop();
+    });
+  } catch (error) {
+    console.error(`[runtime-supervisor] Unexpected error: ${error.message}`);
     process.exit(1);
   }
-
-  console.log(`[runtime-supervisor] Supervisor started (pid=${result.lock.pid}, lock=${SUPERVISOR_LOCK_PATH})`);
-  console.log(`[runtime-supervisor] Initial heartbeat: ${HEARTBEAT_PATH}`);
-
-  // Keep process alive — signals will handle shutdown
-  process.on('beforeExit', () => {
-    supervisor.stop();
-  });
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runSupervisorCli();
+  runSupervisorCli().catch((error) => {
+    console.error(`[runtime-supervisor] Fatal error: ${error.message}`);
+    process.exit(1);
+  });
 }
 
 export {

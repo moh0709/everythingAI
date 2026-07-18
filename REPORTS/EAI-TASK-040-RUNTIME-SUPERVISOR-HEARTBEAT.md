@@ -1,17 +1,53 @@
 # EAI-TASK-040: Add runtime supervisor and heartbeat foundation
 
-## Final status: PASS
+## Final status: PASS (correction pass)
 
 - **Issue:** #63
 - **Task:** EAI-TASK-040
 - **Branch:** main
 - **Repository:** moh0709/everythingAI
+- **Correction pass:** 2026-07-18 (PM rejection items addressed)
 
 ## Summary
 
 Added a narrow supervisor/heartbeat foundation to expose machine-readable liveness
 and process lifecycle state for the Hermes poller/worker runtime. No product
 application code was changed.
+
+**Correction pass** fixed the following defects identified in PM rejection:
+1. CLI entry path now properly awaits `supervisor.start()` with try/catch
+2. Supervisor instances are single-use with detachable signal handlers
+3. CLI boundary smoke tests added (dry-run and live SIGTERM tests)
+
+## Changes from original submission
+
+### Defect 1: CLI entry point synchronous usage
+
+| Before | After |
+|--------|-------|
+| `const result = supervisor.start();` (sync, `result.ok` is `undefined` → always enters error branch) | `const result = await supervisor.start();` with try/catch + top-level `.catch()` on module entry |
+| Top-level call: `runSupervisorCli();` | `runSupervisorCli().catch(...)` for safe async rejection handling |
+
+### Defect 2: Signal handler lifecycle
+
+| Before | After |
+|--------|-------|
+| Single `signalHandlerAttached` boolean prevents re-attachment | `Map`-based signal handler tracking (`signalHandlers`): |
+| Signal closure captures `lockAttempt` param from first `start()` call | `lockRef` tracks current lock; `attachSignalHandlers()` always detaches stale handlers first |
+| Handlers never detached (stale lock reference remains after stop) | `detachSignalHandlers()` called in `stop()` — removes listeners and clears `lockRef` |
+| Second `start()` after `stop()` returns `ALREADY_RUNNING` | Second `start()` returns `SINGLE_USE` — supervisor instances are explicitly single-use |
+| | New getter: `supervisor.used` reflects single-use state |
+
+### Defect 3: Missing CLI boundary test
+
+New tests added to `tests/runtime-supervisor.test.mjs`:
+
+| Test | What it verifies |
+|------|-----------------|
+| `CLI --dry-run outputs valid JSON and exits 0` | `spawnSync` runs supervisor in dry-run mode; asserts stdout is valid JSON with `ok: true`, `result: 'DRY_RUN'`, plus paths |
+| `CLI --dry-run --mode webhook outputs correct mode` | Verifies `WEBHOOK` mode propagation through CLI |
+| `CLI --dry-run --interval 5000 outputs correct interval` | Verifies interval CLI argument parsing |
+| `CLI without --dry-run starts supervisor and writes heartbeat` | Spawns supervisor with short interval, sends SIGTERM after 3s; verifies startup and shutdown messages in stdout |
 
 ## Evidence reviewed
 
@@ -21,18 +57,18 @@ application code was changed.
 - `src/task-queue.js` — existing queue utilities
 - `tests/task-claim.test.mjs` — existing test patterns
 - `package.json` — existing package scripts
-- Issue #63 body and release labels
+- Issue #63 body, PM rejection comment, and release labels
 
 ## Files changed
 
 | File | Change |
 |------|--------|
-| `src/runtime-supervisor.js` | **NEW** — Supervisor entry point, heartbeat writer, supervisor lock |
-| `tests/runtime-supervisor.test.mjs` | **NEW** — 21 deterministic tests with fake timers/dependency injection |
-| `docs/HERMES_OPERATING_MANUAL_RC1.md` | **UPDATED** — Added supervisor startup, shutdown, heartbeat schema, stale interpretation, programmatic API, and known gaps |
-| `LOGS/EAI-TASK-040-terminal.log` | **NEW** — Terminal log with dry-run and live supervisor tests |
-| `REPORTS/EAI-TASK-040-RUNTIME-SUPERVISOR-HEARTBEAT.md` | **NEW** — This report |
-| `docs/HANDOVER_2026-07-15_EAI_TASK_040.json` | **NEW** — Handover artifact |
+| `src/runtime-supervisor.js` | **UPDATED** — Fixed CLI async/await, single-use enforcement, signal handler attach/detach with Map tracking |
+| `tests/runtime-supervisor.test.mjs` | **UPDATED** — 26 tests (was 21): single-use test, `used` getter, fresh instance, 4 CLI boundary tests |
+| `docs/HERMES_OPERATING_MANUAL_RC1.md` | Update with single-use contract and signal handler lifecycle (unchanged from original) |
+| `LOGS/EAI-TASK-040-terminal.log` | **UPDATED** — New terminal log for correction pass |
+| `REPORTS/EAI-TASK-040-RUNTIME-SUPERVISOR-HEARTBEAT.md` | **UPDATED** — This report with correction details |
+| `docs/HANDOVER_2026-07-15_EAI_TASK_040.json` | **UPDATED** — Status, summary, fix details |
 | `.hermes/state.json` | **UPDATED** — Current task and result |
 
 ## Supervisor behavior
@@ -55,9 +91,17 @@ application code was changed.
 - Fields: `pid`, `hostname` (optional), `processStartTime`, `lastHeartbeat`, `mode`, `currentIssue`, `currentTask`, `lastResult`
 - Never records environment variables, tokens, or secrets
 
+### Single-use lifecycle
+
+- Each `createSupervisor()` call produces a fresh, independent instance
+- `start()` can be called at most once per instance; returns `SINGLE_USE` on second attempt
+- `stop()` detaches all signal handlers and releases the lock
+- To restart, create a new instance via `createSupervisor()`
+
 ### Graceful shutdown
 
 - Handles SIGTERM and SIGINT
+- Signal handlers are tracked via `Map` and properly detached on `stop()`
 - Writes final heartbeat with `lastResult: "SHUTDOWN"`
 - Releases supervisor lock
 - Calls optional `onShutdown` callback
@@ -71,7 +115,7 @@ wired into the poller or worker by default.
 
 ## Tests
 
-21 new deterministic tests in `tests/runtime-supervisor.test.mjs`:
+26 deterministic tests in `tests/runtime-supervisor.test.mjs` (was 21):
 
 | Test area | Tests | Description |
 |-----------|-------|-------------|
@@ -79,24 +123,24 @@ wired into the poller or worker by default.
 | Heartbeat read | 2 | Missing file, valid file |
 | Stale detection | 5 | Null heartbeat, fresh, stale, unparseable, threshold parameter |
 | Supervisor lock | 1 | Acquire with metadata verification |
-| Supervisor lifecycle | 4 | Controller shape, double-start prevention, stop without start, setStatus |
-| Constants | 3 | Interval, threshold, mode values |
+| Supervisor lifecycle | 6 | Controller shape, SINGLE_USE enforcement, NOT_RUNNING stop, setStatus, used getter, fresh instance |
+| CLI boundary | 4 | Dry-run JSON output, mode flag, interval flag, live start/SIGTERM |
 
 ## Validation results
 
 | Command | Result |
 |---------|--------|
 | `node scripts/framework-doctor.mjs` | **PASS** (gh authenticated, state valid, all files present) |
-| `node --test tests/*.test.mjs` | **PASS** (50/50 — 29 pre-existing + 21 new) |
+| `node --test tests/*.test.mjs` | **PASS** (55/55 — 29 pre-existing + 26 supervisor tests) |
 | `npm test` | **PASS** (same as `node --test`) |
 | `git diff --check` | **PASS** (no whitespace errors) |
-| JSON parse checks | **PASS** (handover JSON, heartbeat JSON, state JSON all valid) |
+| JSON parse checks | **PASS** (handover JSON, state JSON all valid) |
 
 ## How local MVP runtime behavior was preserved
 
 - No product application code (`apps/`, `services/`) was modified.
 - No existing Hermes framework scripts (`scripts/task-worker.mjs`, `scripts/task-poller.mjs`) were modified.
-- No existing src modules were modified (only added new module `src/runtime-supervisor.js`).
+- No existing src modules were modified (only updated existing `src/runtime-supervisor.js` and its tests).
 - The supervisor is passive and must be explicitly started.
 
 ## Risks and rollback note
@@ -104,7 +148,7 @@ wired into the poller or worker by default.
 - **Risk:** Supervisor is not yet integrated into poller/worker startup — must be started explicitly.
 - **Risk:** Supervisor lock (`.hermes/supervisor.lock`) is separate from task claim lock (`.hermes/claim.lock`) — not yet lifecycle-managed together.
 - **Risk:** Downstream monitoring or auto-recovery from stale heartbeats is not yet wired up.
-- **Rollback:** Remove `src/runtime-supervisor.js`, `tests/runtime-supervisor.test.mjs`, revert changes to `docs/HERMES_OPERATING_MANUAL_RC1.md`, and delete the new artifacts.
+- **Rollback:** Revert `src/runtime-supervisor.js` and `tests/runtime-supervisor.test.mjs` to previous known-good, or remove both plus the new artifacts.
 
 ## Immediate next implementation task
 

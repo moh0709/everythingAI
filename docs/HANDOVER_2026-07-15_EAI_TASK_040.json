@@ -5,7 +5,13 @@
   "issueNumber": 63,
   "title": "Add runtime supervisor and heartbeat foundation",
   "status": "PASS",
-  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation",
+  "passType": "CORRECTION_PASS",
+  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation. Correction pass fixed CLI async/await, single-use lifecycle, and signal handler detachment per PM rejection.",
+  "correctionDetails": {
+    "defect1": "CLI entry point now properly awaits supervisor.start() with try/catch and top-level .catch() on module entry",
+    "defect2": "Supervisor instances are now single-use (SINGLE_USE on second start). Signal handlers tracked via Map and properly detached on stop()",
+    "defect3": "4 new CLI boundary smoke tests added including dry-run and live SIGTERM test"
+  },
   "filesChanged": [
     "src/runtime-supervisor.js",
     "tests/runtime-supervisor.test.mjs",
@@ -17,10 +23,10 @@
   ],
   "validation": {
     "frameworkDoctor": "PASS",
-    "nodeTest": "50/50 pass (including new 21 supervisor tests)",
+    "nodeTest": "55/55 pass (including 26 supervisor tests)",
     "npmTest": "identical to node --test",
     "gitDiffCheck": "PASS (no whitespace errors)",
-    "jsonParseChecks": "PASS (handover JSON, heartbeat JSON, state JSON all valid)"
+    "jsonParseChecks": "PASS (handover JSON, state JSON all valid)"
   },
   "supervisorBehavior": {
     "lockMechanism": "Exclusive-create supervisor lock at .hermes/supervisor.lock",
@@ -30,14 +36,16 @@
     "staleThreshold": "120 seconds (configurable)",
     "sigtermHandling": "Graceful shutdown with final heartbeat and lock release",
     "sigintHandling": "Graceful shutdown with final heartbeat and lock release",
-    "noSecretsInHeartbeat": "Verified — no env vars, tokens, or secrets in heartbeat"
+    "noSecretsInHeartbeat": "Verified — no env vars, tokens, or secrets in heartbeat",
+    "lifecycle": "Single-use — start() returns SINGLE_USE on second call. Create fresh instance via createSupervisor() to restart."
   },
   "tests": {
     "heartbeatWrite": "Verified atomic write with temp file pattern",
     "heartbeatRead": "Returns null for missing file, parsed object for valid file",
     "staleDetection": "Configurable threshold, handles null/missing/unparseable values",
     "supervisorLock": "Acquire, inspect, release with PID/hostname/role tracking",
-    "supervisorLifecycle": "Start, stop, setStatus, double-start prevention",
+    "supervisorLifecycle": "Start, stop, setStatus, single-use enforcement, signal handler lifecycle",
+    "cliBoundary": "4 CLI tests including dry-run JSON, mode/interval flags, live start/SIGTERM",
     "noSecrets": "Heartbeat never records GH_TOKEN, OPENAI_API_KEY, PATH, etc."
   },
   "operatingManualUpdated": true,
