@@ -207,6 +207,43 @@ function ghEditLabels(issueNumber, addLabels, removeLabels, gh) {
   return gh(args);
 }
 
+/**
+ * Attempt to correct GitHub labels and verify the change took effect.
+ * Returns { success: true, actions, evidence } on success, or
+ * { success: false, actions, evidence } on verification failure.
+ */
+function correctLabelsWithVerification({ issueNumber, addLabels, removeLabels, gh, actions, record }) {
+  let postEditLabels;
+  try {
+    ghEditLabels(issueNumber, addLabels, removeLabels, gh);
+    actions.push(`corrected GitHub labels: added ${addLabels.join(', ')}, removed ${removeLabels.join(', ')}`);
+    record('label edit command succeeded — re-reading to verify');
+
+    // Re-read the issue to verify labels actually changed
+    const verifiedIssue = ghViewIssue(issueNumber, gh);
+    postEditLabels = normalizeLabels(verifiedIssue);
+
+    const allAddedPresent = addLabels.every((l) => postEditLabels.includes(l));
+    const anyRemovePresent = removeLabels.some((l) => postEditLabels.includes(l));
+
+    if (allAddedPresent && !anyRemovePresent) {
+      record('label correction verified: expected labels are present and removed labels are absent');
+      return { success: true, postEditLabels };
+    }
+
+    // Verification failed — labels did not change as expected
+    const failureDetail = `label verification failed: added=${JSON.stringify(addLabels)} present=${JSON.stringify(addLabels.filter((l) => postEditLabels.includes(l)))} removed=${JSON.stringify(removeLabels)} stillPresent=${JSON.stringify(removeLabels.filter((l) => postEditLabels.includes(l)))}`;
+    record(failureDetail);
+    actions.push(failureDetail);
+    return { success: false, postEditLabels };
+  } catch (error) {
+    const msg = `label correction or verification failed: ${error.message}`;
+    actions.push(msg);
+    record(msg);
+    return { success: false, postEditLabels };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Reconciliation engine
 // ---------------------------------------------------------------------------
@@ -267,16 +304,66 @@ export async function reconcile({
   else record('state: absent');
 
   // -----------------------------------------------------------------------
-  // Step 2: Assess liveness of each artifact
+  // Step 2: Determine host relationships
+  // -----------------------------------------------------------------------
+
+  const hbSameHost = heartbeat?.hostname ? heartbeat.hostname === hostname : null;
+  const claimSameHost = claimLock?.hostname ? claimLock.hostname === hostname : null;
+  const supervisorSameHost = supervisorLock?.hostname ? supervisorLock.hostname === hostname : null;
+
+  // -----------------------------------------------------------------------
+  // Step 3: UNCONDITIONAL CROSS-HOST ESCALATION
+  // -----------------------------------------------------------------------
+  // Any artifact from a different host cannot be verified locally.
+  // Never infer remote-process liveness from a local PID lookup.
+  // Escalate immediately without checking PID.
+
+  if (claimLock && claimSameHost === false) {
+    record(`claim lock from different host (${claimLock.hostname}) cannot be verified locally — escalating to manual review`);
+    record('cross-host locks must be reviewed by a human; never clear remote locks automatically');
+    return {
+      outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
+      outcomeCode: 'CROSS_HOST_LOCK',
+      evidence,
+      issueNumber: claimLock.issueNumber ?? null,
+      taskId: claimLock.taskId ?? null,
+      actions: []
+    };
+  }
+
+  if (supervisorLock && supervisorSameHost === false) {
+    record(`supervisor lock from different host (${supervisorLock.hostname}) cannot be verified locally — escalating to manual review`);
+    record('cross-host locks must be reviewed by a human; never clear remote locks automatically');
+    return {
+      outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
+      outcomeCode: 'CROSS_HOST_SUPERVISOR_LOCK',
+      evidence,
+      issueNumber: null,
+      taskId: null,
+      actions: []
+    };
+  }
+
+  if (heartbeat && hbSameHost === false) {
+    record(`heartbeat from different host (${heartbeat.hostname}) cannot be verified locally — escalating to manual review`);
+    record('cross-host heartbeats must be reviewed by a human; never infer remote process liveness from local PID');
+    return {
+      outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
+      outcomeCode: 'CROSS_HOST_HEARTBEAT',
+      evidence,
+      issueNumber: null,
+      taskId: null,
+      actions: []
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // Step 4: Assess liveness of each artifact (now safe — all are same-host)
   // -----------------------------------------------------------------------
 
   const hbPidAlive = heartbeat && isPidAlive(heartbeat.pid);
   const claimPidAlive = claimLock && isPidAlive(claimLock.pid);
   const supervisorPidAlive = supervisorLock && isPidAlive(supervisorLock.pid);
-
-  const hbSameHost = heartbeat?.hostname ? heartbeat.hostname === hostname : null;
-  const claimSameHost = claimLock?.hostname ? claimLock.hostname === hostname : null;
-  const supervisorSameHost = supervisorLock?.hostname ? supervisorLock.hostname === hostname : null;
 
   // Heartbeat stale checks
   const hbStale = heartbeat ? (() => {
@@ -292,7 +379,7 @@ export async function reconcile({
   );
 
   // -----------------------------------------------------------------------
-  // Step 3: Determine the "current work context" from available sources
+  // Step 5: Determine the "current work context" from available sources
   // -----------------------------------------------------------------------
 
   const contextIssueNumber = claimLock?.issueNumber ?? state?.currentIssue ?? null;
@@ -300,22 +387,8 @@ export async function reconcile({
   const stateInProgress = state?.result === 'IN_PROGRESS';
 
   // -----------------------------------------------------------------------
-  // Step 4: Evaluate scenarios
+  // Step 6: Evaluate scenarios
   // -----------------------------------------------------------------------
-
-  // SCENARIO: Claim lock from different host → cannot verify, escalate
-  // (check this early before stale-lock cleanup logic)
-  if (claimLock && claimSameHost === false && !claimPidAlive) {
-    record(`claim lock from different host (${claimLock.hostname}) cannot be verified — escalating`);
-    return {
-      outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
-      outcomeCode: 'CROSS_HOST_LOCK',
-      evidence,
-      issueNumber: contextIssueNumber,
-      taskId: contextTaskId,
-      actions: []
-    };
-  }
 
   // SCENARIO: Process heartbeat is still alive on same host → do not interfere
   if (heartbeat && hbPidAlive && hbSameHost) {
@@ -360,9 +433,10 @@ export async function reconcile({
   if (hbIntentionallyStopped && !claimLock && !stateInProgress) {
     record('intentional shutdown detected (lastResult=SHUTDOWN or STOPPED), no claim lock, no IN_PROGRESS state');
     if (heartbeat) {
-      tryRemove(paths.heartbeatPath);
-      actions.push('removed stale heartbeat from intentional shutdown');
-      record('removed heartbeat (intentional shutdown)');
+      if (tryRemove(paths.heartbeatPath)) {
+        actions.push('removed stale heartbeat from intentional shutdown');
+        record('removed heartbeat (intentional shutdown)');
+      }
     }
     return {
       outcome: RECONCILE_OUTCOMES.NO_ACTION,
@@ -401,8 +475,10 @@ export async function reconcile({
   if (heartbeat && hbStale && (!hbSameHost || !hbPidAlive) && !claimLock) {
     record('stale heartbeat without claim lock');
 
-    tryRemove(paths.heartbeatPath);
-    actions.push('removed stale heartbeat');
+    if (tryRemove(paths.heartbeatPath)) {
+      actions.push('removed stale heartbeat');
+      record('removed stale heartbeat');
+    }
 
     if (stateInProgress) {
       record('state is IN_PROGRESS but no claim lock present — ambiguous');
@@ -467,8 +543,7 @@ export async function reconcile({
 
 /**
  * Handle the scenario where both heartbeat and claim lock are stale
- * (owner process is dead on the same host, or on a different host where
- * the PID cannot be verified).
+ * (owner process is dead on the same host).
  */
 function handleStaleHeartbeatAndLock({
   heartbeat, claimLock, supervisorLock,
@@ -486,7 +561,6 @@ function handleStaleHeartbeatAndLock({
       if (liveLabels.includes(LABEL_HERMES_DONE)) {
         // Task was completed on GitHub — update local state to match
         record(`issue #${contextIssueNumber} already has ${LABEL_HERMES_DONE} — task was completed elsewhere`);
-        actions.push('cleaned stale artifacts (completed elsewhere)');
         cleanupStaleArtifacts({ claimLock, supervisorLock, paths, actions, record });
         return {
           outcome: RECONCILE_OUTCOMES.RECOVERED,
@@ -517,15 +591,23 @@ function handleStaleHeartbeatAndLock({
         record(`matching report exists for ${contextTaskId ?? '#' + contextIssueNumber} — task completed before crash`);
         cleanupStaleArtifacts({ claimLock, supervisorLock, paths, actions, record });
 
-        // Correct GitHub labels if still showing hermes:working
+        // Correct GitHub labels if still showing hermes:working, with verification
         if (liveLabels.includes(LABEL_HERMES_WORKING)) {
-          try {
-            ghEditLabels(contextIssueNumber, [LABEL_PM_REVIEW, LABEL_HERMES_DONE], [LABEL_HERMES_WORKING], gh);
-            actions.push('corrected GitHub labels: added pm:review + hermes:done, removed hermes:working');
-            record('corrected GitHub labels — completed task was left with hermes:working');
-          } catch (labelError) {
-            actions.push(`label correction failed: ${labelError.message}`);
-            record(`label correction failed: ${labelError.message}`);
+          const verifyResult = correctLabelsWithVerification({
+            issueNumber: contextIssueNumber,
+            addLabels: [LABEL_PM_REVIEW, LABEL_HERMES_DONE],
+            removeLabels: [LABEL_HERMES_WORKING],
+            gh, actions, record
+          });
+
+          if (!verifyResult.success) {
+            // Label correction failed verification — escalate
+            record('label correction verification failed — escalating for manual review');
+            return {
+              outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
+              outcomeCode: 'LABEL_VERIFICATION_FAILED',
+              evidence, issueNumber: contextIssueNumber, taskId: contextTaskId, actions
+            };
           }
         }
 
@@ -596,17 +678,32 @@ function handleStaleClaimLock({
 
   if (reportExists) {
     record(`stale claim lock with matching report — task completed, cleaning lock`);
-    tryRemove(paths.claimLockPath);
-    actions.push('removed stale claim lock');
+    if (tryRemove(paths.claimLockPath)) {
+      actions.push('removed stale claim lock');
+      record('removed stale claim lock');
+    }
 
     if (contextIssueNumber) {
       try {
         const liveIssue = ghViewIssue(contextIssueNumber, gh);
         const liveLabels = normalizeLabels(liveIssue);
         if (liveLabels.includes(LABEL_HERMES_WORKING)) {
-          ghEditLabels(contextIssueNumber, [LABEL_PM_REVIEW, LABEL_HERMES_DONE], [LABEL_HERMES_WORKING], gh);
-          actions.push('corrected GitHub labels');
-          record('corrected GitHub labels — stale hermes:working changed to pm:review + hermes:done');
+          // Correct labels with verification
+          const verifyResult = correctLabelsWithVerification({
+            issueNumber: contextIssueNumber,
+            addLabels: [LABEL_PM_REVIEW, LABEL_HERMES_DONE],
+            removeLabels: [LABEL_HERMES_WORKING],
+            gh, actions, record
+          });
+
+          if (!verifyResult.success) {
+            record('label correction verification failed — escalating for manual review');
+            return {
+              outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
+              outcomeCode: 'LABEL_VERIFICATION_FAILED',
+              evidence, issueNumber: contextIssueNumber, taskId: contextTaskId, actions
+            };
+          }
         }
       } catch (error) {
         record(`GitHub label correction failed: ${error.message}`);
@@ -631,8 +728,10 @@ function handleStaleClaimLock({
 
   // Lock exists but state is not IN_PROGRESS — safe to remove
   record('stale claim lock with no IN_PROGRESS state — removing lock');
-  tryRemove(paths.claimLockPath);
-  actions.push('removed stale claim lock');
+  if (tryRemove(paths.claimLockPath)) {
+    actions.push('removed stale claim lock');
+    record('removed stale claim lock');
+  }
 
   return {
     outcome: RECONCILE_OUTCOMES.RECOVERED,
@@ -643,20 +742,24 @@ function handleStaleClaimLock({
 
 /**
  * Clean up stale runtime artifacts (claim lock, heartbeat, supervisor lock).
+ * Only records actions for files that were actually removed.
  */
 function cleanupStaleArtifacts({ claimLock, supervisorLock, paths, actions, record }) {
   if (claimLock) {
-    tryRemove(paths.claimLockPath);
-    actions.push('removed stale claim lock');
-    record('removed stale claim lock');
+    if (tryRemove(paths.claimLockPath)) {
+      actions.push('removed stale claim lock');
+      record('removed stale claim lock');
+    }
   }
-  tryRemove(paths.heartbeatPath);
-  actions.push('removed stale heartbeat');
-  record('removed stale heartbeat');
+  if (tryRemove(paths.heartbeatPath)) {
+    actions.push('removed stale heartbeat');
+    record('removed stale heartbeat');
+  }
   if (supervisorLock) {
-    tryRemove(paths.supervisorLockPath);
-    actions.push('removed stale supervisor lock');
-    record('removed stale supervisor lock');
+    if (tryRemove(paths.supervisorLockPath)) {
+      actions.push('removed stale supervisor lock');
+      record('removed stale supervisor lock');
+    }
   }
 }
 

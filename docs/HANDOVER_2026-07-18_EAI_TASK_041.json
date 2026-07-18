@@ -1,87 +1,52 @@
 {
-  "repository": "moh0709/everythingAI",
-  "branch": "main",
-  "taskId": "EAI-TASK-041",
-  "issueNumber": 64,
+  "task": "EAI-TASK-041",
+  "version": "correction-1",
+  "issue": 64,
   "title": "Add crash recovery and stale task reconciliation",
   "status": "PASS",
-  "passType": "FIRST_PASS",
-  "summary": "Added crash recovery and stale task reconciliation module (src/crash-recovery.js) with 20 deterministic tests. The reconcile() function inspects heartbeat, claim lock, supervisor lock, .hermes/state.json, GitHub issue state, and existing reports to produce a machine-readable outcome (NO_ACTION, RECOVERED, RESUME_REQUIRED, MANUAL_REVIEW_REQUIRED, RUNTIME_ERROR). Stale artifacts are cleaned only when evidence is explicit; ambiguous states escalate to manual review. Recovery evidence is appended to .hermes/recovery/recovery-evidence.log. GitHub labels are corrected after live revalidation when a matching report exists. The operating manual (docs/HERMES_OPERATING_MANUAL_RC1.md) is updated with crash recovery documentation and operator remediation guidelines.",
-  "filesChanged": [
-    "src/crash-recovery.js",
-    "tests/crash-recovery.test.mjs",
-    "docs/HERMES_OPERATING_MANUAL_RC1.md",
-    "LOGS/EAI-TASK-041-terminal.log",
-    "REPORTS/EAI-TASK-041-CRASH-RECOVERY-RECONCILIATION.md",
-    "docs/HANDOVER_2026-07-18_EAI_TASK_041.json",
-    ".hermes/state.json"
+  "startedAt": "2026-07-18T20:40:00Z",
+  "completedAt": "2026-07-18T21:00:00Z",
+  "startingCommitSha": "787a4c33",
+  "changes": [
+    "src/crash-recovery.js — Unconditional cross-host escalation, label verification with re-read, tryRemove result checking",
+    "tests/crash-recovery.test.mjs — 7 new tests (27 total)",
+    "REPORTS/EAI-TASK-041-CRASH-RECOVERY-RECONCILIATION.md — Updated report",
+    "LOGS/EAI-TASK-041-terminal.log — Terminal validation log",
+    ".hermes/state.json — Updated state"
   ],
   "validation": {
     "frameworkDoctor": "PASS",
-    "nodeTest": "81/81 pass (61 pre-existing + 20 crash recovery tests)",
-    "npmTest": "identical to node --test",
+    "nodeTest": "88/88 pass (61 pre-existing + 27 crash recovery tests)",
+    "npmTest": "PASS",
     "gitDiffCheck": "PASS (no whitespace errors)",
-    "jsonParseChecks": "PASS (handover JSON, state JSON all valid)"
+    "jsonParseCheck": "PASS"
   },
-  "crashRecoveryModule": {
-    "file": "src/crash-recovery.js",
-    "outcomes": ["NO_ACTION", "RECOVERED", "RESUME_REQUIRED", "MANUAL_REVIEW_REQUIRED", "RUNTIME_ERROR"],
-    "outcomeCodes": {
-      "PROCESS_ALIVE": "Active runtime process running — no action",
-      "CLAIM_OWNER_ALIVE": "Active claim lock owner process running — no action",
-      "SUPERVISOR_ALIVE": "Active supervisor process running — no action",
-      "INTENTIONAL_SHUTDOWN": "Clean shutdown detected — no action",
-      "ALL_CLEAN": "No stale artifacts present — no action",
-      "COMPLETED_ELSEWHERE": "Issue completed on GitHub — stale artifacts cleaned",
-      "ISSUE_CLOSED_STALE_STATE": "Issue closed but state showed IN_PROGRESS — recovered",
-      "REPORT_EXISTS_STALE_ARTIFACTS": "Matching report exists — stale artifacts cleaned, labels corrected",
-      "STALE_ARTIFACTS_CLEANED": "Stale artifacts cleaned (no IN_PROGRESS state)",
-      "STALE_HEARTBEAT_CLEANED": "Stale heartbeat removed",
-      "STALE_LOCK_WITH_REPORT": "Stale claim lock with matching report — cleaned",
-      "STALE_LOCK_CLEANED": "Stale claim lock removed (no IN_PROGRESS state)",
-      "AMBIGUOUS_CRASH_NO_REPORT": "Stale artifacts + IN_PROGRESS + no report — manual review required",
-      "IN_PROGRESS_WITHOUT_LOCK": "IN_PROGRESS state without claim lock — manual review required",
-      "STALE_LOCK_IN_PROGRESS": "Stale claim lock with IN_PROGRESS state — manual review required",
-      "IN_PROGRESS_ALONE": "IN_PROGRESS state alone — manual review required",
-      "CROSS_HOST_LOCK": "Claim lock from different host — manual review required",
-      "GITHUB_UNAVAILABLE": "GitHub lookup failed — manual review required",
-      "UNRECOGNIZED_STATE": "Unrecognized state combination — manual review required"
+  "fixes": [
+    {
+      "id": "FIX-1-CROSS-HOST-SAFETY",
+      "description": "Cross-host artifacts (claim lock, supervisor lock, heartbeat) escalate unconditionally without local PID lookup",
+      "tests": [
+        "cross-host claim lock with locally-existing PID → MANUAL_REVIEW_REQUIRED not stale cleanup",
+        "cross-host supervisor lock → MANUAL_REVIEW_REQUIRED",
+        "cross-host heartbeat → MANUAL_REVIEW_REQUIRED",
+        "both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW"
+      ]
     },
-    "evidencePreserved": true,
-    "evidencePath": ".hermes/recovery/recovery-evidence.log",
-    "labelsCorrected": true,
-    "labelCorrectionRule": "When a matching report exists and GitHub still shows hermes:working, add pm:review + hermes:done and remove hermes:working"
-  },
-  "tests": {
-    "total": 20,
-    "allClean": "Stale heartbeat + stale claim lock + matching report → RECOVERED",
-    "activeProcess": "Active process running → NO_ACTION",
-    "intentionalShutdown": "Intentional shutdown → NO_ACTION",
-    "staleHeartbeatStaleLock": "Stale heartbeat + stale claim lock + matching report → RECOVERED",
-    "ambiguousCrash": "Stale artifacts + IN_PROGRESS + no report + open issue → MANUAL_REVIEW_REQUIRED",
-    "staleLockWithReport": "Stale claim lock with matching report → RECOVERED",
-    "staleLockInProgress": "Stale claim lock with IN_PROGRESS state → MANUAL_REVIEW_REQUIRED",
-    "inProgressAlone": "IN_PROGRESS state without lock or heartbeat → MANUAL_REVIEW_REQUIRED",
-    "crossHostLock": "Claim lock from different host → MANUAL_REVIEW_REQUIRED",
-    "crossHostArtifacts": "Stale artifacts from different host → MANUAL_REVIEW_REQUIRED",
-    "labelCorrection": "Recovery corrects stale hermes:working on GitHub",
-    "evidenceLog": "Reconciliation writes recovery evidence log",
-    "supervisorAlive": "Active supervisor lock with alive PID → NO_ACTION",
-    "staleHeartbeatOnly": "Stale heartbeat without claim lock → RECOVERED",
-    "staleHeartbeatInProgress": "Stale heartbeat with IN_PROGRESS state (no lock) → MANUAL_REVIEW_REQUIRED",
-    "staleLockClean": "Stale claim lock without IN_PROGRESS state → RECOVERED",
-    "stoppedHeartbeat": "STOPPED heartbeat with clean state → NO_ACTION",
-    "fullLifecycle": "Full stale lifecycle → RECOVERED",
-    "hermesWorkingStale": "Recovery corrects hermes:working when report exists"
-  },
-  "operatingManualUpdated": true,
-  "productCodeChanged": false,
-  "risks": [
-    "Crash recovery reconciliation is not yet integrated into the worker startup lifecycle — must be invoked explicitly",
-    "Cross-host artifacts always escalate to manual review (conservative), even when the issue is completed on GitHub",
-    "Evidence log grows unbounded — should be rotated or archived periodically"
+    {
+      "id": "FIX-2-LABEL-VERIFICATION",
+      "description": "GitHub labels are re-read after mutation; failed verification returns MANUAL_REVIEW_REQUIRED",
+      "tests": [
+        "label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED",
+        "label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED"
+      ]
+    },
+    {
+      "id": "FIX-3-TRYREMOVE-ACCURACY",
+      "description": "Only record artifact removal when tryRemove() actually succeeds",
+      "tests": [
+        "tryRemove only records action when file is actually removed"
+      ]
+    }
   ],
-  "nextRecommendedTask": "EAI-TASK-042: Integrate crash recovery reconciliation into worker startup and poller watch loop",
-  "artifactCommitSha": "To be recorded after artifact commit",
-  "finalPushedCommitSha": "To be recorded in final issue comment"
+  "nextRecommendedTask": "EAI-TASK-042: Integrate crash recovery into worker startup"
 }

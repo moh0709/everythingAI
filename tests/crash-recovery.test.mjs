@@ -48,9 +48,14 @@ function makeGhIssue({ number = 64, title = 'EAI-TASK-041', state = 'OPEN', labe
 /**
  * Create a gh harness that returns a controllable issue for view calls.
  * Supports issue edit (label manipulation) for testing.
+ *
+ * Supports a labelVerificationMode for testing post-edit verification:
+ * - 'faithful' (default): labels actually change after edit
+ * - 'stale': labels don't change after edit (simulates edit failure)
+ * - 'incomplete': only some labels get set (simulates partial success)
  */
-function makeGhHarness(initialIssue) {
-  const issue = { ...initialIssue, labels: [...initialIssue.labels] };
+function makeGhHarness(initialIssue, { labelVerificationMode = 'faithful' } = {}) {
+  const issue = { ...initialIssue, labels: [...initialIssue.labels.map((l) => ({ ...l }))] };
   const edits = [];
   const views = [];
   const runner = (args) => {
@@ -61,18 +66,35 @@ function makeGhHarness(initialIssue) {
     if (args[0] === 'issue' && args[1] === 'edit') {
       edits.push(args);
       const addIndex = args.indexOf('--add-label');
-      if (addIndex >= 0 && args[addIndex + 1]) {
-        const labelsToAdd = args[addIndex + 1].split(',');
-        for (const label of labelsToAdd) {
-          if (!issue.labels.some((l) => l.name === label)) {
-            issue.labels.push({ name: label });
+      const removeIndex = args.indexOf('--remove-label');
+
+      if (labelVerificationMode === 'faithful') {
+        if (addIndex >= 0 && args[addIndex + 1]) {
+          const labelsToAdd = args[addIndex + 1].split(',');
+          for (const label of labelsToAdd) {
+            if (!issue.labels.some((l) => l.name === label)) {
+              issue.labels.push({ name: label });
+            }
           }
         }
-      }
-      const removeIndex = args.indexOf('--remove-label');
-      if (removeIndex >= 0 && args[removeIndex + 1]) {
-        const labelsToRemove = args[removeIndex + 1].split(',');
-        issue.labels = issue.labels.filter((l) => !labelsToRemove.includes(l.name));
+        if (removeIndex >= 0 && args[removeIndex + 1]) {
+          const labelsToRemove = args[removeIndex + 1].split(',');
+          issue.labels = issue.labels.filter((l) => !labelsToRemove.includes(l.name));
+        }
+      } else if (labelVerificationMode === 'stale') {
+        // Don't change labels at all — simulates edit not taking effect
+        // Issue remains unchanged
+      } else if (labelVerificationMode === 'incomplete') {
+        // Only add labels but don't remove
+        if (addIndex >= 0 && args[addIndex + 1]) {
+          const labelsToAdd = args[addIndex + 1].split(',');
+          for (const label of labelsToAdd) {
+            if (!issue.labels.some((l) => l.name === label)) {
+              issue.labels.push({ name: label });
+            }
+          }
+        }
+        // Don't remove anything
       }
       return '';
     }
@@ -415,12 +437,12 @@ test('claim lock from different host → MANUAL_REVIEW_REQUIRED', async () => {
 
   assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
   assert.equal(result.outcomeCode, 'CROSS_HOST_LOCK');
+  // Lock should NOT be removed
+  assert.ok(existsSync(repo.claimLockPath));
 });
 
 // ---------------------------------------------------------------------------
-// SCENARIO 11: Stale heartbeat (different host) + stale claim lock
-//              + issue completed on GitHub (hermes:done)
-//              → MANUAL_REVIEW_REQUIRED (cross-host cannot be verified)
+// SCENARIO 11: Stale artifacts from different host are escalated
 // ---------------------------------------------------------------------------
 
 test('stale artifacts from different host are escalated for manual review', async () => {
@@ -501,6 +523,8 @@ test('recovery corrects stale hermes:working on GitHub when report exists', asyn
   // Should have attempted label correction
   const labelEdits = harness.edits.filter((args) => args.includes('--add-label'));
   assert.ok(labelEdits.length >= 1, 'should have attempted at least one label edit');
+  // Should have also verified by re-reading
+  assert.ok(harness.views.length >= 2, 'should have re-read issue to verify labels');
   // The harness issue should now have pm:review and hermes:done
   const finalLabels = harness.issue.labels.map((l) => l.name);
   assert.ok(finalLabels.includes('pm:review'), 'should have added pm:review');
@@ -710,11 +734,6 @@ test('crash recovery handles full stale lifecycle gracefully', async () => {
     result: 'IN_PROGRESS'
   });
 
-  // No matching report, issue lost on GitHub (gh will fail)
-  // Since gh is not provided, it will call the default runner which won't work
-  // but in this case we don't have context issue verification from gh
-  // Actually with state IN_PROGRESS and stale lock, we need gh lookup...
-
   // Let's provide a harness with a completed issue
   const ghIssue = makeGhIssue({ number: 999, labels: ['pm:review', 'hermes:done'] });
   const harness = makeGhHarness(ghIssue);
@@ -770,8 +789,258 @@ test('recovery corrects hermes:working when report exists and issue still shows 
   assert.equal(result.outcome, RECONCILE_OUTCOMES.RECOVERED);
   // Verify label correction was attempted
   assert.ok(harness.edits.length > 0, 'should have attempted label edit');
+  // Verify post-edit verification was done (at least 2 views: pre and post edit)
+  assert.ok(harness.views.length >= 2, 'should have re-read issue to verify labels');
   const finalLabels = harness.issue.labels.map((l) => l.name);
   assert.ok(finalLabels.includes('pm:review'));
   assert.ok(finalLabels.includes('hermes:done'));
   assert.ok(!finalLabels.includes('hermes:working'));
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 21: Cross-host claim lock with PID that exists locally
+//                  → MANUAL_REVIEW (not stale cleanup)
+// ---------------------------------------------------------------------------
+
+test('cross-host claim lock with locally-existing PID → MANUAL_REVIEW_REQUIRED not stale cleanup', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  // Claim lock from different host, but the PID happens to exist on THIS host
+  writeJson(repo.claimLockPath, {
+    pid: process.pid,      // PID exists locally!
+    hostname: 'remote-host', // But from a different host
+    issueNumber: 64,
+    taskId: 'EAI-TASK-041',
+    createdAt: '2026-07-18T18:00:00.000Z'
+  });
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: process.pid,       // Test is running on the same PID
+    ghRunner: undefined     // No gh runner needed — should escalate before gh check
+  });
+
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'CROSS_HOST_LOCK');
+  // Lock must NOT be removed even though PID exists locally
+  assert.ok(existsSync(repo.claimLockPath), 'cross-host lock must not be removed');
+  // No actions should be taken
+  assert.equal(result.actions.length, 0, 'no actions should be taken for cross-host lock');
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 22: Cross-host supervisor lock → MANUAL_REVIEW_REQUIRED
+// ---------------------------------------------------------------------------
+
+test('cross-host supervisor lock → MANUAL_REVIEW_REQUIRED', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  writeJson(repo.supervisorLockPath, {
+    pid: process.pid,
+    hostname: 'remote-host',
+    role: 'supervisor',
+    createdAt: '2026-07-18T18:00:00.000Z'
+  });
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: process.pid
+  });
+
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'CROSS_HOST_SUPERVISOR_LOCK');
+  assert.ok(existsSync(repo.supervisorLockPath), 'cross-host supervisor lock must not be removed');
+  assert.equal(result.actions.length, 0);
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 23: Cross-host heartbeat → MANUAL_REVIEW_REQUIRED
+// ---------------------------------------------------------------------------
+
+test('cross-host heartbeat → MANUAL_REVIEW_REQUIRED', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  writeJson(repo.heartbeatPath, {
+    pid: process.pid,
+    hostname: 'remote-host',
+    lastHeartbeat: '2026-07-18T19:55:00.000Z',
+    lastResult: 'WORKING',
+    mode: 'POLLING'
+  });
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: process.pid
+  });
+
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'CROSS_HOST_HEARTBEAT');
+  assert.ok(existsSync(repo.heartbeatPath), 'cross-host heartbeat must not be removed');
+  assert.equal(result.actions.length, 0);
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 24: Label correction verification failure → MANUAL_REVIEW
+// ---------------------------------------------------------------------------
+
+test('label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  writeJson(repo.claimLockPath, {
+    pid: 12345,
+    hostname: 'test-host',
+    issueNumber: 64,
+    taskId: 'EAI-TASK-041',
+    createdAt: '2026-07-18T12:00:00.000Z'
+  });
+
+  // Matching report
+  writeJson(join(repo.reportsDir, 'EAI-TASK-041.md'), {
+    task: 'EAI-TASK-041',
+    status: 'PASS'
+  });
+
+  // Issue still shows hermes:working
+  const ghIssue = makeGhIssue({ number: 64, labels: ['pm:ready', 'hermes:working'] });
+  // Use 'stale' verification mode — edit succeeds but labels don't change
+  const harness = makeGhHarness(ghIssue, { labelVerificationMode: 'stale' });
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: 99999,
+    ghRunner: harness.runner
+  });
+
+  // Label correction failed verification → MUST escalate
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'LABEL_VERIFICATION_FAILED');
+  // Labels should still be unchanged in the harness
+  const labels = harness.issue.labels.map((l) => l.name);
+  assert.ok(labels.includes('hermes:working'), 'hermes:working should still be present');
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 25: Label correction with incomplete edit (add but no remove)
+// → MANUAL_REVIEW_REQUIRED
+// ---------------------------------------------------------------------------
+
+test('label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  writeJson(repo.claimLockPath, {
+    pid: 12345,
+    hostname: 'test-host',
+    issueNumber: 64,
+    taskId: 'EAI-TASK-041',
+    createdAt: '2026-07-18T12:00:00.000Z'
+  });
+
+  writeJson(join(repo.reportsDir, 'EAI-TASK-041.md'), {
+    task: 'EAI-TASK-041',
+    status: 'PASS'
+  });
+
+  const ghIssue = makeGhIssue({ number: 64, labels: ['pm:ready', 'hermes:working'] });
+  // 'incomplete' mode adds labels but does NOT remove
+  const harness = makeGhHarness(ghIssue, { labelVerificationMode: 'incomplete' });
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: 99999,
+    ghRunner: harness.runner
+  });
+
+  // hermes:working should still be present → verification fails → escalate
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'LABEL_VERIFICATION_FAILED');
+  const labels = harness.issue.labels.map((l) => l.name);
+  assert.ok(labels.includes('hermes:working'), 'hermes:working should not have been removed');
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 26: tryRemove results are only recorded when actual removal happens
+// ---------------------------------------------------------------------------
+
+test('tryRemove only records action when file is actually removed', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  // Create heartbeat but ensure claim lock file does NOT exist
+  writeJson(repo.heartbeatPath, {
+    pid: 12345,
+    hostname: 'test-host',
+    lastHeartbeat: '2026-07-18T19:55:00.000Z',
+    lastResult: 'SHUTDOWN',
+    mode: 'POLLING'
+  });
+
+  // No claim lock, but the INTENTIONAL_SHUTDOWN path tries to remove heartbeat
+  // and we can verify that the action only appears once
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: 99999
+  });
+
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.NO_ACTION);
+  // Should have exactly one 'removed' action for heartbeat
+  const removalActions = result.actions.filter((a) => a.startsWith('removed'));
+  assert.equal(removalActions.length, 1, 'should have exactly one removal action');
+  assert.ok(removalActions[0].includes('heartbeat'), 'should mention heartbeat');
+  assert.ok(!existsSync(repo.heartbeatPath), 'heartbeat should be removed');
+});
+
+// ---------------------------------------------------------------------------
+// NEW SCENARIO 27: Both cross-host locks present (claim + supervisor)
+// → claim lock check triggers first
+// ---------------------------------------------------------------------------
+
+test('both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+
+  writeJson(repo.claimLockPath, {
+    pid: 12345,
+    hostname: 'remote-host',
+    issueNumber: 64,
+    taskId: 'EAI-TASK-041',
+    createdAt: '2026-07-18T18:00:00.000Z'
+  });
+
+  writeJson(repo.supervisorLockPath, {
+    pid: 12345,
+    hostname: 'another-remote',
+    role: 'supervisor',
+    createdAt: '2026-07-18T18:00:00.000Z'
+  });
+
+  const result = await reconcile({
+    repoRoot: repo.base,
+    now,
+    hostname: 'test-host',
+    pid: 99999
+  });
+
+  // Claim lock check is first, so CROSS_HOST_LOCK
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'CROSS_HOST_LOCK');
+  assert.ok(existsSync(repo.claimLockPath));
+  assert.ok(existsSync(repo.supervisorLockPath));
 });

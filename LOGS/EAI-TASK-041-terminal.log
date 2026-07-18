@@ -621,3 +621,45 @@ HANDOVER JSON: valid
 STATE JSON: valid
 
 [2026-07-18T20:17:30Z] EAI-TASK-041 completed successfully
+
+========================================
+Correction pass — 2026-07-18
+========================================
+
+--- Fix 1: Unconditional cross-host escalation ---
+- Cross-host claim lock: unconditional CROSS_HOST_LOCK escalation before any PID check
+- Cross-host supervisor lock: unconditional CROSS_HOST_SUPERVISOR_LOCK escalation
+- Cross-host heartbeat: unconditional CROSS_HOST_HEARTBEAT escalation
+- Never use isPidAlive() on cross-host artifacts
+
+--- Fix 2: GitHub label verification ---
+- Added correctLabelsWithVerification() helper
+- After ghEditLabels, re-reads issue with ghViewIssue
+- Verifies all added labels present and removed labels absent
+- On failure: returns LABEL_VERIFICATION_FAILED → MANUAL_REVIEW_REQUIRED
+
+--- Fix 3: tryRemove result checking ---
+- All tryRemove() callers now check return value before recording actions
+- cleanupStaleArtifacts() only records successful removals
+- Stale heartbeat path only records successful removals
+
+=== Validation ===
+
+$ node --test tests/crash-recovery.test.mjs
+# tests 27
+# pass 27
+# fail 0
+
+$ node --test tests/*.test.mjs
+# tests 88
+# pass 88
+# fail 0
+
+$ node scripts/framework-doctor.mjs
+PASS
+
+$ npm test
+PASS (88/88)
+
+$ git diff --check
+(no output — clean)

@@ -4,14 +4,14 @@
   "currentIssue": 64,
   "currentTask": "EAI-TASK-041",
   "result": "PASS",
-  "updatedAt": "2026-07-18T20:17:30Z",
-  "lastCheckedAt": "2026-07-18T18:37:18Z",
+  "updatedAt": "2026-07-18T21:00:00Z",
+  "lastCheckedAt": "2026-07-18T21:00:00Z",
   "status": "COMPLETED",
   "startingCommitSha": "787a4c33",
   "artifactCommitSha": "to be recorded in issue comment",
   "finalCommitSha": "to be recorded in issue comment",
   "finalizationPattern": "Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.",
-  "startedAt": "2026-07-18T20:16:00Z",
-  "completedAt": "2026-07-18T20:17:30Z",
-  "humanSummary": "Added crash recovery reconciliation module (src/crash-recovery.js) with 20 tests. reconcile() inspects heartbeat, claim lock, supervisor lock, state.json, GitHub issue state, and reports to produce machine-readable outcomes (NO_ACTION, RECOVERED, RESUME_REQUIRED, MANUAL_REVIEW_REQUIRED, RUNTIME_ERROR). Operating manual updated with crash recovery and operator remediation docs."
+  "startedAt": "2026-07-18T20:40:00Z",
+  "completedAt": "2026-07-18T21:00:00Z",
+  "humanSummary": "Correction pass for EAI-TASK-041: (1) Unconditional cross-host escalation — all artifacts (claim lock, supervisor lock, heartbeat) from different hosts are escalated to MANUAL_REVIEW_REQUIRED without local PID lookup. (2) GitHub label correction now re-reads issue after mutation to verify labels actually changed; failed verification returns MANUAL_REVIEW_REQUIRED. (3) tryRemove() result is checked; only successful removals are recorded in actions. 7 new deterministic tests added (27 total)."
 }
