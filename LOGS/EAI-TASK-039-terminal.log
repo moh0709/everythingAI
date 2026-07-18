@@ -1,10 +1,21 @@
-[task-worker] /root/.hermes/projects/everythingAI
-[task-worker] Branch: main
-[task-worker] Starting commit: 1036d52afd3b731b03619f208f0f7842e6b4eeb7
-[task-worker] Claim acknowledgement posted on GitHub issue #61.
-[validation] node scripts/framework-doctor.mjs -> PASS
-[validation] node --test tests/*.test.mjs -> PASS
-[validation] npm test -> PASS
-[validation] git diff --check -> PASS
-[notes] .hermes/state.json was not present, so no state file update was written.
-[notes] The local claim lock is ignored by Git and is released on normal completion/failure paths.
+EAI-TASK-039 terminal log
+
+Working directory: /root/.hermes/projects/everythingAI
+Branch: main
+
+Key commands and results:
+- `node scripts/framework-doctor.mjs` — PASS
+- `node --test tests/*.test.mjs` — PASS
+- `npm test` — PASS
+- `node --test tests/task-worker-runtime-mode.test.mjs tests/webhook-event-dispatcher.test.mjs` — PASS
+- `node --test tests/task-claim.test.mjs tests/task-poller-watch-loop.test.mjs` — PASS
+
+Corrections completed:
+- Fixed `scripts/task-worker.mjs` to pass `readStateIfPresent` into the shared claim authority.
+- Updated `scripts/webhook-event-dispatcher.mjs` to claim through the shared authority before returning EXECUTE.
+- Added deterministic tests for worker claim execution and repeated webhook delivery.
+- Updated the Hermes operating manual to describe shared claim authority behavior.
+
+Notes:
+- `.hermes/state.json` is absent in this checkout; state writes were skipped.
+- No core application code was modified.

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
-import { assessClaimReadiness, CLAIM_RESULTS } from '../src/task-claim.js';
-import { matchingReportExists, readStateIfPresent, summarizeIssue } from '../src/task-queue.js';
+import { claimRunnableIssue, CLAIM_RESULTS } from '../src/task-claim.js';
+import { readStateIfPresent, summarizeIssue } from '../src/task-queue.js';
 
 export const DECISIONS = {
   EXECUTE: 'EXECUTE',
@@ -139,10 +139,10 @@ export async function classifyWebhookEvent({
   argv = process.argv.slice(2),
   stdinText = '',
   readFile = readFileSync,
-  reportExists = matchingReportExists,
   stateReader = readStateIfPresent,
   ghRunner = undefined,
   lockInspector = undefined,
+  claimRunner = claimRunnableIssue,
   runtimeDetector = detectRuntimeMode
 } = {}) {
   const runtime = runtimeDetector({ env, argv });
@@ -215,33 +215,48 @@ export async function classifyWebhookEvent({
     };
   }
 
-  const readiness = await assessClaimReadiness({
-    issueNumber: Number(payload.issue.number),
-    issue: null,
-    reportExists,
-    stateReader,
-    ghRunner,
-    lockInspector
-  });
+  let claim;
+  try {
+    claim = await claimRunner({
+      issueNumber: Number(payload.issue.number),
+      issue: null,
+      stateReader,
+      ghRunner,
+      lockInspector
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      result: DECISIONS.BLOCKED_RUNTIME_CONTRACT,
+      source: discovery.source,
+      issueNumber: Number(payload.issue.number),
+      issue: payload.issue,
+      evidence: [
+        `labels=${labels.join(', ')}`,
+        `claim authority threw: ${error.message}`
+      ],
+      remediation: 'Resolve the claim authority failure before dispatching webhook work.'
+    };
+  }
 
-  if (readiness.ok) {
+  if (claim.ok && claim.result === CLAIM_RESULTS.CLAIMED) {
     return {
       ok: true,
       result: DECISIONS.EXECUTE,
       source: discovery.source,
       issueNumber: Number(payload.issue.number),
-      issue: payload.issue,
-      liveIssue: summarizeIssue(readiness.issue),
-      claimDecision: 'ELIGIBLE',
+      issue: claim.issue ?? payload.issue,
+      liveIssue: summarizeIssue(claim.issue ?? payload.issue),
+      claimDecision: CLAIM_RESULTS.CLAIMED,
       evidence: [
         `labels=${labels.join(', ')}`,
-        ...readiness.evidence
+        ...(claim.evidence ?? [])
       ],
       nextAction: 'claim-and-execute'
     };
   }
 
-  const nonExecutable = readiness.result === CLAIM_RESULTS.CLAIM_CONFLICT
+  const nonExecutable = claim.result === CLAIM_RESULTS.CLAIM_CONFLICT
     ? DECISIONS.CLAIM_CONFLICT
     : DECISIONS.IGNORED_INELIGIBLE;
 
@@ -251,12 +266,12 @@ export async function classifyWebhookEvent({
     source: discovery.source,
     issueNumber: Number(payload.issue.number),
     issue: payload.issue,
-    claimDecision: readiness.result,
+    claimDecision: claim.result,
     evidence: [
       `labels=${labels.join(', ')}`,
-      ...(readiness.evidence ?? [])
+      ...(claim.evidence ?? [])
     ],
-    remediation: readiness.result === CLAIM_RESULTS.CLAIM_CONFLICT
+    remediation: claim.result === CLAIM_RESULTS.CLAIM_CONFLICT
       ? 'Revalidate live GitHub labels, report artifacts, and claim lock state before acting.'
       : 'The issue is not runnable from the current live GitHub state.'
   };

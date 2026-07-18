@@ -189,8 +189,8 @@ Stale-lock policy:
 
 Duplicate-delivery behavior:
 
-- The webhook classifier returns `EXECUTE` only after live revalidation proves the issue is still claimable.
-- Repeated webhook delivery uses the same claim preconditions, so a later delivery sees the active claim state and does not dispatch the worker twice.
+- The webhook classifier invokes the shared claim authority before returning `EXECUTE`.
+- Repeated webhook delivery usually re-sees the updated labels or lock state and returns a non-executable result instead of dispatching again.
 - Polling continues after claim conflicts and other non-fatal duplicate detections.
 
 Crash recovery procedure:

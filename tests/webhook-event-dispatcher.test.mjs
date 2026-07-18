@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { claimRunnableIssue } from '../src/task-claim.js';
 import {
   DECISIONS,
   classifyWebhookEvent,
@@ -33,10 +34,62 @@ function makeGhRunner(issue) {
     if (args[0] === 'issue' && args[1] === 'view') {
       return JSON.stringify(issue);
     }
+    if (args[0] === 'issue' && args[1] === 'edit') {
+      const addIndex = args.indexOf('--add-label');
+      if (addIndex >= 0) {
+        const label = args[addIndex + 1];
+        if (label && !issue.labels.some((entry) => entry.name === label)) {
+          issue.labels.push({ name: label });
+        }
+      }
+      const removeIndex = args.indexOf('--remove-label');
+      if (removeIndex >= 0) {
+        const label = args[removeIndex + 1];
+        issue.labels = issue.labels.filter((entry) => entry.name !== label);
+      }
+      return '';
+    }
+    if (args[0] === 'issue' && args[1] === 'comment') {
+      return '';
+    }
     throw new Error(`Unexpected gh command: ${args.join(' ')}`);
   };
   runner.getCalls = () => calls;
   return runner;
+}
+
+function makeWebhookClaimHarness(issue = makeIssue({ number: 999, title: 'EAI-TASK-999' })) {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-webhook-claim-'));
+  const lockPath = join(dir, 'claim.lock');
+  const ghRunner = makeGhRunner(issue);
+  let releaseLock = null;
+
+  const claimRunner = async (options = {}) => {
+    const result = await claimRunnableIssue({
+      ...options,
+      issue: options.issue ?? issue,
+      ghRunner,
+      lockPath,
+      hostname: 'test-host',
+      pid: process.pid,
+      stateReader: () => null,
+      stateWriter: () => true,
+      reportExists: () => false
+    });
+
+    if (result.ok && result.result === 'CLAIMED' && typeof result.releaseLock === 'function') {
+      releaseLock = result.releaseLock;
+    }
+
+    return result;
+  };
+
+  return {
+    issue,
+    ghRunner,
+    claimRunner,
+    releaseLock: () => releaseLock?.()
+  };
 }
 
 test('discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources', () => {
@@ -93,71 +146,46 @@ test('classifyWebhookEvent ignores issue events missing readiness labels', async
   assert.equal(result.result, DECISIONS.IGNORED_INELIGIBLE);
 });
 
-test('classifyWebhookEvent returns EXECUTE only when live claim checks pass', async () => {
-  const issue = makeIssue();
-  const ghRunner = makeGhRunner(issue);
+test('classifyWebhookEvent returns EXECUTE only after shared claim authority claims the issue', async () => {
+  const harness = makeWebhookClaimHarness();
   const result = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
     argv: ['--mode', 'webhook', '--stdin-json'],
-    stdinText: '{"issue":{"number":60,"title":"EAI-TASK-039","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
-    ghRunner,
-    stateReader: () => null,
-    reportExists: () => false
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner
   });
 
   assert.equal(result.ok, true);
   assert.equal(result.result, DECISIONS.EXECUTE);
-  assert.equal(result.claimDecision, 'ELIGIBLE');
-  assert.equal(result.issueNumber, 60);
+  assert.equal(result.claimDecision, 'CLAIMED');
+  assert.equal(result.issueNumber, 999);
   assert.equal(result.nextAction, 'claim-and-execute');
-  assert.match(result.evidence.join(' | '), /no local state file present/);
-  assert.equal(ghRunner.getCalls(), 1);
+  assert.match(result.evidence.join(' | '), /labels=pm:ready, hermes:ready/);
+  assert.equal(harness.issue.labels.some((entry) => entry.name === 'hermes:working'), true);
+  harness.releaseLock();
 });
 
-test('classifyWebhookEvent returns claim conflict when live state is in progress', async () => {
-  const issue = makeIssue();
-  const result = await classifyWebhookEvent({
-    env: { GITHUB_EVENT_NAME: 'issues' },
-    argv: ['--mode', 'webhook', '--stdin-json'],
-    stdinText: '{"issue":{"number":60,"title":"EAI-TASK-039","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
-    ghRunner: makeGhRunner(issue),
-    stateReader: () => ({ currentIssue: 60, result: 'IN_PROGRESS' }),
-    reportExists: () => false
-  });
-
-  assert.equal(result.ok, true);
-  assert.equal(result.result, DECISIONS.CLAIM_CONFLICT);
-  assert.equal(result.claimDecision, 'CLAIM_CONFLICT');
-  assert.match(result.evidence.join(' | '), /state=currentIssue:60/);
-});
-
-test('classifyWebhookEvent treats repeated delivery as non-executable after the first claim', async () => {
-  const issue = makeIssue();
-  const state = { currentIssue: null, result: null };
+test('classifyWebhookEvent rejects repeated delivery after the first shared claim', async () => {
+  const harness = makeWebhookClaimHarness();
   const first = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
     argv: ['--mode', 'webhook', '--stdin-json'],
-    stdinText: '{"issue":{"number":60,"title":"EAI-TASK-039","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
-    ghRunner: makeGhRunner(issue),
-    stateReader: () => (state.currentIssue ? state : null),
-    reportExists: () => false
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner
   });
-
-  state.currentIssue = 60;
-  state.result = 'IN_PROGRESS';
 
   const second = await classifyWebhookEvent({
     env: { GITHUB_EVENT_NAME: 'issues' },
     argv: ['--mode', 'webhook', '--stdin-json'],
-    stdinText: '{"issue":{"number":60,"title":"EAI-TASK-039","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
-    ghRunner: makeGhRunner(issue),
-    stateReader: () => (state.currentIssue ? state : null),
-    reportExists: () => false
+    stdinText: '{"issue":{"number":999,"title":"EAI-TASK-999","labels":[{"name":"pm:ready"},{"name":"hermes:ready"}]}}',
+    claimRunner: harness.claimRunner
   });
 
   assert.equal(first.result, DECISIONS.EXECUTE);
-  assert.equal(second.result, DECISIONS.CLAIM_CONFLICT);
-  assert.equal(second.claimDecision, 'CLAIM_CONFLICT');
+  assert.equal(first.claimDecision, 'CLAIMED');
+  assert.equal(second.result, DECISIONS.IGNORED_INELIGIBLE);
+  assert.equal(second.claimDecision, 'NOT_RUNNABLE');
+  harness.releaseLock();
 });
 
 test('unknown runtime mode causes no payload inspection or GitHub lookup', async () => {

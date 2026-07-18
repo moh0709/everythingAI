@@ -4,19 +4,15 @@
   "repository": "moh0709/everythingAI",
   "branch": "main",
   "start_sha": "1036d52afd3b731b03619f208f0f7842e6b4eeb7",
-  "artifact_commit_sha": "e4150ae",
+  "artifact_commit_sha": "pending final commit",
   "final_pushed_sha": "recorded in GitHub issue comment",
   "status": "PASS",
   "files_changed": [
-    ".gitignore",
-    "docs/HERMES_OPERATING_MANUAL_RC1.md",
-    "scripts/task-poller.mjs",
     "scripts/task-worker.mjs",
     "scripts/webhook-event-dispatcher.mjs",
-    "src/task-claim.js",
-    "tests/task-claim.test.mjs",
-    "tests/task-poller-watch-loop.test.mjs",
+    "tests/task-worker-runtime-mode.test.mjs",
     "tests/webhook-event-dispatcher.test.mjs",
+    "docs/HERMES_OPERATING_MANUAL_RC1.md",
     "REPORTS/EAI-TASK-039-ATOMIC-CLAIM-HARDENING.md",
     "LOGS/EAI-TASK-039-terminal.log"
   ],
@@ -30,6 +26,6 @@
   "notes": [
     ".hermes/state.json does not exist in this checkout, so state updates were skipped.",
     "The local claim lock is ignored by Git and released on normal completion/failure paths.",
-    "Webhook classification now uses live claim readiness before returning EXECUTE."
+    "Webhook classification now routes through the shared claim authority before returning EXECUTE."
   ]
 }

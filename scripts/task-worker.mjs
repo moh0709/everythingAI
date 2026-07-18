@@ -134,6 +134,7 @@ export async function runTaskWorker({
   argv = process.argv.slice(2),
   issueSelector = selectIssue,
   ghRunner = runGh,
+  stateReader = readStateIfPresent,
   stateWriter = updateState,
   artifactWriter = writeLifecycleArtifacts
 } = {}) {
