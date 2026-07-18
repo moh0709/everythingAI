@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
-import { listRunnableIssues, matchingReportExists, readStateIfPresent, summarizeIssue } from '../src/task-queue.js';
+import { assessClaimReadiness, CLAIM_RESULTS } from '../src/task-claim.js';
+import { matchingReportExists, readStateIfPresent, summarizeIssue } from '../src/task-queue.js';
 
 export const DECISIONS = {
   EXECUTE: 'EXECUTE',
@@ -138,9 +139,10 @@ export async function classifyWebhookEvent({
   argv = process.argv.slice(2),
   stdinText = '',
   readFile = readFileSync,
-  issueLister = listRunnableIssues,
   reportExists = matchingReportExists,
   stateReader = readStateIfPresent,
+  ghRunner = undefined,
+  lockInspector = undefined,
   runtimeDetector = detectRuntimeMode
 } = {}) {
   const runtime = runtimeDetector({ env, argv });
@@ -213,41 +215,50 @@ export async function classifyWebhookEvent({
     };
   }
 
-  const issueNumber = Number(payload.issue.number);
-  const liveRunnable = await issueLister();
-  const liveMatch = liveRunnable.find((issue) => issue.number === issueNumber);
-  if (liveMatch) {
+  const readiness = await assessClaimReadiness({
+    issueNumber: Number(payload.issue.number),
+    issue: null,
+    reportExists,
+    stateReader,
+    ghRunner,
+    lockInspector
+  });
+
+  if (readiness.ok) {
     return {
       ok: true,
       result: DECISIONS.EXECUTE,
       source: discovery.source,
-      issueNumber,
+      issueNumber: Number(payload.issue.number),
       issue: payload.issue,
-      liveIssue: summarizeIssue(liveMatch),
+      liveIssue: summarizeIssue(readiness.issue),
+      claimDecision: 'ELIGIBLE',
       evidence: [
         `labels=${labels.join(', ')}`,
-        `live-runnable=${summarizeIssue(liveMatch)}`
+        ...readiness.evidence
       ],
       nextAction: 'claim-and-execute'
     };
   }
 
-  const currentState = stateReader();
-  const stateConflict = currentState?.currentIssue === issueNumber && currentState?.result === 'IN_PROGRESS';
-  const reportConflict = reportExists(payload.issue);
+  const nonExecutable = readiness.result === CLAIM_RESULTS.CLAIM_CONFLICT
+    ? DECISIONS.CLAIM_CONFLICT
+    : DECISIONS.IGNORED_INELIGIBLE;
 
   return {
     ok: true,
-    result: stateConflict ? DECISIONS.CLAIM_CONFLICT : (reportConflict ? DECISIONS.IGNORED_INELIGIBLE : DECISIONS.CLAIM_CONFLICT),
+    result: nonExecutable,
     source: discovery.source,
-    issueNumber,
+    issueNumber: Number(payload.issue.number),
     issue: payload.issue,
+    claimDecision: readiness.result,
     evidence: [
       `labels=${labels.join(', ')}`,
-      stateConflict ? `state=currentIssue:${currentState.currentIssue}, result:${currentState.result}` : 'state not in progress for this issue',
-      reportConflict ? 'matching report exists' : 'no matching report found'
+      ...(readiness.evidence ?? [])
     ],
-    remediation: 'Revalidate live GitHub labels and queue state before acting.'
+    remediation: readiness.result === CLAIM_RESULTS.CLAIM_CONFLICT
+      ? 'Revalidate live GitHub labels, report artifacts, and claim lock state before acting.'
+      : 'The issue is not runnable from the current live GitHub state.'
   };
 }
 

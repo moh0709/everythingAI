@@ -16,7 +16,8 @@ test('watchLoop resumes queue watching after a poll cycle', async () => {
         return [{ number: 60, title: 'EAI-TASK-038', labels: [] }];
       }
       return [];
-    }
+    },
+    dispatchWorker: async () => 'CLAIM_CONFLICT'
   });
 
   assert.equal(calls, 2);

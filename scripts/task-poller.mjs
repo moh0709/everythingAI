@@ -35,7 +35,7 @@ export async function pollOnce({ listIssues = listRunnableIssues, dispatchWorker
 
   if (watch) {
     console.log(`[task-poller] Dispatching worker for ${summarizeIssue(issues[0])}`);
-    dispatchWorker(issues[0].number);
+    await dispatchWorker(issues[0].number);
   }
 
   return issues[0];

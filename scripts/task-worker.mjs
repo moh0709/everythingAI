@@ -4,7 +4,6 @@ import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import {
-  claimRunnableIssue,
   ensureDir,
   issueTaskId,
   logPathForIssue,
@@ -14,8 +13,13 @@ import {
   repoRoot,
   runGh,
   summarizeIssue,
-  writeStateIfPresent
+  writeStateIfPresent,
+  claimRunnableIssue as selectRunnableIssue
 } from '../src/task-queue.js';
+import {
+  CLAIM_RESULTS,
+  claimRunnableIssue as claimTaskOwnership
+} from '../src/task-claim.js';
 
 const argv = process.argv.slice(2);
 const issueNumberArg = argv.find((value) => /^\d+$/.test(value));
@@ -65,8 +69,8 @@ function getCommitSha() {
 
 function selectIssue(selectedIssueNumber = issueNumber) {
   return Number.isFinite(selectedIssueNumber) && selectedIssueNumber > 0
-    ? claimRunnableIssue({ issueNumber: selectedIssueNumber })
-    : claimRunnableIssue();
+    ? selectRunnableIssue({ issueNumber: selectedIssueNumber })
+    : selectRunnableIssue();
 }
 
 function updateState(issue, status, extra = {}) {
@@ -167,28 +171,35 @@ export async function runTaskWorker({
     return issue;
   }
 
-  const startSha = getCommitSha();
-  const startTime = nowIso();
-  const taskId = issueTaskId(issue);
-  const reportPath = reportPathForIssue(issue);
-  const logPath = logPathForIssue(issue);
-  const labelChange = ghRunner(['issue', 'edit', String(issue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'hermes:working', '--remove-label', 'hermes:ready']);
+  const claim = await claimTaskOwnership({ issueNumber: issue.number, issue, ghRunner, stateReader, stateWriter });
+  if (!claim.ok || claim.result !== CLAIM_RESULTS.CLAIMED) {
+    console.log(`[task-worker] Claim result for ${summarizeIssue(issue)}: ${claim.result}`);
+    if (claim.evidence?.length) {
+      for (const line of claim.evidence) {
+        console.log(`[task-worker] ${line}`);
+      }
+    }
+    process.exitCode = claim.result === CLAIM_RESULTS.RUNTIME_ERROR ? 1 : 0;
+    return claim;
+  }
 
-  stateWriter(issue, 'IN_PROGRESS', {
-    startingCommitSha: startSha,
-    artifactCommitSha: null,
-    finalCommitSha: null,
-    startedAt: startTime
-  });
+  const claimedIssue = claim.issue ?? issue;
+  const releaseClaimLock = claim.releaseLock;
+  try {
+    const startSha = getCommitSha();
+    const startTime = nowIso();
+    const taskId = issueTaskId(claimedIssue);
+    const reportPath = reportPathForIssue(claimedIssue);
+    const logPath = logPathForIssue(claimedIssue);
 
   const logLines = [
-    `[task-worker] Claimed ${summarizeIssue(issue)}`,
+    `[task-worker] Claimed ${summarizeIssue(claimedIssue)}`,
     `[task-worker] Task id: ${taskId}`,
     `[task-worker] Start time: ${startTime}`,
     `[task-worker] Starting commit: ${startSha}`,
     `[task-worker] Report path: ${reportPath}`,
     `[task-worker] Log path: ${logPath}`,
-    `[task-worker] GitHub label update: ${labelChange || 'ok'}`,
+    '[task-worker] Claim authority verified labels and posted the claim acknowledgement.',
     '[task-worker] Lifecycle-only mode completed without modifying application code.'
   ];
 
@@ -198,7 +209,7 @@ export async function runTaskWorker({
     artifactCommitSha: 'recorded after artifact commit',
     finalShaSource: 'GitHub issue comment after artifact push',
     finalShaHandling: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.',
-    filesChanged: '- `scripts/task-worker.mjs`\n- `scripts/task-poller.mjs`\n- `src/task-queue.js`\n- `templates/REPORT_TEMPLATE.md`\n- `.hermes/state.json`\n- `LOGS/EAI-TASK-004-terminal.log`\n- `REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md`',
+    filesChanged: '- `scripts/task-worker.mjs`\n- `scripts/task-poller.mjs`\n- `src/task-queue.js`\n- `src/task-claim.js`\n- `templates/REPORT_TEMPLATE.md`\n- `.hermes/state.json`\n- `LOGS/EAI-TASK-004-terminal.log`\n- `REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md`',
     dryRun: 'N/A',
     frameworkDoctor: 'PENDING',
     uiTypecheck: 'PENDING',
@@ -210,8 +221,8 @@ export async function runTaskWorker({
     followUp: '- PM review should inspect the selected issue, generated report, and terminal log.'
   };
 
-  artifactWriter(issue, 'PASS', { ...details, logLines });
-  stateWriter(issue, 'PASS', {
+  artifactWriter(claimedIssue, 'PASS', { ...details, logLines });
+  stateWriter(claimedIssue, 'PASS', {
     startingCommitSha: startSha,
     artifactCommitSha: 'recorded in the final issue comment',
     finalCommitSha: 'recorded in the final issue comment',
@@ -229,21 +240,24 @@ export async function runTaskWorker({
     finalCommitSha: 'recorded in the final issue comment',
     finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.'
   };
-  const commentResult = ghRunner(['issue', 'comment', String(issue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)]);
+  const commentResult = ghRunner(['issue', 'comment', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)]);
 
-  const finishLabels = ghRunner(['issue', 'edit', String(issue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'pm:review', '--add-label', 'hermes:done', '--remove-label', 'hermes:working']);
-  console.log(`[task-worker] ${summarizeIssue(issue)}`);
+  const finishLabels = ghRunner(['issue', 'edit', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--add-label', 'pm:review', '--add-label', 'hermes:done', '--remove-label', 'hermes:working']);
+  console.log(`[task-worker] ${summarizeIssue(claimedIssue)}`);
   console.log(`[task-worker] Report: ${reportPath}`);
   console.log(`[task-worker] Log: ${logPath}`);
   console.log(`[task-worker] Commented: ${Boolean(commentResult)}`);
   console.log(`[task-worker] Labels updated: ${Boolean(finishLabels)}`);
   process.exitCode = 0;
-  return { issue, reportPath, logPath };
+  return { issue: claimedIssue, reportPath, logPath, claim };
+  } finally {
+    releaseClaimLock?.();
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const result = await runTaskWorker();
-  if (result && result.ok === false) {
+  if (result && result.ok === false && result.result === CLAIM_RESULTS.RUNTIME_ERROR) {
     process.exitCode = 1;
   }
 }

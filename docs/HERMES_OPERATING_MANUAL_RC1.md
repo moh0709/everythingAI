@@ -150,20 +150,55 @@ Additional queue hygiene rules:
 - always prefer live GitHub state over stale webhook payload assumptions,
 - if a later poll shows the issue is already claimed or completed, no-op.
 
-## Atomic claim and duplicate prevention
+## Atomic claim, local lock, and duplicate prevention
 
-Claiming must be atomic and visible before execution begins.
+Claiming is enforced by a shared authority in `src/task-claim.js` so the polling worker and the webhook classifier use the same preconditions.
+
+Claim outcomes are machine-readable and mutually exclusive:
+
+- `CLAIMED`
+- `CLAIM_CONFLICT`
+- `NOT_RUNNABLE`
+- `ALREADY_COMPLETED`
+- `RUNTIME_ERROR`
+
 The claim sequence is:
 
-1. Re-read live issue state.
-2. Switch `hermes:ready` to `hermes:working`.
-3. Leave `pm:ready` in place while work is underway unless the workflow explicitly removes it.
-4. Update `.hermes/state.json` to `IN_PROGRESS`.
-5. Record the current issue number, task ID, starting commit SHA, and claim timestamp.
-6. Post a claim comment containing the task ID, timestamp, starting SHA, and planned deliverable.
-7. Begin execution only after the claim comment is posted successfully.
+1. Re-read live GitHub issue state.
+2. Check `.hermes/state.json` for any active `IN_PROGRESS` task.
+3. Attempt an exclusive local lock at `.hermes/claim.lock`.
+4. Revalidate the live issue, labels, report artifact, and local state after the lock is held.
+5. Add `hermes:working` and remove `hermes:ready`.
+6. Verify the resulting labels from GitHub.
+7. Post the claim acknowledgement comment.
+8. Begin execution only after the claim is established.
 
-If any claim step fails, stop and surface the blocker instead of silently continuing.
+Lock lifecycle:
+
+- The lock file is created with exclusive-create semantics.
+- It records issue number, task ID, PID, hostname, and timestamp.
+- A second claimant is rejected while a valid lock exists.
+- The live worker releases the lock on normal completion and on known failure paths.
+- The lock path is ignored by Git so the live file is never committed.
+
+Stale-lock policy:
+
+- A lock is considered stale only when it was created on the current host and the recorded PID is no longer alive.
+- Host-mismatched locks are treated conservatively as active.
+- If stale evidence is not present, Hermes leaves the lock alone and returns `CLAIM_CONFLICT`.
+
+Duplicate-delivery behavior:
+
+- The webhook classifier returns `EXECUTE` only after live revalidation proves the issue is still claimable.
+- Repeated webhook delivery uses the same claim preconditions, so a later delivery sees the active claim state and does not dispatch the worker twice.
+- Polling continues after claim conflicts and other non-fatal duplicate detections.
+
+Crash recovery procedure:
+
+- If Hermes crashes after creating a lock, the next run inspects the lock metadata before attempting removal.
+- If the owning PID is gone on the same host, the stale lock may be removed and retried.
+- If the owning PID is still alive or the host cannot be verified, the lock is left intact and the issue remains blocked.
+- If `.hermes/state.json` is missing, state updates are skipped rather than synthesized.
 
 ## Execution lifecycle
 
@@ -258,9 +293,9 @@ The completion comment should include:
 ## Known gaps between target behavior and the current worker
 
 - The current worker is lifecycle-oriented and writes claim/report artifacts, but it does not implement a full product-specific execution engine.
-- `docs/ENGINEERINGOS_RC1.md` was not available in this checkout, so this RC1 manual is derived from the existing framework docs instead.
-- The current worker still uses placeholder-style report fields until finalization data is filled in.
-- The repository currently relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service.
+- The repository still relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service, and state writes are skipped if the file is absent.
+- Webhook classification can identify a claimable event, but the actual ownership transition still happens in the polling worker path.
+- If a stale lock cannot be proven stale on the current host, Hermes intentionally leaves it in place and returns `CLAIM_CONFLICT`.
 
 ## Operating summary
 
