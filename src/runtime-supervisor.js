@@ -314,6 +314,9 @@ export function createSupervisor({
       if (onShutdown) {
         onShutdown(signal);
       }
+
+      // Detach signal handlers so stale listeners don't remain in a host process
+      detachSignalHandlers();
     };
 
     const onSigterm = () => handleSignal('SIGTERM');

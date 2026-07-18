@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, mkdirSync, writeFileSync, unlinkSync, readdirSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, mkdirSync, writeFileSync, unlinkSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
@@ -608,5 +608,73 @@ test('stop after SIGTERM-like shutdown does not leave stale handlers', async () 
   });
   const start = await s2.start();
   assert.equal(start.ok, true, 'fresh instance should start after cleanup');
+  s2.stop();
+});
+
+// ---------------------------------------------------------------------------
+// In-process signal handler cleanup test (PM-required correction)
+// ---------------------------------------------------------------------------
+
+test('in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat', async () => {
+  const beforeSigterm = process.listeners('SIGTERM').length;
+  const beforeSigint = process.listeners('SIGINT').length;
+
+  const supervisor = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'inproc-signal-test'
+  });
+
+  const startResult = await supervisor.start();
+  assert.equal(startResult.ok, true, 'supervisor should start');
+
+  // Verify listeners were added
+  assert.equal(
+    process.listeners('SIGTERM').length,
+    beforeSigterm + 1,
+    'SIGTERM listener should be added on start'
+  );
+  assert.equal(
+    process.listeners('SIGINT').length,
+    beforeSigint + 1,
+    'SIGINT listener should be added on start'
+  );
+
+  // Get the registered handler reference
+  const sigtermListeners = process.listeners('SIGTERM');
+  const handler = sigtermListeners[sigtermListeners.length - 1];
+
+  // Invoke the actual registered SIGTERM handler directly (in-process, safe)
+  handler();
+
+  // Verify listener counts returned to baseline
+  assert.equal(
+    process.listeners('SIGTERM').length,
+    beforeSigterm,
+    'SIGTERM listener should be detached after signal handler fires'
+  );
+  assert.equal(
+    process.listeners('SIGINT').length,
+    beforeSigint,
+    'SIGINT listener should be detached after signal handler fires'
+  );
+
+  // Verify heartbeat shows SHUTDOWN
+  const hb = readHeartbeat();
+  assert.ok(hb, 'heartbeat should exist after signal handler');
+  assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on signal');
+
+  // Verify supervisor lock was released
+  assert.ok(
+    !existsSync(SUPERVISOR_LOCK_PATH),
+    'supervisor lock should be released after signal handler fires'
+  );
+
+  // Verify a fresh supervisor instance can start (lock is released, no stale state)
+  const s2 = createSupervisor({
+    mode: HEARTBEAT_MODES.POLLING,
+    hostname: 'inproc-signal-test-2'
+  });
+  const start2 = await s2.start();
+  assert.equal(start2.ok, true, 'fresh supervisor instance should start after signal handler cleanup');
   s2.stop();
 });

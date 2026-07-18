@@ -5,17 +5,15 @@
   "issueNumber": 63,
   "title": "Add runtime supervisor and heartbeat foundation",
   "status": "PASS",
-  "passType": "CORRECTION_PASS",
-  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation. Correction pass 2 added real subprocess SIGTERM/SIGINT tests with isolated working directories, signal handler lifecycle verification, and fresh-instance-after-stop proving no stale handlers.",
+  "passType": "CORRECTION_PASS_3",
+  "summary": "Added runtime supervisor with heartbeat and supervisor lock foundation. Correction pass 3 fixes the final PM-identified defect: signal-triggered shutdown path now calls detachSignalHandlers() after shutdown actions, preventing stale owned listeners from remaining in a host process. Adds in-process signal handler test that triggers the actual registered SIGTERM handler and proves listener cleanup, lock release, SHUTDOWN heartbeat, and fresh instance restart.",
   "correctionDetails": {
-    "defect1": "Real subprocess SIGTERM test — spawns CLI in isolated temp dir, sends SIGTERM, verifies heartbeat.json exists with lastResult=SHUTDOWN, verifies lock is released",
-    "defect2": "Real subprocess SIGINT test — same as SIGTERM but with SIGINT",
-    "defect3": "Signal handler cleanup tests — uses process.listeners() to prove handlers are attached on start and detached on stop; fresh instance works after stop in same process"
+    "defect1": "handleSignal() did not call detachSignalHandlers() after shutdown — fixed by adding detachSignalHandlers() call after releaseSupervisorLock and onShutdown callback",
+    "defect2": "Missing in-process test that triggers actual signal handler and proves cleanup — added in-process SIGTERM handler test via process.listeners() invocation"
   },
   "filesChanged": [
     "src/runtime-supervisor.js",
     "tests/runtime-supervisor.test.mjs",
-    "docs/HERMES_OPERATING_MANUAL_RC1.md",
     "LOGS/EAI-TASK-040-terminal.log",
     "REPORTS/EAI-TASK-040-RUNTIME-SUPERVISOR-HEARTBEAT.md",
     "docs/HANDOVER_2026-07-15_EAI_TASK_040.json",
@@ -23,7 +21,7 @@
   ],
   "validation": {
     "frameworkDoctor": "PASS",
-    "nodeTest": "60/60 pass (including 31 supervisor tests)",
+    "nodeTest": "61/61 pass (including 32 supervisor tests)",
     "npmTest": "identical to node --test",
     "gitDiffCheck": "PASS (no whitespace errors)",
     "jsonParseChecks": "PASS (handover JSON, state JSON all valid)"
@@ -34,10 +32,10 @@
     "atomicWrite": "Write to .tmp then rename to final path",
     "heartbeatInterval": "30 seconds (configurable)",
     "staleThreshold": "120 seconds (configurable)",
-    "sigtermHandling": "Graceful shutdown with final heartbeat and lock release",
-    "sigintHandling": "Graceful shutdown with final heartbeat and lock release",
+    "sigtermHandling": "Graceful shutdown with final heartbeat, lock release, AND signal handler detachment",
+    "sigintHandling": "Graceful shutdown with final heartbeat, lock release, AND signal handler detachment",
     "noSecretsInHeartbeat": "Verified — no env vars, tokens, or secrets in heartbeat",
-    "lifecycle": "Single-use — start() returns SINGLE_USE on second call. Create fresh instance via createSupervisor() to restart."
+    "lifecycle": "Single-use — start() returns SINGLE_USE on second call. Create fresh instance via createSupervisor() to restart. Signal handlers properly detached on both stop() and signal-triggered shutdown."
   },
   "tests": {
     "heartbeatWrite": "Verified atomic write with temp file pattern",
@@ -47,10 +45,10 @@
     "supervisorLifecycle": "Start, stop, setStatus, single-use enforcement, signal handler lifecycle",
     "cliBoundary": "4 CLI tests including dry-run JSON, mode/interval flags, live start/SIGTERM",
     "realSubprocessSignals": "2 tests: SIGTERM and SIGINT with isolated temp dirs verifying heartbeat creation, lastResult=SHUTDOWN, lock release",
-    "signalHandlerCleanup": "3 tests: listener count before/after stop, fresh instance after stop, full lifecycle",
+    "signalHandlerCleanup": "4 tests: listener count before/after stop, fresh instance after stop, full lifecycle, in-process SIGTERM handler invocation with full proof (listener counts, lock, heartbeat, fresh instance)",
     "noSecrets": "Heartbeat never records GH_TOKEN, OPENAI_API_KEY, PATH, etc."
   },
-  "operatingManualUpdated": true,
+  "operatingManualUpdated": false,
   "mvpRuntimePreserved": true,
   "productCodeChanged": false,
   "risks": [
@@ -59,6 +57,6 @@
     "Downstream monitoring or auto-recovery from stale heartbeats is not yet wired up"
   ],
   "nextRecommendedTask": "EAI-TASK-041: Integrate runtime supervisor into poller/worker startup and wire heartbeat status into CLI output",
-  "artifactCommitSha": "recorded after artifact commit",
-  "finalPushedCommitSha": "recorded in final issue comment"
+  "artifactCommitSha": "To be recorded after artifact commit",
+  "finalPushedCommitSha": "To be recorded in final issue comment"
 }

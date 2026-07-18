@@ -1,12 +1,12 @@
 # EAI-TASK-040: Add runtime supervisor and heartbeat foundation
 
-## Final status: PASS (correction pass)
+## Final status: PASS (correction pass 3)
 
 - **Issue:** #63
 - **Task:** EAI-TASK-040
 - **Branch:** main
 - **Repository:** moh0709/everythingAI
-- **Correction pass:** 2026-07-18 (PM rejection items addressed)
+- **Correction pass:** 3 (PM rejection items addressed: signal handler lifecycle cleanup)
 
 ## Summary
 
@@ -14,45 +14,29 @@ Added a narrow supervisor/heartbeat foundation to expose machine-readable livene
 and process lifecycle state for the Hermes poller/worker runtime. No product
 application code was changed.
 
-This correction pass added real subprocess signal verification:
-1. Real SIGTERM/SIGINT subprocess tests with isolated working directories
-2. Signal handler lifecycle and stale-handler cleanup verification
-3. Fresh instance after stop in same process
+This correction pass fixes the final PM-identified defect: the signal-triggered
+shutdown path (`handleSignal`) now calls `detachSignalHandlers()` after performing
+shutdown actions, preventing stale owned listeners from remaining in a host process.
 
-## Changes from original submission
+## Changes from previous submission
 
-### Defect 1: CLI entry point synchronous usage
-
-| Before | After |
-|--------|-------|
-| `const result = supervisor.start();` (sync, `result.ok` is `undefined` → always enters error branch) | `const result = await supervisor.start();` with try/catch + top-level `.catch()` on module entry |
-| Top-level call: `runSupervisorCli();` | `runSupervisorCli().catch(...)` for safe async rejection handling |
-
-### Defect 2: Signal handler lifecycle
+### Defect fixed: Signal handler not detached after signal-triggered shutdown
 
 | Before | After |
 |--------|-------|
-| Single `signalHandlerAttached` boolean prevents re-attachment | `Map`-based signal handler tracking (`signalHandlers`): |
-| Signal closure captures `lockAttempt` param from first `start()` call | `lockRef` tracks current lock; `attachSignalHandlers()` always detaches stale handlers first |
-| Handlers never detached (stale lock reference remains after stop) | `detachSignalHandlers()` called in `stop()` — removes listeners and clears `lockRef` |
-| Second `start()` after `stop()` returns `ALREADY_RUNNING` | Second `start()` returns `SINGLE_USE` — supervisor instances are explicitly single-use |
-| | New getter: `supervisor.used` reflects single-use state |
+| `handleSignal` releases the lock and calls `onShutdown` but never calls `detachSignalHandlers()` | `handleSignal` releases the lock, calls `onShutdown`, then calls `detachSignalHandlers()` to remove owned SIGTERM/SIGINT listeners |
+| In a host process, stale listeners remain attached with closed-over lock references | After any signal-triggered shutdown, all supervisor-owned listeners are properly detached |
+| Only the explicit `stop()` path cleaned up listeners | Both `stop()` and signal-triggered `handleSignal()` paths clean up listeners |
 
-### Defect 3: Missing CLI boundary test
+### New test: In-process signal handler cleanup
 
-New tests added to `tests/runtime-supervisor.test.mjs`:
+| Test | What it proves |
+|------|---------------|
+| `in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat` | Creates supervisor in same process, retrieves the actual registered SIGTERM handler from `process.listeners()`, invokes it directly. Verifies: listener counts return to baseline (both SIGTERM and SIGINT), heartbeat has `lastResult: "SHUTDOWN"`, supervisor lock is released, a fresh supervisor instance can start in the same process. |
 
-| Test | What it verifies |
-|------|-----------------|
-| `CLI --dry-run outputs valid JSON and exits 0` | `spawnSync` runs supervisor in dry-run mode; asserts stdout is valid JSON with `ok: true`, `result: 'DRY_RUN'`, plus paths |
-| `CLI --dry-run --mode webhook outputs correct mode` | Verifies `WEBHOOK` mode propagation through CLI |
-| `CLI --dry-run --interval 5000 outputs correct interval` | Verifies interval CLI argument parsing |
-| `CLI without --dry-run starts supervisor and writes heartbeat` | Spawns supervisor with short interval, sends SIGTERM after 3s; verifies startup and shutdown messages in stdout |
-|| `subprocess SIGTERM creates heartbeat, exits cleanly, releases lock` | **NEW** — Spawns CLI in isolated temp dir, waits for startup, sends SIGTERM, verifies heartbeat file exists with `lastResult: SHUTDOWN`, verifies supervisor lock is released |
-|| `subprocess SIGINT creates heartbeat, exits cleanly, releases lock` | **NEW** — Same as SIGTERM but with SIGINT |
-|| `signal handlers are detached after supervisor stop` | **NEW** — Uses `process.listeners('SIGTERM')` to prove handlers are attached on start and removed on stop |
-|| `fresh supervisor instance works after stop in same process` | **NEW** — Start, stop, create fresh `createSupervisor()`, start again — proves no stale state |
-|| `stop after SIGTERM-like shutdown does not leave stale handlers` | **NEW** — Full lifecycle cycle with listener count verification + fresh instance |
+This test triggers the actual registered SIGTERM handler without terminating the
+test runner, proving both SIGTERM and SIGINT listeners are detached after the
+signal path fires.
 
 ## Evidence reviewed
 
@@ -62,19 +46,24 @@ New tests added to `tests/runtime-supervisor.test.mjs`:
 - `src/task-queue.js` — existing queue utilities
 - `tests/task-claim.test.mjs` — existing test patterns
 - `package.json` — existing package scripts
-- Issue #63 body, PM rejection comment, and release labels
+- Issue #63 body, PM rejection comments, and release labels
 
-## Files changed
+## Files changed (this correction pass)
 
 | File | Change |
 |------|--------|
-| `src/runtime-supervisor.js` | **UPDATED** — Fixed CLI async/await, single-use enforcement, signal handler attach/detach with Map tracking |
-| `tests/runtime-supervisor.test.mjs` | **UPDATED** — 26 tests (was 21): single-use test, `used` getter, fresh instance, 4 CLI boundary tests |
-| `docs/HERMES_OPERATING_MANUAL_RC1.md` | Update with single-use contract and signal handler lifecycle (unchanged from original) |
-| `LOGS/EAI-TASK-040-terminal.log` | **UPDATED** — New terminal log for correction pass |
-| `REPORTS/EAI-TASK-040-RUNTIME-SUPERVISOR-HEARTBEAT.md` | **UPDATED** — This report with correction details |
-| `docs/HANDOVER_2026-07-15_EAI_TASK_040.json` | **UPDATED** — Status, summary, fix details |
-| `.hermes/state.json` | **UPDATED** — Current task and result |
+| `src/runtime-supervisor.js` | **UPDATED** — `handleSignal` now calls `detachSignalHandlers()` after shutdown actions (3 lines added) |
+| `tests/runtime-supervisor.test.mjs` | **UPDATED** — Added in-process signal handler test (32 tests, was 31, was 26, was 21) |
+
+## Files unchanged from prior passes
+
+| File | Status |
+|------|--------|
+| `docs/HERMES_OPERATING_MANUAL_RC1.md` | Unchanged — already documents supervisor lifecycle correctly |
+| `docs/HANDOVER_2026-07-15_EAI_TASK_040.json` | Updated for this pass |
+| `.hermes/state.json` | Updated for this pass |
+| `LOGS/EAI-TASK-040-terminal.log` | Updated for this pass |
+| `REPORTS/EAI-TASK-040-RUNTIME-SUPERVISOR-HEARTBEAT.md` | Updated for this pass |
 
 ## Supervisor behavior
 
@@ -106,10 +95,11 @@ New tests added to `tests/runtime-supervisor.test.mjs`:
 ### Graceful shutdown
 
 - Handles SIGTERM and SIGINT
-- Signal handlers are tracked via `Map` and properly detached on `stop()`
-- Writes final heartbeat with `lastResult: "SHUTDOWN"`
+- Signal handlers are tracked via `Map` and properly detached on both `stop()` and signal-triggered shutdown
+- Writes final heartbeat with `lastResult: "SHUTDOWN"` (or `"STOPPED"` on explicit stop)
 - Releases supervisor lock
 - Calls optional `onShutdown` callback
+- After signal-triggered shutdown, detached listeners ensure no stale references remain
 
 ## Proof that runner does not auto-execute
 
@@ -120,7 +110,7 @@ wired into the poller or worker by default.
 
 ## Tests
 
-31 deterministic tests in `tests/runtime-supervisor.test.mjs` (was 26):
+32 deterministic tests in `tests/runtime-supervisor.test.mjs` (was 31):
 
 | Test area | Tests | Description |
 |-----------|-------|-------------|
@@ -131,14 +121,14 @@ wired into the poller or worker by default.
 | Supervisor lifecycle | 6 | Controller shape, SINGLE_USE enforcement, NOT_RUNNING stop, setStatus, used getter, fresh instance |
 | CLI boundary | 4 | Dry-run JSON output, mode flag, interval flag, live start/SIGTERM |
 | Real subprocess signals | 2 | SIGTERM with isolated dir (heartbeat + lock), SIGINT with isolated dir |
-| Signal handler cleanup | 3 | Listener count before/after stop, fresh instance after stop, full lifecycle |
+| Signal handler cleanup | 4 | Listener count before/after stop, fresh instance after stop, full lifecycle, **in-process SIGTERM handler invocation with full proof** |
 
 ## Validation results
 
 | Command | Result |
 |---------|--------|
 | `node scripts/framework-doctor.mjs` | **PASS** (gh authenticated, state valid, all files present) |
-| `node --test tests/*.test.mjs` | **PASS** (60/60 — 29 pre-existing + 31 supervisor tests) |
+| `node --test tests/*.test.mjs` | **PASS** (61/61 — 29 pre-existing + 32 supervisor tests) |
 | `npm test` | **PASS** (same as `node --test`) |
 | `git diff --check` | **PASS** (no whitespace errors) |
 | JSON parse checks | **PASS** (handover JSON, state JSON all valid) |
@@ -161,11 +151,3 @@ wired into the poller or worker by default.
 
 **EAI-TASK-041:** Integrate runtime supervisor into poller/worker startup and wire
 heartbeat status into CLI output.
-
-## Artifact commit SHA
-
-Recorded after artifact commit (see final issue comment for the actual SHA).
-
-## Final pushed commit SHA
-
-Recorded in the final issue comment.
