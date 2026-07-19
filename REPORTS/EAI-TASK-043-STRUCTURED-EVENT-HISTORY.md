@@ -5,6 +5,7 @@
 **Correction rerun status: PASS — PM QA requirements validated 2026-07-19**
 
 Artifact commit: `897d3ffd308d80bcb8910550dc3f2af67a64ba26`
+Metadata commit: `6492640662243e7726628c049a597b6d9475a59e`
 
 ## Corrections implemented
 

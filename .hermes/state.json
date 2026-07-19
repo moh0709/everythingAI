@@ -9,7 +9,7 @@
   "status": "COMPLETED",
   "startingCommitSha": "99ba72cb089b15b426ecd04e9675ef14a43e4de0",
   "artifactCommitSha": "897d3ffd308d80bcb8910550dc3f2af67a64ba26",
-  "finalCommitSha": "897d3ffd308d80bcb8910550dc3f2af67a64ba26",
+  "finalCommitSha": "6492640662243e7726628c049a597b6d9475a59e",
   "finalizationPattern": "Rerun after PM QA rejection: correct trailing-record tolerance and rotation failure safety, validate, commit artifacts, then finalize metadata.",
   "startedAt": "2026-07-19T06:19:00Z",
   "completedAt": "2026-07-19T06:21:40Z",

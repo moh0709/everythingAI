@@ -36,5 +36,6 @@
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": "897d3ffd308d80bcb8910550dc3f2af67a64ba26"
+  "artifactCommitSha": "897d3ffd308d80bcb8910550dc3f2af67a64ba26",
+  "metadataCommitSha": "6492640662243e7726628c049a597b6d9475a59e"
 }
