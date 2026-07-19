@@ -4,7 +4,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { readHistory } from '../src/event-history.js';
+import { readHistory, redactPayload } from '../src/event-history.js';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname);
 const PATHS = Object.freeze({
@@ -17,21 +17,22 @@ const PATHS = Object.freeze({
   reports: resolve(ROOT, 'REPORTS')
 });
 const HEALTH_STATES = Object.freeze(['HEALTHY', 'DEGRADED', 'BLOCKED', 'STALE', 'STOPPED', 'UNKNOWN']);
+const safeValue = (value) => redactPayload({ value }).value;
 
-function safeJson(path) {
+function safeJson(path, now = () => Date.now()) {
   if (!existsSync(path)) return { present: false, value: null, error: null, ageMs: null };
   try {
     const value = JSON.parse(readFileSync(path, 'utf8'));
-    const ageMs = Math.max(0, Date.now() - statSync(path).mtimeMs);
+    const ageMs = Math.max(0, now() - statSync(path).mtimeMs);
     return { present: true, value, error: null, ageMs };
   } catch (error) {
     return { present: true, value: null, error: 'invalid JSON', ageMs: null };
   }
 }
 
-function ageFromTimestamp(value) {
+function ageFromTimestamp(value, now = () => Date.now()) {
   const parsed = Date.parse(value ?? '');
-  return Number.isFinite(parsed) ? Math.max(0, Date.now() - parsed) : null;
+  return Number.isFinite(parsed) ? Math.max(0, now() - parsed) : null;
 }
 
 function readHistorySnapshot(path) {
@@ -71,19 +72,28 @@ function queueSnapshot() {
 }
 
 export function inspectHealth({ paths = PATHS, now = () => Date.now(), queue = queueSnapshot } = {}) {
-  const state = safeJson(paths.state);
-  const heartbeat = safeJson(paths.heartbeat);
-  const claimLock = safeJson(paths.claimLock);
-  const supervisorLock = safeJson(paths.supervisorLock);
-  const retry = safeJson(paths.retry);
+  const state = safeJson(paths.state, now);
+  const heartbeat = safeJson(paths.heartbeat, now);
+  const claimLock = safeJson(paths.claimLock, now);
+  const supervisorLock = safeJson(paths.supervisorLock, now);
+  const retry = safeJson(paths.retry, now);
   const history = readAllHistory(paths.history);
-  const allRecords = history.flatMap((item) => item.records);
+  const allRecords = history.flatMap((item) => item.records)
+    .map((event, index) => ({ event, index }))
+    .sort((left, right) => {
+      const byTime = Date.parse(left.event.timestamp) - Date.parse(right.event.timestamp);
+      return Number.isNaN(byTime) || byTime === 0 ? left.index - right.index : byTime;
+    })
+    .map(({ event }) => event);
   const heartbeatAgeMs = heartbeat.value ? (() => { const at = Date.parse(heartbeat.value.lastHeartbeat ?? ''); return Number.isFinite(at) ? Math.max(0, now() - at) : null; })() : null;
-  const retryState = retry.value?.retry ?? retry.value ?? state.value?.retry ?? null;
-  const lockAge = (item) => item.value?.createdAt ? ageFromTimestamp(item.value.createdAt) : item.ageMs;
+  const retryState = (retry.value?.retry && typeof retry.value.retry === 'object') ? retry.value.retry : retry.value ?? state.value?.retry ?? null;
+  const lockAge = (item) => item.value?.createdAt ? ageFromTimestamp(item.value.createdAt, now) : item.ageMs;
   const historyCorrupt = history.some((item) => item.error);
+  const artifactCorrupt = Boolean(state.error || heartbeat.error || claimLock.error || supervisorLock.error || retry.error || historyCorrupt);
   let status = 'UNKNOWN';
-  if (heartbeat.error || state.error || claimLock.error || supervisorLock.error || historyCorrupt) status = 'DEGRADED';
+  // Total precedence (highest first): corrupt data, terminal/block, no heartbeat,
+  // stale heartbeat, clean stop, active retry/lock, healthy.
+  if (artifactCorrupt) status = 'DEGRADED';
   else if (state.value?.result === 'BLOCKED' || state.value?.status === 'BLOCKED' || retryState?.terminal === true) status = 'BLOCKED';
   else if (!heartbeat.value) status = 'UNKNOWN';
   else if (heartbeatAgeMs === null || heartbeatAgeMs > 120000) status = 'STALE';
@@ -95,15 +105,15 @@ export function inspectHealth({ paths = PATHS, now = () => Date.now(), queue = q
     readOnly: true,
     generatedAt: new Date(now()).toISOString(),
     queue: queue(),
-    currentTask: state.value?.currentTask ?? heartbeat.value?.currentTask ?? null,
+    currentTask: safeValue(state.value?.currentTask ?? heartbeat.value?.currentTask ?? null),
     currentIssue: state.value?.currentIssue ?? heartbeat.value?.currentIssue ?? null,
     lastCompletedTask: allRecords.filter((event) => event.type === 'completion').at(-1)?.taskId ?? null,
-    lastFailure: allRecords.filter((event) => event.resultCode && ['FAIL', 'FAILED', 'ERROR'].includes(String(event.resultCode).toUpperCase())).at(-1)?.validationSummary ?? null,
+    lastFailure: safeValue(allRecords.filter((event) => event.resultCode && ['FAIL', 'FAILED', 'ERROR'].includes(String(event.resultCode).toUpperCase())).at(-1)?.validationSummary ?? null),
     heartbeat: { present: heartbeat.present, ageMs: heartbeatAgeMs, mode: heartbeat.value?.mode ?? null, lastResult: heartbeat.value?.lastResult ?? null },
     locks: { claim: { present: claimLock.present, ageMs: lockAge(claimLock) }, supervisor: { present: supervisorLock.present, ageMs: lockAge(supervisorLock) } },
-    retry: retryState ? { attempt: retryState.attempt ?? null, retry: retryState.retry ?? null, terminal: retryState.terminal ?? null, failureClass: retryState.failureClass ?? null } : null,
+    retry: retryState ? { attempt: retryState.attempt ?? null, retry: retryState.retry ?? null, terminal: retryState.terminal ?? null, failureClass: safeValue(retryState.failureClass ?? null) } : null,
     metrics: metrics(history),
-    artifacts: { state: state.present, heartbeat: heartbeat.present, history: history.some((item) => item.present), corrupt: Boolean(state.error || heartbeat.error || claimLock.error || supervisorLock.error || historyCorrupt) }
+    artifacts: { state: state.present, heartbeat: heartbeat.present, history: history.some((item) => item.present), corrupt: artifactCorrupt }
   };
 }
 
