@@ -62,3 +62,24 @@ Provision a dedicated non-login `hermes` account and `/opt/everythingAI` checkou
 ## Scope and secret handling
 
 Only task artifacts and `.hermes/state.json` metadata were changed. No files under `apps/` or `services/` were changed. No secret values, environment dumps, credentials, or raw runtime payloads are included in the report or terminal log.
+
+## Authorized rerun — 2026-07-19T15:22:36+02:00
+
+PM explicitly authorized privileged provisioning in the latest issue comment. The rerun performed a fresh bounded host assessment before any installation:
+
+| Check | Result |
+|---|---|
+| Host | `vmi2938167`, Linux `6.8.0-100-generic x86_64` |
+| Execution identity | `uid=0(root)` |
+| Systemd state | **BLOCKED** — `degraded` |
+| Failed-unit assessment | Eight unrelated pre-existing failed units were present; no EverythingAI unit was installed |
+| `hermes` account | **BLOCKED** — absent |
+| `/opt/everythingAI` | **BLOCKED** — absent |
+| `/etc/hermes/everythingai.env` | **BLOCKED** — `/etc/hermes` absent |
+| Root GitHub CLI auth | PASS; authenticated account and masked token status only |
+| Hermes-account GitHub auth | **NOT TESTABLE** — account was absent |
+| Privileged provisioning attempt | **NOT EXECUTED** — scheduled-runner approval gate denied execution of the account/path/credential setup command |
+
+The privileged command was not partially executed: no account, deployment checkout, external credential directory, env file, or systemd unit was created by this rerun. Consequently, enable/start, boot persistence, crash restart, watchdog recovery, lock conflict, rollback, uninstall, reinstall, and restored-state evidence remain unavailable. No service was started and no product code was modified.
+
+Rerun validation completed successfully: `npm run framework:doctor`, `node --test tests/*.test.mjs`, `npm test` (138/138), `systemd-analyze verify` for all five version-controlled units, `git diff --check`, and JSON parsing. The host remains **BLOCKED**, not successful.

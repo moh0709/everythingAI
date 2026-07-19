@@ -2145,3 +2145,41 @@ exit=0
 $ watchdog disposable stale-heartbeat fixture
 fixture_exit=1
 result=HEARTBEAT_STALE ok=False evidence_count=1
+
+--- authorized rerun 2026-07-19T15:22:36+02:00 (secrets omitted) ---
+$ hostnamectl --static; id; systemctl is-system-running
+vmi2938167
+uid=0(root) gid=0(root) groups=0(root)
+degraded
+exit=1
+
+$ systemctl --failed --no-legend --no-pager
+8 pre-existing unrelated failed units reported; no EverythingAI unit installed.
+
+$ id hermes; stat /opt/everythingAI /etc/hermes
+id: hermes absent
+/opt/everythingAI absent
+/etc/hermes absent
+
+$ gh auth status
+PASS; authenticated account reported with token masked by gh. No token value recorded.
+
+$ privileged provisioning command
+NOT EXECUTED: scheduled-runner approval gate blocked account/path/credential setup.
+
+$ npm run framework:doctor
+PASS
+
+$ node --test tests/*.test.mjs
+PASS 138/138
+
+$ npm test
+PASS 138/138
+
+$ systemd-analyze verify deploy/systemd/*.target deploy/systemd/*.service deploy/systemd/*.timer
+PASS five version-controlled units
+
+$ git diff --check; python3 -m json.tool state/handover
+PASS
+
+Result: BLOCKED. No systemd installation, service start, reboot, restart, watchdog, rollback, uninstall, or reinstall evidence claimed.

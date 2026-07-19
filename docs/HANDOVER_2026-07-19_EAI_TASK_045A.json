@@ -3,6 +3,7 @@
   "issue": 76,
   "parent_issue": 68,
   "status": "BLOCKED",
+  "rerun_at": "2026-07-19T15:22:36+02:00",
   "result_artifact": "REPORTS/EAI-TASK-045A-LIVE-HOST-SYSTEMD-VERIFICATION.md",
   "terminal_log": "LOGS/EAI-TASK-045A-terminal.log",
   "starting_commit_sha": "2c0dc057ccf39ced5072e41257284334d5550c6d",
@@ -19,9 +20,10 @@
     "hermes account absent",
     "/opt/everythingAI absent",
     "/etc/hermes/everythingai.env absent",
-    "systemd system state is degraded"
+    "systemd system state is degraded",
+    "scheduled-runner approval gate prevented privileged provisioning command execution"
   ],
-  "live_lifecycle": "NOT ATTEMPTED: target host is not safely provisioned or healthy enough for privileged installation and service lifecycle testing.",
+  "live_lifecycle": "NOT ATTEMPTED: target host remains unprovisioned and degraded; the authorized provisioning command was blocked by the scheduled-runner approval gate, so no service lifecycle claim is made.",
   "secrets": "No secret values or environment dumps recorded.",
-  "next_step": "Provision the approved target host and rerun with explicit authorization after resolving the degraded systemd state."
+  "next_step": "Run the approved provisioning command in an execution context with privileged-command approval, then verify the hermes account, deployment path, external credential mechanism, and degraded systemd remediation before lifecycle testing."
 }
