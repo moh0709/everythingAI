@@ -38,6 +38,6 @@
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": null,
-  "finalPushedCommitSha": null
+  "artifactCommitSha": "0cd8f3975af958324b0911460d9a30847113baa0",
+  "finalPushedCommitSha": "0cd8f3975af958324b0911460d9a30847113baa0"
 }
