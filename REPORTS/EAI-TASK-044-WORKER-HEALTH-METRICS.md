@@ -4,6 +4,8 @@
 
 **Final status:** PASS
 
+Artifact commit SHA: `71aa8bbb56d74401ad561d9d217909f6c18b5481`
+
 Implemented a read-only operator health command at `node scripts/hermes-health.mjs` (also available as `npm run hermes:health`). It reads heartbeat, state, claim/supervisor locks, retry state, and versioned event history without mutating runtime artifacts. It emits JSON with `--json` or concise human-readable output by default.
 
 ## Health states

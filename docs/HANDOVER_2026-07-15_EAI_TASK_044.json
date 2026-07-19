@@ -3,6 +3,7 @@
   "issue": 67,
   "title": "Add worker health CLI and operational metrics snapshot",
   "status": "PASS",
+  "artifactCommitSha": "71aa8bbb56d74401ad561d9d217909f6c18b5481",
   "artifacts": [
     "scripts/hermes-health.mjs",
     "tests/hermes-health.test.mjs",
