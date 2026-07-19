@@ -3,19 +3,22 @@
   "issue": 67,
   "title": "Add worker health CLI and operational metrics snapshot",
   "status": "PASS",
-  "artifactCommitSha": "71aa8bbb56d74401ad561d9d217909f6c18b5481",
+  "artifactCommitSha": "0f2acd67c8b7b4f8d99cd8bbb029c60903401072",
   "artifacts": [
     "scripts/hermes-health.mjs",
     "tests/hermes-health.test.mjs",
+    "docs/HERMES_WORKER_HEALTH.md",
     "LOGS/EAI-TASK-044-terminal.log",
     "REPORTS/EAI-TASK-044-WORKER-HEALTH-METRICS.md"
   ],
   "validation": {
+    "focusedTests": "18/18 PASS",
     "frameworkDoctor": "PASS",
-    "nodeTests": "117/117 PASS",
-    "npmTest": "117/117 PASS",
+    "nodeTests": "129/129 PASS",
+    "npmTest": "129/129 PASS",
     "diffCheck": "PASS",
-    "jsonOutput": "PASS"
+    "jsonChecks": "PASS",
+    "liveJsonOutput": "PASS; STOPPED alert snapshot, readOnly=true"
   },
   "safety": {
     "readOnlyRuntimeInspection": true,

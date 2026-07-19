@@ -2,44 +2,41 @@
 
 ## Result
 
-**Final status:** PASS
+**Correction status:** PASS — PM QA rejection addressed.
 
-Artifact commit SHA: `71aa8bbb56d74401ad561d9d217909f6c18b5481`
+Artifact commit SHA: `0f2acd67c8b7b4f8d99cd8bbb029c60903401072`
 
-Implemented a read-only operator health command at `node scripts/hermes-health.mjs` (also available as `npm run hermes:health`). It reads heartbeat, state, claim/supervisor locks, retry state, and versioned event history without mutating runtime artifacts. It emits JSON with `--json` or concise human-readable output by default.
+The read-only operator command remains available as `node scripts/hermes-health.mjs` and `npm run hermes:health`. This correction pass hardens retry corruption handling, routes mtime and timestamp ages through the injected clock, documents total status precedence, orders durable history chronologically across rotations, and expands the focused tests from 6 to 18.
 
-## Health states
+## QA corrections
 
-- `HEALTHY`: fresh heartbeat and no blocking/degradation evidence.
-- `DEGRADED`: corrupt runtime/history data, retry pending, or an active lock is present.
-- `BLOCKED`: terminal retry state or explicit blocked state.
-- `STALE`: heartbeat is absent of a usable timestamp or older than two minutes.
-- `STOPPED`: clean stopped/idle heartbeat.
-- `UNKNOWN`: no heartbeat is available and no stronger state can be established.
-
-Corrupt or missing files are handled conservatively. Queue lookup is read-only and degrades to `available: false` if GitHub is unavailable. No environment variables, credentials, webhook payloads, or secret values are included.
-
-## Metrics
-
-Counters are derived only from durable NDJSON event history (including retained rotated history files): discovered, claimed, completed, blocked, failed, recovered, and retried. The snapshot also reports queue visibility, current task/issue, last completed task, last failure summary, heartbeat age, retry state, and lock ages.
+- Corrupt `.hermes/retry.json` now contributes to `DEGRADED` and `artifacts.corrupt`.
+- Status precedence is explicit and documented in `docs/HERMES_WORKER_HEALTH.md`.
+- Heartbeat, lock timestamp, and file-mtime fallback ages all use the injected clock.
+- Boundary coverage includes exactly 120,000 ms (fresh) and 120,001 ms (stale), plus lock age.
+- Missing/corrupt state, heartbeat, retry, locks, unsupported history schema, corrupt middle history, and allowed partial trailing history are covered.
+- JSON/human output tests snapshot runtime directory entries, bytes, and mtimes before/after execution.
+- Last completion selection is chronological across active and rotated history.
+- Secret canaries are asserted absent from JSON and human output; corrupt record contents are never emitted.
 
 ## Files changed
 
 - `scripts/hermes-health.mjs`
 - `tests/hermes-health.test.mjs`
-- `package.json`
+- `docs/HERMES_WORKER_HEALTH.md`
 - `LOGS/EAI-TASK-044-terminal.log`
 - `REPORTS/EAI-TASK-044-WORKER-HEALTH-METRICS.md`
 - `docs/HANDOVER_2026-07-15_EAI_TASK_044.json`
 - `.hermes/state.json`
 
+No `apps/` or `services/` core application code was modified.
+
 ## Validation
 
-- `node --test tests/hermes-health.test.mjs` — PASS, 6/6.
+- `node --test tests/hermes-health.test.mjs` — PASS, 18/18.
 - `node scripts/framework-doctor.mjs` — PASS.
-- `node --test tests/*.test.mjs` — PASS, 117/117.
-- `npm test` — PASS, 117/117.
-- `node scripts/hermes-health.mjs --json` — PASS; live snapshot emitted JSON and reported `STOPPED` because the persisted heartbeat is a clean stopped heartbeat.
+- `node --test tests/*.test.mjs` — PASS, 129/129.
+- `npm test` — PASS, 129/129.
+- `node scripts/hermes-health.mjs --json` — PASS output validation; live status `STOPPED`, queue available with 1 ready issue, read-only true. CLI exits 1 for non-healthy alert status as documented.
+- JSON parsing of state, handover, and package manifests — PASS.
 - `git diff --check` — PASS.
-
-No `apps/` or `services/` core application code was modified.
