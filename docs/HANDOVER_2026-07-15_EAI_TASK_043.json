@@ -4,7 +4,7 @@
   "taskId": "EAI-TASK-043",
   "issueNumber": 66,
   "title": "Add structured event log and persistent execution history",
-  "summary": "PM QA correction rerun completed: newline-terminated malformed records are surfaced, CRLF partial fragments are handled, and rotation rename/retention failures are deterministic and loss-safe.",
+  "summary": "PM QA correction rerun completed: deterministic monotonic rotation retention and a four-process concurrent append test now prove newest-generation preservation and complete unique records.",
   "filesChanged": [
     "src/event-history.js",
     "tests/event-history.test.mjs",
@@ -23,13 +23,13 @@
     "unsupportedVersionsSurfaced": true,
     "secretRedaction": true,
     "maxPayloadBytes": 16384,
-    "rotation": { "maxBytes": 5242880, "retainFiles": 3, "failureSeamTested": true },
+    "rotation": { "maxBytes": 5242880, "retainFiles": 3, "monotonicSequence": true, "failureSeamTested": true },
     "runtimePathIgnoredByGit": true
   },
   "validation": {
-    "focusedTests": "11/11 pass",
-    "allNodeTests": "110/110 pass",
-    "npmTest": "110/110 pass",
+    "focusedTests": "12/12 pass",
+    "allNodeTests": "111/111 pass",
+    "npmTest": "111/111 pass",
     "frameworkDoctor": "PASS",
     "gitDiffCheck": "PASS",
     "jsonParseChecks": "PASS"

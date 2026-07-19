@@ -4,7 +4,8 @@
 
 **Correction rerun status: PASS — PM QA requirements validated 2026-07-19**
 
-Implementation correction commit: pending metadata finalization.
+Implementation correction commit: `09768214eb20553c371d0ba53027bfba5644d8d5`
+Metadata commit: pending finalization.
 
 ## Corrections implemented
 
