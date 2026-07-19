@@ -10,7 +10,7 @@
   "startingCommitSha": "8e966843d4a19cf52c1e7f718a9cc06dfe4639ec",
   "implementationCommitSha": null,
   "artifactCommitSha": "5989b5d8ec782ac7b00f68822a484f27f6b38560",
-  "finalCommitSha": "759201cf2f9493a2a99973093675fa3816bdef63",
+  "finalCommitSha": "0d5f1bd4e364b2275414e5e63aa91c8afb258c65",
   "finalizationPattern": "Interactive authorized rerun reached the platform privileged-command gate, which rejected provisioning before execution; post-gate read-only checks verified no host mutation.",
   "startedAt": "2026-07-19T13:02:36Z",
   "completedAt": "2026-07-19T13:42:21Z",
