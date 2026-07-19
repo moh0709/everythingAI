@@ -44,6 +44,8 @@ The live command intentionally returned exit code 1 because the repository heart
 ## Commits
 
 - Implementation and validation artifacts: `f0d712a28501724f465efed52979f341be7b7c9c`
+- Report and handover artifacts: `a5314d2735322ed03c3bde776991854b15f77aba`
+- Final state metadata: `76313d93d10e16a02ad294d000996ed92709c81f`
 
 ## Scope and safety
 
