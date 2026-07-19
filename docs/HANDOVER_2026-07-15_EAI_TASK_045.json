@@ -1,0 +1,40 @@
+{
+  "taskId": "EAI-TASK-045",
+  "issueNumber": 68,
+  "title": "Add systemd deployment and watchdog recovery",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "status": "BLOCKED",
+  "startingCommitSha": "eb29ce2b56ac66b0ebf5c48aca50537f272ddad2",
+  "artifactCommitSha": "recorded after commit",
+  "finalPushedSha": "recorded after push",
+  "blocker": {
+    "systemd": "available, systemctl is-system-running returned degraded",
+    "serviceAccount": "hermes account absent",
+    "deploymentPath": "/opt/everythingAI absent; checkout is under /root/.hermes/projects/everythingAI",
+    "impact": "Host installation and lifecycle verification were not safely executable without provisioning and relocating/configuring the runtime."
+  },
+  "artifacts": [
+    "deploy/systemd/hermes-runtime.target",
+    "deploy/systemd/hermes-supervisor.service",
+    "deploy/systemd/hermes-poller.service",
+    "deploy/systemd/hermes-watchdog.service",
+    "deploy/systemd/hermes-watchdog.timer",
+    "scripts/hermes-watchdog.mjs",
+    "docs/HERMES_RUNTIME_RUNBOOK.md",
+    "docs/HERMES_OPERATING_MANUAL_RC1.md",
+    "LOGS/EAI-TASK-045-terminal.log",
+    "REPORTS/EAI-TASK-045-SYSTEMD-WATCHDOG-DEPLOYMENT.md"
+  ],
+  "validation": {
+    "systemdAnalyzeVerify": "PASS",
+    "frameworkDoctor": "PASS",
+    "nodeTests": "138/138 PASS",
+    "npmTest": "138/138 PASS",
+    "jsonChecks": "PASS",
+    "diffCheck": "PASS",
+    "watchdogDisposableStaleFixture": "PASS: expected HEARTBEAT_STALE exit 1"
+  },
+  "scope": "No apps/ or services/ application code changed; no secrets recorded.",
+  "nextStep": "Provision the target host and rerun the runbook preflight and lifecycle verification."
+}

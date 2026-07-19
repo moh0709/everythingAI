@@ -1,0 +1,16 @@
+[Unit]
+Description=Hermes heartbeat watchdog check
+After=hermes-supervisor.service
+
+[Service]
+Type=oneshot
+User=hermes
+Group=hermes
+WorkingDirectory=/opt/everythingAI
+EnvironmentFile=-/etc/hermes/everythingai.env
+ExecStart=/usr/bin/node /opt/everythingAI/scripts/hermes-watchdog.mjs --root /opt/everythingAI --service hermes-poller.service
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/everythingAI/.hermes

@@ -1,0 +1,26 @@
+[Unit]
+Description=Hermes runtime heartbeat supervisor
+PartOf=hermes-runtime.target
+After=network-online.target
+StartLimitIntervalSec=5min
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=hermes
+Group=hermes
+WorkingDirectory=/opt/everythingAI
+EnvironmentFile=-/etc/hermes/everythingai.env
+ExecStart=/usr/bin/node /opt/everythingAI/src/runtime-supervisor.js --mode polling --interval 30000
+Restart=on-failure
+RestartSec=10s
+KillSignal=SIGTERM
+TimeoutStopSec=30s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/everythingAI/.hermes
+
+[Install]
+WantedBy=hermes-runtime.target

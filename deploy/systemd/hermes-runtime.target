@@ -1,0 +1,8 @@
+[Unit]
+Description=Hermes EverythingAI runtime
+Wants=hermes-supervisor.service hermes-poller.service
+After=network-online.target
+Wants=network-online.target
+
+[Install]
+WantedBy=multi-user.target

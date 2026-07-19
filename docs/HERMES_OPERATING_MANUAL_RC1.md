@@ -599,7 +599,20 @@ node src/crash-recovery.js --repo-root /path/to/repo
 - The runtime supervisor (`src/runtime-supervisor.js`) is now present with heartbeat and supervisor lock support, but it is not yet integrated into the poller/worker startup by default — it must be started explicitly.
 - The supervisor lock path (`.hermes/supervisor.lock`) is separate from the task claim lock (`.hermes/claim.lock`) and is not yet lifecycle-managed by the worker scripts.
 - Heartbeat stale detection is implemented in the module but downstream monitoring or auto-recovery is not yet wired up.
+- The version-controlled systemd deployment in `deploy/systemd/` starts the heartbeat supervisor and polling worker separately. `hermes-watchdog.timer` performs a read-only heartbeat plus service-health check every 60 seconds; it deliberately reports failure rather than issuing an unbounded restart. The service units use bounded `Restart=on-failure` policies for process crashes.
 - Crash recovery reconciliation is implemented in `src/crash-recovery.js` but is not yet integrated into the worker startup lifecycle — it must be invoked explicitly via `reconcile()`.
+
+## systemd deployment and watchdog operations
+
+The supported Linux deployment is described in `docs/HERMES_RUNTIME_RUNBOOK.md` and uses the templates under `deploy/systemd/`. It assumes the repository is installed at `/opt/everythingAI`, the service account is `hermes`, and Node is explicitly located at `/usr/bin/node`. Do not copy a shell-expanded environment into a unit file.
+
+The deployment has three distinct responsibilities:
+
+- `hermes-supervisor.service` emits the atomic `.hermes/runtime/heartbeat.json` and owns `.hermes/supervisor.lock`.
+- `hermes-poller.service` runs the documented polling entry point and is restarted only on failure, with a bounded delay and burst limit.
+- `hermes-watchdog.timer` runs the read-only `scripts/hermes-watchdog.mjs` check. A stale/missing heartbeat or inactive poller is a visible failed watchdog invocation; it does not restart repeatedly and is intended for operator/on-call action.
+
+The watchdog is heartbeat evidence, not a claim that the supervisor has systemd `WatchdogSec`/`sd_notify` integration. If native systemd watchdog notification is required, it must be implemented and tested as a separate runtime change.
 
 ## Operating summary
 
