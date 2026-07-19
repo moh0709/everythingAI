@@ -5,10 +5,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   FAILURE_CLASSES, classifyFailure, isRetryAllowed, calculateBackoff,
-  nextRetry, resetRetryState, persistRetryState, readRetryState
+  nextRetry, resetRetryState, persistRetryState, clearRetryState, readRetryState
 } from '../src/retry-policy.js';
 
-const now = () => new Date('2026-07-19T00:00:00.000Z');
+const at = (ms) => () => new Date(ms);
+const now = at(Date.parse('2026-07-19T00:00:00.000Z'));
 
 test('classifies explicit, transport, claim, validation, and unknown failures', () => {
   assert.equal(classifyFailure({ failureClass: 'transient' }), FAILURE_CLASSES.TRANSIENT);
@@ -30,6 +31,14 @@ test('backoff is bounded and deterministic without jitter', () => {
   assert.equal(calculateBackoff(1, config), 100);
   assert.equal(calculateBackoff(2, config), 200);
   assert.equal(calculateBackoff(3, config), 250);
+});
+
+test('jitter is deterministic, clamped to the ceiling, and sanitizes bad samples', () => {
+  const config = { initialBackoffMs: 250, maxBackoffMs: 250, jitterRatio: 1 };
+  assert.equal(calculateBackoff(1, config, () => 1), 250);
+  assert.equal(calculateBackoff(1, config, () => 0), 0);
+  assert.equal(calculateBackoff(1, config, () => 99), 250);
+  assert.equal(calculateBackoff(1, config, () => Number.NaN), 250);
 });
 
 test('transient failure retries, then exhausts attempts', () => {
@@ -54,13 +63,43 @@ test('permanent, validation, and ambiguous mutations terminate without retry', (
   assert.equal(mutation.retry, false);
 });
 
-test('retry state persists, survives restart, and resets after success', () => {
+test('restart enforces the persisted total-time ceiling at and beyond its boundary', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'retry-policy-ceiling-'));
+  const path = join(dir, 'state.json');
+  const config = { maxAttempts: 3, initialBackoffMs: 100, maxBackoffMs: 1_000, totalTimeCeilingMs: 1_000 };
+  const first = nextRetry({ failure: { code: 'ETIMEDOUT' }, now: at(0), config, idempotent: true });
+  persistRetryState(path, first);
+  const restored = readRetryState(path);
+  const atCeiling = nextRetry({ state: restored, failure: { code: 'ETIMEDOUT' }, now: at(800), config, idempotent: true });
+  assert.equal(atCeiling.retry, true);
+  const aboveCeiling = nextRetry({ state: restored, failure: { code: 'ETIMEDOUT' }, now: at(801), config, idempotent: true });
+  assert.equal(aboveCeiling.retry, false);
+  assert.match(aboveCeiling.reason, /ceiling/);
+});
+
+test('retry lifecycle persists across restart and clears state after success', () => {
   const dir = mkdtempSync(join(tmpdir(), 'retry-policy-test-'));
   const path = join(dir, 'state.json');
   writeFileSync(path, JSON.stringify({ currentTask: 'EAI-TASK-042' }));
-  const state = nextRetry({ failure: { code: 'ETIMEDOUT' }, now, idempotent: true });
+  const state = nextRetry({ failure: { code: 'ETIMEDOUT' }, now: at(0), idempotent: true });
   persistRetryState(path, state);
   assert.deepEqual(readRetryState(path), state);
-  assert.deepEqual(resetRetryState(state), {});
+  const restored = readRetryState(path);
+  const successState = resetRetryState(restored);
+  clearRetryState(path);
+  assert.deepEqual(successState, {});
+  assert.equal(readRetryState(path), null);
   assert.equal(JSON.parse(readFileSync(path, 'utf8')).currentTask, 'EAI-TASK-042');
+});
+
+test('claim conflicts require live revalidation and operator/unknown failures escalate', () => {
+  const claim = nextRetry({ failure: { result: 'CLAIM_CONFLICT' }, now, revalidate: false });
+  assert.equal(claim.retry, false);
+  const revalidated = nextRetry({ failure: { result: 'CLAIM_CONFLICT' }, now, revalidate: true });
+  assert.equal(revalidated.retry, true);
+  for (const failure of [{ operatorActionRequired: true }, {}]) {
+    const terminal = nextRetry({ failure, now, idempotent: true });
+    assert.equal(terminal.retry, false);
+    assert.equal(terminal.terminal, true);
+  }
 });

@@ -1362,3 +1362,21 @@ $ node scripts/framework-doctor.mjs
 }
 
 $ git diff --check
+PASS
+
+--- PM QA correction rerun ---
+Changes: jitter ceiling clamp and random sanitization; persisted restart ceiling boundaries; success lifecycle state clearing; claim-conflict revalidation and terminal escalation tests; unique atomic temp paths.
+
+$ node --test tests/retry-policy.test.mjs
+PASS — 9/9
+
+$ node scripts/framework-doctor.mjs
+PASS
+
+$ npm test
+PASS — 99/99
+
+$ JSON.parse(handover); JSON.parse(.hermes/state.json)
+PASS
+
+Safety: no apps/ or services/ product code changed; tests use injected clocks/randomness and temporary state files; no real GitHub issue mutation by tests.

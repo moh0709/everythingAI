@@ -7,11 +7,11 @@
   "updatedAt": "2026-07-19T00:00:00Z",
   "lastCheckedAt": "2026-07-19T00:00:00Z",
   "status": "COMPLETED",
-  "startingCommitSha": "5941e0f",
-  "artifactCommitSha": "3c92cde261799ffda84ff81ecd6c2417eb76a290",
-  "finalCommitSha": "cc16955f12ee213b6f05517cafa73f8afd5ae51f",
+  "startingCommitSha": "735fef63361f13afb329daff69f8eb84b9243460",
+  "artifactCommitSha": null,
+  "finalCommitSha": null,
   "finalizationPattern": "Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.",
-  "startedAt": "2026-07-19T00:00:00Z",
-  "completedAt": "2026-07-19T00:00:00Z",
-  "humanSummary": "Implemented bounded retry backoff and failure classification with safe retry gating, persistence, restart recovery, and success reset. Validation: 96/96 Node tests, npm test PASS, framework doctor PASS, diff check PASS."
+  "startedAt": "2026-07-19T02:18:00Z",
+  "completedAt": "2026-07-19T02:18:00Z",
+  "humanSummary": "PM QA correction: jitter is ceiling-clamped and sanitized, persisted retry timing is enforced across restart, successful lifecycle clears retry state, claim conflicts require live revalidation, terminal escalation is covered, and atomic persistence uses unique temporary paths. Validation: 9/9 retry-policy tests, 99/99 Node tests, npm test PASS, framework doctor PASS, diff check PASS, JSON parse PASS."
 }

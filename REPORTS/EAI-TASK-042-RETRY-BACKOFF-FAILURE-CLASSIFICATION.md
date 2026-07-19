@@ -2,42 +2,43 @@
 
 ## Result
 
-**Final status: PASS**
+**Final status: PASS — PM QA correction rerun**
 
 ## Scope
 
-Implemented a passive retry-policy module for Hermes runtime operations without changing product application code. The policy provides six explicit failure classes, bounded exponential backoff, optional deterministic jitter injection, an overall retry time ceiling, and JSON state persistence.
+Corrected the bounded retry policy without changing product application code. The policy now clamps positive jitter to the configured backoff ceiling, sanitizes injected random samples, enforces the persisted total-time ceiling across restart, demonstrates a successful retry lifecycle with persisted-state clearing, requires live revalidation for claim conflicts, and uses unique same-directory temporary files for atomic state replacement.
 
 ## Implementation
 
 - `src/retry-policy.js`
-  - Failure classes: `TRANSIENT`, `PERMANENT`, `CLAIM_CONFLICT`, `VALIDATION_FAILURE`, `OPERATOR_ACTION_REQUIRED`, `UNKNOWN`.
-  - Default policy: 3 attempts, 1 second initial delay, 30 second per-delay cap, 120 second total ceiling, zero jitter by default.
-  - Retries are allowed only for transient/claim-conflict failures when the caller marks the operation idempotent or supplies live revalidation.
-  - Destructive or ambiguous Git/GitHub mutations are not automatically retried.
-  - Retry state records attempt number, next retry time, failure class, evidence, and start/update timestamps.
-  - State writes are atomic and preserve unrelated `.hermes/state.json` fields. Successful completion can clear retry fields with `resetRetryState()`.
+  - Six failure classes: `TRANSIENT`, `PERMANENT`, `CLAIM_CONFLICT`, `VALIDATION_FAILURE`, `OPERATOR_ACTION_REQUIRED`, `UNKNOWN`.
+  - Bounded exponential backoff with maximum-attempt and total-time ceilings.
+  - Deterministic/injectable jitter; out-of-range or non-finite samples are conservatively bounded and final delay never exceeds `maxBackoffMs`.
+  - Retries only for transient/claim-conflict failures when the caller marks the operation idempotent or supplies live revalidation.
+  - Claim conflicts without live revalidation, destructive/ambiguous Git/GitHub mutations, operator-action-required failures, and unknown failures terminate without retry.
+  - Retry state records attempt, next retry time, failure class, evidence, and timestamps; persisted `startedAtMs` is reused after restart.
+  - Atomic persistence uses a unique same-directory temporary path followed by rename and preserves unrelated state fields. `clearRetryState()` removes retry state after success.
 - `tests/retry-policy.test.mjs`
-  - Covers classification, retry safety, bounded backoff, success-after-retry, exhaustion, permanent/validation/unknown failures, claim conflict, persistence/restart, and reset.
+  - 9 deterministic tests covering classification, retry safety, bounded backoff, jitter boundary/sanitization, attempt exhaustion, terminal failures, persisted ceiling boundary after restart, success-after-retry state clearing, claim conflicts, and operator/unknown escalation.
 - No `apps/` or `services/` product code was changed.
 
 ## Validation
 
 | Command | Result |
 |---|---|
-| `node --test tests/retry-policy.test.mjs` | **PASS** — 6/6 |
-| `node --test tests/*.test.mjs` | **PASS** — 96/96 |
-| `npm test` | **PASS** — 96/96 |
+| `node --test tests/retry-policy.test.mjs` | **PASS — 9/9** |
+| `node --test tests/*.test.mjs` | **PASS — 99/99** |
+| `npm test` | **PASS — 99/99** |
 | `node scripts/framework-doctor.mjs` | **PASS** |
 | `git diff --check` | **PASS** |
-| JSON parsing | **PASS** — handover and `.hermes/state.json` |
+| JSON parsing | **PASS — handover and `.hermes/state.json`** |
 
 Terminal output is recorded in `LOGS/EAI-TASK-042-terminal.log`.
 
 ## Safety and ownership
 
-The module does not schedule or execute retries itself. The operation owner must decide whether an operation is idempotent or has been live-revalidated before calling `nextRetry()`. Git/GitHub mutations remain operator-action-required unless protected by an explicit safe revalidation contract. Exhausted, non-retryable, validation, and ambiguous failures produce terminal state suitable for PM/operator handoff.
+The module remains passive: callers own operation execution and must provide an idempotency or live-revalidation contract. Git/GitHub mutations are not blindly retried. Claim conflicts retry only with fresh revalidation and remain bounded. Terminal failures provide PM/operator escalation evidence. Tests use temporary files and injected clocks/randomness; they do not mutate real GitHub issues.
 
 ## State and artifacts
 
-`.hermes/state.json` already existed and was updated for this task. No new state file was created. The final commit SHA is recorded after commit/push finalization.
+`.hermes/state.json` pre-existed and was updated for this correction rerun. Artifacts were validated before commit and push. The final pushed commit SHA is recorded in the handover and state metadata after finalization.

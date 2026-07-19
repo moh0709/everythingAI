@@ -9,6 +9,7 @@
 
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { randomUUID } from 'node:crypto';
 
 export const FAILURE_CLASSES = Object.freeze({
   TRANSIENT: 'TRANSIENT',
@@ -63,8 +64,10 @@ export function calculateBackoff(attempt, config = {}, random = Math.random) {
   const policy = normalizedConfig(config);
   const exponent = Math.max(0, Number(attempt) - 1);
   const base = Math.min(policy.maxBackoffMs, policy.initialBackoffMs * (2 ** exponent));
-  const jitter = policy.jitterRatio === 0 ? 0 : ((random() * 2) - 1) * policy.jitterRatio * base;
-  return Math.max(0, Math.round(base + jitter));
+  const sampled = Number(random());
+  const boundedSample = Number.isFinite(sampled) ? Math.min(1, Math.max(0, sampled)) : 0.5;
+  const jitter = policy.jitterRatio === 0 ? 0 : ((boundedSample * 2) - 1) * policy.jitterRatio * base;
+  return Math.min(policy.maxBackoffMs, Math.max(0, Math.round(base + jitter)));
 }
 
 export function nextRetry({ state = {}, failure, now = () => new Date(), config = {}, random = Math.random, idempotent = false, revalidate = false } = {}) {
@@ -109,8 +112,15 @@ export function readRetryState(statePath) {
 export function persistRetryState(statePath, retryState) {
   mkdirSync(dirname(statePath), { recursive: true });
   const current = existsSync(statePath) ? JSON.parse(readFileSync(statePath, 'utf8')) : {};
-  const tmpPath = `${statePath}.tmp`;
-  writeFileSync(tmpPath, `${JSON.stringify({ ...current, retry: retryState }, null, 2)}\n`);
+  const next = { ...current };
+  if (retryState == null) delete next.retry;
+  else next.retry = retryState;
+  const tmpPath = `${statePath}.${process.pid}.${randomUUID()}.tmp`;
+  writeFileSync(tmpPath, `${JSON.stringify(next, null, 2)}\n`);
   renameSync(tmpPath, statePath);
   return retryState;
+}
+
+export function clearRetryState(statePath) {
+  return persistRetryState(statePath, null);
 }

@@ -5,7 +5,8 @@
   "issueNumber": 65,
   "title": "Add bounded retry backoff and failure classification",
   "status": "PASS",
-  "summary": "Added a passive deterministic retry policy with explicit failure classification, bounded exponential backoff, optional jitter, total time ceiling, safe retry gating, persisted retry evidence, restart recovery, and success reset.",
+  "rerun": "PM QA correction requested 2026-07-19",
+  "summary": "Corrected jitter ceiling and random-input handling, persisted retry timing across restart, success-state clearing, claim-conflict revalidation coverage, terminal escalation coverage, and unique temporary-path atomic persistence.",
   "filesChanged": [
     "src/retry-policy.js",
     "tests/retry-policy.test.mjs",
@@ -14,34 +15,29 @@
     "LOGS/EAI-TASK-042-terminal.log",
     ".hermes/state.json"
   ],
-  "failureClasses": [
-    "TRANSIENT",
-    "PERMANENT",
-    "CLAIM_CONFLICT",
-    "VALIDATION_FAILURE",
-    "OPERATOR_ACTION_REQUIRED",
-    "UNKNOWN"
-  ],
   "retryPolicy": {
     "maxAttempts": 3,
     "initialBackoffMs": 1000,
     "maxBackoffMs": 30000,
     "totalTimeCeilingMs": 120000,
     "jitterRatioDefault": 0,
+    "jitterFinalDelayClamped": true,
     "retryableOnlyWhenIdempotentOrRevalidated": true,
     "automaticGitOrGitHubMutationRetry": false,
+    "claimConflictRequiresLiveRevalidation": true,
+    "uniqueAtomicTempPath": true,
     "stateFields": ["attempt", "nextRetryAt", "failureClass", "lastEvidence", "startedAtMs", "updatedAt"]
   },
   "validation": {
     "frameworkDoctor": "PASS",
-    "retryPolicyTests": "6/6 pass",
-    "allNodeTests": "96/96 pass",
-    "npmTest": "96/96 pass",
+    "retryPolicyTests": "9/9 pass",
+    "allNodeTests": "99/99 pass",
+    "npmTest": "99/99 pass",
     "gitDiffCheck": "PASS",
     "jsonParseChecks": "PASS"
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": "3c92cde261799ffda84ff81ecd6c2417eb76a290",
-  "finalPushedCommitSha": "cc16955f12ee213b6f05517cafa73f8afd5ae51f"
+  "artifactCommitSha": null,
+  "finalPushedCommitSha": null
 }
