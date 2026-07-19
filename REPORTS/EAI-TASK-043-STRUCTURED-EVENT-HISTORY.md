@@ -4,6 +4,8 @@
 
 **Rerun status: PASS — PM QA corrections validated 2026-07-19T05:25:30Z**
 
+Artifact commit: `544bbf948c534badf592d9a245cabdec45077571`
+
 ## Corrections implemented
 
 - `readHistory()` now tolerates only malformed JSON in the final non-empty line, while surfacing middle-file corruption with a line-numbered `HistoryCorruptionError` that does not include record contents.
