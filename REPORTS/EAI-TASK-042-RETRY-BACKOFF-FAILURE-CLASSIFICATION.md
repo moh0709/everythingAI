@@ -2,7 +2,7 @@
 
 ## Result
 
-**Final status: PASS — PM QA correction rerun**
+**Final status: PASS — PM QA correction rerun (validated 2026-07-19T02:48:48Z)**
 
 ## Scope
 
@@ -42,3 +42,5 @@ The module remains passive: callers own operation execution and must provide an 
 ## State and artifacts
 
 `.hermes/state.json` pre-existed and was updated for this correction rerun. Artifacts were validated before commit and push. The final pushed commit SHA is recorded in the handover and state metadata after finalization.
+
+Rerun evidence is recorded in `LOGS/EAI-TASK-042-terminal.log`; the validation was performed against final pushed commit `894e3631c206b231108d9c4c1d3410ba1703c310`.
