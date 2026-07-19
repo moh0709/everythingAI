@@ -1,11 +1,10 @@
-# EAI-TASK-045: systemd deployment and watchdog recovery
+# EAI-TASK-045 — systemd deployment and watchdog recovery
 
-## Final status: BLOCKED (host installation prerequisites unavailable)
+## Result
 
-- Issue: #68
-- Repository: `moh0709/everythingAI`
-- Branch: `main`
-- Starting commit: `eb29ce2b56ac66b0ebf5c48aca50537f272ddad2`
+**BLOCKED for host installation; deployment artifacts and validation gates PASS.**
+
+The repository already contains the version-controlled systemd templates, read-only heartbeat watchdog, operating-manual guidance, and runtime runbook required by this issue. This run completed the safe validation path without changing application code or attempting privileged host installation.
 
 ## Delivered artifacts
 
@@ -16,43 +15,45 @@
 - `deploy/systemd/hermes-watchdog.timer`
 - `scripts/hermes-watchdog.mjs`
 - `docs/HERMES_RUNTIME_RUNBOOK.md`
-- Updated `docs/HERMES_OPERATING_MANUAL_RC1.md`
-- `LOGS/EAI-TASK-045-terminal.log`
+- `docs/HERMES_OPERATING_MANUAL_RC1.md`
 - `docs/HANDOVER_2026-07-15_EAI_TASK_045.json`
-- `.hermes/state.json`
+- `.hermes/state.json` (pre-existing and valid; not modified)
+- `LOGS/EAI-TASK-045-terminal.log`
 
-## Implementation summary
+## Design and safety notes
 
-The version-controlled deployment separates the runtime heartbeat supervisor from the GitHub polling worker. Both service units use explicit `/usr/bin/node`, `/opt/everythingAI`, `User=hermes`, external `/etc/hermes/everythingai.env`, bounded `Restart=on-failure` delays, and `StartLimit*` burst controls. Hardening includes `NoNewPrivileges`, `PrivateTmp`, `ProtectSystem=full`, `ProtectHome=read-only`, and explicit writable paths.
+- Supervisor and poller use explicit `/opt/everythingAI` and `/usr/bin/node` paths, the dedicated `hermes` account, bounded `Restart=on-failure` delays, and `StartLimit*` bounds.
+- The heartbeat watchdog runs as a read-only systemd timer check every 60 seconds with a 120-second stale threshold. It reports failure and does not restart services, avoiding restart storms.
+- Native `WatchdogSec` is intentionally not claimed because the Node supervisor does not implement `sd_notify`.
+- Configuration is sourced from the external `/etc/hermes/everythingai.env` contract. Secrets were not printed, committed, or included in this report or log.
+- Runbook procedures cover preflight, install, update, rollback, lifecycle operations, disposable crash verification, and uninstall.
 
-The watchdog timer invokes a read-only Node check every 60 seconds. It validates heartbeat freshness (120-second threshold) and poller service activity. It exits with machine-readable failure evidence and deliberately does not restart the service, preventing restart storms. The documentation explicitly states that this is heartbeat watchdog evidence, not native systemd `WatchdogSec`/`sd_notify` support, because the existing supervisor does not implement `sd_notify`.
-
-The operating manual and runbook document preflight, install, update, start, stop, restart, status, logs, rollback, disposable failure verification, and uninstall procedures. Secrets remain external and are not committed.
-
-## Blocker and exact evidence
-
-Systemd is available (`systemd 255.4-1ubuntu8.16`), but this checkout host is not a prepared Hermes deployment target:
-
-- `systemctl is-system-running` returned `degraded`.
-- `id hermes` returned `no such user`.
-- `/opt/everythingAI` is absent; the checkout is under `/root/.hermes/projects/everythingAI`.
-
-Installing and starting the services would therefore require host provisioning and a repository relocation/copy, plus configuring GitHub CLI credentials for the dedicated service account. Those host-side changes were not performed, and no deployment or service lifecycle success is claimed. The templates were validated with `systemd-analyze verify` and the watchdog was exercised against a disposable stale-heartbeat fixture.
-
-## Validation
+## Validation evidence — 2026-07-19
 
 | Check | Result |
 |---|---|
-| `systemd-analyze verify` on all target/service/timer templates | PASS |
-| `npm run framework:doctor` | PASS |
-| `node --test tests/*.test.mjs` | PASS — 138/138 |
-| `npm test` | PASS — 138/138 |
-| `.hermes/state.json` JSON parse | PASS |
-| `git diff --check` | PASS |
-| Disposable stale watchdog fixture | PASS — expected exit 1 / `HEARTBEAT_STALE` |
+| `npm run framework:doctor` | **PASS** |
+| `npm test` | **PASS — 138/138** |
+| `systemd-analyze verify` for all five unit/template files | **PASS** |
+| Handover JSON parse | **PASS** |
+| Existing `.hermes/state.json` JSON parse | **PASS** |
+| `git diff --check` | **PASS** |
+| Disposable stale-heartbeat watchdog fixture | **PASS — expected `HEARTBEAT_STALE`, exit 1** |
 
-No `apps/` or `services/` application code was changed.
+## Host deployment blocker
 
-## Operator next step
+Host lifecycle installation and recovery testing were not safely executable in this checkout. Read-only evidence captured in the terminal log:
 
-Provision the `hermes` account and `/opt/everythingAI` on the intended Hermes host, configure the protected external environment/credential mechanism, rerun the runbook preflight, install the templates, and perform the documented disposable crash-recovery verification. This issue should remain open for PM review of the blocked host-deployment evidence.
+- `id hermes`: no such user
+- `/opt/everythingAI`: absent; checkout is under `/root/.hermes/projects/everythingAI`
+- `systemctl is-system-running`: `degraded`
+
+Therefore boot enablement, real service status/log capture, and deliberate systemd process-crash recovery remain blocked pending target-host provisioning and operator approval. No claim of successful host deployment is made.
+
+## Scope
+
+No files under `apps/` or `services/` were changed. No secrets, environment dumps, credentials, or raw runtime payloads were recorded.
+
+## Next step
+
+Provision the target host with the `hermes` account and `/opt/everythingAI` checkout, resolve the degraded systemd state, then follow `docs/HERMES_RUNTIME_RUNBOOK.md` and rerun lifecycle verification on that host.
