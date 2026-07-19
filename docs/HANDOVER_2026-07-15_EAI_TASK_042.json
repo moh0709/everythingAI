@@ -40,6 +40,6 @@
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": "0cd8f3975af958324b0911460d9a30847113baa0",
-  "finalPushedCommitSha": "PENDING_FINALIZATION_SHA"
+  "artifactCommitSha": "d1de92856c4aa951a307a49dc26ea290702f9123",
+  "finalPushedCommitSha": "d1de92856c4aa951a307a49dc26ea290702f9123"
 }
