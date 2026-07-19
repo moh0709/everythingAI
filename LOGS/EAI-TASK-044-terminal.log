@@ -22,3 +22,5 @@ $ git diff --check
 PASS
 
 Implementation commit: 0f2acd67c8b7b4f8d99cd8bbb029c60903401072
+Adversarial test/artifact commit: 3e0df61a85430d1950d3c3e365b52dc3a438fc14
+Metadata synchronization commit: f8cda7df9815da82a19b298d7b5e5554a8c791ca
