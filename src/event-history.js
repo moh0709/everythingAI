@@ -57,45 +57,57 @@ export function createEvent({ type, issueNumber, taskId, correlationId = randomU
   return event;
 }
 
-function rotateIfNeeded(historyPath, config) {
-  if (!existsSync(historyPath) || statSync(historyPath).size < config.maxBytes) return;
+function rotateIfNeeded(historyPath, config, fsOps) {
+  if (!fsOps.existsSync(historyPath) || fsOps.statSync(historyPath).size < config.maxBytes) return;
   const dir = dirname(historyPath);
   const base = historyPath.endsWith('.ndjson') ? historyPath.slice(0, -7) : historyPath;
   const rotated = `${base}.${new Date().toISOString().replaceAll(':', '-')}.${process.pid}.${randomUUID()}.ndjson`;
-  renameSync(historyPath, rotated);
-  const files = readdirSync(dir).filter((name) => name.startsWith(`${base.split('/').pop()}.`) && name.endsWith('.ndjson')).sort().reverse();
-  for (const old of files.slice(config.retainFiles)) { try { unlinkSync(join(dir, old)); } catch {} }
+  // Rename is deliberately performed before the append. If it fails, the active
+  // file remains untouched and the append fails rather than risking data loss.
+  fsOps.renameSync(historyPath, rotated);
+  return { dir, base, rotated };
 }
 
 export function appendEvent(historyPath, event, options = {}) {
   const config = { ...DEFAULTS, ...options };
+  const fsOps = { existsSync, mkdirSync, readdirSync, renameSync, statSync, unlinkSync, ...options.fsOps };
   validateEvent(event);
   const line = `${JSON.stringify(event)}\n`;
   if (Buffer.byteLength(line) > config.maxPayloadBytes) throw new RangeError('event exceeds max payload size');
-  mkdirSync(dirname(historyPath), { recursive: true });
-  rotateIfNeeded(historyPath, config);
+  fsOps.mkdirSync(dirname(historyPath), { recursive: true });
+  const rotation = rotateIfNeeded(historyPath, config, fsOps);
   appendFileSync(historyPath, line, { encoding: 'utf8', flag: 'a' });
+  if (rotation) {
+    const files = fsOps.readdirSync(rotation.dir)
+      .filter((name) => name.startsWith(`${rotation.base.split('/').pop()}.`) && name.endsWith('.ndjson'))
+      .sort().reverse();
+    // Retention errors are surfaced after the new active record is safely
+    // appended, so neither the active file nor the complete rotated file is lost.
+    for (const old of files.slice(config.retainFiles)) fsOps.unlinkSync(join(rotation.dir, old));
+  }
   return event;
 }
 
 export function readHistory(historyPath) {
   if (!existsSync(historyPath)) return [];
   const records = [];
-  const lines = readFileSync(historyPath, 'utf8').split('\n');
-  const nonEmpty = lines.reduce((count, line) => count + (line.trim() ? 1 : 0), 0);
-  let seen = 0;
-  for (const line of lines) {
+  const content = readFileSync(historyPath, 'utf8');
+  const lines = content.split('\n');
+  const endsWithLineTerminator = content.endsWith('\n') || content.endsWith('\r');
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     if (!line.trim()) continue;
-    seen += 1;
+    const lineNumber = index + 1;
     let event;
     try { event = JSON.parse(line); } catch {
-      if (seen === nonEmpty) continue; // A crashed append may leave only its final line partial.
-      throw new HistoryCorruptionError(seen, 'malformed JSON');
+      const isFinalFragment = index === lines.length - 1 && !endsWithLineTerminator;
+      if (isFinalFragment) continue; // A crashed append may leave only its final fragment partial.
+      throw new HistoryCorruptionError(lineNumber, 'malformed JSON');
     }
     try { validateEvent(event); } catch (error) {
       const reason = error instanceof TypeError && error.message === 'unsupported event schema version'
         ? 'unsupported event schema version' : 'schema validation failed';
-      throw new HistoryCorruptionError(seen, reason);
+      throw new HistoryCorruptionError(lineNumber, reason);
     }
     records.push(event);
   }

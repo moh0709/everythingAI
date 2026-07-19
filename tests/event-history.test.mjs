@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { appendEvent, createEvent, HistoryCorruptionError, readHistory, redactPayload, validateEvent } from '../src/event-history.js';
@@ -38,7 +38,7 @@ test('surfaces corruption in the middle without leaking its contents', () => {
   assert.throws(() => readHistory(path), (error) => error instanceof HistoryCorruptionError && error.lineNumber === 2 && !error.message.includes('secret'));
 });
 
-test('rejects schema-invalid and unsupported final records while tolerating malformed final records', () => {
+test('rejects schema-invalid and newline-terminated malformed final records', () => {
   const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
   const path = join(dir, 'events.ndjson');
   writeFileSync(path, `${JSON.stringify(fixture('start'))}\n{"schemaVersion":99}\n`, 'utf8');
@@ -46,7 +46,16 @@ test('rejects schema-invalid and unsupported final records while tolerating malf
   writeFileSync(path, `${JSON.stringify(fixture('start'))}\n{"broken":`, 'utf8');
   assert.equal(readHistory(path).length, 1);
   writeFileSync(path, `${JSON.stringify(fixture('start'))}\n{"broken":}\n`, 'utf8');
+  assert.throws(() => readHistory(path), /line 2: malformed JSON/);
+});
+
+test('uses physical line numbers and tolerates a partial CRLF trailing fragment', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  writeFileSync(path, `${JSON.stringify(fixture('start'))}\r\n\r\n{"broken":`, 'utf8');
   assert.equal(readHistory(path).length, 1);
+  writeFileSync(path, `${JSON.stringify(fixture('start'))}\r\nnot-json\r\n${JSON.stringify(fixture('completion'))}\r\n`, 'utf8');
+  assert.throws(() => readHistory(path), (error) => error instanceof HistoryCorruptionError && error.lineNumber === 2);
 });
 
 test('preserves rapid append ordering', () => {
@@ -63,6 +72,36 @@ test('rotates bounded history and retains configured rotated files', () => {
   const files = readdirSync(dir).filter((name) => name.endsWith('.ndjson'));
   assert.ok(files.length <= 3);
   assert.ok(readHistory(path).length >= 1);
+});
+
+test('rotation rename failure leaves the active history unchanged', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  const first = fixture('start');
+  appendEvent(path, first);
+  const before = readFileSync(path, 'utf8');
+  assert.throws(() => appendEvent(path, fixture('completion'), {
+    maxBytes: 1,
+    fsOps: { renameSync() { throw new Error('simulated rename failure'); } },
+  }), /simulated rename failure/);
+  assert.equal(readFileSync(path, 'utf8'), before);
+  assert.equal(readdirSync(dir).filter((name) => name.endsWith('.ndjson')).length, 1);
+});
+
+test('retention failure is explicit after preserving active and rotated records', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  appendEvent(path, fixture('start'));
+  assert.throws(() => appendEvent(path, fixture('completion'), {
+    maxBytes: 1,
+    retainFiles: 0,
+    fsOps: { unlinkSync() { throw new Error('simulated retention failure'); } },
+  }), /simulated retention failure/);
+  assert.equal(readHistory(path).length, 1);
+  const rotated = readdirSync(dir).filter((name) => name.endsWith('.ndjson') && name !== 'events.ndjson');
+  assert.equal(rotated.length, 1);
+  assert.equal(readHistory(join(dir, rotated[0])).length, 1);
+  assert.ok(statSync(path).size > 0);
 });
 
 test('rejects oversized event payloads', () => {
