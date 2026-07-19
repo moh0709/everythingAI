@@ -6,8 +6,8 @@
   "branch": "main",
   "status": "BLOCKED",
   "startingCommitSha": "eb29ce2b56ac66b0ebf5c48aca50537f272ddad2",
-  "artifactCommitSha": "recorded after commit",
-  "finalPushedSha": "recorded after push",
+  "artifactCommitSha": "8a82abb5735a4040829cb0140350c6eb9045a090",
+  "finalPushedSha": "recorded after metadata commit and push",
   "blocker": {
     "systemd": "available, systemctl is-system-running returned degraded",
     "serviceAccount": "hermes account absent",
