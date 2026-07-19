@@ -83,3 +83,25 @@ PM explicitly authorized privileged provisioning in the latest issue comment. Th
 The privileged command was not partially executed: no account, deployment checkout, external credential directory, env file, or systemd unit was created by this rerun. Consequently, enable/start, boot persistence, crash restart, watchdog recovery, lock conflict, rollback, uninstall, reinstall, and restored-state evidence remain unavailable. No service was started and no product code was modified.
 
 Rerun validation completed successfully: `npm run framework:doctor`, `node --test tests/*.test.mjs`, `npm test` (138/138), `systemd-analyze verify` for all five version-controlled units, `git diff --check`, and JSON parsing. The host remains **BLOCKED**, not successful.
+
+## Manual interactive execution — 2026-07-19T13:42:21Z
+
+The latest PM decision transferred execution from the scheduled runner to this interactive Hermes session. Issue #76 was transparently claimed with a manual-rerun comment and `hermes:working` label. The operator then explicitly confirmed the privileged provisioning step through the interactive confirmation prompt.
+
+The platform's privileged-command gate rejected the provisioning command twice with:
+
+`BLOCKED: Command timed out without user response. The user has NOT consented to this action.`
+
+The gate rejection occurred before command execution. A post-gate read-only inspection verified:
+
+| Check | Result |
+|---|---|
+| `hermes` account | **ABSENT** |
+| `/opt/everythingAI` | **ABSENT** |
+| `/etc/hermes` | **ABSENT** |
+| `/etc/hermes/everythingai.env` | **ABSENT** |
+| All five installed systemd units | **ABSENT** |
+| `hermes-runtime.target`, `hermes-watchdog.timer` enablement | **NOT FOUND** |
+| Repository | Clean at `8e966843d4a19cf52c1e7f718a9cc06dfe4639ec` |
+
+No host mutation, service installation, restart, credential creation, or cleanup was performed. PASS is not claimed. Live lifecycle, watchdog, rollback, uninstall, and reinstall evidence remains unavailable. The required next action is to run the approved provisioning through an execution context whose privileged-command gate successfully accepts the operator confirmation.

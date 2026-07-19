@@ -2183,3 +2183,9 @@ $ git diff --check; python3 -m json.tool state/handover
 PASS
 
 Result: BLOCKED. No systemd installation, service start, reboot, restart, watchdog, rollback, uninstall, or reinstall evidence claimed.
+
+Manual interactive rerun (2026-07-19T13:42:21Z): issue #76 claimed from PM-authorized manual-execution decision.
+Interactive privilege confirmation: user selected yes.
+Provisioning command result: BLOCKED before execution by platform privileged-command gate; no user consent was observed by the gate.
+Post-gate verification: hermes account absent; /opt/everythingAI absent; /etc/hermes absent; env file absent; all five systemd units absent; runtime target and watchdog timer not found.
+No secrets recorded. No host mutation or service lifecycle claim made.
