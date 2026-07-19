@@ -7,8 +7,8 @@
   "startedAt": "2026-07-18T20:40:00Z",
   "completedAt": "2026-07-18T21:00:00Z",
   "startingCommitSha": "787a4c33",
-  "artifactCommitSha": "pending",
-  "finalCommitSha": "pending",
+  "artifactCommitSha": "2593b17ea9f422815d38e2d6e303546a39e43ba9",
+  "finalCommitSha": "2593b17ea9f422815d38e2d6e303546a39e43ba9",
   "changes": [
     "src/crash-recovery.js — Unconditional cross-host escalation, label verification with re-read, tryRemove result checking",
     "tests/crash-recovery.test.mjs — 9 new tests (29 total)",
