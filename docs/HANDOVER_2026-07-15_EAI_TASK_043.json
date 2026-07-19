@@ -4,13 +4,11 @@
   "taskId": "EAI-TASK-043",
   "issueNumber": 66,
   "title": "Add structured event log and persistent execution history",
-  "status": "PASS",
-  "summary": "Added a versioned append-only NDJSON event history with lifecycle schema validation, redaction, bounded payloads, malformed-line tolerance, rotation, reader support, tests, and operating manual documentation.",
+  "summary": "PM QA corrections completed: middle-file corruption is surfaced without record contents, only malformed final JSON is tolerated, secret-shaped values are redacted, and deterministic coverage is expanded.",
   "filesChanged": [
     "src/event-history.js",
     "tests/event-history.test.mjs",
     "docs/HERMES_OPERATING_MANUAL_RC1.md",
-    ".gitignore",
     "REPORTS/EAI-TASK-043-STRUCTURED-EVENT-HISTORY.md",
     "docs/HANDOVER_2026-07-15_EAI_TASK_043.json",
     "LOGS/EAI-TASK-043-terminal.log",
@@ -20,22 +18,24 @@
     "schemaVersion": 1,
     "eventTypes": ["discovery", "claim", "start", "validation", "retry", "completion", "block", "recovery", "shutdown"],
     "appendOnly": true,
-    "malformedTrailingRecordTolerated": true,
+    "malformedTrailingJsonTolerated": true,
+    "middleCorruptionSurfaced": true,
+    "unsupportedVersionsSurfaced": true,
     "secretRedaction": true,
     "maxPayloadBytes": 16384,
     "rotation": { "maxBytes": 5242880, "retainFiles": 3 },
     "runtimePathIgnoredByGit": true
   },
   "validation": {
-    "focusedTests": "5/5 pass",
-    "allNodeTests": "104/104 pass",
-    "npmTest": "104/104 pass",
+    "focusedTests": "8/8 pass",
+    "allNodeTests": "107/107 pass",
+    "npmTest": "107/107 pass",
     "frameworkDoctor": "PASS",
     "gitDiffCheck": "PASS",
     "jsonParseChecks": "PASS"
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": "f367b876802a0f07de7f18bb2d1c2d3f37a3fc10",
-  "finalPushedCommitSha": "c579b7cff6f382e4fa57ffd444270693d5a18f1c"
+  "artifactCommitSha": "PENDING",
+  "finalPushedCommitSha": "PENDING"
 }

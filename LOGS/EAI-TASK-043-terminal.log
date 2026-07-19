@@ -1,44 +1,66 @@
+EAI-TASK-043 rerun validation log
+2026-07-19T05:25:30Z
+
 $ node --test tests/event-history.test.mjs
 TAP version 13
 # Subtest: creates and validates the versioned lifecycle schema
 ok 1 - creates and validates the versioned lifecycle schema
   ---
-  duration_ms: 3.201946
+  duration_ms: 2.917867
   type: 'test'
   ...
-# Subtest: redacts sensitive keys and bounds nested payloads
-ok 2 - redacts sensitive keys and bounds nested payloads
+# Subtest: redacts sensitive keys and secret-shaped nested values
+ok 2 - redacts sensitive keys and secret-shaped nested values
   ---
-  duration_ms: 2.012175
+  duration_ms: 4.266526
   type: 'test'
   ...
 # Subtest: appends readable NDJSON and tolerates a malformed trailing line
 ok 3 - appends readable NDJSON and tolerates a malformed trailing line
   ---
-  duration_ms: 3.102831
+  duration_ms: 2.689232
+  type: 'test'
+  ...
+# Subtest: surfaces corruption in the middle without leaking its contents
+ok 4 - surfaces corruption in the middle without leaking its contents
+  ---
+  duration_ms: 1.096459
+  type: 'test'
+  ...
+# Subtest: rejects schema-invalid and unsupported final records while tolerating malformed final records
+ok 5 - rejects schema-invalid and unsupported final records while tolerating malformed final records
+  ---
+  duration_ms: 3.129891
+  type: 'test'
+  ...
+# Subtest: preserves rapid append ordering
+ok 6 - preserves rapid append ordering
+  ---
+  duration_ms: 6.787635
   type: 'test'
   ...
 # Subtest: rotates bounded history and retains configured rotated files
-ok 4 - rotates bounded history and retains configured rotated files
+ok 7 - rotates bounded history and retains configured rotated files
   ---
-  duration_ms: 5.051689
+  duration_ms: 5.689031
   type: 'test'
   ...
 # Subtest: rejects oversized event payloads
-ok 5 - rejects oversized event payloads
+ok 8 - rejects oversized event payloads
   ---
-  duration_ms: 4.294265
+  duration_ms: 2.25776
   type: 'test'
   ...
-1..5
-# tests 5
+1..8
+# tests 8
 # suites 0
-# pass 5
+# pass 8
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 173.812819
+# duration_ms 178.27166
+
 $ npm test
 
 > everythingai-root@0.1.0 test
@@ -48,529 +70,547 @@ TAP version 13
 # Subtest: all clean — no heartbeat, no lock, no state → NO_ACTION
 ok 1 - all clean — no heartbeat, no lock, no state → NO_ACTION
   ---
-  duration_ms: 18.062132
+  duration_ms: 41.992736
   type: 'test'
   ...
 # Subtest: active heartbeat with alive PID on same host → NO_ACTION
 ok 2 - active heartbeat with alive PID on same host → NO_ACTION
   ---
-  duration_ms: 48.761037
+  duration_ms: 36.810116
   type: 'test'
   ...
 # Subtest: active claim lock with alive PID on same host → NO_ACTION
 ok 3 - active claim lock with alive PID on same host → NO_ACTION
   ---
-  duration_ms: 24.651279
+  duration_ms: 55.371099
   type: 'test'
   ...
 # Subtest: intentional shutdown heartbeat with clean state → NO_ACTION
 ok 4 - intentional shutdown heartbeat with clean state → NO_ACTION
   ---
-  duration_ms: 31.315837
+  duration_ms: 46.921604
   type: 'test'
   ...
 # Subtest: stale heartbeat + stale claim lock + matching report → RECOVERED
 ok 5 - stale heartbeat + stale claim lock + matching report → RECOVERED
   ---
-  duration_ms: 33.075231
+  duration_ms: 73.423107
   type: 'test'
   ...
 # Subtest: stale artifacts + IN_PROGRESS + no report + open issue → MANUAL_REVIEW_REQUIRED
 ok 6 - stale artifacts + IN_PROGRESS + no report + open issue → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 36.811023
+  duration_ms: 40.524946
   type: 'test'
   ...
 # Subtest: stale claim lock with matching report → RECOVERED
 ok 7 - stale claim lock with matching report → RECOVERED
   ---
-  duration_ms: 33.590523
+  duration_ms: 32.414781
   type: 'test'
   ...
 # Subtest: stale claim lock with IN_PROGRESS state (no heartbeat) → MANUAL_REVIEW_REQUIRED
 ok 8 - stale claim lock with IN_PROGRESS state (no heartbeat) → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 31.303976
+  duration_ms: 30.176738
   type: 'test'
   ...
 # Subtest: IN_PROGRESS state without claim lock or heartbeat → MANUAL_REVIEW_REQUIRED
 ok 9 - IN_PROGRESS state without claim lock or heartbeat → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 20.690115
+  duration_ms: 22.00002
   type: 'test'
   ...
 # Subtest: claim lock from different host → MANUAL_REVIEW_REQUIRED
 ok 10 - claim lock from different host → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 23.738405
+  duration_ms: 19.550885
   type: 'test'
   ...
 # Subtest: stale artifacts from different host are escalated for manual review
 ok 11 - stale artifacts from different host are escalated for manual review
   ---
-  duration_ms: 26.227901
+  duration_ms: 34.133297
   type: 'test'
   ...
 # Subtest: recovery corrects stale hermes:working on GitHub when report exists
 ok 12 - recovery corrects stale hermes:working on GitHub when report exists
   ---
-  duration_ms: 29.553027
+  duration_ms: 33.653625
   type: 'test'
   ...
 # Subtest: reconciliation writes recovery evidence log
 ok 13 - reconciliation writes recovery evidence log
   ---
-  duration_ms: 22.836132
+  duration_ms: 15.895956
   type: 'test'
   ...
 # Subtest: active supervisor lock with alive PID → NO_ACTION
 ok 14 - active supervisor lock with alive PID → NO_ACTION
   ---
-  duration_ms: 21.091785
+  duration_ms: 18.402479
   type: 'test'
   ...
 # Subtest: stale heartbeat without claim lock → RECOVERED
 ok 15 - stale heartbeat without claim lock → RECOVERED
   ---
-  duration_ms: 23.477397
+  duration_ms: 27.948384
   type: 'test'
   ...
 # Subtest: stale heartbeat with IN_PROGRESS state (no claim lock) → MANUAL_REVIEW_REQUIRED
 ok 16 - stale heartbeat with IN_PROGRESS state (no claim lock) → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 45.863268
+  duration_ms: 20.659206
   type: 'test'
   ...
 # Subtest: stale claim lock without IN_PROGRESS state → RECOVERED
 ok 17 - stale claim lock without IN_PROGRESS state → RECOVERED
   ---
-  duration_ms: 20.813114
+  duration_ms: 20.490954
   type: 'test'
   ...
 # Subtest: STOPPED heartbeat with clean state → NO_ACTION
 ok 18 - STOPPED heartbeat with clean state → NO_ACTION
   ---
-  duration_ms: 22.415365
+  duration_ms: 23.927835
   type: 'test'
   ...
 # Subtest: crash recovery handles full stale lifecycle gracefully
 ok 19 - crash recovery handles full stale lifecycle gracefully
   ---
-  duration_ms: 32.931794
+  duration_ms: 27.631263
   type: 'test'
   ...
 # Subtest: recovery corrects hermes:working when report exists and issue still shows working
 ok 20 - recovery corrects hermes:working when report exists and issue still shows working
   ---
-  duration_ms: 41.182051
+  duration_ms: 25.305127
   type: 'test'
   ...
 # Subtest: cross-host claim lock with locally-existing PID → MANUAL_REVIEW_REQUIRED not stale cleanup
 ok 21 - cross-host claim lock with locally-existing PID → MANUAL_REVIEW_REQUIRED not stale cleanup
   ---
-  duration_ms: 25.656675
+  duration_ms: 31.612959
   type: 'test'
   ...
 # Subtest: cross-host supervisor lock → MANUAL_REVIEW_REQUIRED
 ok 22 - cross-host supervisor lock → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 20.313863
+  duration_ms: 20.378223
   type: 'test'
   ...
 # Subtest: cross-host heartbeat → MANUAL_REVIEW_REQUIRED
 ok 23 - cross-host heartbeat → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 21.833951
+  duration_ms: 25.399924
   type: 'test'
   ...
 # Subtest: label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED
 ok 24 - label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 36.812496
+  duration_ms: 49.571232
   type: 'test'
   ...
 # Subtest: label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED
 ok 25 - label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 32.836445
+  duration_ms: 48.315657
   type: 'test'
   ...
 # Subtest: tryRemove only records action when file is actually removed
 ok 26 - tryRemove only records action when file is actually removed
   ---
-  duration_ms: 29.299394
+  duration_ms: 16.136994
   type: 'test'
   ...
 # Subtest: both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW
 ok 27 - both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW
   ---
-  duration_ms: 20.520861
+  duration_ms: 23.725509
   type: 'test'
   ...
 # Subtest: stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED
 ok 28 - stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED
   ---
-  duration_ms: 21.502582
+  duration_ms: 27.089837
   type: 'test'
   ...
 # Subtest: successful edit plus verified re-read records corrected-label action
 ok 29 - successful edit plus verified re-read records corrected-label action
   ---
-  duration_ms: 28.561998
+  duration_ms: 27.690675
   type: 'test'
   ...
 # Subtest: creates and validates the versioned lifecycle schema
 ok 30 - creates and validates the versioned lifecycle schema
   ---
-  duration_ms: 3.101609
+  duration_ms: 2.582243
   type: 'test'
   ...
-# Subtest: redacts sensitive keys and bounds nested payloads
-ok 31 - redacts sensitive keys and bounds nested payloads
+# Subtest: redacts sensitive keys and secret-shaped nested values
+ok 31 - redacts sensitive keys and secret-shaped nested values
   ---
-  duration_ms: 2.004061
+  duration_ms: 3.50535
   type: 'test'
   ...
 # Subtest: appends readable NDJSON and tolerates a malformed trailing line
 ok 32 - appends readable NDJSON and tolerates a malformed trailing line
   ---
-  duration_ms: 3.637831
+  duration_ms: 4.688992
+  type: 'test'
+  ...
+# Subtest: surfaces corruption in the middle without leaking its contents
+ok 33 - surfaces corruption in the middle without leaking its contents
+  ---
+  duration_ms: 1.045645
+  type: 'test'
+  ...
+# Subtest: rejects schema-invalid and unsupported final records while tolerating malformed final records
+ok 34 - rejects schema-invalid and unsupported final records while tolerating malformed final records
+  ---
+  duration_ms: 6.320516
+  type: 'test'
+  ...
+# Subtest: preserves rapid append ordering
+ok 35 - preserves rapid append ordering
+  ---
+  duration_ms: 12.416494
   type: 'test'
   ...
 # Subtest: rotates bounded history and retains configured rotated files
-ok 33 - rotates bounded history and retains configured rotated files
+ok 36 - rotates bounded history and retains configured rotated files
   ---
-  duration_ms: 7.050478
+  duration_ms: 11.350632
   type: 'test'
   ...
 # Subtest: rejects oversized event payloads
-ok 34 - rejects oversized event payloads
+ok 37 - rejects oversized event payloads
   ---
-  duration_ms: 1.060649
+  duration_ms: 3.060122
   type: 'test'
   ...
 # Subtest: classifies explicit, transport, claim, validation, and unknown failures
-ok 35 - classifies explicit, transport, claim, validation, and unknown failures
+ok 38 - classifies explicit, transport, claim, validation, and unknown failures
   ---
-  duration_ms: 1.728866
+  duration_ms: 1.716833
   type: 'test'
   ...
 # Subtest: only idempotent or live-revalidated operations can retry
-ok 36 - only idempotent or live-revalidated operations can retry
+ok 39 - only idempotent or live-revalidated operations can retry
   ---
-  duration_ms: 0.427519
+  duration_ms: 0.420804
   type: 'test'
   ...
 # Subtest: backoff is bounded and deterministic without jitter
-ok 37 - backoff is bounded and deterministic without jitter
+ok 40 - backoff is bounded and deterministic without jitter
   ---
-  duration_ms: 0.467904
+  duration_ms: 0.441912
   type: 'test'
   ...
 # Subtest: jitter is deterministic, clamped to the ceiling, and sanitizes bad samples
-ok 38 - jitter is deterministic, clamped to the ceiling, and sanitizes bad samples
+ok 41 - jitter is deterministic, clamped to the ceiling, and sanitizes bad samples
   ---
-  duration_ms: 0.567048
+  duration_ms: 0.402429
   type: 'test'
   ...
 # Subtest: transient failure retries, then exhausts attempts
-ok 39 - transient failure retries, then exhausts attempts
+ok 42 - transient failure retries, then exhausts attempts
   ---
-  duration_ms: 1.22176
+  duration_ms: 2.609253
   type: 'test'
   ...
 # Subtest: permanent, validation, and ambiguous mutations terminate without retry
-ok 40 - permanent, validation, and ambiguous mutations terminate without retry
+ok 43 - permanent, validation, and ambiguous mutations terminate without retry
   ---
-  duration_ms: 0.515421
+  duration_ms: 0.494089
   type: 'test'
   ...
 # Subtest: restart enforces the persisted total-time ceiling at and beyond its boundary
-ok 41 - restart enforces the persisted total-time ceiling at and beyond its boundary
+ok 44 - restart enforces the persisted total-time ceiling at and beyond its boundary
   ---
-  duration_ms: 3.195654
+  duration_ms: 5.640271
   type: 'test'
   ...
 # Subtest: retry lifecycle persists across restart and clears state after success
-ok 42 - retry lifecycle persists across restart and clears state after success
+ok 45 - retry lifecycle persists across restart and clears state after success
   ---
-  duration_ms: 3.669088
+  duration_ms: 9.952131
   type: 'test'
   ...
 # Subtest: claim conflicts require live revalidation and operator/unknown failures escalate
-ok 43 - claim conflicts require live revalidation and operator/unknown failures escalate
+ok 46 - claim conflicts require live revalidation and operator/unknown failures escalate
   ---
-  duration_ms: 1.098591
+  duration_ms: 1.156841
   type: 'test'
   ...
 # Subtest: CLI mode polling returns POLLING
-ok 44 - CLI mode polling returns POLLING
+ok 47 - CLI mode polling returns POLLING
   ---
-  duration_ms: 1.794188
+  duration_ms: 2.244967
   type: 'test'
   ...
 # Subtest: CLI mode webhook returns WEBHOOK
-ok 45 - CLI mode webhook returns WEBHOOK
+ok 48 - CLI mode webhook returns WEBHOOK
   ---
-  duration_ms: 0.261358
+  duration_ms: 0.412177
   type: 'test'
   ...
 # Subtest: CLI and environment agree on the same mode
-ok 46 - CLI and environment agree on the same mode
+ok 49 - CLI and environment agree on the same mode
   ---
-  duration_ms: 0.274753
+  duration_ms: 0.338479
   type: 'test'
   ...
 # Subtest: invalid CLI mode returns UNKNOWN
-ok 47 - invalid CLI mode returns UNKNOWN
+ok 50 - invalid CLI mode returns UNKNOWN
   ---
-  duration_ms: 0.492048
+  duration_ms: 0.4241
   type: 'test'
   ...
 # Subtest: no explicit mode returns UNKNOWN
-ok 48 - no explicit mode returns UNKNOWN
+ok 51 - no explicit mode returns UNKNOWN
   ---
-  duration_ms: 3.475126
+  duration_ms: 3.241599
   type: 'test'
   ...
 # Subtest: writeHeartbeat creates a valid heartbeat file at the given path
-ok 49 - writeHeartbeat creates a valid heartbeat file at the given path
+ok 52 - writeHeartbeat creates a valid heartbeat file at the given path
   ---
-  duration_ms: 7.958713
+  duration_ms: 7.207485
   type: 'test'
   ...
 # Subtest: writeHeartbeat does not include hostname when not passed
-ok 50 - writeHeartbeat does not include hostname when not passed
+ok 53 - writeHeartbeat does not include hostname when not passed
   ---
-  duration_ms: 5.150041
+  duration_ms: 4.283888
   type: 'test'
   ...
 # Subtest: writeHeartbeat does not include environment variables, tokens, or secrets
-ok 51 - writeHeartbeat does not include environment variables, tokens, or secrets
+ok 54 - writeHeartbeat does not include environment variables, tokens, or secrets
   ---
-  duration_ms: 2.407012
+  duration_ms: 5.058279
   type: 'test'
   ...
 # Subtest: writeHeartbeat uses atomic write (tmp file then rename)
-ok 52 - writeHeartbeat uses atomic write (tmp file then rename)
+ok 55 - writeHeartbeat uses atomic write (tmp file then rename)
   ---
-  duration_ms: 13.281269
+  duration_ms: 1.547458
   type: 'test'
   ...
 # Subtest: readHeartbeat returns null for missing file
-ok 53 - readHeartbeat returns null for missing file
+ok 56 - readHeartbeat returns null for missing file
   ---
-  duration_ms: 0.560496
+  duration_ms: 0.459485
   type: 'test'
   ...
 # Subtest: readHeartbeat returns parsed heartbeat
-ok 54 - readHeartbeat returns parsed heartbeat
+ok 57 - readHeartbeat returns parsed heartbeat
   ---
-  duration_ms: 2.208401
+  duration_ms: 0.967781
   type: 'test'
   ...
 # Subtest: isHeartbeatStale returns true when heartbeat is null
-ok 55 - isHeartbeatStale returns true when heartbeat is null
+ok 58 - isHeartbeatStale returns true when heartbeat is null
   ---
-  duration_ms: 0.601392
+  duration_ms: 0.507313
   type: 'test'
   ...
 # Subtest: isHeartbeatStale returns false when heartbeat is fresh
-ok 56 - isHeartbeatStale returns false when heartbeat is fresh
+ok 59 - isHeartbeatStale returns false when heartbeat is fresh
   ---
-  duration_ms: 3.048851
+  duration_ms: 0.287705
   type: 'test'
   ...
 # Subtest: isHeartbeatStale returns true when heartbeat exceeds stale threshold
-ok 57 - isHeartbeatStale returns true when heartbeat exceeds stale threshold
+ok 60 - isHeartbeatStale returns true when heartbeat exceeds stale threshold
   ---
-  duration_ms: 0.965852
+  duration_ms: 4.265453
   type: 'test'
   ...
 # Subtest: isHeartbeatStale returns true on unparseable lastHeartbeat
-ok 58 - isHeartbeatStale returns true on unparseable lastHeartbeat
+ok 61 - isHeartbeatStale returns true on unparseable lastHeartbeat
   ---
-  duration_ms: 1.05017
+  duration_ms: 1.674454
   type: 'test'
   ...
 # Subtest: isHeartbeatStale uses threshold parameter correctly
-ok 59 - isHeartbeatStale uses threshold parameter correctly
+ok 62 - isHeartbeatStale uses threshold parameter correctly
   ---
-  duration_ms: 0.649752
+  duration_ms: 0.567836
   type: 'test'
   ...
 # Subtest: acquireSupervisorLock creates lock with metadata
-ok 60 - acquireSupervisorLock creates lock with metadata
+ok 63 - acquireSupervisorLock creates lock with metadata
   ---
-  duration_ms: 4.633569
+  duration_ms: 8.954275
   type: 'test'
   ...
 # Subtest: createSupervisor returns a controller object
-ok 61 - createSupervisor returns a controller object
+ok 64 - createSupervisor returns a controller object
   ---
-  duration_ms: 0.629585
+  duration_ms: 0.65065
   type: 'test'
   ...
 # Subtest: createSupervisor start returns SINGLE_USE if started after stop
-ok 62 - createSupervisor start returns SINGLE_USE if started after stop
+ok 65 - createSupervisor start returns SINGLE_USE if started after stop
   ---
-  duration_ms: 6.689976
+  duration_ms: 11.725048
   type: 'test'
   ...
 # Subtest: createSupervisor stop returns NOT_RUNNING if not started
-ok 63 - createSupervisor stop returns NOT_RUNNING if not started
+ok 66 - createSupervisor stop returns NOT_RUNNING if not started
   ---
-  duration_ms: 0.19275
+  duration_ms: 0.386468
   type: 'test'
   ...
 # Subtest: createSupervisor setStatus updates tracked state
-ok 64 - createSupervisor setStatus updates tracked state
+ok 67 - createSupervisor setStatus updates tracked state
   ---
-  duration_ms: 0.248605
+  duration_ms: 2.091941
   type: 'test'
   ...
 # Subtest: createSupervisor setStatus updates mode
-ok 65 - createSupervisor setStatus updates mode
+ok 68 - createSupervisor setStatus updates mode
   ---
-  duration_ms: 0.211977
+  duration_ms: 0.425672
   type: 'test'
   ...
 # Subtest: supervisor.used getter reflects single-use state
-ok 66 - supervisor.used getter reflects single-use state
+ok 69 - supervisor.used getter reflects single-use state
   ---
-  duration_ms: 1.525658
+  duration_ms: 7.907678
   type: 'test'
   ...
 # Subtest: supervisor creates a fresh instance from a new factory call
-ok 67 - supervisor creates a fresh instance from a new factory call
+ok 70 - supervisor creates a fresh instance from a new factory call
   ---
-  duration_ms: 0.235049
+  duration_ms: 0.436772
   type: 'test'
   ...
 # Subtest: CLI --dry-run outputs valid JSON and exits 0
-ok 68 - CLI --dry-run outputs valid JSON and exits 0
+ok 71 - CLI --dry-run outputs valid JSON and exits 0
   ---
-  duration_ms: 74.93143
+  duration_ms: 95.423035
   type: 'test'
   ...
 # Subtest: CLI --dry-run --mode webhook outputs correct mode
-ok 69 - CLI --dry-run --mode webhook outputs correct mode
+ok 72 - CLI --dry-run --mode webhook outputs correct mode
   ---
-  duration_ms: 76.190471
+  duration_ms: 74.519887
   type: 'test'
   ...
 # Subtest: CLI --dry-run --interval 5000 outputs correct interval
-ok 70 - CLI --dry-run --interval 5000 outputs correct interval
+ok 73 - CLI --dry-run --interval 5000 outputs correct interval
   ---
-  duration_ms: 68.419658
+  duration_ms: 66.387259
   type: 'test'
   ...
 # Subtest: CLI without --dry-run starts supervisor and writes heartbeat
-ok 71 - CLI without --dry-run starts supervisor and writes heartbeat
+ok 74 - CLI without --dry-run starts supervisor and writes heartbeat
   ---
-  duration_ms: 3019.004229
+  duration_ms: 3018.177133
   type: 'test'
   ...
 # Subtest: DEFAULT_HEARTBEAT_INTERVAL_MS is 30 seconds
-ok 72 - DEFAULT_HEARTBEAT_INTERVAL_MS is 30 seconds
+ok 75 - DEFAULT_HEARTBEAT_INTERVAL_MS is 30 seconds
   ---
-  duration_ms: 0.296212
+  duration_ms: 2.000961
   type: 'test'
   ...
 # Subtest: DEFAULT_STALE_THRESHOLD_MS is 2 minutes
-ok 73 - DEFAULT_STALE_THRESHOLD_MS is 2 minutes
+ok 76 - DEFAULT_STALE_THRESHOLD_MS is 2 minutes
   ---
-  duration_ms: 0.147245
+  duration_ms: 0.395396
   type: 'test'
   ...
 # Subtest: HEARTBEAT_MODES has all expected modes
-ok 74 - HEARTBEAT_MODES has all expected modes
+ok 77 - HEARTBEAT_MODES has all expected modes
   ---
-  duration_ms: 2.004381
+  duration_ms: 0.395195
   type: 'test'
   ...
 # Subtest: subprocess SIGTERM creates heartbeat, exits cleanly, releases lock
-ok 75 - subprocess SIGTERM creates heartbeat, exits cleanly, releases lock
+ok 78 - subprocess SIGTERM creates heartbeat, exits cleanly, releases lock
   ---
-  duration_ms: 80.715126
+  duration_ms: 101.274243
   type: 'test'
   ...
 # Subtest: subprocess SIGINT creates heartbeat, exits cleanly, releases lock
-ok 76 - subprocess SIGINT creates heartbeat, exits cleanly, releases lock
+ok 79 - subprocess SIGINT creates heartbeat, exits cleanly, releases lock
   ---
-  duration_ms: 70.725832
+  duration_ms: 84.361094
   type: 'test'
   ...
 # Subtest: signal handlers are detached after supervisor stop
-ok 77 - signal handlers are detached after supervisor stop
+ok 80 - signal handlers are detached after supervisor stop
   ---
-  duration_ms: 2.206178
+  duration_ms: 2.77436
   type: 'test'
   ...
 # Subtest: fresh supervisor instance works after stop in same process
-ok 78 - fresh supervisor instance works after stop in same process
+ok 81 - fresh supervisor instance works after stop in same process
   ---
-  duration_ms: 4.630102
+  duration_ms: 10.132276
   type: 'test'
   ...
 # Subtest: stop after SIGTERM-like shutdown does not leave stale handlers
-ok 79 - stop after SIGTERM-like shutdown does not leave stale handlers
+ok 82 - stop after SIGTERM-like shutdown does not leave stale handlers
   ---
-  duration_ms: 3.267118
+  duration_ms: 2.448345
   type: 'test'
   ...
 # Subtest: in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat
-ok 80 - in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat
+ok 83 - in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat
   ---
-  duration_ms: 4.180622
+  duration_ms: 3.421645
   type: 'test'
   ...
 # Subtest: two claimants targeting the same issue yield exactly one CLAIMED result
-ok 81 - two claimants targeting the same issue yield exactly one CLAIMED result
+ok 84 - two claimants targeting the same issue yield exactly one CLAIMED result
   ---
-  duration_ms: 29.358664
+  duration_ms: 42.618992
   type: 'test'
   ...
 # Subtest: an existing in-progress state causes a claim conflict
-ok 82 - an existing in-progress state causes a claim conflict
+ok 85 - an existing in-progress state causes a claim conflict
   ---
-  duration_ms: 3.057486
+  duration_ms: 0.744794
   type: 'test'
   ...
 # Subtest: an existing valid local lock causes a claim conflict
-ok 83 - an existing valid local lock causes a claim conflict
+ok 86 - an existing valid local lock causes a claim conflict
   ---
-  duration_ms: 2.359664
+  duration_ms: 1.296642
   type: 'test'
   ...
 # Subtest: stale lock recovery is conservative and replaces a dead owner lock
-ok 84 - stale lock recovery is conservative and replaces a dead owner lock
+ok 87 - stale lock recovery is conservative and replaces a dead owner lock
   ---
-  duration_ms: 12.361842
+  duration_ms: 13.170697
   type: 'test'
   ...
 # Subtest: losing hermes:ready between discovery and claim returns NOT_RUNNABLE
-ok 85 - losing hermes:ready between discovery and claim returns NOT_RUNNABLE
+ok 88 - losing hermes:ready between discovery and claim returns NOT_RUNNABLE
   ---
-  duration_ms: 3.596002
+  duration_ms: 3.675296
   type: 'test'
   ...
 # Subtest: an issue already marked hermes:working or hermes:done is not runnable
-ok 86 - an issue already marked hermes:working or hermes:done is not runnable
+ok 89 - an issue already marked hermes:working or hermes:done is not runnable
   ---
-  duration_ms: 1.699612
+  duration_ms: 3.433166
   type: 'test'
   ...
 # Subtest: a matching report short-circuits with ALREADY_COMPLETED
-ok 87 - a matching report short-circuits with ALREADY_COMPLETED
+ok 90 - a matching report short-circuits with ALREADY_COMPLETED
   ---
-  duration_ms: 1.008623
+  duration_ms: 6.015208
   type: 'test'
   ...
 # Subtest: failed label verification releases the local lock
-ok 88 - failed label verification releases the local lock
+ok 91 - failed label verification releases the local lock
   ---
-  duration_ms: 3.596903
+  duration_ms: 6.228375
   type: 'test'
   ...
 # [task-poller] Runnable issues:
@@ -588,21 +628,21 @@ ok 88 - failed label verification releases the local lock
 #   "remediation": "set a mode"
 # }
 # Subtest: polling entry ignores webhook environment noise and still queries the queue
-ok 89 - polling entry ignores webhook environment noise and still queries the queue
+ok 92 - polling entry ignores webhook environment noise and still queries the queue
   ---
-  duration_ms: 7.277143
+  duration_ms: 8.784478
   type: 'test'
   ...
 # Subtest: polling entry succeeds when no webhook variables are present
-ok 90 - polling entry succeeds when no webhook variables are present
+ok 93 - polling entry succeeds when no webhook variables are present
   ---
-  duration_ms: 1.434408
+  duration_ms: 1.543151
   type: 'test'
   ...
 # Subtest: unknown polling runtime does not query GitHub
-ok 91 - unknown polling runtime does not query GitHub
+ok 94 - unknown polling runtime does not query GitHub
   ---
-  duration_ms: 0.411909
+  duration_ms: 0.96799
   type: 'test'
   ...
 # [task-poller] Runnable issues:
@@ -610,9 +650,9 @@ ok 91 - unknown polling runtime does not query GitHub
 # [task-poller] Dispatching worker for \#60 EAI-TASK-038 EAI-TASK-038
 # [task-poller] No runnable issues found.
 # Subtest: watchLoop continues queue watching after a claim conflict
-ok 92 - watchLoop continues queue watching after a claim conflict
+ok 95 - watchLoop continues queue watching after a claim conflict
   ---
-  duration_ms: 9.900668
+  duration_ms: 14.760365
   type: 'test'
   ...
 # {
@@ -631,87 +671,92 @@ ok 92 - watchLoop continues queue watching after a claim conflict
 # [task-worker] Commented: false
 # [task-worker] Labels updated: false
 # Subtest: unknown runtime mode causes no GitHub mutation or issue selection
-ok 93 - unknown runtime mode causes no GitHub mutation or issue selection
+ok 96 - unknown runtime mode causes no GitHub mutation or issue selection
   ---
-  duration_ms: 2.891246
+  duration_ms: 5.426002
   type: 'test'
   ...
 # Subtest: polling worker claims through shared authority without a ReferenceError
-ok 94 - polling worker claims through shared authority without a ReferenceError
+ok 97 - polling worker claims through shared authority without a ReferenceError
   ---
-  duration_ms: 24.41136
+  duration_ms: 25.798725
   type: 'test'
   ...
 # Subtest: discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources
-ok 95 - discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources
+ok 98 - discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources
   ---
-  duration_ms: 7.071758
+  duration_ms: 3.607229
   type: 'test'
   ...
 # Subtest: discoverWebhookPayload blocks when no payload source exists
-ok 96 - discoverWebhookPayload blocks when no payload source exists
+ok 99 - discoverWebhookPayload blocks when no payload source exists
   ---
-  duration_ms: 0.794082
+  duration_ms: 0.815026
   type: 'test'
   ...
 # Subtest: classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON
-ok 97 - classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON
+ok 100 - classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON
   ---
-  duration_ms: 0.684348
+  duration_ms: 0.636955
   type: 'test'
   ...
 # Subtest: classifyWebhookEvent ignores non-issues events
-ok 98 - classifyWebhookEvent ignores non-issues events
+ok 101 - classifyWebhookEvent ignores non-issues events
   ---
-  duration_ms: 0.491298
+  duration_ms: 0.470254
   type: 'test'
   ...
 # Subtest: classifyWebhookEvent ignores issue events missing readiness labels
-ok 99 - classifyWebhookEvent ignores issue events missing readiness labels
+ok 102 - classifyWebhookEvent ignores issue events missing readiness labels
   ---
-  duration_ms: 0.424562
+  duration_ms: 0.413919
   type: 'test'
   ...
 # Subtest: runWebhookEntry claims exactly once and executes using the claimed ownership
-ok 100 - runWebhookEntry claims exactly once and executes using the claimed ownership
+ok 103 - runWebhookEntry claims exactly once and executes using the claimed ownership
   ---
-  duration_ms: 16.792791
+  duration_ms: 16.630723
   type: 'test'
   ...
 # Subtest: concurrent identical webhook deliveries dispatch at most one worker
-ok 101 - concurrent identical webhook deliveries dispatch at most one worker
+ok 104 - concurrent identical webhook deliveries dispatch at most one worker
   ---
-  duration_ms: 23.278207
+  duration_ms: 22.593313
   type: 'test'
   ...
 # Subtest: runWebhookEntry rejects repeated delivery after the first execution
-ok 102 - runWebhookEntry rejects repeated delivery after the first execution
+ok 105 - runWebhookEntry rejects repeated delivery after the first execution
   ---
-  duration_ms: 13.366317
+  duration_ms: 15.555493
   type: 'test'
   ...
 # Subtest: classifyWebhookEvent rejects repeated delivery after the first shared claim
-ok 103 - classifyWebhookEvent rejects repeated delivery after the first shared claim
+ok 106 - classifyWebhookEvent rejects repeated delivery after the first shared claim
   ---
-  duration_ms: 12.499139
+  duration_ms: 15.936832
   type: 'test'
   ...
 # Subtest: unknown runtime mode causes no payload inspection or GitHub lookup
-ok 104 - unknown runtime mode causes no payload inspection or GitHub lookup
+ok 107 - unknown runtime mode causes no payload inspection or GitHub lookup
   ---
-  duration_ms: 1.084766
+  duration_ms: 1.218146
   type: 'test'
   ...
-1..104
-# tests 104
+1..107
+# tests 107
 # suites 0
-# pass 104
+# pass 107
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 3633.261244
-$ node scripts/framework-doctor.mjs
+# duration_ms 3730.231015
+
+$ npm run framework:doctor
+
+> everythingai-root@0.1.0 framework:doctor
+> node scripts/framework-doctor.mjs
+
 {
   "repoRoot": "/root/.hermes/projects/everythingAI/",
   "status": "PASS",
@@ -779,5 +824,8 @@ $ node scripts/framework-doctor.mjs
     }
   ]
 }
+
 $ git diff --check
-$ python3 -m json.tool .hermes/state.json
+
+$ JSON checks
+JSON parse PASS

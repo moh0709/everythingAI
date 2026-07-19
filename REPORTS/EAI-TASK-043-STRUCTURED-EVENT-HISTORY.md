@@ -2,29 +2,34 @@
 
 ## Result
 
-**Final status: PASS — validated 2026-07-19T04:21:21Z**
+**Rerun status: PASS — PM QA corrections validated 2026-07-19T05:25:30Z**
+
+## Corrections implemented
+
+- `readHistory()` now tolerates only malformed JSON in the final non-empty line, while surfacing middle-file corruption with a line-numbered `HistoryCorruptionError` that does not include record contents.
+- Schema-invalid records and unsupported schema versions are surfaced explicitly, including on the final line.
+- Secret-shaped values are redacted independently of key names, covering bearer/basic values, credential-bearing URLs, private-key headers, common environment-shaped values, and conservative token patterns in nested objects and arrays.
+- Added deterministic coverage for middle corruption, valid records after corruption, schema-invalid and unsupported final records, newline-terminated malformed finals, secret-value redaction, and rapid append ordering.
+- Existing append, rotation, retention, payload-limit, and lifecycle-schema coverage remains passing.
 
 ## Implementation
 
-- Added `src/event-history.js`, a passive version-1 NDJSON history writer/reader.
-- Defined lifecycle event types: discovery, claim, start, validation, retry, completion, block, recovery, and shutdown.
+- `src/event-history.js` provides a passive, version-1 append-only NDJSON history writer/reader.
+- Lifecycle event types are discovery, claim, start, validation, retry, completion, block, recovery, and shutdown.
 - Records require task/issue identity, timestamp, correlation ID, and support result codes, commit SHAs, validation summaries, and sanitized payloads.
-- Sensitive-key redaction covers tokens, secrets, passwords, API keys, authorization/cookies, credentials, and environment values; nested data and event size are bounded.
-- Appends use newline-delimited writes. Readers skip malformed records, including an incomplete trailing line.
-- Size-based rotation retains a bounded number of rotated files. `.hermes/history/` is excluded from Git as runtime data.
-- Added deterministic tests for schema validation, append/read behavior, malformed trailing records, redaction, payload limits, and rotation.
-- Updated `docs/HERMES_OPERATING_MANUAL_RC1.md` with the history contract and retention behavior.
+- Writes use a single append operation. Size-based rotation retains a bounded number of complete rotated files. `.hermes/history/` is excluded from Git as runtime data.
 - No product application code under `apps/` or `services/` was changed.
 
 ## Validation
 
 | Command | Result |
 |---|---|
-| `node --test tests/event-history.test.mjs` | **PASS — 5/5** |
-| `npm test` | **PASS — 104/104** |
-| `node scripts/framework-doctor.mjs` | **PASS** |
+| `node --test tests/event-history.test.mjs` | **PASS — 8/8** |
+| `npm test` | **PASS — 107/107** |
+| `npm run framework:doctor` | **PASS** |
 | `git diff --check` | **PASS** |
 | `python3 -m json.tool .hermes/state.json` | **PASS** |
+| `python3 -m json.tool docs/HANDOVER_2026-07-15_EAI_TASK_043.json` | **PASS** |
 
 Terminal output is recorded in `LOGS/EAI-TASK-043-terminal.log`.
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { appendEvent, createEvent, readHistory, redactPayload, validateEvent } from '../src/event-history.js';
+import { appendEvent, createEvent, HistoryCorruptionError, readHistory, redactPayload, validateEvent } from '../src/event-history.js';
 
 function fixture(type = 'start', extra = {}) {
   return createEvent({ type, issueNumber: 66, taskId: 'EAI-TASK-043', correlationId: 'corr-test', timestamp: '2026-07-19T00:00:00.000Z', ...extra });
@@ -16,10 +16,10 @@ test('creates and validates the versioned lifecycle schema', () => {
   assert.throws(() => validateEvent({ ...event, type: 'unknown' }), /invalid event type/);
 });
 
-test('redacts sensitive keys and bounds nested payloads', () => {
-  const payload = redactPayload({ token: 'do-not-store', nested: { apiKey: 'also-secret', safe: 'ok' } });
-  assert.deepEqual(payload, { token: '[REDACTED]', nested: { apiKey: '[REDACTED]', safe: 'ok' } });
-  assert.doesNotMatch(JSON.stringify(payload), /do-not-store|also-secret/);
+test('redacts sensitive keys and secret-shaped nested values', () => {
+  const payload = redactPayload({ token: 'do-not-store', nested: { apiKey: 'also-secret', safe: 'ok', auth: 'Bearer abc.secret-value' }, values: ['https://user:password@example.test/a', '-----BEGIN PRIVATE KEY-----\nsecret'] });
+  assert.deepEqual(payload, { token: '[REDACTED]', nested: { apiKey: '[REDACTED]', safe: 'ok', auth: '[REDACTED]' }, values: ['[REDACTED]', '[REDACTED]'] });
+  assert.doesNotMatch(JSON.stringify(payload), /do-not-store|also-secret|secret-value|password|PRIVATE KEY/);
 });
 
 test('appends readable NDJSON and tolerates a malformed trailing line', () => {
@@ -29,6 +29,31 @@ test('appends readable NDJSON and tolerates a malformed trailing line', () => {
   appendEvent(path, fixture('completion', { resultCode: 'PASS' }));
   writeFileSync(path, `${readFileSync(path, 'utf8')}{{partial`, 'utf8');
   assert.equal(readHistory(path).length, 2);
+});
+
+test('surfaces corruption in the middle without leaking its contents', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  writeFileSync(path, `${JSON.stringify(fixture('start'))}\nnot-json-secret\n${JSON.stringify(fixture('completion'))}\n`, 'utf8');
+  assert.throws(() => readHistory(path), (error) => error instanceof HistoryCorruptionError && error.lineNumber === 2 && !error.message.includes('secret'));
+});
+
+test('rejects schema-invalid and unsupported final records while tolerating malformed final records', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  writeFileSync(path, `${JSON.stringify(fixture('start'))}\n{"schemaVersion":99}\n`, 'utf8');
+  assert.throws(() => readHistory(path), /line 2: unsupported event schema version/);
+  writeFileSync(path, `${JSON.stringify(fixture('start'))}\n{"broken":`, 'utf8');
+  assert.equal(readHistory(path).length, 1);
+  writeFileSync(path, `${JSON.stringify(fixture('start'))}\n{"broken":}\n`, 'utf8');
+  assert.equal(readHistory(path).length, 1);
+});
+
+test('preserves rapid append ordering', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  for (let i = 0; i < 25; i += 1) appendEvent(path, fixture('validation', { correlationId: `rapid-${i}`, resultCode: 'PASS' }));
+  assert.deepEqual(readHistory(path).map((event) => event.correlationId), Array.from({ length: 25 }, (_, i) => `rapid-${i}`));
 });
 
 test('rotates bounded history and retains configured rotated files', () => {

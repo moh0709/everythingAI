@@ -415,11 +415,15 @@ Each record contains an ISO timestamp, correlation ID, positive issue number,
 EAI task ID, result code, optional commit SHA, validation summary, and a
 sanitized payload. Keys that could contain tokens, secrets, credentials,
 authorization data, cookies, API keys, or environment values are replaced with
-`[REDACTED]`; payloads and nested structures are bounded. Writes use append
-semantics and rotate the active file when it reaches the configured size,
-retaining a bounded number of rotated files. `readHistory()` is migration-free
-and skips malformed records, including a partially written final line, so a
-single interrupted write does not hide earlier history.
+`[REDACTED]`. Secret-shaped values are also redacted independently of their
+keys, including bearer/basic credentials, credential-bearing URLs, private-key
+headers, and common environment/token forms; payloads and nested structures are
+bounded. Writes use a single append operation and rotate the active file when it
+reaches the configured size, retaining a bounded number of rotated files.
+`readHistory()` is migration-free and tolerates only malformed JSON in the final
+non-empty line, as allowed for an interrupted append. Schema-invalid or
+unsupported records, and malformed records in the middle of the file, raise a
+line-numbered `HistoryCorruptionError` without including record contents.
 
 ### Programmatic API
 
