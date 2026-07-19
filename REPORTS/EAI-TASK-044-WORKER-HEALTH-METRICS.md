@@ -7,6 +7,7 @@
 Implementation commit SHA: `0f2acd67c8b7b4f8d99cd8bbb029c60903401072`
 Adversarial test/artifact commit SHA: `3e0df61a85430d1950d3c3e365b52dc3a438fc14`
 Metadata synchronization commit SHA: `f8cda7df9815da82a19b298d7b5e5554a8c791ca`
+Verified final pushed SHA: `01814fcde023a5264c978f9b68771bd3e95f4ec9`
 
 The read-only operator command remains available as `node scripts/hermes-health.mjs` and `npm run hermes:health`. This correction pass hardens retry corruption handling, routes mtime and timestamp ages through the injected clock, documents total status precedence, orders durable history chronologically across rotations, and expands the focused tests from 6 to 24.
 
