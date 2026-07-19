@@ -1,16 +1,16 @@
 EAI-TASK-044 correction-pass terminal validation log
 
 $ node --test tests/hermes-health.test.mjs
-PASS — 18 tests, 0 failures
+PASS — 24 tests, 0 failures (including mixed precedence, all malformed/missing artifacts, exact 120000/120001ms boundaries, recursive immutability, and secret canaries)
 
 $ node scripts/framework-doctor.mjs
 PASS — gh authenticated; state valid json; required framework files present
 
 $ node --test tests/*.test.mjs
-PASS — 129 tests, 0 failures
+PASS — 135 tests, 0 failures
 
 $ npm test
-PASS — 129 tests, 0 failures
+PASS — 135 tests, 0 failures
 
 $ node scripts/hermes-health.mjs --json
 PASS — valid JSON emitted; live status STOPPED; queue available with ready=1; readOnly=true; no secrets or environment values emitted; documented exit 1 for non-healthy alert
@@ -21,4 +21,4 @@ PASS — state, handover, and package JSON parsed successfully
 $ git diff --check
 PASS
 
-Artifact commit: 0f2acd67c8b7b4f8d99cd8bbb029c60903401072
+Implementation commit: 0f2acd67c8b7b4f8d99cd8bbb029c60903401072

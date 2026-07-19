@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { inspectHealth, formatHuman } from '../scripts/hermes-health.mjs';
@@ -77,4 +78,84 @@ test('metrics derive from durable history and not mutable state', () => {
   const f = healthy(); write(f.paths.state, { metrics: { completed: 999 } });
   writeFileSync(f.paths.history, [event('discovery', '2026-07-19T00:01:00.000Z'), event('claim', '2026-07-19T00:02:00.000Z'), event('retry', '2026-07-19T00:03:00.000Z'), event('completion', '2026-07-19T00:04:00.000Z'), event('block', '2026-07-19T00:05:00.000Z'), event('recovery', '2026-07-19T00:06:00.000Z'), event('validation', '2026-07-19T00:07:00.000Z', { resultCode: 'FAIL' })].map(JSON.stringify).join('\n') + '\n');
   assert.deepEqual(health(f).metrics, { discovered: 1, claimed: 1, completed: 1, blocked: 1, failed: 1, recovered: 1, retried: 1 });
+});
+
+function snapshotTree(root) {
+  const result = [];
+  function visit(path, relative) {
+    const stat = statSync(path);
+    result.push({ relative, type: stat.isDirectory() ? 'dir' : 'file', size: stat.size, mode: stat.mode, ino: stat.ino, mtimeMs: stat.mtimeMs, bytes: stat.isFile() ? readFileSync(path).toString('base64') : null });
+    if (stat.isDirectory()) {
+      for (const name of readdirSync(path).sort()) visit(join(path, name), join(relative, name));
+    }
+  }
+  visit(root, '.');
+  return result;
+}
+
+test('status precedence is total and deterministic for mixed conditions', () => {
+  const cases = [
+    ['corrupt overrides blocked, stale, stopped, and lock', 'DEGRADED', (f) => {
+      write(f.paths.heartbeat, { lastHeartbeat: '2026-07-18T23:00:00.000Z', lastResult: 'STOPPED' });
+      write(f.paths.state, { status: 'BLOCKED' }); write(f.paths.claimLock, { createdAt: '2026-07-18T23:00:00.000Z' }); writeFileSync(f.paths.retry, '{bad');
+    }],
+    ['blocked overrides stale, stopped, and active lock', 'BLOCKED', (f) => {
+      write(f.paths.heartbeat, { lastHeartbeat: '2026-07-18T23:00:00.000Z', lastResult: 'STOPPED' }); write(f.paths.state, { status: 'BLOCKED' }); write(f.paths.claimLock, { createdAt: '2026-07-18T23:00:00.000Z' });
+    }],
+    ['blocked overrides missing heartbeat', 'BLOCKED', (f) => { write(f.paths.state, { status: 'BLOCKED' }); }],
+    ['stale overrides stopped and active lock', 'STALE', (f) => { write(f.paths.heartbeat, { lastHeartbeat: '2026-07-18T23:00:00.000Z', lastResult: 'STOPPED' }); write(f.paths.claimLock, { createdAt: '2026-07-18T23:00:00.000Z' }); }],
+    ['stopped overrides active lock', 'STOPPED', (f) => { write(f.paths.heartbeat, { lastHeartbeat: '2026-07-19T00:09:55.000Z', lastResult: 'STOPPED' }); write(f.paths.claimLock, { createdAt: '2026-07-19T00:09:00.000Z' }); }],
+    ['active lock degrades fresh heartbeat', 'DEGRADED', (f) => { write(f.paths.heartbeat, { lastHeartbeat: '2026-07-19T00:09:55.000Z' }); write(f.paths.claimLock, { createdAt: '2026-07-19T00:09:00.000Z' }); }]
+  ];
+  for (const [name, expected, setup] of cases) { const f = fixture(); setup(f); assert.equal(health(f).status, expected, name); }
+});
+
+test('exact 120000ms heartbeat boundary is fresh and 120001ms is stale', () => {
+  const exact = fixture(); write(exact.paths.heartbeat, { lastHeartbeat: '2026-07-19T00:08:00.000Z' });
+  assert.equal(inspectHealth({ ...exact, now: () => Date.parse('2026-07-19T00:10:00.000Z'), queue: () => ({ available: true, ready: 0 }) }).status, 'HEALTHY');
+  const over = fixture(); write(over.paths.heartbeat, { lastHeartbeat: '2026-07-19T00:07:59.999Z' });
+  assert.equal(inspectHealth({ ...over, now: () => Date.parse('2026-07-19T00:10:00.000Z'), queue: () => ({ available: true, ready: 0 }) }).status, 'STALE');
+});
+
+test('each malformed runtime JSON artifact degrades and reports corruption', () => {
+  for (const key of ['state', 'heartbeat', 'claimLock', 'supervisorLock', 'retry']) {
+    const f = healthy(); writeFileSync(f.paths[key], '{malformed');
+    const snapshot = health(f);
+    assert.equal(snapshot.status, 'DEGRADED', key);
+    assert.equal(snapshot.artifacts.corrupt, true, key);
+  }
+});
+
+test('missing optional artifacts remain safe and missing heartbeat is UNKNOWN', () => {
+  for (const key of ['state', 'claimLock', 'supervisorLock', 'retry', 'history']) {
+    const f = healthy();
+    assert.equal(health(f).status, 'HEALTHY', key);
+  }
+  const f = fixture();
+  assert.equal(health(f).status, 'UNKNOWN');
+});
+
+test('read-only snapshot preserves every runtime byte, metadata, directory entry, and absence', () => {
+  const f = healthy();
+  write(f.paths.state, { currentTask: 'EAI-TASK-044', nested: { token: 'BEARER_CANARY' } });
+  write(f.paths.claimLock, { createdAt: '2026-07-19T00:09:00.000Z' });
+  const before = snapshotTree(join(f.root, '.hermes'));
+  const snapshot = health(f); formatHuman(snapshot);
+  const after = snapshotTree(join(f.root, '.hermes'));
+  assert.deepEqual(after, before);
+  assert.equal(snapshot.readOnly, true);
+});
+
+test('secret canaries never appear in JSON, human output, stderr, or thrown errors', () => {
+  const f = healthy();
+  write(f.paths.state, { currentTask: 'https://user:pass@example.test/x', secret: 'SUPER_SECRET_CANARY', nested: 'Bearer abc.def.ghi' });
+  writeFileSync(f.paths.history, '{"schemaVersion":999,"payload":{"token":"MIDDLE_SECRET_CANARY"}}\n');
+  const snapshot = health(f); const json = JSON.stringify(snapshot); const human = formatHuman(snapshot);
+  assert.equal(json.includes('SUPER_SECRET_CANARY'), false);
+  assert.equal(json.includes('MIDDLE_SECRET_CANARY'), false);
+  assert.equal(human.includes('SUPER_SECRET_CANARY'), false);
+  const cli = spawnSync(process.execPath, ['scripts/hermes-health.mjs', '--json'], { cwd: join(import.meta.dirname, '..'), encoding: 'utf8' });
+  assert.equal(cli.stderr.includes('SUPER_SECRET_CANARY'), false);
+  assert.equal(cli.stderr.includes('MIDDLE_SECRET_CANARY'), false);
+  assert.doesNotThrow(() => JSON.parse(JSON.stringify(snapshot)));
 });
