@@ -10,7 +10,7 @@
   "startingCommitSha": "eb29ce2b56ac66b0ebf5c48aca50537f272ddad2",
   "implementationCommitSha": "8a82abb5735a4040829cb0140350c6eb9045a090",
   "artifactCommitSha": "8a82abb5735a4040829cb0140350c6eb9045a090",
-  "finalCommitSha": "recorded after metadata commit and push",
+  "finalCommitSha": "67088bb3ec61ff6035c1dd7b4ffc98594ce0189a",
   "finalizationPattern": "Deployment artifacts are committed; final state metadata records the pushed artifact and metadata commits.",
   "startedAt": "2026-07-19T11:18:00Z",
   "completedAt": "2026-07-19T11:24:20Z",
