@@ -1,7 +1,717 @@
-\n== git pull --ff-only ==
-Already up to date.
-[exit 0] git pull --ff-only
-\n== framework doctor ==
+$ node --test tests/event-history.test.mjs
+TAP version 13
+# Subtest: creates and validates the versioned lifecycle schema
+ok 1 - creates and validates the versioned lifecycle schema
+  ---
+  duration_ms: 3.201946
+  type: 'test'
+  ...
+# Subtest: redacts sensitive keys and bounds nested payloads
+ok 2 - redacts sensitive keys and bounds nested payloads
+  ---
+  duration_ms: 2.012175
+  type: 'test'
+  ...
+# Subtest: appends readable NDJSON and tolerates a malformed trailing line
+ok 3 - appends readable NDJSON and tolerates a malformed trailing line
+  ---
+  duration_ms: 3.102831
+  type: 'test'
+  ...
+# Subtest: rotates bounded history and retains configured rotated files
+ok 4 - rotates bounded history and retains configured rotated files
+  ---
+  duration_ms: 5.051689
+  type: 'test'
+  ...
+# Subtest: rejects oversized event payloads
+ok 5 - rejects oversized event payloads
+  ---
+  duration_ms: 4.294265
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 173.812819
+$ npm test
+
+> everythingai-root@0.1.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: all clean — no heartbeat, no lock, no state → NO_ACTION
+ok 1 - all clean — no heartbeat, no lock, no state → NO_ACTION
+  ---
+  duration_ms: 18.062132
+  type: 'test'
+  ...
+# Subtest: active heartbeat with alive PID on same host → NO_ACTION
+ok 2 - active heartbeat with alive PID on same host → NO_ACTION
+  ---
+  duration_ms: 48.761037
+  type: 'test'
+  ...
+# Subtest: active claim lock with alive PID on same host → NO_ACTION
+ok 3 - active claim lock with alive PID on same host → NO_ACTION
+  ---
+  duration_ms: 24.651279
+  type: 'test'
+  ...
+# Subtest: intentional shutdown heartbeat with clean state → NO_ACTION
+ok 4 - intentional shutdown heartbeat with clean state → NO_ACTION
+  ---
+  duration_ms: 31.315837
+  type: 'test'
+  ...
+# Subtest: stale heartbeat + stale claim lock + matching report → RECOVERED
+ok 5 - stale heartbeat + stale claim lock + matching report → RECOVERED
+  ---
+  duration_ms: 33.075231
+  type: 'test'
+  ...
+# Subtest: stale artifacts + IN_PROGRESS + no report + open issue → MANUAL_REVIEW_REQUIRED
+ok 6 - stale artifacts + IN_PROGRESS + no report + open issue → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 36.811023
+  type: 'test'
+  ...
+# Subtest: stale claim lock with matching report → RECOVERED
+ok 7 - stale claim lock with matching report → RECOVERED
+  ---
+  duration_ms: 33.590523
+  type: 'test'
+  ...
+# Subtest: stale claim lock with IN_PROGRESS state (no heartbeat) → MANUAL_REVIEW_REQUIRED
+ok 8 - stale claim lock with IN_PROGRESS state (no heartbeat) → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 31.303976
+  type: 'test'
+  ...
+# Subtest: IN_PROGRESS state without claim lock or heartbeat → MANUAL_REVIEW_REQUIRED
+ok 9 - IN_PROGRESS state without claim lock or heartbeat → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 20.690115
+  type: 'test'
+  ...
+# Subtest: claim lock from different host → MANUAL_REVIEW_REQUIRED
+ok 10 - claim lock from different host → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 23.738405
+  type: 'test'
+  ...
+# Subtest: stale artifacts from different host are escalated for manual review
+ok 11 - stale artifacts from different host are escalated for manual review
+  ---
+  duration_ms: 26.227901
+  type: 'test'
+  ...
+# Subtest: recovery corrects stale hermes:working on GitHub when report exists
+ok 12 - recovery corrects stale hermes:working on GitHub when report exists
+  ---
+  duration_ms: 29.553027
+  type: 'test'
+  ...
+# Subtest: reconciliation writes recovery evidence log
+ok 13 - reconciliation writes recovery evidence log
+  ---
+  duration_ms: 22.836132
+  type: 'test'
+  ...
+# Subtest: active supervisor lock with alive PID → NO_ACTION
+ok 14 - active supervisor lock with alive PID → NO_ACTION
+  ---
+  duration_ms: 21.091785
+  type: 'test'
+  ...
+# Subtest: stale heartbeat without claim lock → RECOVERED
+ok 15 - stale heartbeat without claim lock → RECOVERED
+  ---
+  duration_ms: 23.477397
+  type: 'test'
+  ...
+# Subtest: stale heartbeat with IN_PROGRESS state (no claim lock) → MANUAL_REVIEW_REQUIRED
+ok 16 - stale heartbeat with IN_PROGRESS state (no claim lock) → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 45.863268
+  type: 'test'
+  ...
+# Subtest: stale claim lock without IN_PROGRESS state → RECOVERED
+ok 17 - stale claim lock without IN_PROGRESS state → RECOVERED
+  ---
+  duration_ms: 20.813114
+  type: 'test'
+  ...
+# Subtest: STOPPED heartbeat with clean state → NO_ACTION
+ok 18 - STOPPED heartbeat with clean state → NO_ACTION
+  ---
+  duration_ms: 22.415365
+  type: 'test'
+  ...
+# Subtest: crash recovery handles full stale lifecycle gracefully
+ok 19 - crash recovery handles full stale lifecycle gracefully
+  ---
+  duration_ms: 32.931794
+  type: 'test'
+  ...
+# Subtest: recovery corrects hermes:working when report exists and issue still shows working
+ok 20 - recovery corrects hermes:working when report exists and issue still shows working
+  ---
+  duration_ms: 41.182051
+  type: 'test'
+  ...
+# Subtest: cross-host claim lock with locally-existing PID → MANUAL_REVIEW_REQUIRED not stale cleanup
+ok 21 - cross-host claim lock with locally-existing PID → MANUAL_REVIEW_REQUIRED not stale cleanup
+  ---
+  duration_ms: 25.656675
+  type: 'test'
+  ...
+# Subtest: cross-host supervisor lock → MANUAL_REVIEW_REQUIRED
+ok 22 - cross-host supervisor lock → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 20.313863
+  type: 'test'
+  ...
+# Subtest: cross-host heartbeat → MANUAL_REVIEW_REQUIRED
+ok 23 - cross-host heartbeat → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 21.833951
+  type: 'test'
+  ...
+# Subtest: label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED
+ok 24 - label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 36.812496
+  type: 'test'
+  ...
+# Subtest: label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED
+ok 25 - label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 32.836445
+  type: 'test'
+  ...
+# Subtest: tryRemove only records action when file is actually removed
+ok 26 - tryRemove only records action when file is actually removed
+  ---
+  duration_ms: 29.299394
+  type: 'test'
+  ...
+# Subtest: both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW
+ok 27 - both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW
+  ---
+  duration_ms: 20.520861
+  type: 'test'
+  ...
+# Subtest: stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED
+ok 28 - stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED
+  ---
+  duration_ms: 21.502582
+  type: 'test'
+  ...
+# Subtest: successful edit plus verified re-read records corrected-label action
+ok 29 - successful edit plus verified re-read records corrected-label action
+  ---
+  duration_ms: 28.561998
+  type: 'test'
+  ...
+# Subtest: creates and validates the versioned lifecycle schema
+ok 30 - creates and validates the versioned lifecycle schema
+  ---
+  duration_ms: 3.101609
+  type: 'test'
+  ...
+# Subtest: redacts sensitive keys and bounds nested payloads
+ok 31 - redacts sensitive keys and bounds nested payloads
+  ---
+  duration_ms: 2.004061
+  type: 'test'
+  ...
+# Subtest: appends readable NDJSON and tolerates a malformed trailing line
+ok 32 - appends readable NDJSON and tolerates a malformed trailing line
+  ---
+  duration_ms: 3.637831
+  type: 'test'
+  ...
+# Subtest: rotates bounded history and retains configured rotated files
+ok 33 - rotates bounded history and retains configured rotated files
+  ---
+  duration_ms: 7.050478
+  type: 'test'
+  ...
+# Subtest: rejects oversized event payloads
+ok 34 - rejects oversized event payloads
+  ---
+  duration_ms: 1.060649
+  type: 'test'
+  ...
+# Subtest: classifies explicit, transport, claim, validation, and unknown failures
+ok 35 - classifies explicit, transport, claim, validation, and unknown failures
+  ---
+  duration_ms: 1.728866
+  type: 'test'
+  ...
+# Subtest: only idempotent or live-revalidated operations can retry
+ok 36 - only idempotent or live-revalidated operations can retry
+  ---
+  duration_ms: 0.427519
+  type: 'test'
+  ...
+# Subtest: backoff is bounded and deterministic without jitter
+ok 37 - backoff is bounded and deterministic without jitter
+  ---
+  duration_ms: 0.467904
+  type: 'test'
+  ...
+# Subtest: jitter is deterministic, clamped to the ceiling, and sanitizes bad samples
+ok 38 - jitter is deterministic, clamped to the ceiling, and sanitizes bad samples
+  ---
+  duration_ms: 0.567048
+  type: 'test'
+  ...
+# Subtest: transient failure retries, then exhausts attempts
+ok 39 - transient failure retries, then exhausts attempts
+  ---
+  duration_ms: 1.22176
+  type: 'test'
+  ...
+# Subtest: permanent, validation, and ambiguous mutations terminate without retry
+ok 40 - permanent, validation, and ambiguous mutations terminate without retry
+  ---
+  duration_ms: 0.515421
+  type: 'test'
+  ...
+# Subtest: restart enforces the persisted total-time ceiling at and beyond its boundary
+ok 41 - restart enforces the persisted total-time ceiling at and beyond its boundary
+  ---
+  duration_ms: 3.195654
+  type: 'test'
+  ...
+# Subtest: retry lifecycle persists across restart and clears state after success
+ok 42 - retry lifecycle persists across restart and clears state after success
+  ---
+  duration_ms: 3.669088
+  type: 'test'
+  ...
+# Subtest: claim conflicts require live revalidation and operator/unknown failures escalate
+ok 43 - claim conflicts require live revalidation and operator/unknown failures escalate
+  ---
+  duration_ms: 1.098591
+  type: 'test'
+  ...
+# Subtest: CLI mode polling returns POLLING
+ok 44 - CLI mode polling returns POLLING
+  ---
+  duration_ms: 1.794188
+  type: 'test'
+  ...
+# Subtest: CLI mode webhook returns WEBHOOK
+ok 45 - CLI mode webhook returns WEBHOOK
+  ---
+  duration_ms: 0.261358
+  type: 'test'
+  ...
+# Subtest: CLI and environment agree on the same mode
+ok 46 - CLI and environment agree on the same mode
+  ---
+  duration_ms: 0.274753
+  type: 'test'
+  ...
+# Subtest: invalid CLI mode returns UNKNOWN
+ok 47 - invalid CLI mode returns UNKNOWN
+  ---
+  duration_ms: 0.492048
+  type: 'test'
+  ...
+# Subtest: no explicit mode returns UNKNOWN
+ok 48 - no explicit mode returns UNKNOWN
+  ---
+  duration_ms: 3.475126
+  type: 'test'
+  ...
+# Subtest: writeHeartbeat creates a valid heartbeat file at the given path
+ok 49 - writeHeartbeat creates a valid heartbeat file at the given path
+  ---
+  duration_ms: 7.958713
+  type: 'test'
+  ...
+# Subtest: writeHeartbeat does not include hostname when not passed
+ok 50 - writeHeartbeat does not include hostname when not passed
+  ---
+  duration_ms: 5.150041
+  type: 'test'
+  ...
+# Subtest: writeHeartbeat does not include environment variables, tokens, or secrets
+ok 51 - writeHeartbeat does not include environment variables, tokens, or secrets
+  ---
+  duration_ms: 2.407012
+  type: 'test'
+  ...
+# Subtest: writeHeartbeat uses atomic write (tmp file then rename)
+ok 52 - writeHeartbeat uses atomic write (tmp file then rename)
+  ---
+  duration_ms: 13.281269
+  type: 'test'
+  ...
+# Subtest: readHeartbeat returns null for missing file
+ok 53 - readHeartbeat returns null for missing file
+  ---
+  duration_ms: 0.560496
+  type: 'test'
+  ...
+# Subtest: readHeartbeat returns parsed heartbeat
+ok 54 - readHeartbeat returns parsed heartbeat
+  ---
+  duration_ms: 2.208401
+  type: 'test'
+  ...
+# Subtest: isHeartbeatStale returns true when heartbeat is null
+ok 55 - isHeartbeatStale returns true when heartbeat is null
+  ---
+  duration_ms: 0.601392
+  type: 'test'
+  ...
+# Subtest: isHeartbeatStale returns false when heartbeat is fresh
+ok 56 - isHeartbeatStale returns false when heartbeat is fresh
+  ---
+  duration_ms: 3.048851
+  type: 'test'
+  ...
+# Subtest: isHeartbeatStale returns true when heartbeat exceeds stale threshold
+ok 57 - isHeartbeatStale returns true when heartbeat exceeds stale threshold
+  ---
+  duration_ms: 0.965852
+  type: 'test'
+  ...
+# Subtest: isHeartbeatStale returns true on unparseable lastHeartbeat
+ok 58 - isHeartbeatStale returns true on unparseable lastHeartbeat
+  ---
+  duration_ms: 1.05017
+  type: 'test'
+  ...
+# Subtest: isHeartbeatStale uses threshold parameter correctly
+ok 59 - isHeartbeatStale uses threshold parameter correctly
+  ---
+  duration_ms: 0.649752
+  type: 'test'
+  ...
+# Subtest: acquireSupervisorLock creates lock with metadata
+ok 60 - acquireSupervisorLock creates lock with metadata
+  ---
+  duration_ms: 4.633569
+  type: 'test'
+  ...
+# Subtest: createSupervisor returns a controller object
+ok 61 - createSupervisor returns a controller object
+  ---
+  duration_ms: 0.629585
+  type: 'test'
+  ...
+# Subtest: createSupervisor start returns SINGLE_USE if started after stop
+ok 62 - createSupervisor start returns SINGLE_USE if started after stop
+  ---
+  duration_ms: 6.689976
+  type: 'test'
+  ...
+# Subtest: createSupervisor stop returns NOT_RUNNING if not started
+ok 63 - createSupervisor stop returns NOT_RUNNING if not started
+  ---
+  duration_ms: 0.19275
+  type: 'test'
+  ...
+# Subtest: createSupervisor setStatus updates tracked state
+ok 64 - createSupervisor setStatus updates tracked state
+  ---
+  duration_ms: 0.248605
+  type: 'test'
+  ...
+# Subtest: createSupervisor setStatus updates mode
+ok 65 - createSupervisor setStatus updates mode
+  ---
+  duration_ms: 0.211977
+  type: 'test'
+  ...
+# Subtest: supervisor.used getter reflects single-use state
+ok 66 - supervisor.used getter reflects single-use state
+  ---
+  duration_ms: 1.525658
+  type: 'test'
+  ...
+# Subtest: supervisor creates a fresh instance from a new factory call
+ok 67 - supervisor creates a fresh instance from a new factory call
+  ---
+  duration_ms: 0.235049
+  type: 'test'
+  ...
+# Subtest: CLI --dry-run outputs valid JSON and exits 0
+ok 68 - CLI --dry-run outputs valid JSON and exits 0
+  ---
+  duration_ms: 74.93143
+  type: 'test'
+  ...
+# Subtest: CLI --dry-run --mode webhook outputs correct mode
+ok 69 - CLI --dry-run --mode webhook outputs correct mode
+  ---
+  duration_ms: 76.190471
+  type: 'test'
+  ...
+# Subtest: CLI --dry-run --interval 5000 outputs correct interval
+ok 70 - CLI --dry-run --interval 5000 outputs correct interval
+  ---
+  duration_ms: 68.419658
+  type: 'test'
+  ...
+# Subtest: CLI without --dry-run starts supervisor and writes heartbeat
+ok 71 - CLI without --dry-run starts supervisor and writes heartbeat
+  ---
+  duration_ms: 3019.004229
+  type: 'test'
+  ...
+# Subtest: DEFAULT_HEARTBEAT_INTERVAL_MS is 30 seconds
+ok 72 - DEFAULT_HEARTBEAT_INTERVAL_MS is 30 seconds
+  ---
+  duration_ms: 0.296212
+  type: 'test'
+  ...
+# Subtest: DEFAULT_STALE_THRESHOLD_MS is 2 minutes
+ok 73 - DEFAULT_STALE_THRESHOLD_MS is 2 minutes
+  ---
+  duration_ms: 0.147245
+  type: 'test'
+  ...
+# Subtest: HEARTBEAT_MODES has all expected modes
+ok 74 - HEARTBEAT_MODES has all expected modes
+  ---
+  duration_ms: 2.004381
+  type: 'test'
+  ...
+# Subtest: subprocess SIGTERM creates heartbeat, exits cleanly, releases lock
+ok 75 - subprocess SIGTERM creates heartbeat, exits cleanly, releases lock
+  ---
+  duration_ms: 80.715126
+  type: 'test'
+  ...
+# Subtest: subprocess SIGINT creates heartbeat, exits cleanly, releases lock
+ok 76 - subprocess SIGINT creates heartbeat, exits cleanly, releases lock
+  ---
+  duration_ms: 70.725832
+  type: 'test'
+  ...
+# Subtest: signal handlers are detached after supervisor stop
+ok 77 - signal handlers are detached after supervisor stop
+  ---
+  duration_ms: 2.206178
+  type: 'test'
+  ...
+# Subtest: fresh supervisor instance works after stop in same process
+ok 78 - fresh supervisor instance works after stop in same process
+  ---
+  duration_ms: 4.630102
+  type: 'test'
+  ...
+# Subtest: stop after SIGTERM-like shutdown does not leave stale handlers
+ok 79 - stop after SIGTERM-like shutdown does not leave stale handlers
+  ---
+  duration_ms: 3.267118
+  type: 'test'
+  ...
+# Subtest: in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat
+ok 80 - in-process SIGTERM handler detaches listeners, releases lock, writes SHUTDOWN heartbeat
+  ---
+  duration_ms: 4.180622
+  type: 'test'
+  ...
+# Subtest: two claimants targeting the same issue yield exactly one CLAIMED result
+ok 81 - two claimants targeting the same issue yield exactly one CLAIMED result
+  ---
+  duration_ms: 29.358664
+  type: 'test'
+  ...
+# Subtest: an existing in-progress state causes a claim conflict
+ok 82 - an existing in-progress state causes a claim conflict
+  ---
+  duration_ms: 3.057486
+  type: 'test'
+  ...
+# Subtest: an existing valid local lock causes a claim conflict
+ok 83 - an existing valid local lock causes a claim conflict
+  ---
+  duration_ms: 2.359664
+  type: 'test'
+  ...
+# Subtest: stale lock recovery is conservative and replaces a dead owner lock
+ok 84 - stale lock recovery is conservative and replaces a dead owner lock
+  ---
+  duration_ms: 12.361842
+  type: 'test'
+  ...
+# Subtest: losing hermes:ready between discovery and claim returns NOT_RUNNABLE
+ok 85 - losing hermes:ready between discovery and claim returns NOT_RUNNABLE
+  ---
+  duration_ms: 3.596002
+  type: 'test'
+  ...
+# Subtest: an issue already marked hermes:working or hermes:done is not runnable
+ok 86 - an issue already marked hermes:working or hermes:done is not runnable
+  ---
+  duration_ms: 1.699612
+  type: 'test'
+  ...
+# Subtest: a matching report short-circuits with ALREADY_COMPLETED
+ok 87 - a matching report short-circuits with ALREADY_COMPLETED
+  ---
+  duration_ms: 1.008623
+  type: 'test'
+  ...
+# Subtest: failed label verification releases the local lock
+ok 88 - failed label verification releases the local lock
+  ---
+  duration_ms: 3.596903
+  type: 'test'
+  ...
+# [task-poller] Runnable issues:
+# - \#70 EAI-TASK-039 EAI-TASK-039A
+# [task-poller] Runnable issues:
+# - \#70 EAI-TASK-039 EAI-TASK-039A
+# {
+#   "ok": false,
+#   "result": "UNKNOWN_RUNTIME_MODE",
+#   "source": "none",
+#   "mode": "UNKNOWN",
+#   "evidence": [
+#     "no explicit runtime mode found"
+#   ],
+#   "remediation": "set a mode"
+# }
+# Subtest: polling entry ignores webhook environment noise and still queries the queue
+ok 89 - polling entry ignores webhook environment noise and still queries the queue
+  ---
+  duration_ms: 7.277143
+  type: 'test'
+  ...
+# Subtest: polling entry succeeds when no webhook variables are present
+ok 90 - polling entry succeeds when no webhook variables are present
+  ---
+  duration_ms: 1.434408
+  type: 'test'
+  ...
+# Subtest: unknown polling runtime does not query GitHub
+ok 91 - unknown polling runtime does not query GitHub
+  ---
+  duration_ms: 0.411909
+  type: 'test'
+  ...
+# [task-poller] Runnable issues:
+# - \#60 EAI-TASK-038 EAI-TASK-038
+# [task-poller] Dispatching worker for \#60 EAI-TASK-038 EAI-TASK-038
+# [task-poller] No runnable issues found.
+# Subtest: watchLoop continues queue watching after a claim conflict
+ok 92 - watchLoop continues queue watching after a claim conflict
+  ---
+  duration_ms: 9.900668
+  type: 'test'
+  ...
+# {
+#   "ok": false,
+#   "result": "UNKNOWN_RUNTIME_MODE",
+#   "source": "none",
+#   "mode": "UNKNOWN",
+#   "evidence": [
+#     "no explicit runtime mode found"
+#   ],
+#   "remediation": "set a mode"
+# }
+# [task-worker] \#999 EAI-TASK-999 EAI-TASK-999
+# [task-worker] Report: /root/.hermes/projects/everythingAI/REPORTS/EAI-TASK-999-HERMES-WORKER-LIFECYCLE.md
+# [task-worker] Log: /root/.hermes/projects/everythingAI/LOGS/EAI-TASK-999-terminal.log
+# [task-worker] Commented: false
+# [task-worker] Labels updated: false
+# Subtest: unknown runtime mode causes no GitHub mutation or issue selection
+ok 93 - unknown runtime mode causes no GitHub mutation or issue selection
+  ---
+  duration_ms: 2.891246
+  type: 'test'
+  ...
+# Subtest: polling worker claims through shared authority without a ReferenceError
+ok 94 - polling worker claims through shared authority without a ReferenceError
+  ---
+  duration_ms: 24.41136
+  type: 'test'
+  ...
+# Subtest: discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources
+ok 95 - discoverWebhookPayload prefers GITHUB_EVENT_PATH over other sources
+  ---
+  duration_ms: 7.071758
+  type: 'test'
+  ...
+# Subtest: discoverWebhookPayload blocks when no payload source exists
+ok 96 - discoverWebhookPayload blocks when no payload source exists
+  ---
+  duration_ms: 0.794082
+  type: 'test'
+  ...
+# Subtest: classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON
+ok 97 - classifyWebhookEvent returns INVALID_EVENT_PAYLOAD for malformed JSON
+  ---
+  duration_ms: 0.684348
+  type: 'test'
+  ...
+# Subtest: classifyWebhookEvent ignores non-issues events
+ok 98 - classifyWebhookEvent ignores non-issues events
+  ---
+  duration_ms: 0.491298
+  type: 'test'
+  ...
+# Subtest: classifyWebhookEvent ignores issue events missing readiness labels
+ok 99 - classifyWebhookEvent ignores issue events missing readiness labels
+  ---
+  duration_ms: 0.424562
+  type: 'test'
+  ...
+# Subtest: runWebhookEntry claims exactly once and executes using the claimed ownership
+ok 100 - runWebhookEntry claims exactly once and executes using the claimed ownership
+  ---
+  duration_ms: 16.792791
+  type: 'test'
+  ...
+# Subtest: concurrent identical webhook deliveries dispatch at most one worker
+ok 101 - concurrent identical webhook deliveries dispatch at most one worker
+  ---
+  duration_ms: 23.278207
+  type: 'test'
+  ...
+# Subtest: runWebhookEntry rejects repeated delivery after the first execution
+ok 102 - runWebhookEntry rejects repeated delivery after the first execution
+  ---
+  duration_ms: 13.366317
+  type: 'test'
+  ...
+# Subtest: classifyWebhookEvent rejects repeated delivery after the first shared claim
+ok 103 - classifyWebhookEvent rejects repeated delivery after the first shared claim
+  ---
+  duration_ms: 12.499139
+  type: 'test'
+  ...
+# Subtest: unknown runtime mode causes no payload inspection or GitHub lookup
+ok 104 - unknown runtime mode causes no payload inspection or GitHub lookup
+  ---
+  duration_ms: 1.084766
+  type: 'test'
+  ...
+1..104
+# tests 104
+# suites 0
+# pass 104
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3633.261244
+$ node scripts/framework-doctor.mjs
 {
   "repoRoot": "/root/.hermes/projects/everythingAI/",
   "status": "PASS",
@@ -69,729 +779,5 @@ Already up to date.
     }
   ]
 }
-[exit 0] node scripts/framework-doctor.mjs
-\n== ui typecheck ==
-
-> everything-ai-ui@0.1.0 typecheck
-> tsc --noEmit
-
-[exit 0] bash -lc cd apps/everything-ai-ui && npm run typecheck
-\n== ui build ==
-
-> everything-ai-ui@0.1.0 build
-> vite build
-
-vite v5.4.2 building for production...
-transforming...
-✓ 1554 modules transformed.
-rendering chunks...
-computing gzip size...
-dist/admin.html                    0.48 kB │ gzip:  0.29 kB
-dist/index.html                    0.55 kB │ gzip:  0.30 kB
-dist/assets/styles-CTHDoyWt.css   18.98 kB │ gzip:  4.55 kB
-dist/assets/user-C1KcAk1Y.css     23.19 kB │ gzip:  4.70 kB
-dist/assets/admin-BMIY7-Pe.js     74.24 kB │ gzip: 19.50 kB
-dist/assets/user-CkSB-Dp-.js      89.26 kB │ gzip: 21.80 kB
-dist/assets/styles-o8txTLoH.js   156.64 kB │ gzip: 50.51 kB
-✓ built in 7.20s
-[exit 0] bash -lc cd apps/everything-ai-ui && npm run build
-\n== api tests ==
-
-> everythingai-api@0.1.0 test
-> node --test
-
-TAP version 13
-# Subtest: agent bridge defaults keep connector execution and chat disabled
-ok 1 - agent bridge defaults keep connector execution and chat disabled
-  ---
-  duration_ms: 3.857547
-  type: 'test'
-  ...
-# Subtest: primary connector catalog contains expected safe commands and disabled flags
-ok 2 - primary connector catalog contains expected safe commands and disabled flags
-  ---
-  duration_ms: 0.825021
-  type: 'test'
-  ...
-# Subtest: agent detection rejects unsafe connector command overrides before PATH lookup
-ok 3 - agent detection rejects unsafe connector command overrides before PATH lookup
-  ---
-  duration_ms: 2.185443
-  type: 'test'
-  ...
-# Subtest: agent probes refuse to execute even when an integration is enabled unless backend bridge flag is set
-ok 4 - agent probes refuse to execute even when an integration is enabled unless backend bridge flag is set
-  ---
-  duration_ms: 1.37026
-  type: 'test'
-  ...
-# Subtest: agent probes only allow explicit safe actions
-ok 5 - agent probes only allow explicit safe actions
-  ---
-  duration_ms: 0.554586
-  type: 'test'
-  ...
-# Subtest: agent chat refuses to execute unless both backend bridge and chat flags are set
-ok 6 - agent chat refuses to execute unless both backend bridge and chat flags are set
-  ---
-  duration_ms: 1.291854
-  type: 'test'
-  ...
-# Subtest: agent bridge security notice documents the browser command-execution boundary
-ok 7 - agent bridge security notice documents the browser command-execution boundary
-  ---
-  duration_ms: 0.554897
-  type: 'test'
-  ...
-# Subtest: document context includes active file metadata, preview text, source reference, and insight
-ok 8 - document context includes active file metadata, preview text, source reference, and insight
-  ---
-  duration_ms: 466.053096
-  type: 'test'
-  ...
-# Subtest: document context marks trashed files without hiding context
-ok 9 - document context marks trashed files without hiding context
-  ---
-  duration_ms: 324.693175
-  type: 'test'
-  ...
-# Subtest: document context exposes failed stale file state clearly
-ok 10 - document context exposes failed stale file state clearly
-  ---
-  duration_ms: 185.329956
-  type: 'test'
-  ...
-# Subtest: embedding generation accepts a custom synchronous provider while default search remains stable
-ok 11 - embedding generation accepts a custom synchronous provider while default search remains stable
-  ---
-  duration_ms: 463.98914
-  type: 'test'
-  ...
-# Subtest: embedding generation skips unchanged extracted text and regenerates changed text
-ok 12 - embedding generation skips unchanged extracted text and regenerates changed text
-  ---
-  duration_ms: 456.746358
-  type: 'test'
-  ...
-# Subtest: normal action execution keeps execution_batch_id null
-ok 13 - normal action execution keeps execution_batch_id null
-  ---
-  duration_ms: 753.9332
-  type: 'test'
-  ...
-# Subtest: successful action execution stores execution_batch_id when provided
-ok 14 - successful action execution stores execution_batch_id when provided
-  ---
-  duration_ms: 354.274847
-  type: 'test'
-  ...
-# Subtest: failed action execution stores execution_batch_id when provided
-ok 15 - failed action execution stores execution_batch_id when provided
-  ---
-  duration_ms: 205.970962
-  type: 'test'
-  ...
-# Subtest: creates draft execution batch from selected ready preview IDs
-ok 16 - creates draft execution batch from selected ready preview IDs
-  ---
-  duration_ms: 741.530987
-  type: 'test'
-  ...
-# Subtest: creates draft batch with blocked preview counts without executing anything
-ok 17 - creates draft batch with blocked preview counts without executing anything
-  ---
-  duration_ms: 353.357653
-  type: 'test'
-  ...
-# Subtest: deduplicates preview IDs while preserving first-seen order
-ok 18 - deduplicates preview IDs while preserving first-seen order
-  ---
-  duration_ms: 150.874058
-  type: 'test'
-  ...
-# Subtest: rejects empty or missing preview IDs
-ok 19 - rejects empty or missing preview IDs
-  ---
-  duration_ms: 132.472636
-  type: 'test'
-  ...
-# Subtest: lists execution batches and returns batch detail with executions array
-ok 20 - lists execution batches and returns batch detail with executions array
-  ---
-  duration_ms: 214.032153
-  type: 'test'
-  ...
-# Subtest: approves a draft execution batch with explicit approval
-ok 21 - approves a draft execution batch with explicit approval
-  ---
-  duration_ms: 118.019531
-  type: 'test'
-  ...
-# Subtest: rejects batch approval without explicit approval
-ok 22 - rejects batch approval without explicit approval
-  ---
-  duration_ms: 139.904181
-  type: 'test'
-  ...
-# Subtest: rejects approval for blocked-preview and missing batches
-ok 23 - rejects approval for blocked-preview and missing batches
-  ---
-  duration_ms: 147.357517
-  type: 'test'
-  ...
-# Subtest: rejects approving a batch that is no longer draft
-ok 24 - rejects approving a batch that is no longer draft
-  ---
-  duration_ms: 123.882255
-  type: 'test'
-  ...
-# Subtest: runs an approved execution batch through the safe executor
-ok 25 - runs an approved execution batch through the safe executor
-  ---
-  duration_ms: 201.663954
-  type: 'test'
-  ...
-# Subtest: rejects running batch without explicit approval or from wrong status
-ok 26 - rejects running batch without explicit approval or from wrong status
-  ---
-  duration_ms: 221.985053
-  type: 'test'
-  ...
-# Subtest: stops execution batch on first failure and marks completed_with_errors after partial success
-ok 27 - stops execution batch on first failure and marks completed_with_errors after partial success
-  ---
-  duration_ms: 145.624458
-  type: 'test'
-  ...
-# Subtest: execution without approval is rejected without creating execution or snapshot
-ok 28 - execution without approval is rejected without creating execution or snapshot
-  ---
-  duration_ms: 194.78419
-  type: 'test'
-  ...
-# Subtest: blocked preview cannot execute and is rejected before mutation
-ok 29 - blocked preview cannot execute and is rejected before mutation
-  ---
-  duration_ms: 150.140487
-  type: 'test'
-  ...
-# Subtest: source missing creates failed execution, failed audit, and no snapshot
-ok 30 - source missing creates failed execution, failed audit, and no snapshot
-  ---
-  duration_ms: 117.389103
-  type: 'test'
-  ...
-# Subtest: target exists creates failed execution, failed audit, and no snapshot
-ok 31 - target exists creates failed execution, failed audit, and no snapshot
-  ---
-  duration_ms: 106.208092
-  type: 'test'
-  ...
-# Subtest: execution against active trashed file is rejected with failed audit and no snapshot
-ok 32 - execution against active trashed file is rejected with failed audit and no snapshot
-  ---
-  duration_ms: 170.366368
-  type: 'test'
-  ...
-# Subtest: move execution creates and uses recovery snapshot before filesystem mutation
-ok 33 - move execution creates and uses recovery snapshot before filesystem mutation
-  ---
-  duration_ms: 182.208703
-  type: 'test'
-  ...
-# Subtest: rename execution creates and uses recovery snapshot before filesystem mutation
-ok 34 - rename execution creates and uses recovery snapshot before filesystem mutation
-  ---
-  duration_ms: 105.496513
-  type: 'test'
-  ...
-# Subtest: app-level label execution does not create filesystem recovery snapshot
-ok 35 - app-level label execution does not create filesystem recovery snapshot
-  ---
-  duration_ms: 270.298443
-  type: 'test'
-  ...
-# Subtest: job runner records completed jobs
-ok 36 - job runner records completed jobs
-  ---
-  duration_ms: 99.889367
-  type: 'test'
-  ...
-# Subtest: job runner records failed jobs and rethrows errors
-ok 37 - job runner records failed jobs and rethrows errors
-  ---
-  duration_ms: 5.516216
-  type: 'test'
-  ...
-# Subtest: knowledge ingestion can be wrapped as a job without creating planning suggestions
-ok 38 - knowledge ingestion can be wrapped as a job without creating planning suggestions
-  ---
-  duration_ms: 1026.65721
-  type: 'test'
-  ...
-# Subtest: watcher cycles are recorded as jobs without automatic planning suggestions
-ok 39 - watcher cycles are recorded as jobs without automatic planning suggestions
-  ---
-  duration_ms: 1726.74069
-  type: 'test'
-  ...
-# Subtest: indexes recursively, skips unsafe folders, and hashes files stably
-ok 40 - indexes recursively, skips unsafe folders, and hashes files stably
-  ---
-  duration_ms: 325.823375
-  type: 'test'
-  ...
-# Subtest: extracts supported readable files and records failures without aborting
-ok 41 - extracts supported readable files and records failures without aborting
-  ---
-  duration_ms: 407.143967
-  type: 'test'
-  ...
-# Subtest: searches filename, path, and extracted content with snippets
-ok 42 - searches filename, path, and extracted content with snippets
-  ---
-  duration_ms: 225.813043
-  type: 'test'
-  ...
-# Subtest: prepares chat retrieval and creates preview-only suggestions without mutating source files
-ok 43 - prepares chat retrieval and creates preview-only suggestions without mutating source files
-  ---
-  duration_ms: 291.948664
-  type: 'test'
-  ...
-# Subtest: calls an Ollama-compatible provider when configured
-ok 44 - calls an Ollama-compatible provider when configured
-  ---
-  duration_ms: 2.14121
-  type: 'test'
-  ...
-# Subtest: defaults provider settings to Ollama and updates model options
-ok 45 - defaults provider settings to Ollama and updates model options
-  ---
-  duration_ms: 1.984057
-  type: 'test'
-  ...
-# Subtest: parses selected Windows folder path from the native folder picker
-ok 46 - parses selected Windows folder path from the native folder picker # SKIP Windows-only folder picker
-  ---
-  duration_ms: 0.304108
-  type: 'test'
-  ...
-# Subtest: creates safe action previews without executing file actions
-ok 47 - creates safe action previews without executing file actions
-  ---
-  duration_ms: 204.111196
-  type: 'test'
-  ...
-# Subtest: uses Organizor2-inspired content rules for organization suggestions
-ok 48 - uses Organizor2-inspired content rules for organization suggestions
-  ---
-  duration_ms: 195.140204
-  type: 'test'
-  ...
-# Subtest: executes approved move previews and can undo filesystem changes
-ok 49 - executes approved move previews and can undo filesystem changes
-  ---
-  duration_ms: 219.314933
-  type: 'test'
-  ...
-# Subtest: executes app-level label actions and lists applied labels
-ok 50 - executes app-level label actions and lists applied labels
-  ---
-  duration_ms: 670.310913
-  type: 'test'
-  ...
-# Subtest: syncs extracted files to AnythingLLM upload API when configured
-ok 51 - syncs extracted files to AnythingLLM upload API when configured
-  ---
-  duration_ms: 702.469139
-  type: 'test'
-  ...
-# Subtest: generates deterministic insights and semantic related search results
-ok 52 - generates deterministic insights and semantic related search results
-  ---
-  duration_ms: 441.04043
-  type: 'test'
-  ...
-# Subtest: detects duplicate files by content hash
-ok 53 - detects duplicate files by content hash
-  ---
-  duration_ms: 232.915013
-  type: 'test'
-  ...
-# Subtest: starts a watcher and indexes changed files without automatic planning suggestions
-ok 54 - starts a watcher and indexes changed files without automatic planning suggestions
-  ---
-  duration_ms: 1756.493429
-  type: 'test'
-  ...
-# Subtest: builds knowledge index from generated insights
-ok 55 - builds knowledge index from generated insights
-  ---
-  duration_ms: 220.917567
-  type: 'test'
-  ...
-# Subtest: reports system status counts for the local dashboard
-ok 56 - reports system status counts for the local dashboard
-  ---
-  duration_ms: 493.073869
-  type: 'test'
-  ...
-# Subtest: knowledge ingestion pipeline prepares searchable knowledge without organization suggestions
-ok 57 - knowledge ingestion pipeline prepares searchable knowledge without organization suggestions
-  ---
-  duration_ms: 309.08439
-  type: 'test'
-  ...
-# Subtest: nested undo restores the original nested relative path after approved cross-folder move
-ok 58 - nested undo restores the original nested relative path after approved cross-folder move
-  ---
-  duration_ms: 11419.948857
-  type: 'test'
-  ...
-# Subtest: configured suggestions enforce action allow-list rules
-ok 59 - configured suggestions enforce action allow-list rules
-  ---
-  duration_ms: 314.932988
-  type: 'test'
-  ...
-# Subtest: configured suggestions enforce confidence threshold
-ok 60 - configured suggestions enforce confidence threshold
-  ---
-  duration_ms: 151.400239
-  type: 'test'
-  ...
-# Subtest: configured suggestions can mark previews as not requiring approval
-ok 61 - configured suggestions can mark previews as not requiring approval
-  ---
-  duration_ms: 200.982681
-  type: 'test'
-  ...
-# Subtest: dry-run-only planning rule blocks action previews from execution
-ok 62 - dry-run-only planning rule blocks action previews from execution
-  ---
-  duration_ms: 259.326682
-  type: 'test'
-  ...
-# Subtest: creates and lists planning sessions
-ok 63 - creates and lists planning sessions
-  ---
-  duration_ms: 268.65421
-  type: 'test'
-  ...
-# Subtest: runs a planning session and links generated suggestions to the session
-ok 64 - runs a planning session and links generated suggestions to the session
-  ---
-  duration_ms: 206.734055
-  type: 'test'
-  ...
-# Subtest: session-aware dedupe does not let global suggestions block session suggestions
-ok 65 - session-aware dedupe does not let global suggestions block session suggestions
-  ---
-  duration_ms: 245.037774
-  type: 'test'
-  ...
-# Subtest: rerunning the same planning session dedupes inside that session
-ok 66 - rerunning the same planning session dedupes inside that session
-  ---
-  duration_ms: 162.334759
-  type: 'test'
-  ...
-# Subtest: previews and execution still work from session-linked suggestions
-ok 67 - previews and execution still work from session-linked suggestions
-  ---
-  duration_ms: 163.739785
-  type: 'test'
-  ...
-# Subtest: provider planning sessions use the configured provider for suggestions
-ok 68 - provider planning sessions use the configured provider for suggestions
-  ---
-  duration_ms: 158.038874
-  type: 'test'
-  ...
-# Subtest: configured provider can generate safe planning suggestions
-ok 69 - configured provider can generate safe planning suggestions
-  ---
-  duration_ms: 314.261474
-  type: 'test'
-  ...
-# Subtest: configured provider suggestion generation falls back to deterministic suggestions when provider is unavailable
-ok 70 - configured provider suggestion generation falls back to deterministic suggestions when provider is unavailable
-  ---
-  duration_ms: 153.208107
-  type: 'test'
-  ...
-# Subtest: provider runtime explains remote provider policy blocks
-ok 71 - provider runtime explains remote provider policy blocks
-  ---
-  duration_ms: 243.351493
-  type: 'test'
-  ...
-# Subtest: provider runtime explains missing API keys
-ok 72 - provider runtime explains missing API keys
-  ---
-  duration_ms: 151.275516
-  type: 'test'
-  ...
-# Subtest: provider runtime classifies provider HTTP authorization failures
-ok 73 - provider runtime classifies provider HTTP authorization failures
-  ---
-  duration_ms: 218.396918
-  type: 'test'
-  ...
-# Subtest: moves a file to local recovery trash with retention metadata and audit event
-ok 74 - moves a file to local recovery trash with retention metadata and audit event
-  ---
-  duration_ms: 131.056028
-  type: 'test'
-  ...
-# Subtest: prevents duplicate active trash records for the same file
-ok 75 - prevents duplicate active trash records for the same file
-  ---
-  duration_ms: 137.134365
-  type: 'test'
-  ...
-# Subtest: restores a trashed file record and records recovery audit event
-ok 76 - restores a trashed file record and records recovery audit event
-  ---
-  duration_ms: 140.447986
-  type: 'test'
-  ...
-# Subtest: prevents restoring a trash record more than once
-ok 77 - prevents restoring a trash record more than once
-  ---
-  duration_ms: 128.652939
-  type: 'test'
-  ...
-# Subtest: prevents restoring when indexed file path changed after trashing
-ok 78 - prevents restoring when indexed file path changed after trashing
-  ---
-  duration_ms: 142.355852
-  type: 'test'
-  ...
-# Subtest: blocks permanent purge in the local MVP and audits the denial
-ok 79 - blocks permanent purge in the local MVP and audits the denial
-  ---
-  duration_ms: 133.871549
-  type: 'test'
-  ...
-# Subtest: hides active trash records from file list visibility by default
-ok 80 - hides active trash records from file list visibility by default
-  ---
-  duration_ms: 106.735909
-  type: 'test'
-  ...
-# Subtest: hides active trash records from keyword search by default
-ok 81 - hides active trash records from keyword search by default
-  ---
-  duration_ms: 103.603034
-  type: 'test'
-  ...
-# Subtest: creates recovery snapshot with replay metadata
-ok 82 - creates recovery snapshot with replay metadata
-  ---
-  duration_ms: 182.042352
-  type: 'test'
-  ...
-# Subtest: lists recovery snapshots by file, preview, execution, and status
-ok 83 - lists recovery snapshots by file, preview, execution, and status
-  ---
-  duration_ms: 153.967958
-  type: 'test'
-  ...
-# Subtest: marks recovery snapshot used and failed
-ok 84 - marks recovery snapshot used and failed
-  ---
-  duration_ms: 145.049644
-  type: 'test'
-  ...
-# Subtest: rejects invalid recovery snapshot requests
-ok 85 - rejects invalid recovery snapshot requests
-  ---
-  duration_ms: 101.667598
-  type: 'test'
-  ...
-# Subtest: content search results include stable source references
-ok 86 - content search results include stable source references
-  ---
-  duration_ms: 775.122236
-  type: 'test'
-  ...
-# Subtest: filename and path search results include stable source references
-ok 87 - filename and path search results include stable source references
-  ---
-  duration_ms: 508.936228
-  type: 'test'
-  ...
-# Subtest: normal search hides trashed files while includeTrashed returns explicit trashed state
-ok 88 - normal search hides trashed files while includeTrashed returns explicit trashed state
-  ---
-  duration_ms: 1009.490895
-  type: 'test'
-  ...
-# Subtest: failed extraction files remain searchable by filename with explicit failed extraction state
-ok 89 - failed extraction files remain searchable by filename with explicit failed extraction state
-  ---
-  duration_ms: 473.557524
-  type: 'test'
-  ...
-# Subtest: unsupported files remain searchable by filename with explicit unsupported extraction state
-ok 90 - unsupported files remain searchable by filename with explicit unsupported extraction state
-  ---
-  duration_ms: 263.245864
-  type: 'test'
-  ...
-# Subtest: stale missing files remain searchable by filename with explicit failed index state
-ok 91 - stale missing files remain searchable by filename with explicit failed index state
-  ---
-  duration_ms: 264.708187
-  type: 'test'
-  ...
-# Subtest: scanner skips persisted unchanged files and re-indexes changed files
-ok 92 - scanner skips persisted unchanged files and re-indexes changed files
-  ---
-  duration_ms: 370.11443
-  type: 'test'
-  ...
-# Subtest: persisted active source paths are selected for restart resume
-ok 93 - persisted active source paths are selected for restart resume
-  ---
-  duration_ms: 111.702438
-  type: 'test'
-  ...
-# Subtest: resumePersistedWatchers restarts only persisted active source paths
-ok 94 - resumePersistedWatchers restarts only persisted active source paths
-  ---
-  duration_ms: 192.102188
-  type: 'test'
-  ...
-# Subtest: resumePersistedWatchers reports failed persisted source paths without aborting remaining resumes
-ok 95 - resumePersistedWatchers reports failed persisted source paths without aborting remaining resumes
-  ---
-  duration_ms: 344.042686
-  type: 'test'
-  ...
-# Subtest: marks missing indexed files as stale failures during extraction
-ok 96 - marks missing indexed files as stale failures during extraction
-  ---
-  duration_ms: 190.885856
-  type: 'test'
-  ...
-# Subtest: undo without approval is rejected without audit or snapshot
-ok 97 - undo without approval is rejected without audit or snapshot
-  ---
-  duration_ms: 158.175639
-  type: 'test'
-  ...
-# Subtest: successful filesystem undo creates used undo snapshot and audit includes snapshot id
-ok 98 - successful filesystem undo creates used undo snapshot and audit includes snapshot id
-  ---
-  duration_ms: 181.739666
-  type: 'test'
-  ...
-# Subtest: undo source missing is rejected and audited without snapshot
-ok 99 - undo source missing is rejected and audited without snapshot
-  ---
-  duration_ms: 103.429872
-  type: 'test'
-  ...
-# Subtest: undo target exists is rejected and audited without snapshot
-ok 100 - undo target exists is rejected and audited without snapshot
-  ---
-  duration_ms: 327.290015
-  type: 'test'
-  ...
-# Subtest: semantic search hides trashed files by default and includes them when requested
-ok 101 - semantic search hides trashed files by default and includes them when requested
-  ---
-  duration_ms: 279.868071
-  type: 'test'
-  ...
-# Subtest: unified search does not leak trashed file-linked rows by default
-ok 102 - unified search does not leak trashed file-linked rows by default
-  ---
-  duration_ms: 321.140145
-  type: 'test'
-  ...
-# Subtest: watcher handles rapid file changes through debounced queued cycles
-ok 103 - watcher handles rapid file changes through debounced queued cycles
-  ---
-  duration_ms: 2491.064635
-  type: 'test'
-  ...
-# Subtest: wiki file pages do not use AI summaries as source-backed document body
-ok 104 - wiki file pages do not use AI summaries as source-backed document body
-  ---
-  duration_ms: 385.748249
-  type: 'test'
-  ...
-# Subtest: wiki file pages populate document body from extracted source text when available
-ok 105 - wiki file pages populate document body from extracted source text when available
-  ---
-  duration_ms: 259.196619
-  type: 'test'
-  ...
-# Subtest: wiki source chunks include page numbers when extraction metadata provides a page map
-ok 106 - wiki source chunks include page numbers when extraction metadata provides a page map
-  ---
-  duration_ms: 180.727014
-  type: 'test'
-  ...
-# Subtest: persists durable wiki pages, sections, sources, chunks, relations, and rebuild records
-ok 107 - persists durable wiki pages, sections, sources, chunks, relations, and rebuild records
-  ---
-  duration_ms: 142.200971
-  type: 'test'
-  ...
-# Subtest: persists cross-page relations even when the target page appears later in the batch
-ok 108 - persists cross-page relations even when the target page appears later in the batch
-  ---
-  duration_ms: 64.406509
-  type: 'test'
-  ...
-# Subtest: durable wiki evidence routes expose pages, evidence, and source chunks
-ok 109 - durable wiki evidence routes expose pages, evidence, and source chunks
-  ---
-  duration_ms: 439.753944
-  type: 'test'
-  ...
-# Subtest: wiki validation preview route returns advisory read-only preview for persisted page
-ok 110 - wiki validation preview route returns advisory read-only preview for persisted page
-  ---
-  duration_ms: 361.362287
-  type: 'test'
-  ...
-# Subtest: wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history
-ok 111 - wiki diagnostics route exposes rebuild state, dependencies, fingerprints, and rebuild history
-  ---
-  duration_ms: 308.37808
-  type: 'test'
-  ...
-# Subtest: wiki build persists generated wiki on first build when no persisted wiki exists
-ok 112 - wiki build persists generated wiki on first build when no persisted wiki exists
-  ---
-  duration_ms: 183.37979
-  type: 'test'
-  ...
-# Subtest: wiki build no-op preserves persisted wiki pages after a real prior build
-ok 113 - wiki build no-op preserves persisted wiki pages after a real prior build
-  ---
-  duration_ms: 300.888417
-  type: 'test'
-  ...
-# Subtest: wiki build detects changed extraction dependencies and selectively replaces affected pages
-ok 114 - wiki build detects changed extraction dependencies and selectively replaces affected pages
-  ---
-  duration_ms: 189.109024
-  type: 'test'
-  ...
-1..114
-# tests 114
-# suites 0
-# pass 113
-# fail 0
-# cancelled 0
-# skipped 1
-# todo 0
-# duration_ms 29844.936625
-[exit 0] bash -lc cd services/api && npm test
+$ git diff --check
+$ python3 -m json.tool .hermes/state.json

@@ -402,6 +402,25 @@ The supervisor handles `SIGTERM` and `SIGINT` by:
 This ensures that surviving processes or monitoring can detect an intentional
 shutdown vs. a crash.
 
+## Structured event history
+
+`src/event-history.js` provides a passive, append-only operational history for
+task lifecycle observability. A caller may write one event per line to
+`.hermes/history/events.ndjson`; the directory is runtime data and is excluded
+from Git. The event schema is version `1` and supports `discovery`, `claim`,
+`start`, `validation`, `retry`, `completion`, `block`, `recovery`, and
+`shutdown`.
+
+Each record contains an ISO timestamp, correlation ID, positive issue number,
+EAI task ID, result code, optional commit SHA, validation summary, and a
+sanitized payload. Keys that could contain tokens, secrets, credentials,
+authorization data, cookies, API keys, or environment values are replaced with
+`[REDACTED]`; payloads and nested structures are bounded. Writes use append
+semantics and rotate the active file when it reaches the configured size,
+retaining a bounded number of rotated files. `readHistory()` is migration-free
+and skips malformed records, including a partially written final line, so a
+single interrupted write does not hide earlier history.
+
 ### Programmatic API
 
 The supervisor is implemented as a controller object returned by `createSupervisor()`:
