@@ -4,11 +4,10 @@
   "taskId": "EAI-TASK-043",
   "issueNumber": 66,
   "title": "Add structured event log and persistent execution history",
-  "summary": "PM QA corrections completed: middle-file corruption is surfaced without record contents, only malformed final JSON is tolerated, secret-shaped values are redacted, and deterministic coverage is expanded.",
+  "summary": "PM QA correction rerun completed: newline-terminated malformed records are surfaced, CRLF partial fragments are handled, and rotation rename/retention failures are deterministic and loss-safe.",
   "filesChanged": [
     "src/event-history.js",
     "tests/event-history.test.mjs",
-    "docs/HERMES_OPERATING_MANUAL_RC1.md",
     "REPORTS/EAI-TASK-043-STRUCTURED-EVENT-HISTORY.md",
     "docs/HANDOVER_2026-07-15_EAI_TASK_043.json",
     "LOGS/EAI-TASK-043-terminal.log",
@@ -18,24 +17,24 @@
     "schemaVersion": 1,
     "eventTypes": ["discovery", "claim", "start", "validation", "retry", "completion", "block", "recovery", "shutdown"],
     "appendOnly": true,
-    "malformedTrailingJsonTolerated": true,
-    "middleCorruptionSurfaced": true,
+    "malformedTrailingFragmentOnlyTolerated": true,
+    "newlineTerminatedCorruptionSurfaced": true,
+    "physicalLineNumbers": true,
     "unsupportedVersionsSurfaced": true,
     "secretRedaction": true,
     "maxPayloadBytes": 16384,
-    "rotation": { "maxBytes": 5242880, "retainFiles": 3 },
+    "rotation": { "maxBytes": 5242880, "retainFiles": 3, "failureSeamTested": true },
     "runtimePathIgnoredByGit": true
   },
   "validation": {
-    "focusedTests": "8/8 pass",
-    "allNodeTests": "107/107 pass",
-    "npmTest": "107/107 pass",
+    "focusedTests": "11/11 pass",
+    "allNodeTests": "110/110 pass",
+    "npmTest": "110/110 pass",
     "frameworkDoctor": "PASS",
     "gitDiffCheck": "PASS",
     "jsonParseChecks": "PASS"
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": "544bbf948c534badf592d9a245cabdec45077571",
-  "finalPushedCommitSha": "b58dfef3bc8ec6611ac359754b8ca155498fde82"
+  "artifactCommitSha": "897d3ffd308d80bcb8910550dc3f2af67a64ba26"
 }
