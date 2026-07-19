@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "framework:doctor": "node scripts/framework-doctor.mjs",
+    "hermes:health": "node scripts/hermes-health.mjs",
     "worker:once": "node scripts/task-worker.mjs --mode polling",
     "worker:watch": "node scripts/task-poller.mjs --mode polling --watch",
     "webhook:dispatch": "node scripts/webhook-event-dispatcher.mjs --mode webhook",

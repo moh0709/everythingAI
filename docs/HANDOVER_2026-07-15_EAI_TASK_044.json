@@ -1,0 +1,24 @@
+{
+  "task": "EAI-TASK-044",
+  "issue": 67,
+  "title": "Add worker health CLI and operational metrics snapshot",
+  "status": "PASS",
+  "artifacts": [
+    "scripts/hermes-health.mjs",
+    "tests/hermes-health.test.mjs",
+    "LOGS/EAI-TASK-044-terminal.log",
+    "REPORTS/EAI-TASK-044-WORKER-HEALTH-METRICS.md"
+  ],
+  "validation": {
+    "frameworkDoctor": "PASS",
+    "nodeTests": "117/117 PASS",
+    "npmTest": "117/117 PASS",
+    "diffCheck": "PASS",
+    "jsonOutput": "PASS"
+  },
+  "safety": {
+    "readOnlyRuntimeInspection": true,
+    "secretsExposed": false,
+    "coreApplicationCodeChanged": false
+  }
+}
