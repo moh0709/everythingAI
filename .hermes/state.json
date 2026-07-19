@@ -9,7 +9,7 @@
   "status": "COMPLETED",
   "startingCommitSha": "d1de92856c4aa951a307a49dc26ea290702f9123",
   "artifactCommitSha": "f367b876802a0f07de7f18bb2d1c2d3f37a3fc10",
-  "finalCommitSha": "PENDING",
+  "finalCommitSha": "c579b7cff6f382e4fa57ffd444270693d5a18f1c",
   "finalizationPattern": "Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.",
   "startedAt": "2026-07-19T04:00:00Z",
   "completedAt": "2026-07-19T04:21:21Z",
