@@ -42,6 +42,6 @@
   },
   "productCodeChanged": false,
   "stateFilePreexisted": true,
-  "artifactCommitSha": "To be recorded after artifact commit",
-  "finalPushedCommitSha": "To be recorded in final issue comment"
+  "artifactCommitSha": "3c92cde261799ffda84ff81ecd6c2417eb76a290",
+  "finalPushedCommitSha": "To be recorded after finalization commit"
 }
