@@ -5,15 +5,16 @@
   "issueNumber": 65,
   "title": "Add bounded retry backoff and failure classification",
   "status": "PASS",
-  "rerun": "PM QA correction requested 2026-07-19",
-  "summary": "Corrected jitter ceiling and random-input handling, persisted retry timing across restart, success-state clearing, claim-conflict revalidation coverage, terminal escalation coverage, and unique temporary-path atomic persistence.",
+  "rerun": "PM QA claim-conflict correction requested 2026-07-19",
+  "summary": "Claim-conflict retries now require fresh live revalidation even when idempotent; transient idempotent retries remain allowed. Existing jitter, persisted-ceiling, lifecycle, escalation, and atomic-persistence corrections remain validated.",
   "filesChanged": [
     "src/retry-policy.js",
     "tests/retry-policy.test.mjs",
     "REPORTS/EAI-TASK-042-RETRY-BACKOFF-FAILURE-CLASSIFICATION.md",
     "docs/HANDOVER_2026-07-15_EAI_TASK_042.json",
     "LOGS/EAI-TASK-042-terminal.log",
-    ".hermes/state.json"
+    ".hermes/state.json",
+    "docs/HERMES_OPERATING_MANUAL_RC1.md"
   ],
   "retryPolicy": {
     "maxAttempts": 3,
@@ -25,6 +26,7 @@
     "retryableOnlyWhenIdempotentOrRevalidated": true,
     "automaticGitOrGitHubMutationRetry": false,
     "claimConflictRequiresLiveRevalidation": true,
+    "claimConflictIdempotencyAloneRejected": true,
     "uniqueAtomicTempPath": true,
     "stateFields": ["attempt", "nextRetryAt", "failureClass", "lastEvidence", "startedAtMs", "updatedAt"]
   },
@@ -39,5 +41,5 @@
   "productCodeChanged": false,
   "stateFilePreexisted": true,
   "artifactCommitSha": "0cd8f3975af958324b0911460d9a30847113baa0",
-  "finalPushedCommitSha": "c113724d218d0397e79689edc507e7fa8de28f05"
+  "finalPushedCommitSha": "PENDING_FINALIZATION_SHA"
 }

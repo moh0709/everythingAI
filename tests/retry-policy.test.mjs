@@ -95,8 +95,13 @@ test('retry lifecycle persists across restart and clears state after success', (
 test('claim conflicts require live revalidation and operator/unknown failures escalate', () => {
   const claim = nextRetry({ failure: { result: 'CLAIM_CONFLICT' }, now, revalidate: false });
   assert.equal(claim.retry, false);
+  const idempotentWithoutRevalidation = nextRetry({ failure: { result: 'CLAIM_CONFLICT' }, now, idempotent: true });
+  assert.equal(idempotentWithoutRevalidation.retry, false);
+  assert.equal(idempotentWithoutRevalidation.terminal, true);
   const revalidated = nextRetry({ failure: { result: 'CLAIM_CONFLICT' }, now, revalidate: true });
   assert.equal(revalidated.retry, true);
+  const transientIdempotent = nextRetry({ failure: { code: 'ETIMEDOUT' }, now, idempotent: true });
+  assert.equal(transientIdempotent.retry, true);
   for (const failure of [{ operatorActionRequired: true }, {}]) {
     const terminal = nextRetry({ failure, now, idempotent: true });
     assert.equal(terminal.retry, false);

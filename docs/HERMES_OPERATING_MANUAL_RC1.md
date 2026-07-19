@@ -557,6 +557,7 @@ node src/crash-recovery.js --repo-root /path/to/repo
 - The repository still relies on the GitHub issue queue plus `.hermes/state.json` rather than a separate hidden queue service, and state writes are skipped if the file is absent.
 - Production webhook execution now uses the same claim authority and worker execution helper as polling, but direct calls to the classification helper remain eligibility-only.
 - If a stale lock cannot be proven stale on the current host, Hermes intentionally leaves it in place and returns `CLAIM_CONFLICT`.
+- Retry policy: `CLAIM_CONFLICT` may retry only after fresh live ownership/queue revalidation on that attempt; idempotency alone is insufficient. `TRANSIENT` failures may retry only for idempotent or live-revalidated operations. Permanent, validation, operator-action-required, unknown, and ambiguous Git/GitHub mutation failures escalate without automatic retry.
 - The runtime supervisor (`src/runtime-supervisor.js`) is now present with heartbeat and supervisor lock support, but it is not yet integrated into the poller/worker startup by default — it must be started explicitly.
 - The supervisor lock path (`.hermes/supervisor.lock`) is separate from the task claim lock (`.hermes/claim.lock`) and is not yet lifecycle-managed by the worker scripts.
 - Heartbeat stale detection is implemented in the module but downstream monitoring or auto-recovery is not yet wired up.

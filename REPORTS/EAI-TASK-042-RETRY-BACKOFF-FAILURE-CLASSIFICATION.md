@@ -2,11 +2,11 @@
 
 ## Result
 
-**Final status: PASS — PM QA correction rerun (validated 2026-07-19T02:48:48Z)**
+**Final status: PASS — PM QA claim-conflict correction rerun (validated 2026-07-19T03:23:38Z)**
 
 ## Scope
 
-Corrected the bounded retry policy without changing product application code. The policy now clamps positive jitter to the configured backoff ceiling, sanitizes injected random samples, enforces the persisted total-time ceiling across restart, demonstrates a successful retry lifecycle with persisted-state clearing, requires live revalidation for claim conflicts, and uses unique same-directory temporary files for atomic state replacement.
+Corrected the bounded retry policy without changing product application code. The policy now clamps positive jitter to the configured backoff ceiling, sanitizes injected random samples, enforces the persisted total-time ceiling across restart, demonstrates a successful retry lifecycle with persisted-state clearing, requires live revalidation for claim conflicts even when the operation is idempotent, and uses unique same-directory temporary files for atomic state replacement.
 
 ## Implementation
 
@@ -14,12 +14,12 @@ Corrected the bounded retry policy without changing product application code. Th
   - Six failure classes: `TRANSIENT`, `PERMANENT`, `CLAIM_CONFLICT`, `VALIDATION_FAILURE`, `OPERATOR_ACTION_REQUIRED`, `UNKNOWN`.
   - Bounded exponential backoff with maximum-attempt and total-time ceilings.
   - Deterministic/injectable jitter; out-of-range or non-finite samples are conservatively bounded and final delay never exceeds `maxBackoffMs`.
-  - Retries only for transient/claim-conflict failures when the caller marks the operation idempotent or supplies live revalidation.
+  - Retries transient failures only when the caller marks the operation idempotent or supplies live revalidation; claim-conflict failures require fresh live revalidation and cannot use idempotency alone.
   - Claim conflicts without live revalidation, destructive/ambiguous Git/GitHub mutations, operator-action-required failures, and unknown failures terminate without retry.
   - Retry state records attempt, next retry time, failure class, evidence, and timestamps; persisted `startedAtMs` is reused after restart.
   - Atomic persistence uses a unique same-directory temporary path followed by rename and preserves unrelated state fields. `clearRetryState()` removes retry state after success.
 - `tests/retry-policy.test.mjs`
-  - 9 deterministic tests covering classification, retry safety, bounded backoff, jitter boundary/sanitization, attempt exhaustion, terminal failures, persisted ceiling boundary after restart, success-after-retry state clearing, claim conflicts, and operator/unknown escalation.
+  - 9 deterministic tests covering classification, retry safety, bounded backoff, jitter boundary/sanitization, attempt exhaustion, terminal failures, persisted ceiling boundary after restart, success-after-retry state clearing, the claim-conflict revalidation matrix, and operator/unknown escalation.
 - No `apps/` or `services/` product code was changed.
 
 ## Validation
@@ -43,4 +43,4 @@ The module remains passive: callers own operation execution and must provide an 
 
 `.hermes/state.json` pre-existed and was updated for this correction rerun. Artifacts were validated before commit and push. The final pushed commit SHA is recorded in the handover and state metadata after finalization.
 
-Rerun evidence is recorded in `LOGS/EAI-TASK-042-terminal.log`; the validated artifacts are pushed in immutable commit `c113724d218d0397e79689edc507e7fa8de28f05`.
+Rerun evidence is recorded in `LOGS/EAI-TASK-042-terminal.log`; this rerun specifically closes the PM QA defect where `CLAIM_CONFLICT` could retry with `idempotent: true` and no live revalidation.

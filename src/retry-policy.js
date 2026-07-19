@@ -28,8 +28,6 @@ export const DEFAULT_RETRY_CONFIG = Object.freeze({
   jitterRatio: 0
 });
 
-const RETRYABLE_CLASSES = new Set([FAILURE_CLASSES.TRANSIENT, FAILURE_CLASSES.CLAIM_CONFLICT]);
-
 export function classifyFailure(error = {}) {
   const explicit = String(error.failureClass ?? error.classification ?? '').toUpperCase();
   if (Object.values(FAILURE_CLASSES).includes(explicit)) return explicit;
@@ -57,7 +55,12 @@ function normalizedConfig(config = {}) {
 }
 
 export function isRetryAllowed({ failureClass, idempotent = false, revalidate = false } = {}) {
-  return RETRYABLE_CLASSES.has(failureClass) && (idempotent || revalidate);
+  if (failureClass === FAILURE_CLASSES.CLAIM_CONFLICT) {
+    // A claim conflict can only be retried after fresh ownership/queue
+    // revalidation. Idempotency alone does not prove that the claim is safe.
+    return revalidate;
+  }
+  return failureClass === FAILURE_CLASSES.TRANSIENT && (idempotent || revalidate);
 }
 
 export function calculateBackoff(attempt, config = {}, random = Math.random) {
