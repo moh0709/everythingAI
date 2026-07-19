@@ -246,6 +246,21 @@ For this RC1 manual task, the minimum checks are:
 For code tasks in this repository, also run the repo-appropriate validation commands from the current docs.
 Do not claim a validation result that was not actually executed.
 
+### Persistent event history contract
+
+Hermes lifecycle evidence may be appended as versioned NDJSON under `.hermes/history/`.
+Each append is one complete `O_APPEND` write; concurrent independent writers are
+supported for normal records on the local filesystem contract. Readers tolerate only
+an unterminated final JSON fragment, while newline-terminated or middle-file
+corruption is surfaced with a physical line number. Sensitive keys and secret-shaped
+values are redacted before serialization, and oversized records are rejected.
+
+When the active file reaches its limit, rotation uses monotonic twelve-digit sequence
+names and retains the newest configured generations. Rotation happens before the new
+append, so rename failure leaves the active file untouched; retention failure is
+surfaced only after the active append and complete rotated file are safe. Runtime
+history is ignored by Git; fixtures and focused tests remain tracked.
+
 ## Branch, commit, and push safety
 
 - Work on `main` unless the task explicitly says otherwise.

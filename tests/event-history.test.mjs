@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { tmpdir } from 'node:os';
 import { appendEvent, createEvent, HistoryCorruptionError, readHistory, redactPayload, validateEvent } from '../src/event-history.js';
 
@@ -65,13 +68,34 @@ test('preserves rapid append ordering', () => {
   assert.deepEqual(readHistory(path).map((event) => event.correlationId), Array.from({ length: 25 }, (_, i) => `rapid-${i}`));
 });
 
+test('preserves complete records from concurrent independent writers', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
+  const path = join(dir, 'events.ndjson');
+  const moduleUrl = pathToFileURL(join(process.cwd(), 'src/event-history.js')).href;
+  const script = `import { appendEvent, createEvent } from ${JSON.stringify(moduleUrl)};
+const [historyPath, writer] = process.argv.slice(1);
+for (let i = 0; i < 20; i += 1) appendEvent(historyPath, createEvent({ type: 'validation', issueNumber: 66, taskId: 'EAI-TASK-043', correlationId: writer + '-' + i, timestamp: '2026-07-19T00:00:00.000Z' }), { maxBytes: 1024 * 1024 });`;
+  const children = Array.from({ length: 4 }, (_, writer) => spawn(process.execPath, ['--input-type=module', '-e', script, path, `writer-${writer}`]));
+  const results = await Promise.all(children.map(async (child) => {
+    const [code] = await once(child, 'close');
+    return code;
+  }));
+  assert.deepEqual(results, [0, 0, 0, 0]);
+  const ids = readHistory(path).map((event) => event.correlationId);
+  assert.equal(ids.length, 80);
+  assert.equal(new Set(ids).size, 80);
+});
+
 test('rotates bounded history and retains configured rotated files', () => {
   const dir = mkdtempSync(join(tmpdir(), 'hermes-history-'));
   const path = join(dir, 'events.ndjson');
   for (let i = 0; i < 4; i += 1) appendEvent(path, fixture('retry', { correlationId: `corr-${i}`, payload: { n: i } }), { maxBytes: 1, retainFiles: 2 });
   const files = readdirSync(dir).filter((name) => name.endsWith('.ndjson'));
-  assert.ok(files.length <= 3);
+  const rotated = files.filter((name) => name !== 'events.ndjson').sort();
+  assert.deepEqual(rotated, ['events.000000000002.ndjson', 'events.000000000003.ndjson']);
   assert.ok(readHistory(path).length >= 1);
+  assert.deepEqual(readHistory(join(dir, rotated[0])).map((event) => event.correlationId), ['corr-1']);
+  assert.deepEqual(readHistory(join(dir, rotated[1])).map((event) => event.correlationId), ['corr-2']);
 });
 
 test('rotation rename failure leaves the active history unchanged', () => {

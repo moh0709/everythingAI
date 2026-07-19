@@ -4,15 +4,15 @@
 
 **Correction rerun status: PASS — PM QA requirements validated 2026-07-19**
 
-Artifact commit: `897d3ffd308d80bcb8910550dc3f2af67a64ba26`
-Metadata commit: `6492640662243e7726628c049a597b6d9475a59e`
+Implementation correction commit: pending metadata finalization.
 
 ## Corrections implemented
 
 - `readHistory()` tolerates malformed JSON only in an unterminated final fragment. A malformed final record terminated by `\n` or `\r\n` is surfaced as corruption.
 - Corruption errors use physical line numbers and never include record contents or secret values.
 - Schema-invalid and unsupported-version records are surfaced, including on the final line.
-- Rotation uses an injectable filesystem seam for deterministic failure testing.
+- Rotation uses a monotonic twelve-digit sequence instead of timestamp/PID/random filename ordering, so same-timestamp rotations retain the newest generations deterministically.
+- Added a four-process concurrent-writer test proving 80 complete, unique, parseable records with single-write appends.
 - Rename failure aborts before append and leaves the active history unchanged.
 - Retention deletion failure is explicit after the active record is safely appended; active and complete rotated records remain readable.
 - Added CRLF, physical-line-number, rename-failure, retention-failure, and complete-rotated-record coverage.
@@ -29,8 +29,8 @@ Metadata commit: `6492640662243e7726628c049a597b6d9475a59e`
 
 | Command | Result |
 |---|---|
-| `node --test tests/event-history.test.mjs` | **PASS — 11/11** |
-| `npm test` | **PASS — 110/110** |
+| `node --test tests/event-history.test.mjs` | **PASS — 12/12** |
+| `npm test` | **PASS — 111/111** |
 | `npm run framework:doctor` | **PASS** |
 | `git diff --check` | **PASS** |
 | `python3 -m json.tool .hermes/state.json` | **PASS** |

@@ -61,7 +61,16 @@ function rotateIfNeeded(historyPath, config, fsOps) {
   if (!fsOps.existsSync(historyPath) || fsOps.statSync(historyPath).size < config.maxBytes) return;
   const dir = dirname(historyPath);
   const base = historyPath.endsWith('.ndjson') ? historyPath.slice(0, -7) : historyPath;
-  const rotated = `${base}.${new Date().toISOString().replaceAll(':', '-')}.${process.pid}.${randomUUID()}.ndjson`;
+  const prefix = `${base.split('/').pop()}.`;
+  const existing = fsOps.readdirSync(dir)
+    .filter((name) => new RegExp(`^${prefix.replace('.', '\\.') }\\d{12}\\.ndjson$`).test(name));
+  const sequence = existing.reduce((highest, name) => {
+    const match = name.match(/\.(\d{12})\.ndjson$/);
+    return match ? Math.max(highest, Number(match[1])) : highest;
+  }, 0) + 1;
+  // A monotonic sequence, rather than timestamp/PID/random ordering, makes
+  // retention deterministic even when several rotations share a timestamp.
+  const rotated = `${base}.${String(sequence).padStart(12, '0')}.ndjson`;
   // Rename is deliberately performed before the append. If it fails, the active
   // file remains untouched and the append fails rather than risking data loss.
   fsOps.renameSync(historyPath, rotated);
@@ -79,8 +88,12 @@ export function appendEvent(historyPath, event, options = {}) {
   appendFileSync(historyPath, line, { encoding: 'utf8', flag: 'a' });
   if (rotation) {
     const files = fsOps.readdirSync(rotation.dir)
-      .filter((name) => name.startsWith(`${rotation.base.split('/').pop()}.`) && name.endsWith('.ndjson'))
-      .sort().reverse();
+      .filter((name) => new RegExp(`^${rotation.base.split('/').pop()}\\.\\d{12}\\.ndjson$`).test(name))
+      .sort((left, right) => {
+        const leftSequence = Number(left.match(/\.(\d{12})\.ndjson$/)?.[1] ?? 0);
+        const rightSequence = Number(right.match(/\.(\d{12})\.ndjson$/)?.[1] ?? 0);
+        return rightSequence - leftSequence;
+      });
     // Retention errors are surfaced after the new active record is safely
     // appended, so neither the active file nor the complete rotated file is lost.
     for (const old of files.slice(config.retainFiles)) fsOps.unlinkSync(join(rotation.dir, old));
