@@ -926,6 +926,7 @@ test('label correction with non-responsive edit (labels unchanged) → MANUAL_RE
   // Label correction failed verification → MUST escalate
   assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
   assert.equal(result.outcomeCode, 'LABEL_VERIFICATION_FAILED');
+  assert.ok(!result.actions.some((action) => action.startsWith('corrected GitHub labels')));
   // Labels should still be unchanged in the harness
   const labels = harness.issue.labels.map((l) => l.name);
   assert.ok(labels.includes('hermes:working'), 'hermes:working should still be present');
@@ -1043,4 +1044,49 @@ test('both cross-host claim lock and supervisor lock → first cross-host check 
   assert.equal(result.outcomeCode, 'CROSS_HOST_LOCK');
   assert.ok(existsSync(repo.claimLockPath));
   assert.ok(existsSync(repo.supervisorLockPath));
+});
+
+test('stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+  writeJson(repo.claimLockPath, {
+    pid: 12345,
+    hostname: 'test-host',
+    issueNumber: 64,
+    taskId: 'EAI-TASK-041',
+    createdAt: '2026-07-18T18:00:00.000Z'
+  });
+  writeFileSync(join(repo.reportsDir, 'EAI-TASK-041-RESULT.md'), '# completed report\n');
+  const ghRunner = (args) => {
+    if (args[0] === 'issue' && args[1] === 'view') {
+      throw new Error('simulated GitHub unavailable');
+    }
+    throw new Error(`Unexpected gh command: ${args.join(' ')}`);
+  };
+
+  const result = await reconcile({ repoRoot: repo.base, now, hostname: 'test-host', pid: 99999, ghRunner });
+
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED);
+  assert.equal(result.outcomeCode, 'GITHUB_UNAVAILABLE');
+  assert.ok(result.evidence.some((line) => line.includes('simulated GitHub unavailable')));
+  assert.ok(!result.actions.some((action) => action.startsWith('corrected GitHub labels')));
+});
+
+test('successful edit plus verified re-read records corrected-label action', async () => {
+  const repo = tempRepo();
+  const now = () => new Date('2026-07-18T20:00:00.000Z');
+  writeJson(repo.claimLockPath, {
+    pid: 12345,
+    hostname: 'test-host',
+    issueNumber: 64,
+    taskId: 'EAI-TASK-041',
+    createdAt: '2026-07-18T12:00:00.000Z'
+  });
+  writeFileSync(join(repo.reportsDir, 'EAI-TASK-041-RESULT.md'), '# completed report\n');
+  const harness = makeGhHarness(makeGhIssue({ number: 64, labels: ['pm:ready', 'hermes:working'] }));
+
+  const result = await reconcile({ repoRoot: repo.base, now, hostname: 'test-host', pid: 99999, ghRunner: harness.runner });
+
+  assert.equal(result.outcome, RECONCILE_OUTCOMES.RECOVERED);
+  assert.ok(result.actions.some((action) => action.startsWith('corrected GitHub labels')));
 });

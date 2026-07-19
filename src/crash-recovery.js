@@ -216,7 +216,6 @@ function correctLabelsWithVerification({ issueNumber, addLabels, removeLabels, g
   let postEditLabels;
   try {
     ghEditLabels(issueNumber, addLabels, removeLabels, gh);
-    actions.push(`corrected GitHub labels: added ${addLabels.join(', ')}, removed ${removeLabels.join(', ')}`);
     record('label edit command succeeded — re-reading to verify');
 
     // Re-read the issue to verify labels actually changed
@@ -227,6 +226,7 @@ function correctLabelsWithVerification({ issueNumber, addLabels, removeLabels, g
     const anyRemovePresent = removeLabels.some((l) => postEditLabels.includes(l));
 
     if (allAddedPresent && !anyRemovePresent) {
+      actions.push(`corrected GitHub labels: added ${addLabels.join(', ')}, removed ${removeLabels.join(', ')}`);
       record('label correction verified: expected labels are present and removed labels are absent');
       return { success: true, postEditLabels };
     }
@@ -707,6 +707,11 @@ function handleStaleClaimLock({
         }
       } catch (error) {
         record(`GitHub label correction failed: ${error.message}`);
+        return {
+          outcome: RECONCILE_OUTCOMES.MANUAL_REVIEW_REQUIRED,
+          outcomeCode: 'GITHUB_UNAVAILABLE',
+          evidence, issueNumber: contextIssueNumber, taskId: contextTaskId, actions
+        };
       }
     }
 
