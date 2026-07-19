@@ -1,31 +1,40 @@
 {
   "task": "EAI-TASK-044",
   "issue": 67,
-  "title": "Add worker health CLI and operational metrics snapshot",
   "status": "PASS",
-  "implementationCommitSha": "0f2acd67c8b7b4f8d99cd8bbb029c60903401072",
-  "artifactCommitSha": "3e0df61a85430d1950d3c3e365b52dc3a438fc14",
-  "metadataCommitSha": "f8cda7df9815da82a19b298d7b5e5554a8c791ca",
-  "finalPushedSha": "01814fcde023a5264c978f9b68771bd3e95f4ec9",
-  "artifacts": [
+  "correctionPass": true,
+  "implementationCommitSha": "f0d712a28501724f465efed52979f341be7b7c9c",
+  "filesChanged": [
     "scripts/hermes-health.mjs",
     "tests/hermes-health.test.mjs",
     "docs/HERMES_WORKER_HEALTH.md",
     "LOGS/EAI-TASK-044-terminal.log",
-    "REPORTS/EAI-TASK-044-WORKER-HEALTH-METRICS.md"
+    "REPORTS/EAI-TASK-044-WORKER-HEALTH-METRICS.md",
+    "docs/HANDOVER_2026-07-15_EAI_TASK_044.json",
+    ".hermes/state.json"
   ],
   "validation": {
-    "focusedTests": "24/24 PASS",
+    "focusedTests": "27/27 PASS",
+    "nodeTests": "138/138 PASS",
+    "npmTest": "138/138 PASS",
     "frameworkDoctor": "PASS",
-    "nodeTests": "135/135 PASS",
-    "npmTest": "135/135 PASS",
-    "diffCheck": "PASS",
     "jsonChecks": "PASS",
-    "liveJsonOutput": "PASS; STOPPED alert snapshot, readOnly=true"
+    "diffCheck": "PASS",
+    "productionSmoke": "PASS output validation; STOPPED status, readOnly=true, queue available=true, stderr empty"
   },
-  "safety": {
-    "readOnlyRuntimeInspection": true,
-    "secretsExposed": false,
-    "coreApplicationCodeChanged": false
-  }
+  "adversarialCases": [
+    "queue unavailable and queue throws",
+    "all malformed runtime JSON artifacts",
+    "missing individual artifacts",
+    "120000ms and 120001ms heartbeat boundaries",
+    "120000ms and 120001ms lock ages plus mtime fallback",
+    "partial trailing versus corrupt middle history",
+    "unsupported history schema",
+    "recursive runtime bytes/metadata/directory immutability through both CLI modes",
+    "secret canaries in state, retry, both locks, history, JSON, human, stderr, and error paths"
+  ],
+  "repositoryCleanBeforeMetadata": true,
+  "remoteSynchronizationPending": true,
+  "noApplicationCodeChanged": true,
+  "completedAt": "2026-07-19T10:21:15Z"
 }
