@@ -5,6 +5,7 @@ Use these read-only commands from the repository root:
 ```sh
 npm run hermes:health          # concise operator output
 npm run hermes:health -- --json # stable machine-readable snapshot
+node scripts/hermes-health.mjs --root /path/to/runtime --json # isolated fixture/operator root
 ```
 
 The command reads `.hermes/state.json`, heartbeat, retry and lock files, plus active and retained `events.*.ndjson` history. It never writes, rotates, deletes, or touches runtime files. Queue visibility is obtained with a read-only `gh issue list`; if GitHub is unavailable, `queue.available` is `false` and the count is `null`.
@@ -25,4 +26,4 @@ The first matching row wins:
 
 Age calculations use one captured/injectable clock, including lock timestamp and file-mtime fallback calculations. Counters are reconstructed from durable event history, including retained rotations, and last-event fields are selected chronologically by event timestamp.
 
-The output intentionally excludes environment values, credentials, webhook bodies, raw corrupt records, and secret-shaped values. A non-healthy status exits with code 1 so operators and automation can distinguish a clean health result from an alert condition.
+The output intentionally excludes environment values, credentials, webhook bodies, raw corrupt records, and secret-shaped values. Queue lookup failures—including unavailable `gh` and thrown lookup errors—are represented as `queue.available=false` with a null count and do not alter the runtime status. A non-healthy status exits with code 1 so operators and automation can distinguish a clean health result from an alert condition. `--root` is intended for isolated validation fixtures and points all runtime reads and the read-only queue working directory at the supplied root.

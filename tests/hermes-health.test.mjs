@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -126,10 +126,15 @@ test('each malformed runtime JSON artifact degrades and reports corruption', () 
   }
 });
 
-test('missing optional artifacts remain safe and missing heartbeat is UNKNOWN', () => {
+test('each individually missing optional artifact remains safe', () => {
   for (const key of ['state', 'claimLock', 'supervisorLock', 'retry', 'history']) {
     const f = healthy();
-    assert.equal(health(f).status, 'HEALTHY', key);
+    if (key !== 'state') write(f.paths.state, { currentTask: 'EAI-TASK-044' });
+    if (key !== 'claimLock' && key !== 'supervisorLock' && key !== 'state') write(f.paths.claimLock, { createdAt: '2026-07-19T00:09:00.000Z' });
+    if (key !== 'claimLock' && key !== 'supervisorLock' && key !== 'state') write(f.paths.supervisorLock, { createdAt: '2026-07-19T00:09:00.000Z' });
+    if (key !== 'retry') write(f.paths.retry, { retry: false, attempt: 0 });
+    if (key !== 'history') writeFileSync(f.paths.history, `${JSON.stringify(event('discovery', '2026-07-19T00:09:00.000Z'))}\n`);
+    assert.equal(health(f).status, key === 'retry' || key === 'history' ? 'DEGRADED' : 'HEALTHY', key);
   }
   const f = fixture();
   assert.equal(health(f).status, 'UNKNOWN');
@@ -148,14 +153,56 @@ test('read-only snapshot preserves every runtime byte, metadata, directory entry
 
 test('secret canaries never appear in JSON, human output, stderr, or thrown errors', () => {
   const f = healthy();
-  write(f.paths.state, { currentTask: 'https://user:pass@example.test/x', secret: 'SUPER_SECRET_CANARY', nested: 'Bearer abc.def.ghi' });
+  write(f.paths.state, { currentTask: 'https://user:pass@example.test/x', currentIssue: 'Bearer SUPER_SECRET_CANARYTOKEN', secret: 'SUPER_SECRET_CANARY', nested: 'Bearer abc.def.ghi' });
+  write(f.paths.retry, { failureClass: 'Bearer MIDDLE_SECRET_CANARYTOKEN', token: 'SUPER_SECRET_CANARY' });
+  write(f.paths.claimLock, { createdAt: '2026-07-19T00:09:00.000Z', credential: 'SUPER_SECRET_CANARY' });
+  write(f.paths.supervisorLock, { createdAt: '2026-07-19T00:09:00.000Z', authorization: 'SUPER_SECRET_CANARY' });
   writeFileSync(f.paths.history, '{"schemaVersion":999,"payload":{"token":"MIDDLE_SECRET_CANARY"}}\n');
   const snapshot = health(f); const json = JSON.stringify(snapshot); const human = formatHuman(snapshot);
   assert.equal(json.includes('SUPER_SECRET_CANARY'), false);
   assert.equal(json.includes('MIDDLE_SECRET_CANARY'), false);
   assert.equal(human.includes('SUPER_SECRET_CANARY'), false);
-  const cli = spawnSync(process.execPath, ['scripts/hermes-health.mjs', '--json'], { cwd: join(import.meta.dirname, '..'), encoding: 'utf8' });
-  assert.equal(cli.stderr.includes('SUPER_SECRET_CANARY'), false);
-  assert.equal(cli.stderr.includes('MIDDLE_SECRET_CANARY'), false);
-  assert.doesNotThrow(() => JSON.parse(JSON.stringify(snapshot)));
+  const cliJson = spawnSync(process.execPath, ['scripts/hermes-health.mjs', '--root', f.root, '--json'], { cwd: join(import.meta.dirname, '..'), env: { PATH: '/nonexistent' }, encoding: 'utf8' });
+  const cliHuman = spawnSync(process.execPath, ['scripts/hermes-health.mjs', '--root', f.root], { cwd: join(import.meta.dirname, '..'), env: { PATH: '/nonexistent' }, encoding: 'utf8' });
+  for (const cli of [cliJson, cliHuman]) {
+    assert.equal(cli.error, undefined);
+    assert.equal(cli.stdout.includes('SUPER_SECRET_CANARY'), false);
+    assert.equal(cli.stdout.includes('MIDDLE_SECRET_CANARY'), false);
+    assert.equal(cli.stderr.includes('SUPER_SECRET_CANARY'), false);
+    assert.equal(cli.stderr.includes('MIDDLE_SECRET_CANARY'), false);
+  }
+  assert.doesNotThrow(() => inspectHealth({ ...f, queue: () => { throw new Error('SUPER_SECRET_CANARY'); } }));
+});
+
+test('queue unavailable and queue exceptions are deterministic and non-fatal to inspection', () => {
+  const f = healthy();
+  const unavailable = inspectHealth({ ...f, queue: () => ({ available: false, ready: null }) });
+  const thrown = inspectHealth({ ...f, queue: () => { throw new Error('queue secret failure'); } });
+  assert.deepEqual(unavailable.queue, { available: false, ready: null });
+  assert.deepEqual(thrown.queue, { available: false, ready: null });
+  assert.equal(unavailable.status, 'HEALTHY');
+  assert.equal(thrown.status, 'HEALTHY');
+});
+
+test('claim and supervisor lock ages, including mtime fallback, use the injected clock', () => {
+  const f = healthy();
+  write(f.paths.claimLock, { createdAt: '2026-07-19T00:08:00.000Z' });
+  write(f.paths.supervisorLock, {});
+  const mtime = Date.parse('2026-07-19T00:08:00.001Z') / 1000;
+  utimesSync(f.paths.supervisorLock, mtime, mtime);
+  const snapshot = inspectHealth({ ...f, now: () => Date.parse('2026-07-19T00:10:00.001Z'), queue: () => ({ available: true, ready: 0 }) });
+  assert.equal(snapshot.locks.claim.ageMs, 120001);
+  assert.equal(snapshot.locks.supervisor.ageMs, 120000);
+});
+
+test('actual JSON and human CLI modes preserve an isolated runtime tree', () => {
+  const f = healthy();
+  write(f.paths.state, { currentTask: 'EAI-TASK-044' });
+  write(f.paths.claimLock, { createdAt: '2026-07-19T00:09:00.000Z' });
+  const before = snapshotTree(join(f.root, '.hermes'));
+  for (const args of [['--json'], []]) {
+    const result = spawnSync(process.execPath, ['scripts/hermes-health.mjs', '--root', f.root, ...args], { cwd: join(import.meta.dirname, '..'), env: { PATH: '/nonexistent' }, encoding: 'utf8' });
+    assert.equal(result.error, undefined);
+    assert.deepEqual(snapshotTree(join(f.root, '.hermes')), before, args.join(' ') || 'human');
+  }
 });

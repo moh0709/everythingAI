@@ -7,15 +7,16 @@ import { spawnSync } from 'node:child_process';
 import { readHistory, redactPayload } from '../src/event-history.js';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname);
-const PATHS = Object.freeze({
-  state: resolve(ROOT, '.hermes/state.json'),
-  heartbeat: resolve(ROOT, '.hermes/runtime/heartbeat.json'),
-  claimLock: resolve(ROOT, '.hermes/claim.lock'),
-  supervisorLock: resolve(ROOT, '.hermes/supervisor.lock'),
-  retry: resolve(ROOT, '.hermes/retry.json'),
-  history: resolve(ROOT, '.hermes/runtime/events.ndjson'),
-  reports: resolve(ROOT, 'REPORTS')
+const pathsForRoot = (root) => Object.freeze({
+  state: resolve(root, '.hermes/state.json'),
+  heartbeat: resolve(root, '.hermes/runtime/heartbeat.json'),
+  claimLock: resolve(root, '.hermes/claim.lock'),
+  supervisorLock: resolve(root, '.hermes/supervisor.lock'),
+  retry: resolve(root, '.hermes/retry.json'),
+  history: resolve(root, '.hermes/runtime/events.ndjson'),
+  reports: resolve(root, 'REPORTS')
 });
+const PATHS = pathsForRoot(ROOT);
 const HEALTH_STATES = Object.freeze(['HEALTHY', 'DEGRADED', 'BLOCKED', 'STALE', 'STOPPED', 'UNKNOWN']);
 const safeValue = (value) => redactPayload({ value }).value;
 
@@ -23,7 +24,7 @@ function safeJson(path, now = () => Date.now()) {
   if (!existsSync(path)) return { present: false, value: null, error: null, ageMs: null };
   try {
     const value = JSON.parse(readFileSync(path, 'utf8'));
-    const ageMs = Math.max(0, now() - statSync(path).mtimeMs);
+    const ageMs = Math.max(0, Math.round(now() - statSync(path).mtimeMs));
     return { present: true, value, error: null, ageMs };
   } catch (error) {
     return { present: true, value: null, error: 'invalid JSON', ageMs: null };
@@ -65,10 +66,21 @@ function metrics(snapshots) {
   return counts;
 }
 
-function queueSnapshot() {
-  const result = spawnSync('gh', ['issue', 'list', '--repo', 'moh0709/everythingAI', '--state', 'open', '--label', 'pm:ready', '--label', 'hermes:ready', '--limit', '100', '--json', 'number,title'], { cwd: ROOT, encoding: 'utf8', timeout: 10000 });
+function queueSnapshot(root = ROOT) {
+  const result = spawnSync('gh', ['issue', 'list', '--repo', 'moh0709/everythingAI', '--state', 'open', '--label', 'pm:ready', '--label', 'hermes:ready', '--limit', '100', '--json', 'number,title'], { cwd: root, encoding: 'utf8', timeout: 10000 });
   if (result.status !== 0) return { available: false, ready: null };
   try { return { available: true, ready: JSON.parse(result.stdout).length }; } catch { return { available: false, ready: null }; }
+}
+
+function safeQueue(queue) {
+  try {
+    const value = queue();
+    return value && typeof value === 'object' && typeof value.available === 'boolean'
+      ? { available: value.available, ready: Number.isInteger(value.ready) ? value.ready : null }
+      : { available: false, ready: null };
+  } catch {
+    return { available: false, ready: null };
+  }
 }
 
 export function inspectHealth({ paths = PATHS, now = () => Date.now(), queue = queueSnapshot } = {}) {
@@ -104,9 +116,9 @@ export function inspectHealth({ paths = PATHS, now = () => Date.now(), queue = q
     status: HEALTH_STATES.includes(status) ? status : 'UNKNOWN',
     readOnly: true,
     generatedAt: new Date(now()).toISOString(),
-    queue: queue(),
+    queue: safeQueue(queue),
     currentTask: safeValue(state.value?.currentTask ?? heartbeat.value?.currentTask ?? null),
-    currentIssue: state.value?.currentIssue ?? heartbeat.value?.currentIssue ?? null,
+    currentIssue: safeValue(state.value?.currentIssue ?? heartbeat.value?.currentIssue ?? null),
     lastCompletedTask: allRecords.filter((event) => event.type === 'completion').at(-1)?.taskId ?? null,
     lastFailure: safeValue(allRecords.filter((event) => event.resultCode && ['FAIL', 'FAILED', 'ERROR'].includes(String(event.resultCode).toUpperCase())).at(-1)?.validationSummary ?? null),
     heartbeat: { present: heartbeat.present, ageMs: heartbeatAgeMs, mode: heartbeat.value?.mode ?? null, lastResult: heartbeat.value?.lastResult ?? null },
@@ -122,7 +134,9 @@ export function formatHuman(snapshot) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const snapshot = inspectHealth();
+  const rootFlag = process.argv.indexOf('--root');
+  const requestedRoot = rootFlag >= 0 && process.argv[rootFlag + 1] ? resolve(process.argv[rootFlag + 1]) : ROOT;
+  const snapshot = inspectHealth({ paths: pathsForRoot(requestedRoot), queue: () => queueSnapshot(requestedRoot) });
   process.stdout.write(process.argv.includes('--json') ? `${JSON.stringify(snapshot, null, 2)}\n` : `${formatHuman(snapshot)}\n`);
   process.exitCode = snapshot.status === 'HEALTHY' ? 0 : 1;
 }
