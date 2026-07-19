@@ -663,3 +663,35 @@ PASS (88/88)
 
 $ git diff --check
 (no output — clean)
+
+========================================
+Correction pass 2 — 2026-07-19
+========================================
+
+--- Required correction ---
+- GitHub pre-read failure in stale-claim/report reconciliation now returns GITHUB_UNAVAILABLE / MANUAL_REVIEW_REQUIRED.
+- Successful corrected-label action is appended only after post-edit label verification succeeds.
+- Added deterministic tests for unavailable GitHub state, failed-verification evidence, and verified-success evidence.
+
+=== Validation ===
+$ node --test tests/crash-recovery.test.mjs
+# tests 29
+# pass 29
+# fail 0
+
+$ node scripts/framework-doctor.mjs
+PASS
+
+$ node --test tests/*.test.mjs
+# tests 90
+# pass 90
+# fail 0
+
+$ npm test
+PASS (90/90)
+
+$ git diff --check
+(no output — clean)
+
+$ git rev-parse HEAD (implementation)
+5286f118b2d851289d94f25aa6500a0b407ab249

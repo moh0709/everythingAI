@@ -9,8 +9,8 @@
 - **Repository path used:** `/root/.hermes/projects/everythingAI/`
 - **Current branch:** `main`
 - **Starting commit SHA:** `787a4c33`
-- **Artifact commit SHA:** `4f6997b`
-- **Final pushed SHA:** `4f6997b`
+- **Correction implementation commit SHA:** `5286f118b2d851289d94f25aa6500a0b407ab249`
+- **Final pushed SHA:** pending artifact finalization commit
 
 ## Summary
 
@@ -36,19 +36,23 @@ The old pattern `if (claimLock && claimSameHost === false && !claimPidAlive)` wa
 
 ### Fix 2: GitHub label correction with live verification
 
-**Problem:** The implementation called `ghEditLabels` but did not re-read GitHub after mutation to verify the labels actually changed.
+**Problem:** The implementation called `ghEditLabels` but did not re-read GitHub after mutation to verify the labels actually changed. A prior correction also recorded a successful correction action before post-verification, and a GitHub pre-read failure could fall through to `RECOVERED`.
 
 **Fix:** A new `correctLabelsWithVerification()` function:
 1. Calls `ghEditLabels` with target labels
 2. Immediately re-reads the issue via `ghViewIssue`
 3. Verifies that all added labels are present and all removed labels are absent
-4. On verification failure, returns `LABEL_VERIFICATION_FAILED` → `MANUAL_REVIEW_REQUIRED` — never fabricates success
+4. Records an edit attempt before verification; only a verified match records the successful correction action
+5. On verification failure, returns `LABEL_VERIFICATION_FAILED` → `MANUAL_REVIEW_REQUIRED` — never fabricates success
+6. On pre-mutation GitHub read failure, returns `GITHUB_UNAVAILABLE` → `MANUAL_REVIEW_REQUIRED`
 
 This function is used in both label correction paths (in `handleStaleHeartbeatAndLock` and `handleStaleClaimLock`).
 
 **New tests:**
 - `label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED` — simulates edit that returns success but doesn't change labels
 - `label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED` — simulates partial success
+- `stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED` — proves unavailable live state cannot recover
+- `successful edit plus verified re-read records corrected-label action` — proves success evidence is emitted only after verification
 
 Existing label tests were updated to verify that post-edit re-reads occur (`harness.views.length >= 2`).
 
@@ -71,7 +75,7 @@ This applies to `cleanupStaleArtifacts()`, `handleStaleClaimLock()`, the stale h
 ## Files changed
 
 - `src/crash-recovery.js` — Fixed cross-host escalation, label verification, tryRemove result checking
-- `tests/crash-recovery.test.mjs` — 7 new tests (27 total), existing tests hardened for label verification views
+- `tests/crash-recovery.test.mjs` — 9 new tests (29 total), including GitHub-unavailable and action-evidence checks
 - `REPORTS/EAI-TASK-041-CRASH-RECOVERY-RECONCILIATION.md` — Updated this report
 - `LOGS/EAI-TASK-041-terminal.log` — Terminal log with validation output
 - `.hermes/state.json` — Updated state
@@ -81,7 +85,7 @@ This applies to `cleanupStaleArtifacts()`, `handleStaleClaimLock()`, the stale h
 | Command | Result |
 |---------|--------|
 | Framework doctor (`node scripts/framework-doctor.mjs`) | **PASS** (gh authenticated, state valid, all files present) |
-| All tests (`node --test tests/*.test.mjs`) | **PASS** (88/88 — 61 pre-existing + 27 crash recovery tests) |
+| All tests (`node --test tests/*.test.mjs`) | **PASS** (90/90 — 61 pre-existing + 29 crash recovery tests) |
 | `npm test` | **PASS** (identical to node --test) |
 | `git diff --check` | **PASS** (no whitespace errors) |
 | JSON parse checks | **PASS** (handover JSON, state JSON all valid) |
@@ -115,6 +119,8 @@ This applies to `cleanupStaleArtifacts()`, `handleStaleClaimLock()`, the stale h
 | **Cross-host heartbeat** | **MANUAL_REVIEW** | **`cross-host heartbeat → MANUAL_REVIEW_REQUIRED`** |
 | **Label verification: stale edit** | **MANUAL_REVIEW** | **`label correction with non-responsive edit (labels unchanged) → MANUAL_REVIEW_REQUIRED`** |
 | **Label verification: incomplete edit** | **MANUAL_REVIEW** | **`label correction with incomplete edit (adds labels but does not remove stale ones) → MANUAL_REVIEW_REQUIRED`** |
+| **GitHub read unavailable** | **MANUAL_REVIEW** | **`stale claim lock + matching report + GitHub read failure → MANUAL_REVIEW_REQUIRED`** |
+| **Verified action evidence** | **RECOVERED** | **`successful edit plus verified re-read records corrected-label action`** |
 | **tryRemove result accuracy** | **verified** | **`tryRemove only records action when file is actually removed`** |
 | **Both cross-host locks** | **MANUAL_REVIEW** | **`both cross-host claim lock and supervisor lock → first cross-host check triggers MANUAL_REVIEW`** |
 
@@ -131,7 +137,7 @@ This applies to `cleanupStaleArtifacts()`, `handleStaleClaimLock()`, the stale h
 - [x] **Label verification:** Failed verification returns `MANUAL_REVIEW_REQUIRED` (not `RECOVERED`).
 - [x] **Label verification:** Tests for successful verification and simulated edit that returns success without changing labels.
 - [x] **Evidence consistency:** Artifact removal is only reported when `tryRemove()` actually succeeds.
-- [x] **Evidence consistency:** Report, log, handover, `.hermes/state.json` updated with new SHA and exact test count (27 crash recovery + 61 pre-existing = 88 total).
+- [x] **Evidence consistency:** Successful correction action is recorded only after verified labels; unavailable GitHub state escalates. Report, log, handover, and `.hermes/state.json` updated with correction SHA and exact test count (29 crash recovery + 61 pre-existing = 90 total).
 - [x] **Validation:** Framework doctor, all Node tests, `npm test`, `git diff --check`, and JSON parsing all pass.
 
 ## How existing behavior was preserved

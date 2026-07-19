@@ -4,14 +4,14 @@
   "currentIssue": 64,
   "currentTask": "EAI-TASK-041",
   "result": "PASS",
-  "updatedAt": "2026-07-18T21:00:00Z",
-  "lastCheckedAt": "2026-07-18T21:00:00Z",
+  "updatedAt": "2026-07-19T01:20:00Z",
+  "lastCheckedAt": "2026-07-19T01:20:00Z",
   "status": "COMPLETED",
   "startingCommitSha": "787a4c33",
-  "artifactCommitSha": "4f6997b",
-  "finalCommitSha": "4f6997b",
+  "artifactCommitSha": "pending",
+  "finalCommitSha": "pending",
   "finalizationPattern": "Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.",
   "startedAt": "2026-07-18T20:40:00Z",
-  "completedAt": "2026-07-18T21:00:00Z",
-  "humanSummary": "Correction pass for EAI-TASK-041: (1) Unconditional cross-host escalation — all artifacts (claim lock, supervisor lock, heartbeat) from different hosts are escalated to MANUAL_REVIEW_REQUIRED without local PID lookup. (2) GitHub label correction now re-reads issue after mutation to verify labels actually changed; failed verification returns MANUAL_REVIEW_REQUIRED. (3) tryRemove() result is checked; only successful removals are recorded in actions. 7 new deterministic tests added (27 total)."
+  "completedAt": "2026-07-19T01:20:00Z",
+  "humanSummary": "Correction pass 2 for EAI-TASK-041: GitHub read failures now return MANUAL_REVIEW_REQUIRED rather than RECOVERED, and successful corrected-label actions are recorded only after verified post-edit labels. Cross-host safety and tryRemove evidence checks remain enforced. 9 new deterministic tests added (29 crash-recovery tests; 90 total)."
 }
