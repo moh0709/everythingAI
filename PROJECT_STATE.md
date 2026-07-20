@@ -6,16 +6,38 @@ This file is the canonical, machine- and human-readable state record for Everyth
 
 Authority order:
 
-1. Accepted PM decisions and acceptance comments on GitHub issues.
-2. This `PROJECT_STATE.md`.
-3. `AI_BOOTSTRAP.md`.
-4. Accepted architecture and operating manuals.
-5. Accepted handover JSON, reports, logs, commits, and runtime evidence.
-6. Unaccepted implementation artifacts and agent statements.
+1. Explicit Product Owner / CEO decisions.
+2. Accepted PM decisions and acceptance comments on GitHub issues.
+3. This `PROJECT_STATE.md`.
+4. `AI_BOOTSTRAP.md`.
+5. Accepted architecture and operating manuals, ADRs, runbooks, and issue bodies.
+6. Accepted handover JSON, reports, logs, commits, and runtime evidence.
+7. Unaccepted implementation artifacts and agent statements.
+
+The authority hierarchy determines conflict resolution only. It must never be interpreted as preventing an agent from loading, reading, comparing, validating, or—when authorized—updating lower-ranked authoritative documents.
 
 Conflicts must be resolved conservatively. No agent may infer acceptance from implementation completion alone.
 
-## 2. Executive Status
+## 2. Authoritative Context Retrieval Contract
+
+Before making a project-state decision or beginning implementation, the acting agent must load both:
+
+1. `PROJECT_STATE.md`
+2. `AI_BOOTSTRAP.md`
+
+A failed lookup through one mechanism is not evidence that a file is unavailable or that access is read-only. The agent must use the available retrieval fallbacks in this order where applicable:
+
+1. GitHub repository file on the default branch.
+2. Known repository path, explicit branch, commit, or repository URL.
+3. Connected File Library copy.
+4. Current-conversation attachment or materialized copy.
+5. Only after all available routes fail may the agent report the context as unavailable or return `BLOCKED`.
+
+Before claiming repository read or write access is unavailable, the agent must inspect the available connector/tool capabilities and verify whether repository read and write actions exist. Capability limits must be based on tool-supported evidence, not inference from one failed request.
+
+A retrieval failure must be documented with the attempted source, exact failure, fallback attempts, and impact. It must not silently weaken governance or halt otherwise authorized work.
+
+## 3. Executive Status
 
 - Program: EverythingAI
 - Repository: `moh0709/everythingAI`
@@ -28,7 +50,7 @@ Conflicts must be resolved conservatively. No agent may infer acceptance from im
 - Phase 3: In progress
 - Current phase status: BLOCKED at live host deployment gate
 
-## 3. Accepted Baseline
+## 4. Accepted Baseline
 
 Accepted dependency chain:
 
@@ -41,7 +63,7 @@ Accepted dependency chain:
 
 These form the accepted Phase 3 repository-level reliability baseline.
 
-## 4. Current Dependency Gate
+## 5. Current Dependency Gate
 
 ### Parent task
 
@@ -81,7 +103,7 @@ Hermes is already functioning through an internal scheduled job rather than the 
 
 This existing runtime is operational but does not satisfy the Phase 3 boot persistence, dedicated-account, watchdog, rollback, uninstall, and host lifecycle acceptance criteria.
 
-## 5. Current Roadmap
+## 6. Current Roadmap
 
 1. Complete #76 through direct SSH/root or authorized sudo execution on the Linux host.
 2. Install and verify the accepted systemd deployment.
@@ -91,7 +113,7 @@ This existing runtime is operational but does not satisfy the Phase 3 boot persi
 6. Release #69 only after #68 is accepted and closed.
 7. Execute #69 — unattended reliability drill and Phase 3 completion decision.
 
-## 6. Dependency Graph
+## 7. Dependency Graph
 
 ```text
 #61 accepted
@@ -109,7 +131,7 @@ This existing runtime is operational but does not satisfy the Phase 3 boot persi
 
 Only one dependency-satisfied execution task may carry both queue labels at a time.
 
-## 7. Governance Controls
+## 8. Governance Controls
 
 - PM releases exactly one dependency-satisfied task.
 - Hermes claims only issues carrying both `pm:ready` and `hermes:ready`.
@@ -120,8 +142,10 @@ Only one dependency-satisfied execution task may carry both queue labels at a ti
 - PASS without independently reviewable evidence is invalid.
 - BLOCKED is a valid outcome when supported by exact evidence and remediation.
 - No later dependency may be released while the current gate is unresolved.
+- Context retrieval and tool-capability verification are mandatory before declaring an access blocker.
+- A transient connector failure must not be promoted into a project-state limitation without fallback verification.
 
-## 8. Definition of Done
+## 9. Definition of Done
 
 A task is done only when all applicable evidence agrees:
 
@@ -139,7 +163,7 @@ A task is done only when all applicable evidence agrees:
 
 Repository-only validation cannot substitute for required production or host evidence.
 
-## 9. Architecture Principles
+## 10. Architecture Principles
 
 - Explicit runtime modes
 - Poller, webhook, and gateway separation
@@ -154,8 +178,10 @@ Repository-only validation cannot substitute for required production or host evi
 - External secret storage
 - Reversible deployment
 - Truthful BLOCKED outcomes
+- Multi-source authoritative-context retrieval
+- Evidence-based capability declarations
 
-## 10. Environment Inventory
+## 11. Environment Inventory
 
 ### Existing Hermes runtime
 
@@ -174,7 +200,7 @@ Repository-only validation cannot substitute for required production or host evi
 - Monitoring: heartbeat-based watchdog
 - Required properties: bounded restart, boot persistence, single-instance ownership, reversible install/uninstall
 
-## 11. Risk Register
+## 12. Risk Register
 
 | Risk | Status | Impact | Required control |
 |---|---|---:|---|
@@ -185,14 +211,18 @@ Repository-only validation cannot substitute for required production or host evi
 | Restart storm | Controlled by design, unproven live | High | Bounded restart settings and watchdog observation |
 | Duplicate task execution | Controlled in repository, must be revalidated live | Critical | Lock conflict and single-instance tests |
 | Phase 3 advanced without host evidence | Prevented | High | #69 remains unreleased |
+| False access limitation from a failed lookup | Controlled by governance | High | Mandatory fallback retrieval and tool-capability verification |
+| Stale File Library copy diverges from repository | Open | Medium | Prefer default-branch repository copy and compare versions before use |
 
-## 12. Immediate Next Action
+## 13. Immediate Next Action
 
-The next valid action is direct Linux SSH provisioning following `docs/HERMES_RUNTIME_RUNBOOK.md` and the accepted unit files under `deploy/systemd/`.
+The next valid implementation action is direct Linux SSH provisioning following `docs/HERMES_RUNTIME_RUNBOOK.md` and the accepted unit files under `deploy/systemd/`.
 
 Do not requeue #76 to Hermes until host provisioning has been performed outside the restricted Hermes command gate. After provisioning, Hermes may run read-only and non-privileged validation and submit final evidence.
 
-## 13. Change Control
+Before any future execution session, load and compare both authoritative documents using the retrieval contract in Section 2. Retrieval problems must be exhausted through available fallbacks before execution is declared blocked.
+
+## 14. Change Control
 
 Every update to this file must include:
 
@@ -201,4 +231,6 @@ Every update to this file must include:
 - evidence SHA where available;
 - dependency impact;
 - next released or blocked action;
-- no unsupported success claims.
+- no unsupported success claims;
+- confirmation that both authoritative documents were loaded or the exact exhausted retrieval failure;
+- confirmation that any claimed repository capability limitation was tool-verified.
