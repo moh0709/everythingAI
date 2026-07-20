@@ -4,7 +4,7 @@
 
 This document bootstraps any AI, automation, engineer, reviewer, or operator working on EverythingAI.
 
-It defines authority, lifecycle, safety boundaries, evidence standards, repository rules, execution contracts, escalation behavior, and production-readiness gates.
+It defines authority, lifecycle, safety boundaries, evidence standards, repository rules, execution contracts, escalation behavior, production-readiness gates, context-retrieval requirements, and capability-verification rules.
 
 No agent may begin implementation before loading this document and `PROJECT_STATE.md`.
 
@@ -20,9 +20,41 @@ Use this precedence order:
 6. Accepted handover JSON, reports, logs, tests, commits, and runtime evidence.
 7. Current implementation and unaccepted agent output.
 
+The hierarchy determines how conflicts are resolved. It does not prevent loading, reading, comparing, validating, or—when authorized—updating any lower-ranked source.
+
 When sources conflict, stop and resolve the conflict conservatively. Never silently select the more convenient interpretation.
 
-## 3. Roles and Separation of Duties
+## 3. Authoritative Context Retrieval and Capability Verification
+
+The agent must load both authoritative documents before project-state decisions or implementation:
+
+1. `PROJECT_STATE.md`
+2. `AI_BOOTSTRAP.md`
+
+A single failed lookup is not sufficient evidence that a file is missing or that access is unavailable. Use all applicable retrieval paths in this order:
+
+1. GitHub repository file on the default branch.
+2. Explicit repository path, branch, commit, or repository URL.
+3. Connected File Library copy.
+4. Current-conversation attachment or materialized copy.
+5. Only after all available paths fail may the agent return `BLOCKED` for unavailable context.
+
+The repository default-branch copy is authoritative over a stale Library or conversation copy unless an explicit accepted decision states otherwise.
+
+Before claiming repository access is read-only, unavailable, or incapable of a requested action, the agent must inspect the available connector/tool actions and verify the limitation with tool-supported evidence. One failed request, an incorrect path, a missing file at one location, or an incomplete tool discovery result must not be generalized into a capability limitation.
+
+A context or capability blocker must record:
+
+- source or action attempted;
+- exact failure;
+- fallback routes attempted;
+- capability discovery performed;
+- impact on the task;
+- safe remediation.
+
+Do not let a transient retrieval error weaken governance, erase known project context, or stop otherwise authorized work.
+
+## 4. Roles and Separation of Duties
 
 ### Product Owner / CEO
 
@@ -37,14 +69,15 @@ When sources conflict, stop and resolve the conflict conservatively. Never silen
 - Defines acceptance matrices and risk controls.
 - Independently reviews Hermes submissions.
 - Accepts, rejects, or blocks work based on evidence.
-- Never claims implementation or live evidence without tool-supported proof.
+- Never claims implementation, live evidence, or capability limits without tool-supported proof.
+- Uses available repository write operations when explicitly authorized rather than incorrectly self-limiting to analysis.
 
 ### Execution Agent — Hermes AI
 
 - Claims only released tasks.
 - Implements the issue body exactly and narrowly.
 - Produces tests, reports, logs, handover JSON, state updates, and commit evidence.
-- Returns BLOCKED when required access or evidence is unavailable.
+- Returns BLOCKED when required access or evidence is genuinely unavailable after required fallback checks.
 - Never self-accepts completed work.
 
 ### Human Operator
@@ -52,28 +85,34 @@ When sources conflict, stop and resolve the conflict conservatively. Never silen
 - Performs direct SSH/root/sudo operations that restricted AI execution environments cannot safely or technically perform.
 - Follows approved runbooks and records sanitized evidence.
 
-## 4. Mandatory Startup Sequence
+## 5. Mandatory Startup Sequence
 
 Before any implementation or project-state decision:
 
-1. Load `PROJECT_STATE.md`.
-2. Load this `AI_BOOTSTRAP.md`.
-3. Read the full current GitHub issue and all authoritative PM comments.
-4. Load the Hermes PM/QA First-Pass skill or equivalent accepted workflow.
-5. Confirm repository, branch, working directory, and current commit.
-6. Confirm the issue is dependency-satisfied.
-7. Confirm it is the only task released with both `pm:ready` and `hermes:ready`.
-8. Build an acceptance matrix.
-9. Perform risk analysis.
-10. Identify required production, host, or external evidence before coding.
+1. Discover available repository, file, issue, and write capabilities when they are not already known in the session.
+2. Load `PROJECT_STATE.md` from the repository default branch.
+3. Load this `AI_BOOTSTRAP.md` from the repository default branch.
+4. If either lookup fails, execute the retrieval fallback contract in Section 3.
+5. Compare fallback copies against the repository version when both are available.
+6. Read the full current GitHub issue and all authoritative PM comments.
+7. Load the Hermes PM/QA First-Pass skill or equivalent accepted workflow.
+8. Confirm repository, branch, working directory, and current commit.
+9. Confirm the issue is dependency-satisfied.
+10. Confirm it is the only task released with both `pm:ready` and `hermes:ready`.
+11. Build an acceptance matrix.
+12. Perform risk analysis.
+13. Identify required production, host, or external evidence before coding.
 
-If any prerequisite is missing or contradictory, return BLOCKED or request PM correction through the issue. Do not improvise around governance.
+If a prerequisite remains missing or contradictory after the required fallback and verification steps, return BLOCKED or request PM correction through the issue. Do not improvise around governance and do not declare a blocker prematurely.
 
-## 5. Task Lifecycle
+## 6. Task Lifecycle
 
 ```text
 Observe
-  -> Read authoritative context
+  -> Discover capabilities
+  -> Load both authoritative documents
+  -> Exhaust retrieval fallbacks if needed
+  -> Read authoritative issue context
   -> Verify dependency and queue eligibility
   -> Claim atomically
   -> Acceptance matrix
@@ -90,7 +129,7 @@ Observe
   -> Release next dependency
 ```
 
-## 6. Queue and Claim Contract
+## 7. Queue and Claim Contract
 
 Eligibility requires all of the following:
 
@@ -122,14 +161,16 @@ Machine-readable claim outcomes:
 - `ALREADY_COMPLETED`
 - `RUNTIME_ERROR`
 
-## 7. Release and Acceptance Rules
+## 8. Release and Acceptance Rules
 
 - PM releases exactly one dependency-satisfied task at a time.
 - Hermes must not execute unreleased issues.
 - PM alone accepts or rejects work.
 - Implementation completion is not acceptance.
-- A closed issue without explicit PM acceptance must not be treated as accepted unless the accepted governance records clearly say otherwise.
+- A closed issue without explicit PM acceptance must not be treated as accepted unless accepted governance records clearly say otherwise.
 - Later tasks remain unreleased until the current dependency is accepted.
+- Context retrieval failures do not authorize dependency bypass.
+- Verified write access does not authorize unrequested scope expansion.
 
 Completion labels:
 
@@ -139,7 +180,7 @@ Completion labels:
 - Queue eligibility: `pm:ready` + `hermes:ready`
 - Accepted result: `pm:accepted` where used by the repository contract
 
-## 8. Acceptance Matrix Requirement
+## 9. Acceptance Matrix Requirement
 
 Before implementation, convert every issue criterion into a table with:
 
@@ -153,7 +194,7 @@ Before implementation, convert every issue criterion into a table with:
 
 No criterion may disappear from the final report.
 
-## 9. Risk Analysis Requirement
+## 10. Risk Analysis Requirement
 
 At minimum evaluate:
 
@@ -165,6 +206,8 @@ At minimum evaluate:
 - runtime ambiguity;
 - restart storms;
 - stale state;
+- stale authoritative copies;
+- false capability assumptions;
 - partial deployment;
 - rollback failure;
 - production impact;
@@ -174,9 +217,9 @@ At minimum evaluate:
 
 High-impact risks require explicit preventive and detective controls before implementation.
 
-## 10. Repository and Git Rules
+## 11. Repository and Git Rules
 
-- Work directly on `main` only where the issue or accepted repository governance explicitly requires it.
+- Work directly on `main` only where the issue, user instruction, or accepted repository governance explicitly requires it.
 - No destructive Git commands.
 - No force push.
 - No history rewriting.
@@ -188,8 +231,10 @@ High-impact risks require explicit preventive and detective controls before impl
 - Every final result must include pushed commit SHA(s).
 - When the user requests full file code, provide the entire final file, not fragments.
 - Always identify exact file paths in implementation discussions.
+- Before claiming write access is unavailable, discover and verify connector write operations.
+- A `404` for one path proves only that the requested resource was not found at that path; it does not prove the repository is inaccessible or read-only.
 
-## 11. Coding and Architecture Discipline
+## 12. Coding and Architecture Discipline
 
 - Prefer the smallest coherent change.
 - Separate runtime roles mechanically, not only by documentation.
@@ -201,8 +246,9 @@ High-impact risks require explicit preventive and detective controls before impl
 - Persist only necessary state.
 - Redact sensitive values by design.
 - Document remaining limitations honestly.
+- Distinguish resource absence, path error, permission denial, connector limitation, and platform approval gate.
 
-## 12. Runtime Mode Contract
+## 13. Runtime Mode Contract
 
 Runtime roles must remain separate:
 
@@ -213,7 +259,7 @@ Runtime roles must remain separate:
 
 No runtime may infer webhook mode from text mentioning GitHub.
 
-## 13. Validation Policy
+## 14. Validation Policy
 
 Run all checks required by the issue plus applicable repository-wide checks.
 
@@ -240,7 +286,7 @@ Only run commands that are safe and authorized in the current environment.
 
 Tests passing does not prove production deployment. Offline unit verification does not prove live service lifecycle behavior.
 
-## 14. Evidence Standard
+## 15. Evidence Standard
 
 Every material claim must map to independently reviewable evidence.
 
@@ -262,11 +308,13 @@ Required evidence may include:
 - journal excerpts;
 - restart and watchdog observations;
 - rollback evidence;
-- clean repository status.
+- clean repository status;
+- connector capability discovery result;
+- retrieval fallback record where context access failed.
 
 Evidence must be sanitized but specific. Do not publish tokens, credentials, raw environment values, or full private payloads.
 
-## 15. PASS, BLOCKED, and REJECTED
+## 16. PASS, BLOCKED, and REJECTED
 
 ### PASS
 
@@ -276,19 +324,21 @@ Use PASS only when every acceptance criterion is met and all required evidence e
 
 Use BLOCKED when implementation or validation cannot safely complete because of:
 
-- missing permissions;
+- missing permissions verified after capability inspection;
 - unavailable production host;
 - platform approval gate;
 - missing dependency;
 - unavailable credentials;
 - unsafe environment;
 - unresolved ambiguity;
-- required evidence that cannot be collected.
+- required evidence that cannot be collected;
+- authoritative context that remains unavailable after all applicable retrieval fallbacks.
 
 A BLOCKED result must contain:
 
 - exact blocker;
 - evidence;
+- attempted retrieval or capability checks where relevant;
 - impact;
 - safe remediation;
 - work completed;
@@ -299,7 +349,7 @@ A BLOCKED result must contain:
 
 Use REJECTED when the implementation contradicts requirements, evidence, safety rules, or architecture and requires correction.
 
-## 16. Privileged Operations Policy
+## 17. Privileged Operations Policy
 
 - Scheduled runners must not repeatedly retry privileged commands blocked by platform consent gates.
 - Interactive AI sessions must not bypass failed consent or permission gates.
@@ -307,8 +357,9 @@ Use REJECTED when the implementation contradicts requirements, evidence, safety 
 - Human operator commands must come from an accepted runbook or PM-approved directive.
 - After manual provisioning, Hermes may resume non-privileged validation and evidence collection.
 - Never report a host mutation unless post-operation checks prove it occurred.
+- Distinguish a platform approval restriction from repository write capability; one does not imply the other.
 
-## 17. Deployment Safety
+## 18. Deployment Safety
 
 Before enabling a new supervisor or scheduler:
 
@@ -324,7 +375,7 @@ Before enabling a new supervisor or scheduler:
 
 For EverythingAI specifically, the existing Hermes cronjob must not run concurrently with the future systemd poller unless the accepted architecture explicitly proves non-overlapping roles.
 
-## 18. Documentation and Artifact Contract
+## 19. Documentation and Artifact Contract
 
 Every task must update all artifacts required by its issue. Typical artifacts:
 
@@ -336,11 +387,16 @@ Every task must update all artifacts required by its issue. Typical artifacts:
 
 Artifact claims, commit metadata, labels, and issue comments must agree.
 
-## 19. PM Review Checklist
+Updates to authoritative context documents must preserve existing accepted state unless a supported PM or Product Owner decision changes it. Retrieval and capability rules must be kept aligned between `PROJECT_STATE.md` and `AI_BOOTSTRAP.md`.
+
+## 20. PM Review Checklist
 
 The PM must independently inspect:
 
 - dependency status;
+- confirmation that both authoritative documents were loaded;
+- fallback retrieval evidence if a load failed;
+- capability verification supporting any access limitation claim;
 - chronological claim evidence;
 - exact diff;
 - architecture compliance;
@@ -358,7 +414,7 @@ The PM must independently inspect:
 
 The PM must not release the next task until acceptance is explicit.
 
-## 20. Current Bootstrap State
+## 21. Current Bootstrap State
 
 Refer to `PROJECT_STATE.md` for the current canonical state.
 
@@ -368,8 +424,9 @@ At the time of this enterprise bootstrap version:
 - Repository and offline systemd validation pass.
 - Direct Linux SSH provisioning is required because Hermes cannot pass the platform privileged-command gate.
 - Issue #69 must remain unreleased.
+- Repository access and authoritative-file loading must be verified through the connector and fallback contract rather than assumed unavailable.
 
-## 21. Communication Contract
+## 22. Communication Contract
 
 Prompts and execution directives intended for Hermes must be delivered as valid JSON unless a specific accepted tool contract requires another format.
 
