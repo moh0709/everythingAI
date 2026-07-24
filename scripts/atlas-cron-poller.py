@@ -48,7 +48,6 @@ def api_request(url, token, method="GET", data=None):
         return None
 
 def main():
-    print(f"[atlas-cron] {datetime.datetime.utcnow().strftime('%H:%M:%S')} Alive — checking queue")
     token = get_token()
     if not token:
         print("[atlas-cron] No token available", file=sys.stderr)
@@ -59,10 +58,8 @@ def main():
     issues = api_request(url, token)
 
     if issues is None:
-        print(f"[atlas-cron] {datetime.datetime.utcnow().strftime('%H:%M:%S')} API call failed (see stderr)")
         sys.exit(0)
     if len(issues) == 0:
-        print(f"[atlas-cron] {datetime.datetime.utcnow().strftime('%H:%M:%S')} No open pm:ready + atlas:ready issues")
         sys.exit(0)
 
     issue = issues[0]
