@@ -3,6 +3,7 @@ Atlas Poller — checks GitHub issue queue for pm:ready + atlas:ready labels.
 Runs as a cron job script (no_agent=True).
 Exits silently when no work is available.
 """
+import datetime
 import json
 import os
 import subprocess
@@ -47,6 +48,7 @@ def api_request(url, token, method="GET", data=None):
         return None
 
 def main():
+    print(f"[atlas-cron] {datetime.datetime.utcnow().strftime('%H:%M:%S')} Alive — checking queue")
     token = get_token()
     if not token:
         print("[atlas-cron] No token available", file=sys.stderr)
@@ -56,8 +58,11 @@ def main():
     url = f"https://api.github.com/repos/{REPO}/issues?state=open&labels=pm:ready,atlas:ready&per_page=5"
     issues = api_request(url, token)
 
-    if not issues or len(issues) == 0:
-        # Silent exit — nothing to do
+    if issues is None:
+        print(f"[atlas-cron] {datetime.datetime.utcnow().strftime('%H:%M:%S')} API call failed (see stderr)")
+        sys.exit(0)
+    if len(issues) == 0:
+        print(f"[atlas-cron] {datetime.datetime.utcnow().strftime('%H:%M:%S')} No open pm:ready + atlas:ready issues")
         sys.exit(0)
 
     issue = issues[0]
@@ -74,7 +79,6 @@ def main():
     api_request(add_url, token, method="POST", data={"labels": ["atlas:working"]})
 
     # Post claim comment
-    import datetime
     now = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     comment_url = f"https://api.github.com/repos/{REPO}/issues/{num}/comments"
     comment_body = (
