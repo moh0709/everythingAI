@@ -1,6 +1,7 @@
 """
 Atlas Poller — checks GitHub issue queue for pm:ready + atlas:ready labels.
 Runs as a cron job script (no_agent=True).
+Idempotent: re-checks labels before claiming to prevent duplicate claims.
 Exits silently when no work is available.
 """
 import datetime
@@ -12,6 +13,7 @@ import urllib.request
 
 REPO = "moh0709/everythingAI"
 WORKDIR = r"C:\temp\everythingAI"
+
 
 def get_token():
     """Extract GitHub token from git credential manager."""
@@ -31,6 +33,7 @@ def get_token():
         print(f"[atlas-cron] Token error: {e}", file=sys.stderr)
     return None
 
+
 def api_request(url, token, method="GET", data=None):
     """Make a GitHub API request."""
     headers = {
@@ -47,13 +50,23 @@ def api_request(url, token, method="GET", data=None):
         print(f"[atlas-cron] API error {e.code}: {e.read().decode()[:200]}", file=sys.stderr)
         return None
 
+
+def get_label_names(issue_num, token):
+    """Get current label names for an issue."""
+    url = f"https://api.github.com/repos/{REPO}/issues/{issue_num}/labels"
+    labels = api_request(url, token)
+    if labels is None:
+        return set()
+    return {l["name"] for l in labels}
+
+
 def main():
     token = get_token()
     if not token:
         print("[atlas-cron] No token available", file=sys.stderr)
         sys.exit(1)
 
-    # Query for eligible issues
+    # Query for potentially eligible issues
     url = f"https://api.github.com/repos/{REPO}/issues?state=open&labels=pm:ready,atlas:ready&per_page=5"
     issues = api_request(url, token)
 
@@ -65,15 +78,32 @@ def main():
     issue = issues[0]
     num = issue["number"]
     title = issue["title"]
-    print(f"[atlas-cron] Found eligible issue #{num}: {title}")
 
-    # Claim: remove atlas:ready
+    # --- Idempotency gate: re-read current labels ---
+    current_labels = get_label_names(num, token)
+    if "atlas:ready" not in current_labels:
+        # Another instance already claimed it, or labels changed
+        sys.exit(0)
+    if "atlas:working" in current_labels:
+        # Already claimed — skip
+        sys.exit(0)
+
+    print(f"[atlas-cron] Claiming issue #{num}: {title}")
+
+    # --- Atomic claim ---
+    # Remove atlas:ready
     del_url = f"https://api.github.com/repos/{REPO}/issues/{num}/labels/atlas:ready"
     api_request(del_url, token, method="DELETE")
 
     # Add atlas:working
     add_url = f"https://api.github.com/repos/{REPO}/issues/{num}/labels"
     api_request(add_url, token, method="POST", data={"labels": ["atlas:working"]})
+
+    # --- Verify claim took effect ---
+    final_labels = get_label_names(num, token)
+    if "atlas:working" not in final_labels:
+        print(f"[atlas-cron] ERROR: Claim verification failed for #{num}")
+        sys.exit(0)
 
     # Post claim comment
     now = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -90,6 +120,7 @@ def main():
     api_request(comment_url, token, method="POST", data={"body": comment_body})
 
     print(f"[atlas-cron] Successfully claimed issue #{num}")
+
 
 if __name__ == "__main__":
     main()

@@ -4,16 +4,20 @@
   "currentIssue": 76,
   "currentTask": "EAI-TASK-045A",
   "result": "CLAIMED",
-  "updatedAt": "2026-07-24T07:20:00Z",
-  "lastCheckedAt": "2026-07-24T07:20:00Z",
+  "updatedAt": "2026-07-24T11:45:00Z",
+  "lastCheckedAt": "2026-07-24T11:45:00Z",
   "status": "IN_PROGRESS",
   "startingCommitSha": "33bf2fa0b57724217eb97975d4503433ed8fc7ba",
   "implementationCommitSha": null,
-  "artifactCommitSha": null,
-  "finalCommitSha": null,
-  "finalizationPattern": null,
-  "startedAt": "2026-07-24T07:20:00Z",
-  "completedAt": null,
-  "humanSummary": "Claimed by Atlas via atlas:ready→atlas:working. Host provisioning and live systemd lifecycle verification in progress.",
-  "labelProtocol": "atlas:ready → atlas:working → atlas:done + pm:review"
+  "completedIssues": [
+    {
+      "issue": 77,
+      "task": "OPS-TEST: Verify Atlas autonomous poller claim handshake",
+      "status": "COMPLETED",
+      "finalLabels": ["pm:review", "atlas:done"],
+      "completedAt": "2026-07-24T11:45:00Z"
+    }
+  ],
+  "labelProtocol": "atlas:ready → atlas:working → atlas:done + pm:review",
+  "humanSummary": "#77 test handshake PASSED and completed. #76 host provisioning blocked by SSH access."
 }
