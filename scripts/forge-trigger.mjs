@@ -51,8 +51,9 @@ export async function watchForge({ iterations = Infinity, pauseMs = intervalMs, 
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
+  const sha = gh(['rev-parse', 'HEAD']);
   const result = process.argv.includes('--watch')
-    ? await watchForge({ iterations: Number(process.env.FORGE_TRIGGER_ITERATIONS ?? 1) })
-    : await pollForgeOnce({ sha: gh(['rev-parse', 'HEAD']) });
+    ? await watchForge({ iterations: Number(process.env.FORGE_TRIGGER_ITERATIONS ?? 1), sha })
+    : await pollForgeOnce({ sha });
   console.log(JSON.stringify(result, null, 2));
 }
