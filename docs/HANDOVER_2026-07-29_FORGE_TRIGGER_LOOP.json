@@ -1,10 +1,11 @@
 {
   "milestone": "Forge trigger loop with Atlas reporting",
   "issue": 79,
-  "status": "IN_PROGRESS",
+  "status": "READY_FOR_PM_REVIEW",
   "repository": "moh0709/everythingAI",
   "branch": "main",
   "startingSha": "9421ece46afca8d89e6cd536de8778c0eca2b630",
+  "implementationSha": "be05ffecabf14d95410e903dfb0f19afe166a78f",
   "claim": {
     "verified": true,
     "labels": ["pm:ready", "forge:working"],
@@ -21,14 +22,23 @@
     "docs/FORGE_TRIGGER_AND_REPORTING_RUNBOOK.md"
   ],
   "validation": {
-    "automatedTests": "PENDING",
-    "frameworkDoctor": "PENDING",
-    "liveHandshake": "PENDING",
-    "telegram": "SANITIZED_ADAPTER_IMPLEMENTED"
+    "automatedTests": "144/144 PASS on VPS",
+    "forgeTests": "6/6 PASS",
+    "frameworkDoctor": "PASS on VPS",
+    "diffCheck": "PASS on VPS",
+    "liveHandshake": "PASS issue #80 detected once, claimed once, context prepared, repeat tick IDLE",
+    "telegram": "PASS sanitized handshake_claimed and human_start_required reports delivered"
   },
   "knownLimitations": [
-    "Codex desktop automatic wake/resume is not claimed; supported human-start boundary is documented.",
-    "The required dedicated handshake issue must be created and exercised before final submission."
+    "Codex desktop automatic wake/resume is not claimed; supported human-start boundary is documented."
   ],
-  "nextAction": "Run automated validation, create a dedicated handshake issue, and verify detection, claim, context preparation, and sanitized reporting."
+  "handshakeIssue": {
+    "issue": 80,
+    "state": "open",
+    "labels": ["pm:ready", "forge:working"],
+    "claimCommentCount": 1,
+    "notClosedByForge": true
+  },
+  "preservedUnrelatedPaths": ["apps/everything-ai-ui/src/planning.css"],
+  "nextAction": "PM independently reviews issue #79 and the dedicated handshake evidence."
 }
