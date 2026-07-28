@@ -11,7 +11,7 @@ PASS submitted for independent PM review. No product application code was change
 - systemd: 255.4-1ubuntu8.16
 - Service account: `hermes` (uid 997, gid 986)
 - Deployment checkout: `/opt/everythingAI`
-- Deployment commit: `994e49ae6f8096e635bfe550635be9cd1784a4b3`
+- Deployment checkout commit: `ef63d2113cc563dd0f17573f0be5f674a37240c1`
 - Protected runtime environment: `/etc/hermes/everythingai.env`, mode `0640`, owner `root:hermes`
 - GitHub CLI credential store: `/var/lib/hermes/gh`, mode `0700`, owner `hermes`; no credential-bearing files remain in the repository checkout
 - Legacy EverythingAI cron job: disabled before systemd activation
