@@ -4,10 +4,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { claimForgeIssue, FORGE_RESULTS, isForgeEligible } from '../src/forge-trigger.js';
 import { sendForgeReport } from '../src/forge-reporting.js';
+import { startForgeExecution } from '../src/forge-execution.js';
 
 const repo = 'moh0709/everythingAI';
 const root = process.cwd();
 const intervalMs = Number(process.env.FORGE_TRIGGER_INTERVAL_MS ?? 60_000);
+const codexPath = process.env.FORGE_CODEX_PATH ?? 'codex';
 
 function gh(args) {
   const result = spawnSync('gh', args, { cwd: root, encoding: 'utf8' });
@@ -41,10 +43,16 @@ function postComment(issue, comment) {
   catch (error) { return { ok: false, error: error.message }; }
 }
 
-export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8') } = {}) {
+async function executeWithReporting({ contextPath, issue, repoRoot, reporter }) {
+  const result = await startForgeExecution({ contextPath, repoRoot, codexPath });
+  await reporter({ event: result.ok ? 'execution_completed' : 'execution_blocked', issue, contextPath });
+  return result;
+}
+
+export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8') } = {}) {
   const issues = await list();
   if (!issues.length) return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs };
-  return claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter });
+  return claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
 }
 
 export async function watchForge({ iterations = Infinity, pauseMs = intervalMs, ...options } = {}) {

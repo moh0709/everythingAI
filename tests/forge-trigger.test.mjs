@@ -62,6 +62,27 @@ test('comment failure is persisted and recovered without relabeling', async () =
   assert.equal(JSON.parse(readFileSync(statePath, 'utf8')).claimCommentPosted, true);
 });
 
+test('claimed issue is handed to the autonomous executor when configured', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-autonomous-'));
+  const lockPath = join(root, 'claim.lock');
+  let live = issue();
+  const fetch = async () => live;
+  const update = async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; };
+  let execution;
+  const result = await claimForgeIssue({
+    issue: live,
+    fetchLiveIssue: fetch,
+    updateLabels: update,
+    postComment: async () => ({ ok: true }),
+    lockPath,
+    repoRoot: root,
+    execute: async (args) => { execution = args; return { ok: true, result: 'COMPLETED' }; }
+  });
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.equal(execution.issue.number, 801);
+  assert.match(execution.contextPath, /context-801\.json$/);
+});
+
 test('cross-host and dead same-host locks are handled conservatively', () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-lock-'));
   const cross = join(root, 'cross.lock');

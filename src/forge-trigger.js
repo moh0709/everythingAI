@@ -9,7 +9,9 @@ export const FORGE_RESULTS = Object.freeze({
   CLAIM_CONFLICT: 'CLAIM_CONFLICT',
   REPORTING_REQUIRED: 'REPORTING_REQUIRED',
   RUNTIME_ERROR: 'RUNTIME_ERROR',
-  HUMAN_START_REQUIRED: 'HUMAN_START_REQUIRED'
+  HUMAN_START_REQUIRED: 'HUMAN_START_REQUIRED',
+  AUTONOMOUS_STARTED: 'AUTONOMOUS_STARTED',
+  AUTONOMOUS_BLOCKED: 'AUTONOMOUS_BLOCKED'
 });
 
 const EXCLUDED_LABELS = new Set([
@@ -95,14 +97,15 @@ export function sanitizeReport(report) {
   return JSON.parse(sanitizeText(JSON.stringify(report)));
 }
 
-export function prepareForgeContext({ issue, repoRoot, startingSha, projectState, bootstrap, contextPath } = {}) {
+export function prepareForgeContext({ issue, repoRoot, startingSha, projectState, bootstrap, contextPath, now = () => new Date() } = {}) {
   const target = contextPath ?? resolve(repoRoot, '.hermes/forge', `context-${issue.number}.json`);
   const context = {
     issue: { number: issue.number, title: issue.title, url: issue.url, state: issue.state, labels: normalizeLabels(issue), body: issue.body ?? '' },
     authoritativeContext: { projectState, bootstrap },
     startingSha,
-    automationBoundary: 'AUTOMATIC_DETECTION_WITH_HUMAN_START',
-    nextAction: 'Open or resume a Codex desktop task in the repository and use this complete context.'
+    createdAt: now().toISOString(),
+    automationBoundary: 'FULLY_AUTOMATIC_CODEX_CLI',
+    nextAction: 'The trigger launches one bounded Codex CLI worker from this complete context.'
   };
   atomicWriteJson(target, sanitizeReport(context));
   return { path: target, context };
@@ -110,7 +113,7 @@ export function prepareForgeContext({ issue, repoRoot, startingSha, projectState
 
 function defaultStatePath(repoRoot) { return resolve(repoRoot, '.hermes/forge/state.json'); }
 
-export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, statePath = defaultStatePath(process.cwd()), repoRoot = process.cwd(), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }) } = {}) {
+export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, statePath = defaultStatePath(process.cwd()), repoRoot = process.cwd(), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
   const targetNumber = Number(issue?.number);
   if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
   const live = await fetchLiveIssue(targetNumber);
@@ -135,8 +138,8 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     if (!after.includes('pm:ready') || !after.includes('forge:working') || after.includes('forge:ready')) {
       return { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, issue: verifiedAfterMutation, evidence: ['claim label mutation did not verify'] };
     }
-    const prepared = prepareForgeContext({ issue: verifiedAfterMutation, repoRoot, startingSha, projectState, bootstrap });
-    const comment = JSON.stringify({ agent: 'Forge', issue: targetNumber, status: 'CLAIMED', startingSha, contextPath: prepared.path, automationBoundary: 'AUTOMATIC_DETECTION_WITH_HUMAN_START' });
+    const prepared = prepareForgeContext({ issue: verifiedAfterMutation, repoRoot, startingSha, projectState, bootstrap, now });
+    const comment = JSON.stringify({ agent: 'Forge', issue: targetNumber, status: 'CLAIMED', startingSha, contextPath: prepared.path, automationBoundary: 'FULLY_AUTOMATIC_CODEX_CLI' });
     const posted = await postComment(verifiedAfterMutation, comment);
     if (!posted?.ok) {
       atomicWriteJson(statePath, { issueNumber: targetNumber, status: 'REPORTING_REQUIRED', comment, claimCommentPosted: false, claimedAt: now().toISOString() });
@@ -144,7 +147,10 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     }
     atomicWriteJson(statePath, { issueNumber: targetNumber, status: 'CLAIMED', claimCommentPosted: true, contextPath: prepared.path, claimedAt: now().toISOString() });
     const report = await reporter({ event: 'task_claimed', issue: verifiedAfterMutation, contextPath: prepared.path });
-    return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
+    if (!execute) return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
+    const execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
+    const autonomous = execution?.ok ? FORGE_RESULTS.AUTONOMOUS_STARTED : FORGE_RESULTS.AUTONOMOUS_BLOCKED;
+    return { ok: execution?.ok === true, result: autonomous, issue: verifiedAfterMutation, contextPath: prepared.path, report, execution };
   } finally {
     releaseForgeLock({ lockPath, lock: acquired.lock });
   }
