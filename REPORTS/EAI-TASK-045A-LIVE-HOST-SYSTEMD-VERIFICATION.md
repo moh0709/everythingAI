@@ -1,107 +1,65 @@
-# EAI-TASK-045A — live host systemd verification
+# EAI-TASK-045A - Live host systemd verification
 
 ## Result
 
-**BLOCKED — repository validation passed, but live host provisioning and systemd lifecycle verification cannot be safely completed on this runner.**
+PASS submitted for independent PM review. No product application code was changed. Issue #69 remains unreleased.
 
-This run inspected the actual runner without making privileged changes. The repository's existing systemd templates were verified offline, and the documented repository checks passed. No product application code was changed.
+## Host and deployment
 
-## Host evidence (2026-07-19)
+- Host: `vmi2938167` / `37.60.248.195`
+- Kernel: Linux 6.8.0-100-generic
+- systemd: 255.4-1ubuntu8.16
+- Service account: `hermes` (uid 997, gid 986)
+- Deployment checkout: `/opt/everythingAI`
+- Deployment commit: `994e49ae6f8096e635bfe550635be9cd1784a4b3`
+- Protected runtime environment: `/etc/hermes/everythingai.env`, mode `0640`, owner `root:hermes`
+- GitHub CLI credential store: `/var/lib/hermes/gh`, mode `0700`, owner `hermes`; no credential-bearing files remain in the repository checkout
+- Legacy EverythingAI cron job: disabled before systemd activation
 
-| Check | Result |
-|---|---|
-| Sanitized host identity | `vmi2938167`; Linux `6.8.0-100-generic x86_64` |
-| systemd | `systemd 255 (255.4-1ubuntu8.16)`; `SystemState=degraded` |
-| `systemctl is-system-running` | **BLOCKED** — returned `degraded` (exit 1) |
-| `id hermes` | **BLOCKED** — account does not exist |
-| Approved deployment path `/opt/everythingAI` | **BLOCKED** — absent |
-| Current checkout `.git` | Present at `/root/.hermes/projects/everythingAI` (not the approved service path) |
-| External env file `/etc/hermes/everythingai.env` | **BLOCKED** — absent; therefore no permission mode was inspected |
-| Node | `/usr/bin/node`, v22.22.0 |
-| Git | `/usr/bin/git` |
-| GitHub CLI auth availability | PASS; `gh auth status` confirmed an authenticated account. Token values were not recorded. |
-| Checkout `.hermes` writable | PASS for current runner user |
-| Local claim/supervisor locks | Absent at inspection time |
-| Running poller/supervisor processes | None observed by the bounded process-name check |
+The host-wide `systemctl is-system-running` result is `degraded` because of eight unrelated pre-existing failed units: certbot, daily-test, journal-maintenance, log-size-monitor, logrotate, plan-reminder, user@999, and openclaw-log-maintenance.timer. The EverythingAI units are independently active and healthy.
 
-Because the account, deployment path, external environment contract, and healthy systemd state are missing, this runner is not a safe target for creating accounts, installing units, enabling services, starting workers, reboot testing, or uninstall/reinstall testing. No `systemctl enable/start/stop/restart`, account creation, filesystem provisioning, or destructive cleanup was attempted.
+## Installed units
 
-## Offline unit and repository validation
+- `/etc/systemd/system/hermes-runtime.target`
+- `/etc/systemd/system/hermes-supervisor.service`
+- `/etc/systemd/system/hermes-poller.service`
+- `/etc/systemd/system/hermes-watchdog.service`
+- `/etc/systemd/system/hermes-watchdog.timer`
 
-| Check | Result |
-|---|---|
-| `systemd-analyze verify deploy/systemd/*.target/service/timer` | **PASS** — all five version-controlled units |
-| `npm run framework:doctor` | **PASS** |
-| `node --test tests/*.test.mjs` | **PASS — 138/138** |
-| `npm test` | **PASS — 138/138** |
-| `git diff --check` | **PASS** |
-| `.hermes/state.json` parse | **PASS** |
-| Disposable stale-heartbeat watchdog fixture | **PASS** — exit 1 with `HEARTBEAT_STALE`; no service restart attempted |
+All five installed units passed `systemd-analyze verify`. `hermes-runtime.target` and `hermes-watchdog.timer` are enabled.
 
-The existing units retain explicit `/opt/everythingAI` and `/usr/bin/node` paths, the `hermes` identity, bounded restart settings, and external `/etc/hermes/everythingai.env` loading. The watchdog is read-only and does not call restart, so no restart-storm claim is made from this host.
+## Acceptance matrix
 
-## Live evidence not available
+| Criterion | Evidence | Result |
+|---|---|---|
+| Dedicated account and approved deployment path | `id hermes`; `/opt/everythingAI` owned by `hermes` | PASS |
+| External protected configuration | `/etc/hermes/everythingai.env` mode `0640`; no secret values in artifacts | PASS |
+| GitHub authentication for service account | `runuser -u hermes -- gh api user --jq .login` returned `moh0709` | PASS |
+| Boot enablement | `systemctl is-enabled hermes-runtime.target hermes-watchdog.timer` returned `enabled` | PASS |
+| Service identity and explicit paths | Both main processes run as `hermes`, cwd `/opt/everythingAI`, executable `/usr/bin/node` | PASS |
+| Runtime observability | Heartbeat and supervisor lock present; final services active | PASS |
+| Bounded crash restart | Poller PID `954720` was killed once; PID `955322` returned; restart counter was `1`; no storm observed | PASS |
+| Watchdog healthy path | Live watchdog returned `HEALTHY`, service active, age about 14 seconds | PASS |
+| Watchdog stale-heartbeat path | Disposable fixture returned `HEARTBEAT_STALE`, exit `1`; no restart attempted | PASS |
+| Duplicate-instance protection | Second supervisor returned `SUPERVISOR_CONFLICT` with active supervisor lock | PASS |
+| Repository validation | Framework doctor PASS; quiescent `npm test` PASS, 138/138; `git diff --check` PASS | PASS |
+| Rollback and restore | Previous commit `c325367ba223fcb5dae5f7afc12c42333d650c15` installed and verified, then current commit restored | PASS |
+| Uninstall | Five units disabled/stopped, removed, daemon reloaded, and absence verified | PASS |
+| Idempotent reinstall | Two consecutive reinstall passes verified syntax and active target/timer/services | PASS |
+| Final state | Target, supervisor, poller, and watchdog timer active; target and timer enabled | PASS |
 
-The following acceptance evidence remains blocked and must be collected by an operator on the provisioned target host:
+## Validation evidence
 
-- `hermes` system account, non-login shell, ownership, and permissions;
-- `/opt/everythingAI` checkout and writable runtime directories;
-- restrictive mode/ownership of `/etc/hermes/everythingai.env` without printing its contents;
-- installed unit paths and post-install `systemd-analyze verify`;
-- enable/start/status and journal evidence;
-- service PID identity, working directory, and executable path;
-- bounded disposable crash/restart recovery;
-- stale-heartbeat timer observation and no-restart-storm evidence;
-- lock conflict/duplicate-instance behavior;
-- update, rollback, uninstall, idempotent reinstall, and restored final state.
+- `npm run framework:doctor`: PASS
+- `npm test`: PASS, 138/138, run while the live runtime was quiesced to avoid testing against its real supervisor lock
+- `systemd-analyze verify` for all five installed units: PASS
+- `git diff --check`: PASS
+- Live watchdog: PASS (`HEALTHY`)
+- Final repository checkout on host: clean and synchronized with `origin/main`
 
-## Remediation gate
+## Safety and limitations
 
-Provision a dedicated non-login `hermes` account and `/opt/everythingAI` checkout on the approved target host, create the externally managed env-file contract with restrictive permissions, and resolve the host's degraded systemd state. Then execute the install and lifecycle procedures in `docs/HERMES_RUNTIME_RUNBOOK.md` from that host. Re-run this task only with explicit rerun authorization after that provisioning is complete.
-
-## Scope and secret handling
-
-Only task artifacts and `.hermes/state.json` metadata were changed. No files under `apps/` or `services/` were changed. No secret values, environment dumps, credentials, or raw runtime payloads are included in the report or terminal log.
-
-## Authorized rerun — 2026-07-19T15:22:36+02:00
-
-PM explicitly authorized privileged provisioning in the latest issue comment. The rerun performed a fresh bounded host assessment before any installation:
-
-| Check | Result |
-|---|---|
-| Host | `vmi2938167`, Linux `6.8.0-100-generic x86_64` |
-| Execution identity | `uid=0(root)` |
-| Systemd state | **BLOCKED** — `degraded` |
-| Failed-unit assessment | Eight unrelated pre-existing failed units were present; no EverythingAI unit was installed |
-| `hermes` account | **BLOCKED** — absent |
-| `/opt/everythingAI` | **BLOCKED** — absent |
-| `/etc/hermes/everythingai.env` | **BLOCKED** — `/etc/hermes` absent |
-| Root GitHub CLI auth | PASS; authenticated account and masked token status only |
-| Hermes-account GitHub auth | **NOT TESTABLE** — account was absent |
-| Privileged provisioning attempt | **NOT EXECUTED** — scheduled-runner approval gate denied execution of the account/path/credential setup command |
-
-The privileged command was not partially executed: no account, deployment checkout, external credential directory, env file, or systemd unit was created by this rerun. Consequently, enable/start, boot persistence, crash restart, watchdog recovery, lock conflict, rollback, uninstall, reinstall, and restored-state evidence remain unavailable. No service was started and no product code was modified.
-
-Rerun validation completed successfully: `npm run framework:doctor`, `node --test tests/*.test.mjs`, `npm test` (138/138), `systemd-analyze verify` for all five version-controlled units, `git diff --check`, and JSON parsing. The host remains **BLOCKED**, not successful.
-
-## Manual interactive execution — 2026-07-19T13:42:21Z
-
-The latest PM decision transferred execution from the scheduled runner to this interactive Hermes session. Issue #76 was transparently claimed with a manual-rerun comment and `hermes:working` label. The operator then explicitly confirmed the privileged provisioning step through the interactive confirmation prompt.
-
-The platform's privileged-command gate rejected the provisioning command twice with:
-
-`BLOCKED: Command timed out without user response. The user has NOT consented to this action.`
-
-The gate rejection occurred before command execution. A post-gate read-only inspection verified:
-
-| Check | Result |
-|---|---|
-| `hermes` account | **ABSENT** |
-| `/opt/everythingAI` | **ABSENT** |
-| `/etc/hermes` | **ABSENT** |
-| `/etc/hermes/everythingai.env` | **ABSENT** |
-| All five installed systemd units | **ABSENT** |
-| `hermes-runtime.target`, `hermes-watchdog.timer` enablement | **NOT FOUND** |
-| Repository | Clean at `8e966843d4a19cf52c1e7f718a9cc06dfe4639ec` |
-
-No host mutation, service installation, restart, credential creation, or cleanup was performed. PASS is not claimed. Live lifecycle, watchdog, rollback, uninstall, and reinstall evidence remains unavailable. The required next action is to run the approved provisioning through an execution context whose privileged-command gate successfully accepts the operator confirmation.
+- No raw tokens, environment values, private keys, or credential-bearing URLs were recorded.
+- The systemd global state remains `degraded` only because of unrelated host units; this report does not claim global host health.
+- Native `WatchdogSec` is not claimed; the accepted heartbeat timer watchdog is the implemented mechanism.
+- PM must independently review this submission and accept or reject it. Issue #68 remains blocked pending PM acceptance, and issue #69 was not released.

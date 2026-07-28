@@ -2,28 +2,60 @@
   "task_id": "EAI-TASK-045A",
   "issue": 76,
   "parent_issue": 68,
-  "status": "BLOCKED",
-  "rerun_at": "2026-07-19T15:22:36+02:00",
+  "status": "PASS_SUBMITTED_PM_REVIEW",
   "result_artifact": "REPORTS/EAI-TASK-045A-LIVE-HOST-SYSTEMD-VERIFICATION.md",
   "terminal_log": "LOGS/EAI-TASK-045A-terminal.log",
-  "starting_commit_sha": "8e966843d4a19cf52c1e7f718a9cc06dfe4639ec",
-  "repository_validation": {
+  "repository": {
+    "repo": "moh0709/everythingAI",
+    "branch": "main",
+    "deployment_commit": "994e49ae6f8096e635bfe550635be9cd1784a4b3"
+  },
+  "host": {
+    "hostname": "vmi2938167",
+    "address": "37.60.248.195",
+    "kernel": "Linux 6.8.0-100-generic",
+    "systemd": "255.4-1ubuntu8.16",
+    "system_state": "degraded_due_to_unrelated_failed_units",
+    "service_account": "hermes uid=997 gid=986",
+    "deployment_path": "/opt/everythingAI",
+    "environment_file": "/etc/hermes/everythingai.env mode=0640 owner=root:hermes",
+    "credential_store": "/var/lib/hermes/gh mode=0700 owner=hermes"
+  },
+  "installed_units": [
+    "hermes-runtime.target",
+    "hermes-supervisor.service",
+    "hermes-poller.service",
+    "hermes-watchdog.service",
+    "hermes-watchdog.timer"
+  ],
+  "validation": {
     "framework_doctor": "PASS",
     "node_tests": "PASS 138/138",
     "npm_test": "PASS 138/138",
-    "systemd_analyze_verify": "PASS five version-controlled units",
+    "systemd_analyze_verify": "PASS five installed units",
     "git_diff_check": "PASS",
-    "state_json_parse": "PASS",
-    "watchdog_stale_fixture": "PASS expected HEARTBEAT_STALE exit 1"
+    "github_auth_as_hermes": "PASS moh0709",
+    "boot_enablement": "PASS target and watchdog timer enabled",
+    "final_services": "PASS target, supervisor, poller, and watchdog timer active"
   },
-  "host_blockers": [
-    "hermes account absent",
-    "/opt/everythingAI absent",
-    "/etc/hermes/everythingai.env absent",
-    "systemd system state is degraded",
-    "interactive platform privileged-command gate rejected provisioning before execution"
-  ],
-  "live_lifecycle": "NOT ATTEMPTED: interactive operator confirmation was granted, but the platform privileged-command gate rejected provisioning before execution; post-gate checks verified no host mutation, so no service lifecycle claim is made.",
-  "secrets": "No secret values or environment dumps recorded.",
-  "next_step": "Run the approved provisioning command in an execution context whose privileged-command gate successfully accepts the interactive operator confirmation, then verify the hermes account, deployment path, external credential mechanism, and degraded systemd remediation before lifecycle testing."
+  "live_lifecycle": {
+    "bounded_restart": "PASS one deliberate SIGKILL recovered after bounded delay; no restart storm",
+    "watchdog_healthy": "PASS",
+    "watchdog_stale_fixture": "PASS HEARTBEAT_STALE exit 1",
+    "duplicate_instance_lock": "PASS SUPERVISOR_CONFLICT",
+    "rollback_restore": "PASS previous commit c325367ba223fcb5dae5f7afc12c42333d650c15 verified then 994e49ae6f8096e635bfe550635be9cd1784a4b3 restored",
+    "uninstall": "PASS exact five units removed and absence verified",
+    "idempotent_reinstall": "PASS two consecutive reinstall passes",
+    "final_state": "PASS services active and enabled target/timer"
+  },
+  "security": {
+    "secrets_recorded": false,
+    "credential_files_in_checkout": false,
+    "legacy_everythingai_cron_enabled": false
+  },
+  "dependency_decision": {
+    "issue_68": "REMAINS_BLOCKED_PENDING_PM_ACCEPTANCE",
+    "issue_69": "NOT_RELEASED"
+  },
+  "next_action": "PM independently reviews issue #76 and issue #68, then accepts or rejects the evidence."
 }
