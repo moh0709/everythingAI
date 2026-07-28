@@ -24,7 +24,10 @@ function fetchIssue(number) {
 }
 
 function updateLabels(number, labels) {
-  gh(['issue', 'edit', String(number), '--repo', repo, '--label', labels.join(',')]);
+  const args = ['issue', 'edit', String(number), '--repo', repo];
+  if (labels.includes('forge:working')) args.push('--add-label', 'forge:working');
+  if (!labels.includes('forge:ready')) args.push('--remove-label', 'forge:ready');
+  gh(args);
 }
 
 function postComment(issue, comment) {
