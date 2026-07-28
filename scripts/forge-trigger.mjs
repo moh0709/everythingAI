@@ -15,6 +15,12 @@ function gh(args) {
   return result.stdout.trim();
 }
 
+function gitSha() {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' });
+  if (result.error || result.status !== 0) throw new Error(result.error?.message ?? result.stderr.trim() ?? 'git rev-parse failed');
+  return result.stdout.trim();
+}
+
 function listIssues() {
   return JSON.parse(gh(['issue', 'list', '--repo', repo, '--state', 'open', '--label', 'pm:ready', '--label', 'forge:ready', '--limit', '20', '--json', 'number,title,state,labels,url,body'])).filter(isForgeEligible);
 }
@@ -51,7 +57,7 @@ export async function watchForge({ iterations = Infinity, pauseMs = intervalMs, 
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const sha = gh(['rev-parse', 'HEAD']);
+  const sha = gitSha();
   const result = process.argv.includes('--watch')
     ? await watchForge({ iterations: Number(process.env.FORGE_TRIGGER_ITERATIONS ?? 1), sha })
     : await pollForgeOnce({ sha });
