@@ -6,11 +6,13 @@
   "branch": "main",
   "startingSha": "9421ece46afca8d89e6cd536de8778c0eca2b630",
   "implementationSha": "be05ffecabf14d95410e903dfb0f19afe166a78f",
+  "finalPushedSha": "a17169ae9c7ee50e8365950ac407ec05a22a68b1",
   "claim": {
     "verified": true,
     "labels": ["pm:ready", "forge:working"],
     "claimCommentCount": 1
   },
+  "finalLabels": ["forge:done", "pm:review"],
   "automationBoundary": "AUTOMATIC_DETECTION_WITH_HUMAN_START",
   "implementation": [
     "src/forge-trigger.js",
