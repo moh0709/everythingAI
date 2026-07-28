@@ -1,0 +1,34 @@
+{
+  "milestone": "Forge trigger loop with Atlas reporting",
+  "issue": 79,
+  "status": "IN_PROGRESS",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "startingSha": "9421ece46afca8d89e6cd536de8778c0eca2b630",
+  "claim": {
+    "verified": true,
+    "labels": ["pm:ready", "forge:working"],
+    "claimCommentCount": 1
+  },
+  "automationBoundary": "AUTOMATIC_DETECTION_WITH_HUMAN_START",
+  "implementation": [
+    "src/forge-trigger.js",
+    "src/forge-reporting.js",
+    "scripts/forge-trigger.mjs",
+    "tests/forge-trigger.test.mjs",
+    "docs/FORGE_OPERATING_MODEL.md",
+    "docs/FORGE_ATLAS_DELEGATION_PROTOCOL.md",
+    "docs/FORGE_TRIGGER_AND_REPORTING_RUNBOOK.md"
+  ],
+  "validation": {
+    "automatedTests": "PENDING",
+    "frameworkDoctor": "PENDING",
+    "liveHandshake": "PENDING",
+    "telegram": "SANITIZED_ADAPTER_IMPLEMENTED"
+  },
+  "knownLimitations": [
+    "Codex desktop automatic wake/resume is not claimed; supported human-start boundary is documented.",
+    "The required dedicated handshake issue must be created and exercised before final submission."
+  ],
+  "nextAction": "Run automated validation, create a dedicated handshake issue, and verify detection, claim, context preparation, and sanitized reporting."
+}

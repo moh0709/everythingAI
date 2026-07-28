@@ -1,0 +1,151 @@
+import { existsSync, mkdirSync, openSync, readFileSync, closeSync, unlinkSync, renameSync, writeFileSync } from 'node:fs';
+import { hostname } from 'node:os';
+import { dirname, resolve } from 'node:path';
+
+export const FORGE_RESULTS = Object.freeze({
+  CLAIMED: 'CLAIMED',
+  IDLE: 'IDLE',
+  IGNORED_INELIGIBLE: 'IGNORED_INELIGIBLE',
+  CLAIM_CONFLICT: 'CLAIM_CONFLICT',
+  REPORTING_REQUIRED: 'REPORTING_REQUIRED',
+  RUNTIME_ERROR: 'RUNTIME_ERROR',
+  HUMAN_START_REQUIRED: 'HUMAN_START_REQUIRED'
+});
+
+const EXCLUDED_LABELS = new Set([
+  'forge:working', 'forge:done', 'forge:blocked', 'pm:review',
+  'atlas:ready', 'atlas:working', 'atlas:done', 'atlas:blocked',
+  'hermes:ready', 'hermes:working', 'hermes:done', 'hermes:blocked'
+]);
+
+export function normalizeLabels(issue) {
+  return (issue?.labels ?? []).map((label) => typeof label === 'string' ? label : label?.name).filter(Boolean);
+}
+
+export function isForgeEligible(issue) {
+  const labels = normalizeLabels(issue);
+  return String(issue?.state ?? '').toLowerCase() === 'open'
+    && labels.includes('pm:ready')
+    && labels.includes('forge:ready')
+    && !labels.some((label) => EXCLUDED_LABELS.has(label));
+}
+
+function atomicWriteJson(path, value) {
+  mkdirSync(dirname(path), { recursive: true });
+  const temp = `${path}.${process.pid}.tmp`;
+  writeFileSync(temp, `${JSON.stringify(value, null, 2)}\n`, { encoding: 'utf8', flag: 'w' });
+  renameSync(temp, path);
+}
+
+function readJson(path) {
+  return JSON.parse(readFileSync(path, 'utf8'));
+}
+
+function pidAlive(pid, processChecker = (value) => {
+  try { process.kill(Number(value), 0); return true; } catch (error) { return error?.code !== 'ESRCH'; }
+}) {
+  return Number.isInteger(Number(pid)) && Number(pid) > 0 && processChecker(pid);
+}
+
+export function acquireForgeLock({ lockPath, issueNumber, pid = process.pid, host = hostname(), now = () => new Date(), staleAfterMs = 15 * 60 * 1000, processChecker } = {}) {
+  mkdirSync(dirname(lockPath), { recursive: true });
+  const lock = { issueNumber: Number(issueNumber), pid, hostname: host, createdAt: now().toISOString() };
+  try {
+    const fd = openSync(lockPath, 'wx');
+    writeFileSync(fd, `${JSON.stringify(lock, null, 2)}\n`);
+    closeSync(fd);
+    return { ok: true, lock };
+  } catch (error) {
+    if (error?.code !== 'EEXIST') return { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, evidence: [`lock create failed: ${error.message}`] };
+    let current;
+    try { current = readJson(lockPath); } catch (readError) {
+      return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, evidence: [`lock unreadable: ${readError.message}`] };
+    }
+    const sameHost = current.hostname === host;
+    const ageMs = Date.parse(current.createdAt) ? Math.max(0, now().getTime() - Date.parse(current.createdAt)) : null;
+    if (!sameHost) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, evidence: ['cross-host lock requires manual review'] };
+    if (pidAlive(current.pid, processChecker) || ageMs === null || ageMs <= staleAfterMs) {
+      return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, evidence: [`active local lock for issue #${current.issueNumber}`] };
+    }
+    try { unlinkSync(lockPath); } catch (removeError) {
+      return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, evidence: [`stale lock removal failed: ${removeError.message}`] };
+    }
+    return acquireForgeLock({ lockPath, issueNumber, pid, host, now, staleAfterMs, processChecker });
+  }
+}
+
+export function releaseForgeLock({ lockPath, lock }) {
+  if (!existsSync(lockPath)) return false;
+  try {
+    const current = readJson(lockPath);
+    if (current.pid !== lock.pid || current.hostname !== lock.hostname || current.issueNumber !== lock.issueNumber) return false;
+    unlinkSync(lockPath);
+    return true;
+  } catch { return false; }
+}
+
+export function sanitizeText(value) {
+  return String(value ?? '')
+    .replace(/(?:gh[pousr]_|github_pat_|xox[baprs]-|sk-[A-Za-z0-9_-]{10,}|\d{8,12}:[A-Za-z0-9_-]{20,})[A-Za-z0-9._-]*/g, '[REDACTED]')
+    .replace(/-----BEGIN [A-Z ]+-----[\s\S]*?-----END [A-Z ]+-----/g, '[REDACTED_PRIVATE_KEY]')
+    .replace(/(authorization\s*[:=]\s*bearer\s+|bot_token\s*[:=]\s*|token\s*[:=]\s*)[^\s,;]+/gi, '$1[REDACTED]');
+}
+
+export function sanitizeReport(report) {
+  return JSON.parse(sanitizeText(JSON.stringify(report)));
+}
+
+export function prepareForgeContext({ issue, repoRoot, startingSha, projectState, bootstrap, contextPath } = {}) {
+  const target = contextPath ?? resolve(repoRoot, '.hermes/forge', `context-${issue.number}.json`);
+  const context = {
+    issue: { number: issue.number, title: issue.title, url: issue.url, state: issue.state, labels: normalizeLabels(issue), body: issue.body ?? '' },
+    authoritativeContext: { projectState, bootstrap },
+    startingSha,
+    automationBoundary: 'AUTOMATIC_DETECTION_WITH_HUMAN_START',
+    nextAction: 'Open or resume a Codex desktop task in the repository and use this complete context.'
+  };
+  atomicWriteJson(target, sanitizeReport(context));
+  return { path: target, context };
+}
+
+function defaultStatePath(repoRoot) { return resolve(repoRoot, '.hermes/forge/state.json'); }
+
+export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, statePath = defaultStatePath(process.cwd()), repoRoot = process.cwd(), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }) } = {}) {
+  const targetNumber = Number(issue?.number);
+  if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
+  const live = await fetchLiveIssue(targetNumber);
+  const existingState = existsSync(statePath) ? readJson(statePath) : null;
+  if (existingState?.issueNumber === targetNumber && existingState?.status === 'REPORTING_REQUIRED') {
+    const recovered = await postComment(live, existingState.comment);
+    if (!recovered?.ok) return { ok: false, result: FORGE_RESULTS.REPORTING_REQUIRED, issue: live, evidence: ['pending claim acknowledgement still requires delivery'] };
+    atomicWriteJson(statePath, { ...existingState, status: 'CLAIMED', claimCommentPosted: true, recoveredAt: now().toISOString() });
+    return { ok: true, result: FORGE_RESULTS.CLAIMED, issue: live, recovered: true };
+  }
+  if (!isForgeEligible(live)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`live labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
+  const acquired = acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
+  if (!acquired.ok) return { ok: false, ...acquired, issue: live };
+  try {
+    const verifiedBeforeMutation = await fetchLiveIssue(targetNumber);
+    if (!isForgeEligible(verifiedBeforeMutation)) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: ['readiness changed before mutation'] };
+    const labels = normalizeLabels(verifiedBeforeMutation).filter((label) => label !== 'forge:ready');
+    labels.push('forge:working');
+    await updateLabels(targetNumber, labels);
+    const verifiedAfterMutation = await fetchLiveIssue(targetNumber);
+    const after = normalizeLabels(verifiedAfterMutation);
+    if (!after.includes('pm:ready') || !after.includes('forge:working') || after.includes('forge:ready')) {
+      return { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, issue: verifiedAfterMutation, evidence: ['claim label mutation did not verify'] };
+    }
+    const prepared = prepareForgeContext({ issue: verifiedAfterMutation, repoRoot, startingSha, projectState, bootstrap });
+    const comment = JSON.stringify({ agent: 'Forge', issue: targetNumber, status: 'CLAIMED', startingSha, contextPath: prepared.path, automationBoundary: 'AUTOMATIC_DETECTION_WITH_HUMAN_START' });
+    const posted = await postComment(verifiedAfterMutation, comment);
+    if (!posted?.ok) {
+      atomicWriteJson(statePath, { issueNumber: targetNumber, status: 'REPORTING_REQUIRED', comment, claimCommentPosted: false, claimedAt: now().toISOString() });
+      return { ok: false, result: FORGE_RESULTS.REPORTING_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, evidence: ['labels claimed; acknowledgement delivery failed'] };
+    }
+    atomicWriteJson(statePath, { issueNumber: targetNumber, status: 'CLAIMED', claimCommentPosted: true, contextPath: prepared.path, claimedAt: now().toISOString() });
+    const report = await reporter({ event: 'task_claimed', issue: verifiedAfterMutation, contextPath: prepared.path });
+    return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
+  } finally {
+    releaseForgeLock({ lockPath, lock: acquired.lock });
+  }
+}

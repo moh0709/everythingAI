@@ -8,6 +8,7 @@
     "hermes:health": "node scripts/hermes-health.mjs",
     "worker:once": "node scripts/task-worker.mjs --mode polling",
     "worker:watch": "node scripts/task-poller.mjs --mode polling --watch",
+    "forge:trigger": "node scripts/forge-trigger.mjs",
     "webhook:dispatch": "node scripts/webhook-event-dispatcher.mjs --mode webhook",
     "test": "node --test tests/*.test.mjs"
   }
