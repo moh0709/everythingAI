@@ -41,6 +41,18 @@ Register-ScheduledTask -TaskName 'EverythingAI Forge Trigger' -Action $action -T
 
 Verify with `Get-ScheduledTask -TaskName 'EverythingAI Forge Trigger'` and `Get-ScheduledTaskInfo -TaskName 'EverythingAI Forge Trigger'`.
 
+The production task must:
+
+- run as the interactive Windows user that owns both Codex and GitHub authentication;
+- execute from `C:\temp\EverythingAI`;
+- provide the GitHub CLI directory on `PATH`;
+- provide `FORGE_CODEX_PATH`;
+- use `IgnoreNew` for overlapping invocations;
+- run once per minute with `StartWhenAvailable`;
+- append sanitized output to `.hermes/forge/scheduler.log`.
+
+Every poll writes `.hermes/forge/trigger-heartbeat.json`. A healthy idle installation has `status: HEALTHY`, `result: IDLE`, a recent `lastPollAt`, and Task Scheduler result `0`. The desktop must remain powered on and the owning user must remain logged in.
+
 ## Uninstall and recover
 
 ```powershell
@@ -48,3 +60,5 @@ Unregister-ScheduledTask -TaskName 'EverythingAI Forge Trigger' -Confirm:$false
 ```
 
 Inspect `.hermes/forge/execution-state.json`, `execution-heartbeat.json`, `execution.jsonl`, and `execution.lock`. A live worker or a cross-host lock requires review. A dead lock older than the configured stale window is recovered automatically on the next launch. Never use `git clean` for recovery.
+
+For Telegram intake, exactly one Hermes gateway may poll a bot token. The Docker `hermes` gateway is the selected owner on the current VPS; `hermes-gateway.service` must remain disabled unless the Docker gateway is intentionally removed first.

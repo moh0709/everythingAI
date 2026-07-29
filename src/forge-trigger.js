@@ -93,8 +93,29 @@ export function sanitizeText(value) {
     .replace(/(authorization\s*[:=]\s*bearer\s+|bot_token\s*[:=]\s*|token\s*[:=]\s*)[^\s,;]+/gi, '$1[REDACTED]');
 }
 
+function sanitizeValue(value, key = '') {
+  if (/(?:authorization|bot.?token|password|private.?key|secret|token)/i.test(key)) return '[REDACTED]';
+  if (typeof value === 'string') return sanitizeText(value);
+  if (Array.isArray(value)) return value.map((entry) => sanitizeValue(entry));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([entryKey, entryValue]) => [entryKey, sanitizeValue(entryValue, entryKey)]));
+  }
+  return value;
+}
+
 export function sanitizeReport(report) {
-  return JSON.parse(sanitizeText(JSON.stringify(report)));
+  return sanitizeValue(report);
+}
+
+export function recordForgeTriggerHeartbeat({ heartbeatPath, result, now = () => new Date() } = {}) {
+  const heartbeat = sanitizeReport({
+    status: result?.ok ? 'HEALTHY' : 'DEGRADED',
+    result: result?.result ?? FORGE_RESULTS.RUNTIME_ERROR,
+    lastPollAt: now().toISOString(),
+    evidence: result?.evidence ?? []
+  });
+  atomicWriteJson(heartbeatPath, heartbeat);
+  return heartbeat;
 }
 
 export function prepareForgeContext({ issue, repoRoot, startingSha, projectState, bootstrap, contextPath, now = () => new Date() } = {}) {
@@ -150,7 +171,38 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     if (!execute) return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
     const execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
     const autonomous = execution?.ok ? FORGE_RESULTS.AUTONOMOUS_STARTED : FORGE_RESULTS.AUTONOMOUS_BLOCKED;
-    return { ok: execution?.ok === true, result: autonomous, issue: verifiedAfterMutation, contextPath: prepared.path, report, execution };
+    if (execution?.ok) return { ok: true, result: autonomous, issue: verifiedAfterMutation, contextPath: prepared.path, report, execution };
+
+    const blockedLabels = normalizeLabels(verifiedAfterMutation)
+      .filter((label) => !['forge:ready', 'forge:working', 'forge:done', 'forge:blocked', 'pm:ready', 'pm:review'].includes(label));
+    blockedLabels.push('forge:blocked', 'pm:review');
+    await updateLabels(targetNumber, blockedLabels);
+    const verifiedBlocked = await fetchLiveIssue(targetNumber);
+    const afterBlocked = normalizeLabels(verifiedBlocked);
+    const transitionVerified = afterBlocked.includes('forge:blocked')
+      && afterBlocked.includes('pm:review')
+      && !afterBlocked.includes('forge:working')
+      && !afterBlocked.includes('pm:ready');
+    const blockerComment = JSON.stringify(sanitizeReport({
+      agent: 'Forge',
+      issue: targetNumber,
+      status: 'BLOCKED',
+      result: execution?.result ?? 'START_FAILURE',
+      evidence: execution?.evidence ?? ['Codex execution failed'],
+      contextPath: prepared.path
+    }));
+    const blockedPosted = await postComment(verifiedBlocked, blockerComment);
+    return {
+      ok: false,
+      result: autonomous,
+      issue: verifiedBlocked,
+      contextPath: prepared.path,
+      report,
+      execution,
+      evidence: transitionVerified && blockedPosted?.ok
+        ? execution?.evidence ?? []
+        : ['blocked transition or acknowledgement did not verify']
+    };
   } finally {
     releaseForgeLock({ lockPath, lock: acquired.lock });
   }

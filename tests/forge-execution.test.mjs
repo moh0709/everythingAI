@@ -12,7 +12,7 @@ function fixture() {
   writeFileSync(contextPath, JSON.stringify({
     issue: { number: 901, title: 'Forge execution test', state: 'OPEN', labels: ['pm:ready', 'forge:working'], body: 'bounded task' },
     startingSha: 'a'.repeat(40),
-    createdAt: '2026-07-29T01:00:00.000Z'
+    createdAt: new Date().toISOString()
   }));
   return { root, repoRoot: root, contextPath, statePath: join(root, 'state.json'), heartbeatPath: join(root, 'heartbeat.json'), lockPath: join(root, 'execution.lock') };
 }

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { acquireForgeLock, claimForgeIssue, FORGE_RESULTS, isForgeEligible, sanitizeText } from '../src/forge-trigger.js';
+import { acquireForgeLock, claimForgeIssue, FORGE_RESULTS, isForgeEligible, recordForgeTriggerHeartbeat, sanitizeText } from '../src/forge-trigger.js';
 
 function issue(labels = ['pm:ready', 'forge:ready']) {
   return { number: 801, title: 'OPS-AUTO handshake', state: 'open', url: 'https://github.com/moh0709/everythingAI/issues/801', body: 'handshake', labels: labels.map((name) => ({ name })) };
@@ -83,6 +83,29 @@ test('claimed issue is handed to the autonomous executor when configured', async
   assert.match(execution.contextPath, /context-801\.json$/);
 });
 
+test('worker launch failure transitions the claimed issue to blocked PM review', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-autonomous-blocked-'));
+  const lockPath = join(root, 'claim.lock');
+  let live = issue();
+  const comments = [];
+  const fetch = async () => live;
+  const update = async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; };
+  const result = await claimForgeIssue({
+    issue: live,
+    fetchLiveIssue: fetch,
+    updateLabels: update,
+    postComment: async (target, body) => { comments.push(body); return { ok: true }; },
+    lockPath,
+    repoRoot: root,
+    execute: async () => ({ ok: false, result: 'START_FAILURE', evidence: ['Codex process could not start'] })
+  });
+  const labels = live.labels.map(({ name }) => name);
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_BLOCKED);
+  assert.deepEqual(labels.sort(), ['forge:blocked', 'pm:review']);
+  assert.equal(comments.length, 2);
+  assert.match(comments[1], /START_FAILURE/);
+});
+
 test('cross-host and dead same-host locks are handled conservatively', () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-lock-'));
   const cross = join(root, 'cross.lock');
@@ -100,4 +123,19 @@ test('cross-host and dead same-host locks are handled conservatively', () => {
 test('sanitized reports redact tokens, bot tokens and private keys', () => {
   const output = sanitizeText('gho_abcdefghijklmnopqrstuvwxyz 8995460068:AAFfFakeTokenLongEnoughForRedaction -----BEGIN PRIVATE KEY-----secret-----END PRIVATE KEY-----');
   assert.doesNotMatch(output, /gho_|8995460068|PRIVATE KEY-----secret/);
+});
+
+test('idle polling records a durable sanitized trigger heartbeat', () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-trigger-heartbeat-'));
+  const heartbeatPath = join(root, 'trigger-heartbeat.json');
+  recordForgeTriggerHeartbeat({
+    heartbeatPath,
+    result: { ok: true, result: FORGE_RESULTS.IDLE, evidence: ['token=gho_secret_should_not_leak'] },
+    now: () => new Date('2026-07-29T07:00:00.000Z')
+  });
+  const heartbeat = JSON.parse(readFileSync(heartbeatPath, 'utf8'));
+  assert.equal(heartbeat.status, 'HEALTHY');
+  assert.equal(heartbeat.result, FORGE_RESULTS.IDLE);
+  assert.equal(heartbeat.lastPollAt, '2026-07-29T07:00:00.000Z');
+  assert.doesNotMatch(JSON.stringify(heartbeat), /gho_secret_should_not_leak/);
 });

@@ -1,0 +1,46 @@
+{
+  "agent": "Forge",
+  "status": "AWAITING_NEW_INDEPENDENT_PM_TEST",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "startingCommitSha": "444ec92845bda39e6982e40b74862c1312ebb77d",
+  "failedPmTestIssue": 81,
+  "failedPmTestDisposition": [
+    "Issue #81 remains open.",
+    "PM changed it to forge:blocked plus pm:review.",
+    "Forge did not reuse it as autonomy evidence."
+  ],
+  "rootCauses": [
+    "No EverythingAI Forge Trigger scheduled task had been installed on Windows.",
+    "The Windows GitHub CLI dependency was absent.",
+    "The Forge CLI entrypoint comparison did not recognize a Windows path, so direct execution performed no poll.",
+    "Idle polls did not write a durable trigger heartbeat.",
+    "Worker launch failures did not enforce the blocked PM-review label transition.",
+    "Two Hermes gateways were polling the same Telegram bot token."
+  ],
+  "remediation": [
+    "Installed checksum-verified GitHub CLI 2.94.0 for the Codex-owning Windows user.",
+    "Configured authenticated GitHub access without printing the token.",
+    "Installed EverythingAI Forge Trigger in Windows Task Scheduler with one-minute recurrence, IgnoreNew overlap policy, and StartWhenAvailable.",
+    "Added Windows direct-run detection and a durable sanitized trigger heartbeat.",
+    "Added verified blocked transition handling for worker launch failures.",
+    "Disabled the duplicate systemd Hermes gateway and retained the Docker hermes gateway as sole Telegram polling owner."
+  ],
+  "liveEvidence": {
+    "schedulerTask": "EverythingAI Forge Trigger",
+    "schedulerResult": 0,
+    "heartbeatStatus": "HEALTHY",
+    "heartbeatResult": "IDLE",
+    "githubAccount": "moh0709",
+    "telegramOutbound": "HTTP 200, sent true",
+    "telegramPollingConflictsLatestThreeMinutes": 0,
+    "focusedTests": "17/17 PASS"
+  },
+  "preservedPath": "apps/everything-ai-ui/src/planning.css",
+  "issue69": "NOT_RELEASED",
+  "rollback": [
+    "Unregister-ScheduledTask -TaskName 'EverythingAI Forge Trigger' -Confirm:$false",
+    "Re-enable hermes-gateway.service only after stopping the Docker hermes gateway."
+  ],
+  "nextAction": "PM creates a new independent issue with pm:ready plus forge:ready. Do not reuse issue #81."
+}

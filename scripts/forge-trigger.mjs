@@ -2,7 +2,8 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { claimForgeIssue, FORGE_RESULTS, isForgeEligible } from '../src/forge-trigger.js';
+import { pathToFileURL } from 'node:url';
+import { claimForgeIssue, FORGE_RESULTS, isForgeEligible, recordForgeTriggerHeartbeat, sanitizeText } from '../src/forge-trigger.js';
 import { sendForgeReport } from '../src/forge-reporting.js';
 import { startForgeExecution } from '../src/forge-execution.js';
 
@@ -31,10 +32,22 @@ function fetchIssue(number) {
   return JSON.parse(gh(['issue', 'view', String(number), '--repo', repo, '--json', 'number,title,state,labels,url,body']));
 }
 
+export function planLabelMutation(currentLabels, desiredLabels) {
+  const current = new Set(currentLabels);
+  const desired = new Set(desiredLabels);
+  return {
+    add: [...desired].filter((label) => !current.has(label)),
+    remove: [...current].filter((label) => !desired.has(label))
+  };
+}
+
 function updateLabels(number, labels) {
+  const current = fetchIssue(number).labels.map((label) => typeof label === 'string' ? label : label.name).filter(Boolean);
+  const mutation = planLabelMutation(current, labels);
   const args = ['issue', 'edit', String(number), '--repo', repo];
-  if (labels.includes('forge:working')) args.push('--add-label', 'forge:working');
-  if (!labels.includes('forge:ready')) args.push('--remove-label', 'forge:ready');
+  for (const label of mutation.add) args.push('--add-label', label);
+  for (const label of mutation.remove) args.push('--remove-label', label);
+  if (args.length === 5) return;
   gh(args);
 }
 
@@ -64,10 +77,21 @@ export async function watchForge({ iterations = Infinity, pauseMs = intervalMs, 
   return results;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const sha = gitSha();
-  const result = process.argv.includes('--watch')
-    ? await watchForge({ iterations: Number(process.env.FORGE_TRIGGER_ITERATIONS ?? 1), sha })
-    : await pollForgeOnce({ sha });
+export function isDirectRun(moduleUrl, argvPath) {
+  return Boolean(argvPath) && moduleUrl === pathToFileURL(resolve(argvPath)).href;
+}
+
+if (isDirectRun(import.meta.url, process.argv[1])) {
+  let result;
+  try {
+    const sha = gitSha();
+    result = process.argv.includes('--watch')
+      ? await watchForge({ iterations: Number(process.env.FORGE_TRIGGER_ITERATIONS ?? 1), sha })
+      : await pollForgeOnce({ sha });
+  } catch (error) {
+    result = { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, evidence: [sanitizeText(error.message)] };
+    process.exitCode = 1;
+  }
+  recordForgeTriggerHeartbeat({ heartbeatPath: resolve(root, '.hermes/forge/trigger-heartbeat.json'), result });
   console.log(JSON.stringify(result, null, 2));
 }
