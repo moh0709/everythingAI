@@ -14,7 +14,16 @@ function fixture() {
     startingSha: 'a'.repeat(40),
     createdAt: new Date().toISOString()
   }));
-  return { root, repoRoot: root, contextPath, statePath: join(root, 'state.json'), heartbeatPath: join(root, 'heartbeat.json'), lockPath: join(root, 'execution.lock') };
+  return {
+    root,
+    repoRoot: root,
+    contextPath,
+    statePath: join(root, 'state.json'),
+    heartbeatPath: join(root, 'heartbeat.json'),
+    lockPath: join(root, 'execution.lock'),
+    outputPath: join(root, 'execution-result.json'),
+    schemaPath: join(root, 'execution-result.schema.json')
+  };
 }
 
 function childHarness({ pid = 7001 } = {}) {
@@ -40,13 +49,15 @@ test('starts exactly one bounded Codex execution and clears heartbeat on exit', 
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(JSON.parse(readFileSync(f.statePath, 'utf8')).status, 'RUNNING');
   assert.equal(JSON.parse(readFileSync(f.heartbeatPath, 'utf8')).issueNumber, 901);
+  writeFileSync(f.outputPath, JSON.stringify({ status: 'SUBMITTED_FOR_PM_REVIEW', evidence: ['commit pushed and labels verified'] }));
   child.emit('close', 0, null);
   const result = await promise;
   assert.equal(result.result, EXECUTION_RESULTS.COMPLETED);
   assert.equal(JSON.parse(readFileSync(f.statePath, 'utf8')).status, 'COMPLETED');
   assert.equal(JSON.parse(readFileSync(f.heartbeatPath, 'utf8')).status, 'STOPPED');
   assert.equal(launched.path, 'codex.exe');
-  assert.deepEqual(launched.args.slice(0, 9), ['exec', '--ephemeral', '--json', '--sandbox', 'workspace-write', '-c', 'approval_policy="never"', '-C', f.root]);
+  assert.equal(launched.args[4], 'danger-full-access');
+  assert.deepEqual(launched.args.slice(5, 9), ['--output-schema', f.schemaPath, '--output-last-message', f.outputPath]);
 });
 
 test('rejects duplicate execution while the recorded worker is alive', async () => {
@@ -87,8 +98,20 @@ test('recovers a dead stale execution lock before launch', async () => {
   const child = childHarness();
   const promise = startForgeExecution({ ...f, spawnProcess: () => child, processChecker: () => false, now: () => new Date('2026-07-29T02:00:00.000Z'), maxContextAgeMs: 2 * 60 * 60 * 1000, staleLockAfterMs: 1000 });
   await new Promise((resolve) => setImmediate(resolve));
+  writeFileSync(f.outputPath, JSON.stringify({ status: 'SUBMITTED_FOR_PM_REVIEW', evidence: [] }));
   child.emit('close', 0, null);
   const result = await promise;
   assert.equal(result.result, EXECUTION_RESULTS.COMPLETED);
   assert.equal(existsSync(f.lockPath), false);
+});
+
+test('zero process exit without submitted structured result is worker failure', async () => {
+  const f = fixture();
+  const child = childHarness();
+  const promise = startForgeExecution({ ...f, spawnProcess: () => child });
+  await new Promise((resolve) => setImmediate(resolve));
+  child.emit('close', 0, null);
+  const result = await promise;
+  assert.equal(result.result, EXECUTION_RESULTS.WORKER_FAILED);
+  assert.equal(JSON.parse(readFileSync(f.statePath, 'utf8')).status, 'BLOCKED');
 });

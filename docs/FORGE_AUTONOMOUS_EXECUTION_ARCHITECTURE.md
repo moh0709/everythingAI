@@ -2,7 +2,7 @@
 
 ## Decision
 
-The supported execution method is `FULLY_AUTOMATIC_CODEX_CLI` on the Codex desktop host. The installed CLI (`0.146.0-alpha.3.1`) completed a non-interactive JSONL probe in this repository. The worker is launched with a bounded workspace-write sandbox and an explicit `approval_policy="never"` configuration.
+The supported execution method is `FULLY_AUTOMATIC_CODEX_CLI` on the Codex desktop host. The installed CLI (`0.146.0-alpha.3.1`) completed a non-interactive JSONL probe in this repository. The worker is launched with `danger-full-access` and an explicit `approval_policy="never"` configuration because Codex `workspace-write` intentionally blocks `.git` writes and GitHub network access. The PM-release label gate, repository-path restriction, single-owner locks, timeout, and structured completion contract provide the external execution boundary.
 
 The VPS also has Codex CLI (`0.142.0`), but its unattended probe did not complete within the bounded test window. It is not the selected worker host.
 
@@ -13,7 +13,8 @@ The VPS also has Codex CLI (`0.142.0`), but its unattended probe did not complet
 3. Forge writes a sanitized, timestamped context file under `.hermes/forge/`.
 4. The execution adapter acquires an exclusive lock and starts one Codex CLI worker.
 5. State and heartbeat files are updated while the worker runs; JSONL output is sanitized before logging.
-6. Normal exit records `COMPLETED`; failure or timeout records `BLOCKED` and releases the lock.
+6. Codex must write a schema-constrained final result. Only `SUBMITTED_FOR_PM_REVIEW` plus verified live `forge:done + pm:review` records `COMPLETED`.
+7. A missing/blocked final result, unverified labels, process failure, or timeout records `BLOCKED` and releases the lock.
 
 ## Queue boundary
 

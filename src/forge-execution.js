@@ -2,7 +2,7 @@ import { appendFileSync, existsSync, mkdirSync, openSync, readFileSync, closeSyn
 import { spawn } from 'node:child_process';
 import { hostname } from 'node:os';
 import { dirname, resolve } from 'node:path';
-import { sanitizeText } from './forge-trigger.js';
+import { sanitizeReport, sanitizeText } from './forge-trigger.js';
 
 export const EXECUTION_RESULTS = Object.freeze({
   STARTED: 'STARTED',
@@ -17,6 +17,15 @@ export const EXECUTION_RESULTS = Object.freeze({
 const DEFAULT_CONTEXT_MAX_AGE_MS = 30 * 60 * 1000;
 const DEFAULT_MAX_RUNTIME_MS = 30 * 60 * 1000;
 const HEARTBEAT_INTERVAL_MS = 30 * 1000;
+const EXECUTION_RESULT_SCHEMA = Object.freeze({
+  type: 'object',
+  additionalProperties: false,
+  required: ['status', 'evidence'],
+  properties: {
+    status: { type: 'string', enum: ['SUBMITTED_FOR_PM_REVIEW', 'BLOCKED'] },
+    evidence: { type: 'array', items: { type: 'string' }, maxItems: 20 }
+  }
+});
 
 function atomicWrite(path, value) {
   mkdirSync(dirname(path), { recursive: true });
@@ -78,14 +87,26 @@ function releaseExecutionLock(lockPath, expected) {
 }
 
 function executionPrompt(contextPath, issueNumber) {
-  return `You are Forge executing released EverythingAI issue #${issueNumber}. Read ${contextPath} completely before acting. Work only in the repository and scope defined by that context. Preserve unrelated files, especially any explicitly preserved untracked files. Do not close the issue, self-accept PM work, release dependent tasks, expose secrets, or use destructive Git commands. Run the required validation, commit focused changes on main, push, submit forge:done plus pm:review or forge:blocked plus pm:review, and report concise sanitized milestones.`;
+  return `You are Forge executing released EverythingAI issue #${issueNumber}. Read ${contextPath} completely before acting. Work only in the repository and scope defined by that context. Preserve unrelated files, especially any explicitly preserved untracked files. Do not close the issue, self-accept PM work, release dependent tasks, expose secrets, or use destructive Git commands. Use the installed local Git and GitHub CLI for repository and issue operations. Run the required validation, commit focused changes on main, push, and verify the live issue transition. Your final response must match the supplied JSON schema: status SUBMITTED_FOR_PM_REVIEW only after forge:done plus pm:review is verified live; otherwise status BLOCKED with concise sanitized evidence.`;
 }
 
-export async function startForgeExecution({ contextPath, repoRoot, codexPath = 'codex', statePath, heartbeatPath, lockPath, logPath, maxRuntimeMs = DEFAULT_MAX_RUNTIME_MS, maxContextAgeMs = DEFAULT_CONTEXT_MAX_AGE_MS, staleLockAfterMs = DEFAULT_MAX_RUNTIME_MS, now = () => new Date(), processChecker, spawnProcess = spawn, setIntervalFn = setInterval, clearIntervalFn = clearInterval, setTimeoutFn = setTimeout, clearTimeoutFn = clearTimeout } = {}) {
+function readWorkerResult(outputPath) {
+  try {
+    const result = readJson(outputPath);
+    if (!['SUBMITTED_FOR_PM_REVIEW', 'BLOCKED'].includes(result?.status) || !Array.isArray(result?.evidence)) return null;
+    return sanitizeReport(result);
+  } catch {
+    return null;
+  }
+}
+
+export async function startForgeExecution({ contextPath, repoRoot, codexPath = 'codex', statePath, heartbeatPath, lockPath, logPath, outputPath, schemaPath, maxRuntimeMs = DEFAULT_MAX_RUNTIME_MS, maxContextAgeMs = DEFAULT_CONTEXT_MAX_AGE_MS, staleLockAfterMs = DEFAULT_MAX_RUNTIME_MS, now = () => new Date(), processChecker, spawnProcess = spawn, setIntervalFn = setInterval, clearIntervalFn = clearInterval, setTimeoutFn = setTimeout, clearTimeoutFn = clearTimeout } = {}) {
   statePath ??= resolve(repoRoot, '.hermes/forge/execution-state.json');
   heartbeatPath ??= resolve(repoRoot, '.hermes/forge/execution-heartbeat.json');
   lockPath ??= resolve(repoRoot, '.hermes/forge/execution.lock');
   logPath ??= resolve(repoRoot, '.hermes/forge/execution.jsonl');
+  outputPath ??= resolve(repoRoot, '.hermes/forge/execution-result.json');
+  schemaPath ??= resolve(repoRoot, '.hermes/forge/execution-result.schema.json');
   const contextResult = readExecutionContext({ contextPath, now, maxAgeMs: maxContextAgeMs });
   if (!contextResult.ok) return contextResult;
   const context = contextResult.context;
@@ -100,10 +121,12 @@ export async function startForgeExecution({ contextPath, repoRoot, codexPath = '
   if (!acquireExecutionLock(lockPath, lock, { now, staleAfterMs: staleLockAfterMs, processChecker })) return { ok: false, result: EXECUTION_RESULTS.ALREADY_RUNNING, issueNumber, evidence: ['execution lock is held'] };
   const executionDir = dirname(logPath);
   mkdirSync(executionDir, { recursive: true });
+  atomicWrite(schemaPath, EXECUTION_RESULT_SCHEMA);
+  if (existsSync(outputPath)) unlinkSync(outputPath);
   const startedAt = now().toISOString();
   let child;
   try {
-    const args = ['exec', '--ephemeral', '--json', '--sandbox', 'workspace-write', '-c', 'approval_policy="never"', '-C', repoRoot, executionPrompt(contextPath, issueNumber)];
+    const args = ['exec', '--ephemeral', '--json', '--sandbox', 'danger-full-access', '--output-schema', schemaPath, '--output-last-message', outputPath, '-c', 'approval_policy="never"', '-C', repoRoot, executionPrompt(contextPath, issueNumber)];
     child = spawnProcess(codexPath, args, { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
   } catch (error) {
     atomicWrite(statePath, { issueNumber, status: 'BLOCKED', result: EXECUTION_RESULTS.START_FAILURE, error: sanitizeText(error.message), startedAt });
@@ -130,17 +153,21 @@ export async function startForgeExecution({ contextPath, repoRoot, codexPath = '
       releaseExecutionLock(lockPath, lock);
       resolvePromise({ ok: false, result: EXECUTION_RESULTS.TIMEOUT, issueNumber });
     }, maxRuntimeMs);
-    const finish = (result, status) => {
+    const finish = (result, status, workerResult = null) => {
       if (settled) return;
       settled = true;
       clearTimeoutFn(timeoutTimer);
       clearIntervalFn(heartbeatTimer);
       writeHeartbeat('STOPPED');
-      atomicWrite(statePath, { ...state, status, result, finishedAt: now().toISOString() });
+      atomicWrite(statePath, { ...state, status, result, workerResult, finishedAt: now().toISOString() });
       releaseExecutionLock(lockPath, lock);
-      resolvePromise({ ok: result === EXECUTION_RESULTS.COMPLETED, result, issueNumber, exitCode: result === EXECUTION_RESULTS.COMPLETED ? 0 : 1 });
+      resolvePromise({ ok: result === EXECUTION_RESULTS.COMPLETED, result, issueNumber, exitCode: result === EXECUTION_RESULTS.COMPLETED ? 0 : 1, evidence: workerResult?.evidence ?? [] });
     };
     child.once('error', (error) => finish(EXECUTION_RESULTS.START_FAILURE, 'BLOCKED'));
-    child.once('close', (code) => finish(code === 0 ? EXECUTION_RESULTS.COMPLETED : EXECUTION_RESULTS.WORKER_FAILED, code === 0 ? 'COMPLETED' : 'BLOCKED'));
+    child.once('close', (code) => {
+      const workerResult = readWorkerResult(outputPath);
+      const submitted = code === 0 && workerResult?.status === 'SUBMITTED_FOR_PM_REVIEW';
+      finish(submitted ? EXECUTION_RESULTS.COMPLETED : EXECUTION_RESULTS.WORKER_FAILED, submitted ? 'COMPLETED' : 'BLOCKED', workerResult);
+    });
   });
 }

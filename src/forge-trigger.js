@@ -169,9 +169,25 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     atomicWriteJson(statePath, { issueNumber: targetNumber, status: 'CLAIMED', claimCommentPosted: true, contextPath: prepared.path, claimedAt: now().toISOString() });
     const report = await reporter({ event: 'task_claimed', issue: verifiedAfterMutation, contextPath: prepared.path });
     if (!execute) return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
-    const execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
-    const autonomous = execution?.ok ? FORGE_RESULTS.AUTONOMOUS_STARTED : FORGE_RESULTS.AUTONOMOUS_BLOCKED;
-    if (execution?.ok) return { ok: true, result: autonomous, issue: verifiedAfterMutation, contextPath: prepared.path, report, execution };
+    let execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
+    if (execution?.ok) {
+      const verifiedCompletion = await fetchLiveIssue(targetNumber);
+      const completionLabels = normalizeLabels(verifiedCompletion);
+      const submitted = completionLabels.includes('forge:done')
+        && completionLabels.includes('pm:review')
+        && !completionLabels.includes('forge:working')
+        && !completionLabels.includes('pm:ready');
+      if (submitted) {
+        return { ok: true, result: FORGE_RESULTS.AUTONOMOUS_STARTED, issue: verifiedCompletion, contextPath: prepared.path, report, execution };
+      }
+      execution = {
+        ...execution,
+        ok: false,
+        result: 'UNVERIFIED_COMPLETION',
+        evidence: [...(execution.evidence ?? []), 'worker exited without verified forge:done plus pm:review']
+      };
+    }
+    const autonomous = FORGE_RESULTS.AUTONOMOUS_BLOCKED;
 
     const blockedLabels = normalizeLabels(verifiedAfterMutation)
       .filter((label) => !['forge:ready', 'forge:working', 'forge:done', 'forge:blocked', 'pm:ready', 'pm:review'].includes(label));

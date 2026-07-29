@@ -8,6 +8,8 @@
 - One claim lock and one execution lock prevent duplicate launches.
 - Context age, runtime, and heartbeat intervals are bounded.
 - Dead stale locks can be recovered only on the same host after the stale window.
+- `danger-full-access` is required for Git staging and GitHub push; it is permitted only after the live PM/Forge label gate and repository-path check succeed.
+- A zero Codex process exit is not success. The worker must emit the constrained submission result and the trigger must verify live completion labels.
 
 ## Secrets and evidence
 

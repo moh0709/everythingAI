@@ -76,7 +76,11 @@ test('claimed issue is handed to the autonomous executor when configured', async
     postComment: async () => ({ ok: true }),
     lockPath,
     repoRoot: root,
-    execute: async (args) => { execution = args; return { ok: true, result: 'COMPLETED' }; }
+    execute: async (args) => {
+      execution = args;
+      live = { ...live, labels: [{ name: 'forge:done' }, { name: 'pm:review' }] };
+      return { ok: true, result: 'COMPLETED' };
+    }
   });
   assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
   assert.equal(execution.issue.number, 801);
@@ -104,6 +108,25 @@ test('worker launch failure transitions the claimed issue to blocked PM review',
   assert.deepEqual(labels.sort(), ['forge:blocked', 'pm:review']);
   assert.equal(comments.length, 2);
   assert.match(comments[1], /START_FAILURE/);
+});
+
+test('zero-exit worker without verified review labels is treated as blocked', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-unverified-success-'));
+  const lockPath = join(root, 'claim.lock');
+  let live = issue();
+  const fetch = async () => live;
+  const update = async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; };
+  const result = await claimForgeIssue({
+    issue: live,
+    fetchLiveIssue: fetch,
+    updateLabels: update,
+    postComment: async () => ({ ok: true }),
+    lockPath,
+    repoRoot: root,
+    execute: async () => ({ ok: true, result: 'COMPLETED', evidence: ['worker exited zero'] })
+  });
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_BLOCKED);
+  assert.deepEqual(live.labels.map(({ name }) => name).sort(), ['forge:blocked', 'pm:review']);
 });
 
 test('cross-host and dead same-host locks are handled conservatively', () => {
