@@ -47,6 +47,12 @@ function issueMatches(issue, issueNumber) {
   return Number(issue?.number) === Number(issueNumber);
 }
 
+function hasReadinessFields(issue) {
+  return issue
+    && Object.hasOwn(issue, 'state')
+    && Array.isArray(issue.labels);
+}
+
 function lockMetadata({ issue, pid = process.pid, hostname = getHostname(), now = () => new Date() }) {
   return {
     issueNumber: Number(issue?.number),
@@ -221,7 +227,7 @@ async function assessClaimReadiness({
   }
 
   let liveIssue = issue;
-  if (!liveIssue) {
+  if (!hasReadinessFields(liveIssue)) {
     try {
       liveIssue = await ghIssueView(targetIssueNumber, ghRunner);
     } catch (error) {

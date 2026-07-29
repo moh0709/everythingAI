@@ -115,3 +115,25 @@ test('polling worker claims through shared authority without a ReferenceError', 
   assert.ok(stateWrites > 0);
   assert.equal(artifactWrites, 1);
 });
+
+test('polling worker re-reads a poller-selected partial issue before claim readiness', async () => {
+  const selectedIssue = {
+    number: 1000,
+    title: 'DISPOSABLE-DRILL-1000',
+    labels: [{ name: 'pm:ready' }, { name: 'hermes:ready' }]
+  };
+  const liveIssue = makeIssue({ number: 1000, title: 'DISPOSABLE-DRILL-1000' });
+  const ghRunner = makeGhHarness(liveIssue);
+
+  const result = await runTaskWorker({
+    env: {},
+    argv: ['--mode', 'polling'],
+    issueSelector: async () => selectedIssue,
+    ghRunner,
+    stateReader: () => null,
+    stateWriter: () => true,
+    artifactWriter: () => ({ logPath: '', reportPath: '' })
+  });
+
+  assert.equal(result.claim.result, 'CLAIMED');
+});

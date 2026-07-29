@@ -1,0 +1,92 @@
+{
+  "task": "EAI-TASK-046B",
+  "issue": 87,
+  "status": "PASS_SUBMITTED_FOR_PM_REVIEW",
+  "date": "2026-07-29",
+  "startingSha": "8591949152242beba1ce242f5cdbf10037228cfa",
+  "rootCause": {
+    "issue86": {
+      "summary": "No active Hermes poller process was present during the prior bounded observation window, so #86 received zero claim or completion comments.",
+      "retired": true
+    },
+    "issue88Probe": {
+      "issue": 88,
+      "result": "RETIRED_FAILED_FIXTURE",
+      "evidence": "A restored poller discovered #88, but the worker rejected it as NOT_RUNNABLE with issue state=unknown because claim readiness evaluated a partial poller-selected issue object before a live issue re-read.",
+      "closed": true
+    }
+  },
+  "implementation": {
+    "summary": "Hermes claim readiness now re-reads live GitHub issue state when the caller supplies a partial issue object without readiness fields.",
+    "filesChanged": [
+      "src/task-claim.js",
+      "tests/task-worker-runtime-mode.test.mjs",
+      ".hermes/state.json",
+      "REPORTS/EAI-TASK-046B-HERMES-POLLER-LIFECYCLE.md",
+      "docs/HANDOVER_2026-07-29_EAI_TASK_046B.json"
+    ]
+  },
+  "runtimeEvidence": {
+    "preRestoreProcesses": {
+      "hermesPollerPresent": false,
+      "hermesWorkerPresent": false,
+      "otherNodeProcesses": [
+        "scripts\\\\forge-trigger.mjs",
+        "./mcp/server.cjs --stdio"
+      ]
+    },
+    "correctedPoller": {
+      "pid": 19940,
+      "command": "node scripts/task-poller.mjs --mode polling --watch",
+      "workingDirectory": "C:\\\\temp\\\\EverythingAI",
+      "firstCycle": "No runnable issues found.",
+      "stoppedAfterEvidence": true
+    },
+    "disposableIssue": {
+      "issue": 89,
+      "title": "DISPOSABLE-DRILL-087-CLEAN-NOOP-20260729T104752Z",
+      "createdAtObserved": "2026-07-29T08:47:52Z",
+      "claimCommentAt": "2026-07-29T08:48:45Z",
+      "completionCommentAt": "2026-07-29T08:48:46Z",
+      "closedAt": "2026-07-29T08:49:38Z",
+      "claimWorkerLock": {
+        "pid": 21752,
+        "hostname": "DESKTOP-GB3N7NM",
+        "createdAt": "2026-07-29T08:48:39.034Z"
+      },
+      "finalLabelsBeforeClose": [
+        "pm:ready",
+        "hermes:done",
+        "pm:review"
+      ],
+      "claimComments": 1,
+      "completionComments": 1
+    },
+    "queueReturn": {
+      "openPmReadyHermesReady": [],
+      "claimLockPresentAfterCompletion": false,
+      "pollerOrWorkerProcessPresentAfterCleanup": false
+    }
+  },
+  "validation": {
+    "frameworkDoctor": "PASS",
+    "focusedQueuePolicyAndRuntime": "PASS 19/19",
+    "nodeAllTests": "PASS 164/164",
+    "npmTest": "PASS 164/164",
+    "healthCliJson": "VALID_JSON_EXIT_1_UNKNOWN_NO_LOCAL_HEARTBEAT_AFTER_BOUNDED_CLEANUP",
+    "healthHistoryTests": "PASS in full suite",
+    "gitDiffCheck": "PASS_EXIT_0_WITH_LINE_ENDING_WARNINGS_ONLY",
+    "jsonChecks": "PASS_HANDOVER_STATE_CONTEXT87"
+  },
+  "safety": {
+    "atlasFencePreserved": true,
+    "issue69Modified": false,
+    "secretsRecorded": false,
+    "unrelatedUntrackedFilesPreserved": [
+      "apps/everything-ai-ui/src/planning.css",
+      "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+    ]
+  },
+  "finalPushedSha": "recorded in issue #87 final evidence comment after push",
+  "pmReview": "Do not self-accept; #69 remains for PM re-release decision only after independent acceptance."
+}
