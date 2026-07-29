@@ -4,6 +4,8 @@
   "agent": "Forge",
   "status": "BLOCKED",
   "startingSha": "fc663333be93a080ab3b05c0f2ef3c2dae0528d6",
+  "artifactCommitSha": "a970335",
+  "finalPushedSha": "recorded in issue #92 final evidence comment after push",
   "observation": {
     "startedAt": "2026-07-29T10:41:12.279Z",
     "endedAt": "2026-07-29T10:43:48.722Z",

@@ -8,9 +8,9 @@
   "status": "BLOCKED_READY_FOR_PM_SUBMISSION",
   "result": "BLOCKED_READY_FOR_PM_SUBMISSION",
   "startingCommitSha": "fc663333be93a080ab3b05c0f2ef3c2dae0528d6",
-  "implementationCommitSha": "pending commit",
-  "artifactCommitSha": "pending commit",
-  "finalPushedSha": "pending push",
+  "implementationCommitSha": "a970335",
+  "artifactCommitSha": "a970335",
+  "finalPushedSha": "recorded in issue #92 final evidence comment after push",
   "host": "vmi2938167 / 37.60.248.195",
   "serviceState": "SPOT_CHECK_ACTIVE_NOT_24H_SOAK",
   "observation": {
