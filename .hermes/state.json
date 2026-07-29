@@ -8,8 +8,8 @@
   "lastCheckedAt": "2026-07-29T07:12:00Z",
   "status": "BLOCKED_PENDING_PM_REVIEW",
   "startingCommitSha": "985ce1c0b34f23447b33deb2951702017928a800",
-  "implementationCommitSha": "63265bd95fc3dd0146b74d2ea09f04d825e82c59",
-  "artifactCommitSha": "63265bd95fc3dd0146b74d2ea09f04d825e82c59",
+  "implementationCommitSha": "63265bd5f38d46fd67473f5ecb51d4c4a066eb40",
+  "artifactCommitSha": "63265bd5f38d46fd67473f5ecb51d4c4a066eb40",
   "host": "vmi2938167 / 37.60.248.195",
   "serviceState": "ACTIVE",
   "validation": {
