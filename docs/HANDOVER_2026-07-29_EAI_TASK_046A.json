@@ -1,0 +1,83 @@
+{
+  "task": "EAI-TASK-046A",
+  "issue": 85,
+  "status": "BLOCKED",
+  "date": "2026-07-29",
+  "startingSha": "538e38c62a10fe5693354db356a3965799e8d443",
+  "rootCause": {
+    "unauthorizedClaimIssue": 84,
+    "claimIdentity": "Atlas (poller)",
+    "claimTimestamp": "2026-07-29T07:02:09Z",
+    "liveProcess": {
+      "pid": 6936,
+      "name": "node.exe",
+      "commandLine": "C:/nvm/v22.15.0/node.exe scripts/atlas-poller.mjs",
+      "createdLocalTime": "2026-07-24 09:13:49"
+    },
+    "trackedAtlasScript": "scripts/atlas-cron-poller.py",
+    "untrackedAtlasPollerPresentInRepository": false
+  },
+  "changes": [
+    "Added src/agent-queue-policy.js",
+    "Updated src/forge-trigger.js to use shared Forge eligibility and repo-root state path",
+    "Updated src/task-claim.js to use shared Hermes eligibility",
+    "Updated scripts/atlas-cron-poller.py to require pm:approved-delegation and an explicit Atlas delegation contract",
+    "Added tests/agent-queue-policy.test.mjs",
+    "Updated tests/forge-trigger.test.mjs with a repo-root state-path regression"
+  ],
+  "runtimeEvidence": {
+    "atlasProcessStopped": true,
+    "atlasStoppedPid": 6936,
+    "postStopAtlasProcessRecheck": "No atlas-poller or atlas-cron process remained after five-second recheck.",
+    "scheduledTasks": [
+      {
+        "taskName": "EverythingAI Forge Trigger",
+        "state": "Running"
+      }
+    ],
+    "hermesClaimLock": "ABSENT",
+    "openHermesReadyQueueBeforeDrill": [],
+    "openAtlasReadyQueueAfterFence": []
+  },
+  "disposableDrill": {
+    "issue": 86,
+    "createdAt": "2026-07-29T07:42:17Z",
+    "initialLabels": [
+      "pm:ready",
+      "hermes:ready"
+    ],
+    "observationWindow": "approximately 6 minutes, 20 second polling interval",
+    "claimIdentity": null,
+    "completionComment": null,
+    "finalLabels": [
+      "hermes:blocked",
+      "pm:review"
+    ],
+    "closed": false,
+    "result": "BLOCKED_DRILL_NO_UNATTENDED_DISCOVERY",
+    "duplicateExecutionObserved": false,
+    "unauthorizedAtlasClaimObservedAfterFence": false
+  },
+  "validation": {
+    "focusedQueuePolicy": "PASS 5/5",
+    "focusedForgeTrigger": "PASS 11/11",
+    "focusedTaskClaim": "PASS 8/8",
+    "focusedRuntimeMode": "PASS 5/5",
+    "frameworkDoctor": "PASS",
+    "npmTest": "PASS 163/163",
+    "nodeAllTests": "PASS 163/163",
+    "gitDiffCheck": "PASS with line-ending warnings only",
+    "context85Json": "PASS"
+  },
+  "artifacts": [
+    "REPORTS/EAI-TASK-046A-QUEUE-OWNERSHIP-FENCE.md",
+    "LOGS/EAI-TASK-046A-terminal.log",
+    "docs/HANDOVER_2026-07-29_EAI_TASK_046A.json"
+  ],
+  "blocker": {
+    "summary": "No unattended Hermes worker discovered and completed disposable issue #86.",
+    "impact": "Issue #85 success contract cannot be satisfied.",
+    "remediation": "Restore or start exactly one authorized Hermes poller for pm:ready + hermes:ready, then rerun a new disposable no-op drill and prove exactly-one claim and completion."
+  },
+  "secrets": "No secrets recorded."
+}

@@ -14,6 +14,7 @@ import {
   summarizeIssue,
   writeStateIfPresent
 } from './task-queue.js';
+import { isHermesEligibleForQueue, normalizeIssueLabels } from './agent-queue-policy.js';
 
 const claimLockPath = resolve(repoRoot, '.hermes/claim.lock');
 const DEFAULT_STALE_LOCK_MS = 15 * 60 * 1000;
@@ -39,9 +40,7 @@ function asIssueNumber(issueOrNumber) {
 }
 
 function normalizeLabels(issue) {
-  return (issue?.labels ?? [])
-    .map((label) => (typeof label === 'string' ? label : label?.name))
-    .filter(Boolean);
+  return normalizeIssueLabels(issue);
 }
 
 function issueMatches(issue, issueNumber) {
@@ -252,7 +251,7 @@ async function assessClaimReadiness({
   }
 
   const labels = normalizeLabels(liveIssue);
-  if (!labels.includes('pm:ready') || !labels.includes('hermes:ready')) {
+  if (!isHermesEligibleForQueue(liveIssue)) {
     return {
       ok: false,
       result: CLAIM_RESULTS.NOT_RUNNABLE,

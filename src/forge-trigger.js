@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, openSync, readFileSync, closeSync, unlinkSync, renameSync, writeFileSync } from 'node:fs';
 import { hostname } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { isForgeEligibleForQueue, normalizeIssueLabels } from './agent-queue-policy.js';
 
 export const FORGE_RESULTS = Object.freeze({
   CLAIMED: 'CLAIMED',
@@ -14,22 +15,12 @@ export const FORGE_RESULTS = Object.freeze({
   AUTONOMOUS_BLOCKED: 'AUTONOMOUS_BLOCKED'
 });
 
-const EXCLUDED_LABELS = new Set([
-  'forge:working', 'forge:done', 'forge:blocked', 'pm:review',
-  'atlas:ready', 'atlas:working', 'atlas:done', 'atlas:blocked',
-  'hermes:ready', 'hermes:working', 'hermes:done', 'hermes:blocked'
-]);
-
 export function normalizeLabels(issue) {
-  return (issue?.labels ?? []).map((label) => typeof label === 'string' ? label : label?.name).filter(Boolean);
+  return normalizeIssueLabels(issue);
 }
 
 export function isForgeEligible(issue) {
-  const labels = normalizeLabels(issue);
-  return String(issue?.state ?? '').toLowerCase() === 'open'
-    && labels.includes('pm:ready')
-    && labels.includes('forge:ready')
-    && !labels.some((label) => EXCLUDED_LABELS.has(label));
+  return isForgeEligibleForQueue(issue);
 }
 
 function atomicWriteJson(path, value) {
@@ -134,7 +125,7 @@ export function prepareForgeContext({ issue, repoRoot, startingSha, projectState
 
 function defaultStatePath(repoRoot) { return resolve(repoRoot, '.hermes/forge/state.json'); }
 
-export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, statePath = defaultStatePath(process.cwd()), repoRoot = process.cwd(), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
+export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultStatePath(repoRoot), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
   const targetNumber = Number(issue?.number);
   if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
   const live = await fetchLiveIssue(targetNumber);

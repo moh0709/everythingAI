@@ -1,0 +1,21 @@
+2026-07-29T07:34:09Z loaded .hermes/forge/context-85.json.
+2026-07-29T07:34:10Z verified issue #85 live labels pm:ready + forge:working and claim comment.
+2026-07-29T07:35Z found #84 Atlas (poller) claim comment at 2026-07-29T07:02:09Z.
+2026-07-29T07:38Z RED node --test tests/agent-queue-policy.test.mjs failed with ERR_MODULE_NOT_FOUND for src/agent-queue-policy.js.
+2026-07-29T07:38Z RED Atlas poller fence assertion failed because scripts/atlas-cron-poller.py lacked pm:approved-delegation gate.
+2026-07-29T07:39Z focused queue-policy test passed 5/5 after shared policy and Python poller fence.
+2026-07-29T07:39Z RED Forge state-path regression failed because default state was not written under supplied repoRoot.
+2026-07-29T07:39Z Forge state-path regression passed after default statePath now follows repoRoot.
+2026-07-29T07:40Z focused Forge/Hermes runtime tests passed.
+2026-07-29T07:40Z process scan identified live competing Atlas path: PID 6936 node.exe command line C:/nvm/v22.15.0/node.exe scripts/atlas-poller.mjs.
+2026-07-29T07:40Z scripts/atlas-poller.mjs was not present locally and not tracked; only scripts/atlas-cron-poller.py was tracked.
+2026-07-29T07:40Z stopped Atlas poller PID 6936 and rechecked after five seconds; no atlas-poller or atlas-cron process remained.
+2026-07-29T07:40Z scheduled task query showed only EverythingAI Forge Trigger running.
+2026-07-29T07:41Z npm run framework:doctor PASS.
+2026-07-29T07:41Z npm test PASS 163/163.
+2026-07-29T07:41Z node --test tests/*.test.mjs PASS 163/163.
+2026-07-29T07:41Z git diff --check exit 0 with line-ending warnings only.
+2026-07-29T07:41Z python -m json.tool .hermes/forge/context-85.json PASS.
+2026-07-29T07:42:17Z created disposable Hermes no-op issue #86 with pm:ready + hermes:ready.
+2026-07-29T07:42:17Z to 2026-07-29T07:48:37Z observed #86 every 20 seconds; labels remained pm:ready + hermes:ready and comments remained empty.
+2026-07-29T07:48:57Z commented #86 blocker evidence and moved it to hermes:blocked + pm:review; left open because completion evidence was not collected.

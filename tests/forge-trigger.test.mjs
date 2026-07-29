@@ -62,6 +62,31 @@ test('comment failure is persisted and recovered without relabeling', async () =
   assert.equal(JSON.parse(readFileSync(statePath, 'utf8')).claimCommentPosted, true);
 });
 
+test('default Forge state path follows the supplied repo root', async () => {
+  const originalCwd = process.cwd();
+  const cwdRoot = mkdtempSync(join(tmpdir(), 'forge-cwd-'));
+  const repoRoot = mkdtempSync(join(tmpdir(), 'forge-repo-root-'));
+  let live = issue();
+  const fetch = async () => live;
+  const update = async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; };
+  process.chdir(cwdRoot);
+  try {
+    const result = await claimForgeIssue({
+      issue: live,
+      fetchLiveIssue: fetch,
+      updateLabels: update,
+      postComment: async () => ({ ok: false }),
+      lockPath: join(repoRoot, 'claim.lock'),
+      repoRoot
+    });
+    assert.equal(result.result, FORGE_RESULTS.REPORTING_REQUIRED);
+    assert.equal(existsSync(join(repoRoot, '.hermes', 'forge', 'state.json')), true);
+    assert.equal(existsSync(join(cwdRoot, '.hermes', 'forge', 'state.json')), false);
+  } finally {
+    process.chdir(originalCwd);
+  }
+});
+
 test('claimed issue is handed to the autonomous executor when configured', async () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-autonomous-'));
   const lockPath = join(root, 'claim.lock');
