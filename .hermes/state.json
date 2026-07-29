@@ -1,44 +1,51 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 69,
-  "currentTask": "EAI-TASK-046",
-  "updatedAt": "2026-07-29T09:56:16Z",
-  "lastCheckedAt": "2026-07-29T09:56:16Z",
-  "status": "PASS_READY_FOR_PM_SUBMISSION",
-  "result": "PASS_READY_FOR_PM_SUBMISSION",
-  "phaseDecision": "PHASE_3_ACCEPTED",
-  "startingCommitSha": "cd777d63d9252005fec437bf6e3e1f87655ad3b0",
-  "implementationCommitSha": "d5aa013764c8d6d2568e13ba69174a15e5580e5f",
-  "artifactCommitSha": "d5aa013764c8d6d2568e13ba69174a15e5580e5f",
-  "finalPushedSha": "recorded in issue #69 final evidence comment after push",
+  "currentIssue": 92,
+  "currentTask": "EAI-TASK-047",
+  "updatedAt": "2026-07-29T10:43:48.722Z",
+  "lastCheckedAt": "2026-07-29T10:43:48.722Z",
+  "status": "BLOCKED_READY_FOR_PM_SUBMISSION",
+  "result": "BLOCKED_READY_FOR_PM_SUBMISSION",
+  "startingCommitSha": "fc663333be93a080ab3b05c0f2ef3c2dae0528d6",
+  "implementationCommitSha": "pending commit",
+  "artifactCommitSha": "pending commit",
+  "finalPushedSha": "pending push",
   "host": "vmi2938167 / 37.60.248.195",
-  "deployedCheckoutSha": "cd777d63d9252005fec437bf6e3e1f87655ad3b0",
-  "serviceState": "ACTIVE",
+  "serviceState": "SPOT_CHECK_ACTIVE_NOT_24H_SOAK",
+  "observation": {
+    "startedAt": "2026-07-29T10:41:12.279Z",
+    "endedAt": "2026-07-29T10:43:48.722Z",
+    "duration": "PT2M36.443S",
+    "requiredDuration": "PT24H",
+    "continuous24HourSoakCompleted": false
+  },
+  "blocker": {
+    "summary": "The required 24-hour continuous Hermes reliability soak was not completed in this bounded Forge worker session.",
+    "remediation": "Run a durable 24-hour observer and resubmit with exact sanitized evidence."
+  },
+  "finalizationRace": {
+    "confirmed": true,
+    "sourceIssue": 69,
+    "fixed": true,
+    "regression": "stale autonomous timeout does not downgrade already submitted Forge evidence"
+  },
   "validation": {
     "frameworkDoctor": "PASS",
-    "nodeTests": "164/164 PASS",
-    "npmTest": "164/164 PASS",
-    "healthCliJson": "VALID JSON; local status UNKNOWN because no local heartbeat is expected",
-    "historyParser": "PASS one completion record; secret canary and credential URL absent",
+    "targetedRegressionRed": "PASS expected failure observed before fix",
+    "targetedRegressionGreen": "PASS 12/12",
+    "nodeTests": "165/165 PASS",
+    "npmTest": "165/165 PASS",
+    "healthCliJson": "PASS parseable JSON; local UNKNOWN because no local runtime artifacts exist",
+    "historyParser": "PASS import",
     "jsonChecks": "PASS handover and state JSON",
-    "gitDiffCheck": "PASS exit 0 with CRLF normalization warnings only",
-    "systemdUnits": "PASS installed units verified and four active units observed",
-    "watchdog": "PASS stale HEARTBEAT_STALE and restored HEALTHY observed",
-    "restart": "PASS bounded poller SIGKILL recovery observed",
-    "duplicateLock": "PASS active same-host claim-lock conflict observed",
-    "queueLifecycle": "PASS issue #90 reached hermes:done + pm:review"
+    "gitDiffCheck": "PASS with CRLF normalization warnings only",
+    "systemdSpotEvidence": "PASS target reachable; runtime target, poller service, and watchdog timer active; poller NRestarts=0"
   },
   "queueLabels": [
     "forge:working"
   ],
-  "issue69": "IN_PROGRESS_PENDING_FINAL_SUBMISSION",
-  "disposableIssue": 90,
-  "soak24Hour": {
-    "performed": false,
-    "followUpGateRecommended": true
-  },
-  "humanSummary": "EAI-TASK-046 rerun accepted for bounded Phase 3 reliability gate after clean disposable completion on #90.",
-  "startedAt": "2026-07-29T09:41:33Z",
-  "completedAt": "2026-07-29T09:56:16Z"
+  "issue92": "BLOCKED_PENDING_FINAL_SUBMISSION",
+  "secrets": "none recorded",
+  "humanSummary": "EAI-TASK-047 cannot truthfully pass because the required 24-hour soak was not completed; finalization race was fixed and tested."
 }

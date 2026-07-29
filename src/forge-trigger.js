@@ -125,6 +125,14 @@ export function prepareForgeContext({ issue, repoRoot, startingSha, projectState
 
 function defaultStatePath(repoRoot) { return resolve(repoRoot, '.hermes/forge/state.json'); }
 
+function hasVerifiedForgeSubmission(issue) {
+  const labels = normalizeLabels(issue);
+  return labels.includes('forge:done')
+    && labels.includes('pm:review')
+    && !labels.includes('forge:working')
+    && !labels.includes('pm:ready');
+}
+
 export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultStatePath(repoRoot), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
   const targetNumber = Number(issue?.number);
   if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
@@ -163,12 +171,7 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     let execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
     if (execution?.ok) {
       const verifiedCompletion = await fetchLiveIssue(targetNumber);
-      const completionLabels = normalizeLabels(verifiedCompletion);
-      const submitted = completionLabels.includes('forge:done')
-        && completionLabels.includes('pm:review')
-        && !completionLabels.includes('forge:working')
-        && !completionLabels.includes('pm:ready');
-      if (submitted) {
+      if (hasVerifiedForgeSubmission(verifiedCompletion)) {
         return { ok: true, result: FORGE_RESULTS.AUTONOMOUS_STARTED, issue: verifiedCompletion, contextPath: prepared.path, report, execution };
       }
       execution = {
@@ -178,9 +181,13 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
         evidence: [...(execution.evidence ?? []), 'worker exited without verified forge:done plus pm:review']
       };
     }
+    const verifiedAfterExecution = await fetchLiveIssue(targetNumber);
+    if (hasVerifiedForgeSubmission(verifiedAfterExecution)) {
+      return { ok: true, result: FORGE_RESULTS.AUTONOMOUS_STARTED, issue: verifiedAfterExecution, contextPath: prepared.path, report, execution: { ...execution, staleFinalizationIgnored: true } };
+    }
     const autonomous = FORGE_RESULTS.AUTONOMOUS_BLOCKED;
 
-    const blockedLabels = normalizeLabels(verifiedAfterMutation)
+    const blockedLabels = normalizeLabels(verifiedAfterExecution)
       .filter((label) => !['forge:ready', 'forge:working', 'forge:done', 'forge:blocked', 'pm:ready', 'pm:review'].includes(label));
     blockedLabels.push('forge:blocked', 'pm:review');
     await updateLabels(targetNumber, blockedLabels);

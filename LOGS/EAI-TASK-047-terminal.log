@@ -1,0 +1,15 @@
+2026-07-29T10:41:12.279Z context loaded from .hermes/forge/context-92.json.
+2026-07-29T10:41:13Z live issue #92 claim comment already present; labels were pm:ready + forge:working.
+2026-07-29T10:43:00Z inspected #69 comments: PASS evidence preceded stale TIMEOUT/BLOCKED wrapper comment.
+2026-07-29T10:43:10Z added regression test for stale autonomous timeout after verified forge:done + pm:review.
+2026-07-29T10:43:12Z node --test tests/forge-trigger.test.mjs failed as expected before fix: AUTONOMOUS_BLOCKED vs AUTONOMOUS_STARTED.
+2026-07-29T10:43:18Z updated src/forge-trigger.js to re-read live labels before blocked finalization.
+2026-07-29T10:43:21Z node --test tests/forge-trigger.test.mjs passed 12/12.
+2026-07-29T10:43:21Z npm run framework:doctor passed.
+2026-07-29T10:43:21Z node --test tests/*.test.mjs passed 165/165.
+2026-07-29T10:43:21Z npm test passed 165/165.
+2026-07-29T10:43:21Z node scripts/hermes-health.mjs --json emitted parseable JSON with local UNKNOWN status.
+2026-07-29T10:43:30Z history parser import passed.
+2026-07-29T10:43:35Z SSH service spot check reached vmi2938167; hermes-runtime.target, hermes-poller.service, and hermes-watchdog.timer active; hermes-watchdog.service inactive; poller NRestarts=0.
+2026-07-29T10:43:40Z git diff --check passed with CRLF normalization warnings only.
+2026-07-29T10:43:48.722Z observation ended after PT2M36.443S; 24-hour soak not completed, so #92 result is BLOCKED.

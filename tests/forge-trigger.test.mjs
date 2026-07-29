@@ -154,6 +154,30 @@ test('zero-exit worker without verified review labels is treated as blocked', as
   assert.deepEqual(live.labels.map(({ name }) => name).sort(), ['forge:blocked', 'pm:review']);
 });
 
+test('stale autonomous timeout does not downgrade already submitted Forge evidence', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-stale-timeout-'));
+  const lockPath = join(root, 'claim.lock');
+  let live = issue();
+  const comments = [];
+  const fetch = async () => live;
+  const update = async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; };
+  const result = await claimForgeIssue({
+    issue: live,
+    fetchLiveIssue: fetch,
+    updateLabels: update,
+    postComment: async (target, body) => { comments.push(body); return { ok: true }; },
+    lockPath,
+    repoRoot: root,
+    execute: async () => {
+      live = { ...live, labels: [{ name: 'forge:done' }, { name: 'pm:review' }] };
+      return { ok: false, result: 'TIMEOUT', evidence: ['outer execution timeout after pushed evidence'] };
+    }
+  });
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.deepEqual(live.labels.map(({ name }) => name).sort(), ['forge:done', 'pm:review']);
+  assert.equal(comments.length, 1);
+});
+
 test('cross-host and dead same-host locks are handled conservatively', () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-lock-'));
   const cross = join(root, 'cross.lock');

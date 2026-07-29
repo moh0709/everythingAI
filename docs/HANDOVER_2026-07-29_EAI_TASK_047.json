@@ -1,0 +1,49 @@
+{
+  "task": "EAI-TASK-047",
+  "issue": 92,
+  "agent": "Forge",
+  "status": "BLOCKED",
+  "startingSha": "fc663333be93a080ab3b05c0f2ef3c2dae0528d6",
+  "observation": {
+    "startedAt": "2026-07-29T10:41:12.279Z",
+    "endedAt": "2026-07-29T10:43:48.722Z",
+    "duration": "PT2M36.443S",
+    "requiredDuration": "PT24H",
+    "continuous24HourSoakCompleted": false
+  },
+  "blocker": {
+    "summary": "The required 24-hour continuous Hermes reliability soak was not completed in this bounded Forge worker session.",
+    "impact": "Issue #92 cannot truthfully be submitted as forge:done.",
+    "remediation": "Run a durable 24-hour observer and submit the resulting sanitized evidence."
+  },
+  "finalizationRace": {
+    "confirmed": true,
+    "sourceIssue": 69,
+    "passEvidenceAt": "2026-07-29T10:02:30Z",
+    "staleTimeoutAt": "2026-07-29T10:08:17Z",
+    "pmAcceptanceAt": "2026-07-29T10:40:18Z",
+    "fix": "Forge trigger now re-reads live labels and preserves an already verified forge:done + pm:review submission before applying blocked finalization."
+  },
+  "filesChanged": [
+    "src/forge-trigger.js",
+    "tests/forge-trigger.test.mjs",
+    "REPORTS/EAI-TASK-047-HERMES-24H-SOAK.md",
+    "docs/HANDOVER_2026-07-29_EAI_TASK_047.json",
+    "LOGS/EAI-TASK-047-terminal.log",
+    ".hermes/state.json"
+  ],
+  "validation": {
+    "frameworkDoctor": "PASS",
+    "targetedRegressionRed": "PASS - test failed before fix for expected AUTONOMOUS_BLOCKED vs AUTONOMOUS_STARTED mismatch",
+    "targetedRegressionGreen": "PASS 12/12",
+    "nodeTests": "PASS 165/165",
+    "npmTest": "PASS 165/165",
+    "healthCliJson": "PASS parseable JSON; local status UNKNOWN without local runtime artifacts",
+    "historyParser": "PASS import",
+    "systemdServiceSpotEvidence": "PASS spot check: target host reachable; runtime target, poller service, and watchdog timer active; poller NRestarts=0",
+    "gitDiffCheck": "PASS with CRLF normalization warnings only",
+    "jsonChecks": "PASS"
+  },
+  "secrets": "No secrets or raw environment values recorded.",
+  "issueTransition": "Submit forge:blocked + pm:review after commit push; do not close."
+}
