@@ -5,6 +5,7 @@ Agent: Forge
 Decision: `PHASE_3_ACCEPTED`
 Rerun date: 2026-07-29
 Starting SHA: `cd777d63d9252005fec437bf6e3e1f87655ad3b0`
+Artifact commit: `d5aa013764c8d6d2568e13ba69174a15e5580e5f`
 Deployed host: `vmi2938167 / 37.60.248.195`
 Deployed checkout during drill: `cd777d63d9252005fec437bf6e3e1f87655ad3b0`
 
@@ -52,7 +53,7 @@ Fresh validation after artifact refresh:
 - History parser validation: PASS, one completion record parsed with secret canary and credential URL absent.
 - Remote systemd verification/status: PASS; installed units verified and four EverythingAI units active.
 - Handover and state JSON parsing: PASS.
-- `git diff --check`: pending final metadata run after SHA alignment.
+- `git diff --check`: PASS, exit 0 with CRLF normalization warnings only.
 
 Runtime validation already collected:
 

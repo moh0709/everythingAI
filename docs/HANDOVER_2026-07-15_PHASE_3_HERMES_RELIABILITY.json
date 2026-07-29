@@ -14,6 +14,8 @@
     "followUpGateRecommended": true
   },
   "startingSha": "cd777d63d9252005fec437bf6e3e1f87655ad3b0",
+  "artifactCommitSha": "d5aa013764c8d6d2568e13ba69174a15e5580e5f",
+  "finalPushedSha": "recorded in issue #69 final evidence comment after push",
   "host": "vmi2938167 / 37.60.248.195",
   "deployedCheckoutSha": "cd777d63d9252005fec437bf6e3e1f87655ad3b0",
   "disposableIssue": 90,
@@ -37,7 +39,7 @@
     "healthCliJson": "VALID JSON; local status UNKNOWN because no local heartbeat is expected",
     "historyParser": "PASS one completion record; secret canary and credential URL absent",
     "systemdStatus": "PASS installed units verified; four live units active",
-    "gitDiffCheck": "PENDING_FINAL_METADATA_RUN",
+    "gitDiffCheck": "PASS exit 0 with CRLF normalization warnings only",
     "jsonChecks": "PASS handover and state JSON"
   },
   "artifacts": [
