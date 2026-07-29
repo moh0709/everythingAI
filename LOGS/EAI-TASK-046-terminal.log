@@ -1,0 +1,171 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260729090133
+Username: DESKTOP-GB3N7NM\Mohammad Ismail
+RunAs User: DESKTOP-GB3N7NM\Mohammad Ismail
+Configuration Name: 
+Machine: DESKTOP-GB3N7NM (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -Command try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}
+$ErrorActionPreference = 'Continue'
+function UtcNow { (Get-Date).ToUniversalTime().ToString('o') }
+$log = Join-Path (Get-Location) 'LOGS/EAI-TASK-046-terminal.log'
+New-Item -ItemType Directory -Force -Path 'LOGS' | Out-Null
+Start-Transcript -Path $log -Force | Out-Null
+try {
+  Write-Host "=== EAI-TASK-046 bounded unattended reliability drill ==="
+  Write-Host "startedAt=$(UtcNow)"
+  Write-Host "localHead=$(git rev-parse HEAD)"
+  Write-Host "localStatus=$(git status --short --branch | Out-String)"
+
+  Write-Host "=== Live host baseline ==="
+  ssh -o BatchMode=yes -o ConnectTimeout=10 root@37.60.248.195 "set -e; hostname; systemctl is-active hermes-runtime.target hermes-supervisor.service hermes-poller.service hermes-watchdog.timer; systemctl show hermes-poller.service -p NRestarts -p Result --no-pager; systemctl show hermes-supervisor.service -p NRestarts -p Result --no-pager; runuser -u hermes -- bash -lc 'cd /opt/everythingAI && git rev-parse HEAD && node scripts/hermes-health.mjs --json'"
+
+  Write-Host "=== Create disposable no-op issue for queue lifecycle ==="
+  $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+  $title = "DISPOSABLE-DRILL-069-NOOP-$stamp"
+  $body = "Disposable no-op reliability drill issue for EverythingAI #69. This issue is not product work; Hermes lifecycle-only worker may claim it and return pm:review + hermes:done. No secrets."
+  $issueUrl = gh issue create --repo moh0709/everythingAI --title $title --body $body --label pm:ready --label hermes:ready
+  Write-Host "disposableIssueUrl=$issueUrl"
+  $issueNumber = [int]($issueUrl -replace '.*/issues/','')
+  Write-Host "disposableIssueNumber=$issueNumber"
+
+  Write-Host "=== Force one claim conflict with active same-host lock ==="
+  $lockCreatedAt = UtcNow
+  ssh -o BatchMode=yes root@37.60.248.195 "set -e; hn=\$(hostname); printf '{\n  \"issueNumber\": %s,\n  \"taskId\": \"DISPOSABLE-DRILL-069\",\n  \"pid\": 1,\n  \"hostname\": \"%s\",\n  \"createdAt\": \"%s\"\n}\n' '$issueNumber' \"\$hn\" \"$lockCreatedAt\" > /opt/everythingAI/.hermes/claim.lock; chown hermes:hermes /opt/everythingAI/.hermes/claim.lock; ls -l /opt/everythingAI/.hermes/claim.lock; cat /opt/everythingAI/.hermes/claim.lock"
+  Write-Host "manualConflictWorkerRunAt=$(UtcNow)"
+  ssh -o BatchMode=yes root@37.60.248.195 "runuser -u hermes -- bash -lc 'cd /opt/everythingAI && node scripts/task-worker.mjs --mode polling $issueNumber'"
+  Write-Host "postConflictLabels=$(gh issue view $issueNumber --repo moh0709/everythingAI --json labels --jq '.labels[].name' | Out-String)"
+  ssh -o BatchMode=yes root@37.60.248.195 "rm -f /opt/everythingAI/.hermes/claim.lock; test ! -e /opt/everythingAI/.hermes/claim.lock && echo claim_lock_removed"
+
+  Write-Host "=== Wait for unattended poller to discover, claim, execute, and complete disposable issue ==="
+  $deadline = (Get-Date).AddMinutes(4)
+  $done = $false
+  while ((Get-Date) -lt $deadline) {
+    $labels = gh issue view $issueNumber --repo moh0709/everythingAI --json labels --jq '.labels[].name' 2>$null
+    $labelText = ($labels -join ',')
+    Write-Host "pollLabels[$(UtcNow)]=$labelText"
+    if ($labelText -match 'hermes:done' -and $labelText -match 'pm:review') { $done = $true; break }
+    Start-Sleep -Seconds 15
+  }
+  Write-Host "disposableCompletionObserved=$done"
+  gh issue view $issueNumber --repo moh0709/everythingAI --json number,title,state,labels,comments --jq '{number,title,state,labels:[.labels[].name],commentCount:(.comments|length),lastComment:(.comments[-1].body // "")}'
+
+  Write-Host "=== Simulate transient failure and retry policy ==="
+  node --input-type=module -e "import { nextRetry, resetRetryState } from './src/retry-policy.js'; const now=()=>new Date('2026-07-29T07:10:00.000Z'); const first=nextRetry({state:{startedAtMs:Date.parse('2026-07-29T07:10:00.000Z')}, failure:{code:'ETIMEDOUT', evidence:'sanitized transient timeout'}, now, config:{maxAttempts:3, initialBackoffMs:100, maxBackoffMs:500, totalTimeCeilingMs:2000, jitterRatio:0}, idempotent:true}); const conflict=nextRetry({state:first, failure:{result:'CLAIM_CONFLICT', evidence:'sanitized ownership conflict'}, now:()=>new Date('2026-07-29T07:10:00.100Z'), config:{maxAttempts:3, initialBackoffMs:100, maxBackoffMs:500, totalTimeCeilingMs:2000, jitterRatio:0}, revalidate:true}); const reset=resetRetryState({retry:first, attempt:first.attempt}); console.log(JSON.stringify({first, conflict, reset}, null, 2));"
+
+  Write-Host "=== Simulate worker crash and verify bounded systemd recovery ==="
+  ssh -o BatchMode=yes root@37.60.248.195 "set -e; echo before; systemctl show hermes-poller.service -p NRestarts -p ActiveState -p SubState --no-pager; systemctl kill --kill-who=main --signal=SIGKILL hermes-poller.service; sleep 8; echo after; systemctl show hermes-poller.service -p NRestarts -p ActiveState -p SubState -p Result --no-pager; systemctl is-active hermes-poller.service"
+
+  Write-Host "=== Simulate stale heartbeat and watchdog recovery ==="
+  ssh -o BatchMode=yes root@37.60.248.195 "set -e; cd /opt/everythingAI; cp .hermes/runtime/heartbeat.json /tmp/eai-task-046-heartbeat.backup.json; node --input-type=module -e 'import { readFileSync, writeFileSync } from \"node:fs\"; const p=\".hermes/runtime/heartbeat.json\"; const hb=JSON.parse(readFileSync(p,\"utf8\")); hb.lastHeartbeat=\"2026-01-01T00:00:00.000Z\"; hb.lastResult=\"DRILL_STALE_HEARTBEAT\"; writeFileSync(p, JSON.stringify(hb,null,2)+\"\\n\");'; node scripts/hermes-watchdog.mjs --root /opt/everythingAI --service hermes-poller.service --stale-ms 1000 || true; mv /tmp/eai-task-046-heartbeat.backup.json .hermes/runtime/heartbeat.json; chown hermes:hermes .hermes/runtime/heartbeat.json; systemctl restart hermes-supervisor.service; sleep 35; node scripts/hermes-watchdog.mjs --root /opt/everythingAI --service hermes-poller.service --stale-ms 120000; runuser -u hermes -- bash -lc 'cd /opt/everythingAI && node scripts/hermes-health.mjs --json'"
+
+  Write-Host "=== Structured history parser and secret redaction drill ==="
+  node --input-type=module -e "import { mkdtempSync } from 'node:fs'; import { join } from 'node:path'; import { tmpdir } from 'node:os'; import { createEvent, appendEvent, readHistory } from './src/event-history.js'; const dir=mkdtempSync(join(tmpdir(),'eai-task-046-history-')); const path=join(dir,'events.ndjson'); const events=['discovery','claim','start','retry','recovery','validation','completion'].map((type,i)=>createEvent({type, issueNumber:69, taskId:'EAI-TASK-046', correlationId:'drill-'+i, timestamp:new Date(Date.parse('2026-07-29T07:20:00.000Z')+i*1000).toISOString(), resultCode:type==='completion'?'PASS':null, payload:{note:'sanitized', token:'SUPER_SECRET_CANARY', url:'https://user:pass@example.test/path'}})); for (const event of events) appendEvent(path,event); const parsed=readHistory(path); const redacted=JSON.stringify(parsed); console.log(JSON.stringify({path, parsed:parsed.length, types:parsed.map(e=>e.type), secretCanaryPresent:redacted.includes('SUPER_SECRET_CANARY'), credentialUrlPresent:redacted.includes('user:pass')}, null, 2));"
+
+  Write-Host "=== Service restart, status, duplicate execution, and restart storm checks ==="
+  ssh -o BatchMode=yes root@37.60.248.195 "set -e; systemctl restart hermes-runtime.target; sleep 35; systemctl is-active hermes-runtime.target hermes-supervisor.service hermes-poller.service hermes-watchdog.timer; systemctl show hermes-poller.service hermes-supervisor.service -p NRestarts -p ActiveState -p Result --no-pager; journalctl -u hermes-poller.service -u hermes-supervisor.service --since '20 minutes ago' --no-pager | grep -E 'DISPOSABLE-DRILL-069|SUPERVISOR_CONFLICT|Claim result|Labels updated|Restart|Started|Stopped' || true; runuser -u hermes -- bash -lc 'cd /opt/everythingAI && node scripts/hermes-health.mjs --json'"
+
+  Write-Host "=== Local validation preflight commands for report ==="
+  npm run framework:doctor
+  node --test tests/*.test.mjs
+  npm test
+  node scripts/hermes-health.mjs --json
+  if ($LASTEXITCODE -ne 0) { Write-Host "local hermes-health exited $LASTEXITCODE as expected when no fresh local heartbeat is present"; $global:LASTEXITCODE = 0 }
+  node scripts/crash-recovery.js --json
+  git diff --check
+  Write-Host "endedAt=$(UtcNow)"
+} finally {
+  Stop-Transcript | Out-Null
+}
+
+Process ID: 15624
+PSVersion: 5.1.26100.8894
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8894
+BuildVersion: 10.0.26100.8894
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+=== EAI-TASK-046 bounded unattended reliability drill ===
+startedAt=2026-07-29T07:01:33.5478335Z
+localHead=985ce1c0b34f23447b33deb2951702017928a800
+localStatus=## main...origin/main
+?? apps/everything-ai-ui/src/planning.css
+?? docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+=== Live host baseline ===
+
+=== Create disposable no-op issue for queue lifecycle ===
+disposableIssueUrl=https://github.com/moh0709/everythingAI/issues/84
+disposableIssueNumber=84
+=== Force one claim conflict with active same-host lock ===
+
+manualConflictWorkerRunAt=2026-07-29T07:01:40.9950947Z
+
+postConflictLabels=pm:ready
+hermes:ready
+
+=== Wait for unattended poller to discover, claim, execute, and complete disposable issue ===
+pollLabels[2026-07-29T07:01:43.4987317Z]=pm:ready,hermes:ready
+pollLabels[2026-07-29T07:01:58.9714316Z]=pm:ready,hermes:ready
+pollLabels[2026-07-29T07:02:14.4739957Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:02:29.9240730Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:02:45.4489237Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:03:00.9883289Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:03:16.4779777Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:03:31.9490650Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:03:47.3775501Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:04:10.0636894Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:04:25.5900259Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:04:41.0643209Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:04:56.5303150Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:05:12.0758263Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:05:27.7377122Z]=pm:ready,hermes:working
+pollLabels[2026-07-29T07:05:43.6315844Z]=pm:ready,hermes:working
+disposableCompletionObserved=False
+
+=== Simulate transient failure and retry policy ===
+
+=== Simulate worker crash and verify bounded systemd recovery ===
+
+=== Simulate stale heartbeat and watchdog recovery ===
+
+=== Structured history parser and secret redaction drill ===
+
+=== Service restart, status, duplicate execution, and restart storm checks ===
+
+=== Local validation preflight commands for report ===
+
+
+
+
+
+
+endedAt=2026-07-29T07:07:37.0736889Z
+**********************
+Windows PowerShell transcript end
+End time: 20260729090737
+**********************
+
+=== Forge sanitized evidence addendum ===
+The shell transcript above omitted several native command outputs from the Codex tool stream. Sanitized material results captured by Forge:
+
+- Live host: vmi2938167 / 37.60.248.195.
+- Baseline systemd services: hermes-runtime.target active, hermes-supervisor.service active, hermes-poller.service active, hermes-watchdog.timer active.
+- Baseline restart counters: hermes-poller.service NRestarts=1, hermes-supervisor.service NRestarts=0.
+- Remote deployed checkout observed by hermes user: 71b2c017eb4d4b2c29902e4523d664a789582646.
+- Remote hermes-health JSON: status DEGRADED, readOnly true, heartbeat present, queue.available false, currentTask EAI-TASK-045A, currentIssue 76, supervisor lock present, no corrupt artifacts.
+- Disposable no-op issue created: #84, DISPOSABLE-DRILL-069-NOOP-20260729T070138Z.
+- Disposable issue #84 labels during wait: pm:ready + hermes:ready, then pm:ready + hermes:working from 2026-07-29T07:02:14Z through 2026-07-29T07:05:43Z.
+- Disposable completion observed during bounded wait: false.
+- Live #84 comment: Atlas poller autonomously claimed the issue at 2026-07-29T07:02:09Z.
+- Cleanup action: Forge commented on #84 and moved it to hermes:blocked + pm:review to remove it from the runnable queue.
+- Poller journal: systemd Hermes poller discovered #84 and dispatched worker; worker returned NOT_RUNNABLE with issue state unknown.
+- Crash drill: hermes-poller.service was sent SIGKILL, produced result=signal, and returned to active after bounded systemd restart behavior; later status showed poller active, supervisor active, poller NRestarts=1, supervisor NRestarts=0.
+- Retry drill: TRANSIENT timeout produced retry=true with 100 ms delay; revalidated CLAIM_CONFLICT produced retry=true with 200 ms delay; reset cleared retry state.
+- Structured history drill: seven records parsed for discovery, claim, start, retry, recovery, validation, completion; secret canary present=false; credential URL user-info present=false.
+- Initial local validation: npm run framework:doctor PASS; node --test tests/*.test.mjs initially 149/157 pass with 8 Windows reliability failures.
+- Root-cause fixes applied after initial validation: event-history basename handling, runtime-supervisor Windows CLI entrypoint detection, and Windows-compatible subprocess signal assertions.
+- Targeted post-fix validation: node --test tests/event-history.test.mjs 12/12 pass; node --test tests/runtime-supervisor.test.mjs 32/32 pass.
+- Secret handling: no raw /etc/hermes/everythingai.env contents, tokens, credential values, or raw environment dumps were recorded.

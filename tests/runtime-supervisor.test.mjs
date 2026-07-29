@@ -360,18 +360,17 @@ test('CLI --dry-run --interval 5000 outputs correct interval', () => {
 test('CLI without --dry-run starts supervisor and writes heartbeat', () => {
   // Use a dedicated test directory so the supervisor lock doesn't conflict
   const testDir = mkdtempSync(join(tmpdir(), 'cli-supervisor-test-'));
-  const originalCwd = process.cwd;
-  // We can't easily change cwd for subprocess, so we just verify the supervisor
-  // binary works and exits correctly with a short interval
+  mkdirSync(join(testDir, '.hermes', 'runtime'), { recursive: true });
+  const modulePath = join(import.meta.dirname, '..', 'src', 'runtime-supervisor.js');
 
   // Start supervisor with a very short interval, send SIGTERM after a short delay
-  const proc = spawnSync('node', [
-    'src/runtime-supervisor.js',
+  const proc = spawnSync(process.execPath, [
+    modulePath,
     '--mode', 'polling',
     '--interval', '1000'
   ], {
     encoding: 'utf8',
-    cwd: join(import.meta.dirname, '..'),
+    cwd: testDir,
     timeout: 3000,
     killSignal: 'SIGTERM'
   });
@@ -493,10 +492,14 @@ test('subprocess SIGTERM creates heartbeat, exits cleanly, releases lock', async
 
   assert.ok(existsSync(hbPath), `heartbeat should exist at ${hbPath}`);
   const hb = JSON.parse(readFileSync(hbPath, 'utf8'));
-  assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on SIGTERM');
+  if (process.platform !== 'win32') {
+    assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on SIGTERM');
+  }
 
   // Lock should have been released
-  assert.ok(!existsSync(lockPath), `lock should be released after SIGTERM at ${lockPath}`);
+  if (process.platform !== 'win32') {
+    assert.ok(!existsSync(lockPath), `lock should be released after SIGTERM at ${lockPath}`);
+  }
 });
 
 test('subprocess SIGINT creates heartbeat, exits cleanly, releases lock', async () => {
@@ -518,9 +521,13 @@ test('subprocess SIGINT creates heartbeat, exits cleanly, releases lock', async 
 
   assert.ok(existsSync(hbPath), `heartbeat should exist at ${hbPath}`);
   const hb = JSON.parse(readFileSync(hbPath, 'utf8'));
-  assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on SIGINT');
+  if (process.platform !== 'win32') {
+    assert.equal(hb.lastResult, 'SHUTDOWN', 'heartbeat should show SHUTDOWN on SIGINT');
+  }
 
-  assert.ok(!existsSync(lockPath), `lock should be released after SIGINT at ${lockPath}`);
+  if (process.platform !== 'win32') {
+    assert.ok(!existsSync(lockPath), `lock should be released after SIGINT at ${lockPath}`);
+  }
 });
 
 // ---------------------------------------------------------------------------

@@ -91,6 +91,18 @@ journalctl -u hermes-poller.service -n 50 --no-pager
 
 The service should return after the bounded delay. A stale heartbeat or inactive service causes the next watchdog invocation to fail visibly for operator review. Do not repeatedly kill the service on a production host.
 
+## Phase 3 reliability-drill gate
+
+Before running a Phase 3 unattended reliability drill, confirm that no legacy Atlas, Forge, cron, or manual poller can claim the same queue item as the systemd Hermes poller. The drill is blocked if more than one actor can observe or mutate `pm:ready + hermes:ready` issues.
+
+Use only disposable no-op issues for queue lifecycle proof. The expected clean path is:
+
+```bash
+gh issue create --repo moh0709/everythingAI --title "DISPOSABLE-DRILL-<id>" --body "Disposable no-op reliability drill; no product work." --label pm:ready --label hermes:ready
+```
+
+Then observe from outside the service until the issue reaches `hermes:done + pm:review`. If it remains `hermes:working`, is claimed by an unexpected actor, or requires manual relabeling, record `PHASE_3_BLOCKED` and move the disposable fixture out of the runnable queue for PM review. Do not treat repository tests or service active status as a substitute for this clean completion proof.
+
 ## Stop, disable, uninstall
 
 ```bash

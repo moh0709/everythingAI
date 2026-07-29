@@ -2,7 +2,7 @@
 /** Versioned, append-only Hermes operational event history. */
 
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, unlinkSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
 export const HISTORY_SCHEMA_VERSION = 1;
@@ -61,7 +61,7 @@ function rotateIfNeeded(historyPath, config, fsOps) {
   if (!fsOps.existsSync(historyPath) || fsOps.statSync(historyPath).size < config.maxBytes) return;
   const dir = dirname(historyPath);
   const base = historyPath.endsWith('.ndjson') ? historyPath.slice(0, -7) : historyPath;
-  const prefix = `${base.split('/').pop()}.`;
+  const prefix = `${basename(base)}.`;
   const existing = fsOps.readdirSync(dir)
     .filter((name) => new RegExp(`^${prefix.replace('.', '\\.') }\\d{12}\\.ndjson$`).test(name));
   const sequence = existing.reduce((highest, name) => {
@@ -88,7 +88,7 @@ export function appendEvent(historyPath, event, options = {}) {
   appendFileSync(historyPath, line, { encoding: 'utf8', flag: 'a' });
   if (rotation) {
     const files = fsOps.readdirSync(rotation.dir)
-      .filter((name) => new RegExp(`^${rotation.base.split('/').pop()}\\.\\d{12}\\.ndjson$`).test(name))
+      .filter((name) => new RegExp(`^${basename(rotation.base)}\\.\\d{12}\\.ndjson$`).test(name))
       .sort((left, right) => {
         const leftSequence = Number(left.match(/\.(\d{12})\.ndjson$/)?.[1] ?? 0);
         const rightSequence = Number(right.match(/\.(\d{12})\.ndjson$/)?.[1] ?? 0);

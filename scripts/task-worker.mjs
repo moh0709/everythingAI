@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import {
   ensureDir,
@@ -286,7 +287,7 @@ export async function runTaskWorker({
   });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await runTaskWorker();
   if (result && result.ok === false && result.result === CLAIM_RESULTS.RUNTIME_ERROR) {
     process.exitCode = 1;

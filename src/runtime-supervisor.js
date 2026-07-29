@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync, unlinkS
 import { hostname as getHostname } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const RUNTIME_DIR = resolve('.hermes', 'runtime');
 const HEARTBEAT_PATH = resolve(RUNTIME_DIR, 'heartbeat.json');
@@ -513,7 +514,7 @@ async function runSupervisorCli() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   runSupervisorCli().catch((error) => {
     console.error(`[runtime-supervisor] Fatal error: ${error.message}`);
     process.exit(1);

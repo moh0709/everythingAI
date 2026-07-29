@@ -1,0 +1,63 @@
+{
+  "task": "EAI-TASK-046",
+  "issue": 69,
+  "agent": "Forge",
+  "status": "BLOCKED",
+  "phaseDecision": "PHASE_3_BLOCKED",
+  "startedAt": "2026-07-29T07:01:33Z",
+  "observationEndedAt": "2026-07-29T07:07:37Z",
+  "observationWindow": "approximately 6 minutes",
+  "startingSha": "985ce1c0b34f23447b33deb2951702017928a800",
+  "host": "vmi2938167 / 37.60.248.195",
+  "disposableIssue": 84,
+  "decisionSummary": "Live services were active and bounded restart behavior was evidenced, but the unattended disposable queue task did not complete cleanly. The task was externally claimed by an Atlas poller comment and remained hermes:working until Forge moved the fixture to hermes:blocked + pm:review.",
+  "passedEvidence": [
+    "Prerequisite issues #76 and #68 were live-verified closed with PM acceptance comments before execution.",
+    "hermes-runtime.target, hermes-supervisor.service, hermes-poller.service, and hermes-watchdog.timer were active on the live host.",
+    "A SIGKILL to hermes-poller.service produced bounded systemd recovery with no restart storm observed.",
+    "Retry policy simulation produced bounded retry states for TRANSIENT and revalidated CLAIM_CONFLICT failures.",
+    "Structured history parser simulation parsed seven sanitized records and did not expose secret canaries.",
+    "Disposable issue #84 did not show duplicate completion."
+  ],
+  "blockers": [
+    {
+      "blocker": "Clean unattended queue completion not observed",
+      "evidence": "Disposable issue #84 remained pm:ready + hermes:working for the 4-minute completion wait and had only an Atlas poller claim comment.",
+      "impact": "Phase 3 cannot be accepted because queue lifecycle completion after recovery is a required criterion."
+    },
+    {
+      "blocker": "Queue ownership ambiguity",
+      "evidence": "Issue #84 was claimed by an external Atlas poller while #69 was assigned to Forge and the systemd Hermes poller was also active.",
+      "impact": "Single ownership is not proven."
+    },
+    {
+      "blocker": "Remote health queue availability false",
+      "evidence": "Remote hermes-health JSON reported queue.available=false while services were active.",
+      "impact": "Health and queue readiness require follow-up validation from the exact systemd service environment."
+    }
+  ],
+  "validation": {
+    "frameworkDoctorInitial": "PASS",
+    "nodeTestsInitial": "149/157 PASS; 8 failures in Windows reliability validation before fixes",
+    "targetedEventHistoryAfterFix": "12/12 PASS",
+    "targetedRuntimeSupervisorAfterFix": "32/32 PASS",
+    "fullSuiteFinal": "157/157 PASS",
+    "npmTestFinal": "157/157 PASS",
+    "healthCliJson": "PASS JSON parse; local status UNKNOWN because no local heartbeat is expected",
+    "crashRecoveryCliJson": "PASS JSON parse; conservative MANUAL_REVIEW_REQUIRED observed for generated test heartbeat before cleanup",
+    "historyParser": "PASS",
+    "systemdStatus": "PASS; four live units active",
+    "gitDiffCheck": "PASS",
+    "jsonChecks": "PASS"
+  },
+  "artifacts": [
+    "REPORTS/PHASE-3-HERMES-WORKER-RELIABILITY-ACCEPTANCE.md",
+    "docs/HANDOVER_2026-07-15_PHASE_3_HERMES_RELIABILITY.json",
+    "LOGS/EAI-TASK-046-terminal.log",
+    "docs/HERMES_RUNTIME_RUNBOOK.md",
+    ".hermes/state.json"
+  ],
+  "secrets": "No raw environment values or secrets recorded. Environment file was inspected only by path, owner, group, mode, and size metadata.",
+  "nextAction": "Fence or disable Atlas poller ownership, verify GitHub queue access from the exact systemd Hermes service environment, rerun the disposable no-op reliability drill, then run a longer soak gate.",
+  "atlasCreation": "NOT_AUTHORIZED"
+}

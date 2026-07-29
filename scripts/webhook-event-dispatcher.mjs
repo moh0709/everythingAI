@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import { claimRunnableIssue, CLAIM_RESULTS } from '../src/task-claim.js';
 import { executeClaimedTask } from './task-worker.mjs';
@@ -306,6 +307,6 @@ async function main() {
   console.log(JSON.stringify(result, null, 2));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   await main();
 }

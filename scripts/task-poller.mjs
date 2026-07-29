@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
+import { pathToFileURL } from 'node:url';
 import { detectRuntimeMode, RUNTIME_MODES } from '../src/runtime-mode.js';
 import { listRunnableIssues, summarizeIssue } from '../src/task-queue.js';
 
@@ -83,7 +84,7 @@ export async function runPollingEntry({
   return pollOnce({ listIssues, dispatchWorker, watch: false });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await runPollingEntry();
   if (result && result.ok === false) {
     process.exitCode = 1;

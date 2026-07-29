@@ -16,7 +16,7 @@ import { existsSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, readdir
 import { hostname as getHostname } from 'node:os';
 import { resolve, dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 // ---------------------------------------------------------------------------
 // Paths — configurable for test injection
@@ -840,6 +840,6 @@ async function runCli() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   runCli();
 }

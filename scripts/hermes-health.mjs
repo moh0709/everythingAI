@@ -4,6 +4,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { readHistory, redactPayload } from '../src/event-history.js';
 
 const ROOT = resolve(new URL('..', import.meta.url).pathname);
@@ -133,7 +134,7 @@ export function formatHuman(snapshot) {
   return [`Hermes health: ${snapshot.status}`, `Queue ready: ${snapshot.queue.ready ?? 'unknown'}`, `Current task: ${snapshot.currentTask ?? 'none'}`, `Last completed: ${snapshot.lastCompletedTask ?? 'none'}`, `Heartbeat age: ${snapshot.heartbeat.ageMs == null ? 'unknown' : `${Math.round(snapshot.heartbeat.ageMs / 1000)}s`}`, `Retry: ${snapshot.retry ? `${snapshot.retry.failureClass ?? 'unknown'} attempt ${snapshot.retry.attempt ?? '?'}` : 'none'}`, `Metrics: ${Object.entries(snapshot.metrics).map(([key, value]) => `${key}=${value}`).join(', ')}`].join('\n');
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const rootFlag = process.argv.indexOf('--root');
   const requestedRoot = rootFlag >= 0 && process.argv[rootFlag + 1] ? resolve(process.argv[rootFlag + 1]) : ROOT;
   const snapshot = inspectHealth({ paths: pathsForRoot(requestedRoot), queue: () => queueSnapshot(requestedRoot) });
