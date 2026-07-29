@@ -2,54 +2,43 @@
   "task": "EAI-TASK-046",
   "issue": 69,
   "agent": "Forge",
-  "status": "BLOCKED",
-  "phaseDecision": "PHASE_3_BLOCKED",
-  "startedAt": "2026-07-29T07:01:33Z",
-  "observationEndedAt": "2026-07-29T07:07:37Z",
-  "observationWindow": "approximately 6 minutes",
-  "startingSha": "985ce1c0b34f23447b33deb2951702017928a800",
-  "artifactCommitSha": "63265bd5f38d46fd67473f5ecb51d4c4a066eb40",
+  "status": "PASS_READY_FOR_PM_SUBMISSION",
+  "phaseDecision": "PHASE_3_ACCEPTED",
+  "rerunDate": "2026-07-29",
+  "startedAt": "2026-07-29T09:41:33Z",
+  "observationEndedAt": "2026-07-29T09:56:16Z",
+  "observationWindow": "approximately 14 minutes 43 seconds",
+  "soak24Hour": {
+    "performed": false,
+    "reason": "A 24-hour soak was not feasible in the bounded Codex worker session.",
+    "followUpGateRecommended": true
+  },
+  "startingSha": "cd777d63d9252005fec437bf6e3e1f87655ad3b0",
   "host": "vmi2938167 / 37.60.248.195",
-  "disposableIssue": 84,
-  "decisionSummary": "Live services were active and bounded restart behavior was evidenced, but the unattended disposable queue task did not complete cleanly. The task was externally claimed by an Atlas poller comment and remained hermes:working until Forge moved the fixture to hermes:blocked + pm:review.",
+  "deployedCheckoutSha": "cd777d63d9252005fec437bf6e3e1f87655ad3b0",
+  "disposableIssue": 90,
+  "decisionSummary": "After accepted #87 remediation, systemd Hermes completed a fresh disposable no-op issue through unattended discovery, claim, execution, completion, and queue return. No duplicate execution or restart storm was observed.",
   "passedEvidence": [
-    "Prerequisite issues #76 and #68 were live-verified closed with PM acceptance comments before execution.",
-    "hermes-runtime.target, hermes-supervisor.service, hermes-poller.service, and hermes-watchdog.timer were active on the live host.",
-    "A SIGKILL to hermes-poller.service produced bounded systemd recovery with no restart storm observed.",
+    "Prerequisite issues #76 and #68 were live-verified closed with PM acceptance comments before #69 rerun.",
+    "Issue #87 was accepted and closed before #69 rerun, preserving Atlas delegation fencing.",
+    "Remote checkout was fast-forwarded with git pull --ff-only origin main to cd777d63d9252005fec437bf6e3e1f87655ad3b0.",
+    "hermes-runtime.target, hermes-supervisor.service, hermes-poller.service, and hermes-watchdog.timer were active after update, after deliberate crash recovery, and during the final stability window.",
+    "Disposable no-op issue #90 was claimed once at 2026-07-29T09:42:35Z and completed once at 2026-07-29T09:42:36Z.",
+    "Live queue query for open pm:ready + hermes:ready issues returned an empty array after completion.",
     "Retry policy simulation produced bounded retry states for TRANSIENT and revalidated CLAIM_CONFLICT failures.",
-    "Structured history parser simulation parsed seven sanitized records and did not expose secret canaries.",
-    "Disposable issue #84 did not show duplicate completion."
-  ],
-  "blockers": [
-    {
-      "blocker": "Clean unattended queue completion not observed",
-      "evidence": "Disposable issue #84 remained pm:ready + hermes:working for the 4-minute completion wait and had only an Atlas poller claim comment.",
-      "impact": "Phase 3 cannot be accepted because queue lifecycle completion after recovery is a required criterion."
-    },
-    {
-      "blocker": "Queue ownership ambiguity",
-      "evidence": "Issue #84 was claimed by an external Atlas poller while #69 was assigned to Forge and the systemd Hermes poller was also active.",
-      "impact": "Single ownership is not proven."
-    },
-    {
-      "blocker": "Remote health queue availability false",
-      "evidence": "Remote hermes-health JSON reported queue.available=false while services were active.",
-      "impact": "Health and queue readiness require follow-up validation from the exact systemd service environment."
-    }
+    "Stale-heartbeat watchdog simulation returned HEARTBEAT_STALE, then restored watchdog returned HEALTHY.",
+    "Structured history parser simulation parsed seven sanitized records and did not expose secret canaries or credential URL user-info.",
+    "Final stability observation collected 10 samples over approximately 10 minutes with all four units active and queue.available true."
   ],
   "validation": {
-    "frameworkDoctorInitial": "PASS",
-    "nodeTestsInitial": "149/157 PASS; 8 failures in Windows reliability validation before fixes",
-    "targetedEventHistoryAfterFix": "12/12 PASS",
-    "targetedRuntimeSupervisorAfterFix": "32/32 PASS",
-    "fullSuiteFinal": "157/157 PASS",
-    "npmTestFinal": "157/157 PASS",
-    "healthCliJson": "PASS JSON parse; local status UNKNOWN because no local heartbeat is expected",
-    "crashRecoveryCliJson": "PASS JSON parse; conservative MANUAL_REVIEW_REQUIRED observed for generated test heartbeat before cleanup",
-    "historyParser": "PASS",
-    "systemdStatus": "PASS; four live units active",
-    "gitDiffCheck": "PASS",
-    "jsonChecks": "PASS"
+    "frameworkDoctor": "PASS",
+    "nodeTests": "164/164 PASS",
+    "npmTest": "164/164 PASS",
+    "healthCliJson": "VALID JSON; local status UNKNOWN because no local heartbeat is expected",
+    "historyParser": "PASS one completion record; secret canary and credential URL absent",
+    "systemdStatus": "PASS installed units verified; four live units active",
+    "gitDiffCheck": "PENDING_FINAL_METADATA_RUN",
+    "jsonChecks": "PASS handover and state JSON"
   },
   "artifacts": [
     "REPORTS/PHASE-3-HERMES-WORKER-RELIABILITY-ACCEPTANCE.md",
@@ -58,7 +47,33 @@
     "docs/HERMES_RUNTIME_RUNBOOK.md",
     ".hermes/state.json"
   ],
-  "secrets": "No raw environment values or secrets recorded. Environment file was inspected only by path, owner, group, mode, and size metadata.",
-  "nextAction": "Fence or disable Atlas poller ownership, verify GitHub queue access from the exact systemd Hermes service environment, rerun the disposable no-op reliability drill, then run a longer soak gate.",
-  "atlasCreation": "NOT_AUTHORIZED"
+  "riskRegister": [
+    {
+      "risk": "24-hour soak not performed",
+      "status": "OPEN",
+      "impact": "MEDIUM",
+      "control": "Create a follow-up soak gate before broad autonomous expansion."
+    },
+    {
+      "risk": "Health CLI reports DEGRADED because supervisor lock is present",
+      "status": "OPEN",
+      "impact": "MEDIUM",
+      "control": "Clarify expected supervisor-lock health semantics without weakening read-only health behavior."
+    },
+    {
+      "risk": "Future non-delegated Atlas/Forge queue overlap",
+      "status": "CONTROLLED",
+      "impact": "CRITICAL",
+      "control": "Retain #87 delegation fence and require explicit PM delegation labels."
+    },
+    {
+      "risk": "Secret exposure in evidence",
+      "status": "CONTROLLED",
+      "impact": "CRITICAL",
+      "control": "No raw environment file contents, tokens, credential stores, or raw env dumps are recorded."
+    }
+  ],
+  "secrets": "No raw environment values or secrets recorded. Environment file and credential store contents were not printed.",
+  "atlasCreation": "NOT_PERFORMED_REQUIRES_PM_DECISION_AFTER_ACCEPTANCE",
+  "nextAction": "PM independently reviews #69. If accepted, create a separate 24-hour soak gate and only then consider explicit Atlas delegation scope."
 }

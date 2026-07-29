@@ -2,77 +2,83 @@
 
 Issue: #69 / EAI-TASK-046
 Agent: Forge
-Decision: `PHASE_3_BLOCKED`
-Artifact commit: `63265bd5f38d46fd67473f5ecb51d4c4a066eb40`
-Observation window: 2026-07-29T07:01:33Z through 2026-07-29T07:07:37Z, approximately 6 minutes. A 24-hour soak was not feasible in this bounded Codex worker session.
+Decision: `PHASE_3_ACCEPTED`
+Rerun date: 2026-07-29
+Starting SHA: `cd777d63d9252005fec437bf6e3e1f87655ad3b0`
+Deployed host: `vmi2938167 / 37.60.248.195`
+Deployed checkout during drill: `cd777d63d9252005fec437bf6e3e1f87655ad3b0`
 
 ## Executive Decision
 
-Phase 3 is blocked, not accepted.
+Phase 3 is accepted for the bounded reliability gate.
 
-The live systemd services were active and bounded restart behavior was evidenced, but the unattended queue lifecycle did not complete cleanly. Disposable drill issue #84 was claimed by an external Atlas poller comment and remained `pm:ready + hermes:working` through the bounded observation window. The systemd Hermes poller logged `NOT_RUNNABLE`, and no `hermes:done + pm:review` clean completion was observed for that disposable task. Forge moved the disposable fixture out of the runnable queue to `hermes:blocked + pm:review` for PM inspection.
+After the accepted #87 queue-ownership remediation, Forge reran the #69 unattended reliability drill against fresh disposable issue #90. The systemd Hermes poller discovered the fixture, claimed it, executed the no-op lifecycle, completed it as `hermes:done + pm:review`, returned the `pm:ready + hermes:ready` queue to empty, and showed no duplicate execution.
 
-Atlas must not be created from this result.
+A 24-hour soak was not feasible in this bounded Codex worker session. The observation window for this rerun was 2026-07-29T09:41:33Z through 2026-07-29T09:56:16Z, approximately 14 minutes 43 seconds including a 10-minute post-completion stability watch. A follow-up 24-hour soak gate remains recommended before expanding Atlas or other autonomous delegation.
+
+Atlas creation is not performed by this task. It may be considered only after PM accepts this result and explicitly delegates the next Atlas scope.
 
 ## Acceptance Matrix
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| All preceding Phase 3 tasks accepted | Pass | Live GitHub #76 closed with PM acceptance; #68 closed with PM acceptance before #69 release. |
-| Automatic startup or service restart | Pass | `hermes-runtime.target`, `hermes-supervisor.service`, `hermes-poller.service`, and `hermes-watchdog.timer` active on `vmi2938167 / 37.60.248.195`; restart of `hermes-runtime.target` returned all four active. |
-| Heartbeat continuity | Pass with limitation | Live health showed heartbeat present and fresh after restart; health status remains `DEGRADED` because supervisor lock presence is treated conservatively by the read-only CLI. |
-| Single ownership | Blocked | Disposable #84 was claimed by an external Atlas poller while Forge was running the drill; no duplicate completion was observed, but ownership ambiguity blocks acceptance. |
-| Queue discovery, claim, execution, validation, completion, queue return | Blocked | #84 was discovered and moved to `hermes:working`, but clean completion was not observed within 4 minutes. |
-| Retry behavior | Pass | Deterministic retry-policy drill produced retryable `TRANSIENT` and revalidated `CLAIM_CONFLICT` states with bounded backoff. |
-| Crash recovery | Pass with limitation | `systemctl kill --signal=SIGKILL hermes-poller.service` produced a bounded restart path; service returned active after the restart cycle. |
-| Structured history | Pass | Local parser drill wrote and parsed seven sanitized event-history records: discovery, claim, start, retry, recovery, validation, completion. Secret canaries and credential URL user-info were absent from parsed JSON. |
-| Health CLI JSON validation | Pass with limitation | Local and remote CLI output was valid JSON; remote status was `DEGRADED` because queue availability was false and a supervisor lock was present. |
-| Watchdog recovery | Partial | The intended stale-heartbeat simulation command had quoting failure in the first drill run; subsequent service restart restored fresh heartbeat. This is not enough to claim full watchdog recovery for #69. |
-| Simulated transient failure | Pass | Retry-policy fixture recorded retryable transient timeout evidence. |
-| Claim conflict | Partial | The manual same-host claim-lock fixture command was malformed by shell quoting, but the live systemd poller logged a `NOT_RUNNABLE` dispatch and the task remained externally claimed. |
-| Worker crash | Pass | Poller was killed with SIGKILL and systemd returned it to active state without storm. |
-| Stale-state reconciliation | Pass | Repository crash-recovery tests exercise stale heartbeat, stale claim lock, cross-host lock, and manual review cases. |
-| Clean completion after recovery | Fail | #84 did not reach `hermes:done + pm:review`; Forge moved it to blocked review. |
-| No duplicate task execution | Pass with limitation | No duplicate completion comments or duplicate done labels were observed on #84; no clean completion occurred. |
-| No restart storm | Pass | `NRestarts` remained bounded: poller `1`, supervisor `0` in the post-drill status sample. |
-| No secrets in artifacts | Pass | No secret values or raw environment contents were printed; `/etc/hermes/everythingai.env` was inspected only by metadata. |
+| All preceding Phase 3 tasks accepted | Pass | Live GitHub #76 and #68 are closed with PM acceptance comments; #87 was accepted and closed before this #69 rerun. |
+| Automatic startup or service restart | Pass | Host runtime was stopped, fast-forwarded to `cd777d63`, then `hermes-runtime.target`, `hermes-supervisor.service`, `hermes-poller.service`, and `hermes-watchdog.timer` restarted active. |
+| Heartbeat continuity | Pass with limitation | Health JSON remained valid with fresh heartbeat through the stability window. Status is `DEGRADED` because the read-only health CLI treats the expected supervisor lock as conservative degradation. |
+| Single ownership | Pass | Atlas fence from #87 remained in place; #90 had exactly one `CLAIMED` comment and one `PASS` comment from Hermes. |
+| Queue discovery, claim, execution, validation, completion, queue return | Pass | #90 was discovered by systemd poller, claimed at 2026-07-29T09:42:35Z, completed at 2026-07-29T09:42:36Z, and live queue query returned `[]`. |
+| Retry behavior | Pass | Deterministic retry-policy drill produced retryable `TRANSIENT` and revalidated `CLAIM_CONFLICT` states with bounded backoff, then reset cleanly. |
+| Crash recovery | Pass | `hermes-poller.service` was killed with SIGKILL and recovered through bounded systemd restart to active state. |
+| Structured history | Pass | Parser drill wrote and parsed seven sanitized records: discovery, claim, start, retry, recovery, validation, completion. Secret canary and credential URL user-info were absent. |
+| Health CLI JSON validation | Pass with limitation | Local and remote health CLI outputs were valid JSON. Remote queue availability was true with ready count 0; local status is expected to be `UNKNOWN` where no local heartbeat exists. |
+| Watchdog recovery | Pass | Stale-heartbeat simulation returned `HEARTBEAT_STALE`; heartbeat was restored and watchdog returned `HEALTHY`. |
+| Simulated transient failure | Pass | Retry-policy fixture recorded retryable sanitized timeout evidence. |
+| Claim conflict | Pass | A same-host active claim lock forced a worker claim conflict before the lock was removed for unattended completion. |
+| Worker crash | Pass | Poller SIGKILL recovery returned active without unbounded restarts. |
+| Stale-state reconciliation | Pass | Stale heartbeat was detected conservatively, restored, and health returned to fresh heartbeat evidence. Repository crash-recovery tests also cover stale locks and manual review cases. |
+| Clean completion after recovery | Pass | After #87 remediation and claim-conflict release, #90 completed as `hermes:done + pm:review`. |
+| No duplicate task execution | Pass | #90 had one claim comment and one pass comment; no duplicate completion was observed. |
+| No restart storm | Pass | Final samples showed poller and supervisor `NRestarts=0` after the final controlled restart window. The deliberate SIGKILL sample showed one bounded restart only. |
+| No secrets in artifacts | Pass | No raw `/etc/hermes/everythingai.env` contents, tokens, credential values, or raw environment dumps were recorded. |
 
 ## Validation Summary
 
-Initial full validation in the drill exposed Windows reliability test failures:
-
-- `event-history` rotation/retention used POSIX-only basename parsing.
-- `runtime-supervisor` CLI entrypoint compared `import.meta.url` with a raw Windows path, so CLI tests did not execute the entrypoint.
-- Runtime-supervisor subprocess signal assertions assumed Linux signal behavior on Windows.
-
-Forge made narrow reliability/test fixes and verified the targeted suites:
-
-- `node --test tests/event-history.test.mjs`: 12/12 pass.
-- `node --test tests/runtime-supervisor.test.mjs`: 32/32 pass.
-
-Final validation after artifact finalization:
+Fresh validation after artifact refresh:
 
 - `npm run framework:doctor`: PASS.
-- `node --test tests/*.test.mjs`: 157/157 pass.
-- `npm test`: 157/157 pass.
-- `node scripts/hermes-health.mjs --json` wrapper: JSON parsed; CLI status `UNKNOWN` locally because no local heartbeat is expected.
-- `node src/crash-recovery.js --json`: JSON parsed; returned `MANUAL_REVIEW_REQUIRED` for a generated test heartbeat before cleanup, which is conservative behavior.
-- History parser validation: PASS, one completion record parsed.
-- Live systemd status evidence: four units active; poller `NRestarts=1`, supervisor `NRestarts=0`.
+- `node --test tests/*.test.mjs`: PASS, 164/164.
+- `npm test`: PASS, 164/164.
+- `node scripts/hermes-health.mjs --json`: valid JSON; local status `UNKNOWN` and exit 1 because this Windows checkout has no local heartbeat.
+- History parser validation: PASS, one completion record parsed with secret canary and credential URL absent.
+- Remote systemd verification/status: PASS; installed units verified and four EverythingAI units active.
 - Handover and state JSON parsing: PASS.
-- `git diff --check`: PASS.
+- `git diff --check`: pending final metadata run after SHA alignment.
+
+Runtime validation already collected:
+
+- Remote queue before fixture: `[]`.
+- Remote checkout fast-forwarded with `git pull --ff-only origin main` to `cd777d63d9252005fec437bf6e3e1f87655ad3b0`.
+- Remote `npm ci --ignore-scripts`: PASS, no vulnerabilities.
+- Four systemd units active after update and after final restart.
+- #90 completion observed within the bounded wait.
+- Post-completion stability samples: 10 samples over approximately 10 minutes, all four units active, queue available with ready count 0.
 
 ## Metrics
 
 | Metric | Result |
 |---|---|
-| Observation duration | Approximately 6 minutes |
-| Disposable issue used | #84 |
-| Disposable issue final state | Open, `hermes:blocked + pm:review` |
-| Clean disposable completions | 0 |
+| Rerun observation duration | Approximately 14 minutes 43 seconds |
+| 24-hour soak | Not performed; follow-up gate recommended |
+| Disposable issue used | #90 |
+| Disposable issue final state during evidence collection | Open, `pm:ready + hermes:done + pm:review` |
+| Clean disposable completions | 1 |
 | Duplicate completions observed | 0 |
-| Poller restart count after crash/restart | 1 |
-| Supervisor restart count after drill | 0 |
+| Claim comments on #90 | 1 |
+| Completion comments on #90 | 1 |
+| Poller restart count during deliberate crash sample | 1 bounded restart |
+| Final poller restart count after final restart window | 0 |
+| Final supervisor restart count after final restart window | 0 |
+| Stability samples | 10 |
 | Event-history parser drill records | 7 |
 | Secret canary present in parser output | false |
 
@@ -80,13 +86,13 @@ Final validation after artifact finalization:
 
 | Risk | Status | Impact | Control / Remediation |
 |---|---|---:|---|
-| External Atlas poller claims disposable Hermes queue task | Open | Critical | Disable or fence Atlas poller before rerunning #69; prove only one worker owns the queue. |
-| Clean unattended completion not observed | Open | Critical | Rerun a disposable no-op task after ownership fencing and verify `hermes:done + pm:review`. |
-| Hermes service GitHub queue availability false in health CLI | Open | High | Verify `/etc/hermes/everythingai.env` and systemd service environment without exposing values; confirm `gh` access from the exact service environment. |
-| Watchdog stale-heartbeat drill command quoting failed | Open | Medium | Rerun stale-heartbeat simulation through a checked shell script or direct SSH here-doc, then restore heartbeat and verify watchdog healthy. |
-| 24-hour soak not performed | Open | Medium | Create a follow-up soak gate after clean bounded completion is proven. |
-| Windows validation drift | Mitigated | Medium | Path and CLI entrypoint fixes added; full suite rerun required before final submission. |
+| 24-hour soak not performed | Open | Medium | Add a separate 24-hour soak gate before broadening autonomous delegation or declaring long-duration operational maturity. |
+| Health CLI reports `DEGRADED` while service is otherwise healthy | Open | Medium | Clarify expected supervisor-lock semantics in a follow-up health UX task; current JSON remains accurate and read-only. |
+| Future Atlas or Forge queue overlap | Controlled | Critical | Keep #87 Atlas delegation fence active; require explicit PM delegation labels before Atlas can claim tasks. |
+| Host-wide systemd degraded state from unrelated units | Open | Low for Hermes | Avoid claiming global host health; continue reporting only EverythingAI unit status and known unrelated host state separately. |
+| Disposable issue left open for PM inspection | Controlled | Low | Close or archive disposable fixture #90 only after PM has inspected the evidence, unless PM directs immediate cleanup. |
+| Secret exposure in evidence | Controlled | Critical | Continue metadata-only env checks and redaction scans; never print env file contents or credential stores. |
 
 ## Epic #62 Recommendation
 
-Do not close Phase 3 and do not authorize Atlas creation from this run. The next valid action is a follow-up reliability rerun after queue ownership is fenced so Atlas and Hermes cannot both act on the same disposable queue item.
+Recommend accepting Phase 3 as `PHASE_3_ACCEPTED` for the bounded reliability gate. Do not create Atlas automatically from this result. PM should first accept #69, then decide whether to create a follow-up 24-hour soak gate and a separately scoped Atlas delegation task.

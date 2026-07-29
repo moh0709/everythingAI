@@ -169,3 +169,776 @@ The shell transcript above omitted several native command outputs from the Codex
 - Root-cause fixes applied after initial validation: event-history basename handling, runtime-supervisor Windows CLI entrypoint detection, and Windows-compatible subprocess signal assertions.
 - Targeted post-fix validation: node --test tests/event-history.test.mjs 12/12 pass; node --test tests/runtime-supervisor.test.mjs 32/32 pass.
 - Secret handling: no raw /etc/hermes/everythingai.env contents, tokens, credential values, or raw environment dumps were recorded.
+
+=== EAI-TASK-046 rerun after #87 remediation started 2026-07-29T09:41:33.6941061Z ===
+disposableIssueUrl=https://github.com/moh0709/everythingAI/issues/90
+disposableIssueNumber=90
+=== claim conflict fixture ===
+[task-worker] No runnable issue found.
+claim_lock_removed
+pollLabels[2026-07-29T09:41:38.1307818Z]=pm:ready,hermes:ready
+pollLabels[2026-07-29T09:41:53.6042485Z]=pm:ready,hermes:ready
+pollLabels[2026-07-29T09:42:09.0872575Z]=pm:ready,hermes:ready
+pollLabels[2026-07-29T09:42:24.6042935Z]=pm:ready,hermes:ready
+pollLabels[2026-07-29T09:42:40.1044782Z]=pm:ready,hermes:done,pm:review
+disposableCompletionObserved=True
+disposableIssueJson=LOGS/EAI-TASK-046-disposable-issue.json
+
+=== EAI-TASK-046 runtime evidence collection 2026-07-29T09:43:15.3541260Z ===
+--- issue #90 summary ---
+{"comments":["{\"task\":\"TASK-90\",\"status\":\"CLAIMED\",\"issue\":90,\"title\":\"DISPOSABLE-DRILL-069-RERUN-NOOP-20260729T094133Z\",\"claimedAt\":\"2026-07-29T09:42:35.098Z\",\"startingCommitSha\":\"cd777d63d9252005fec437bf6e3e1f87655ad3b0\",\"labels\":\"hermes:ready -\u003e hermes:working\",\"lock\":{\"pid\":1242285,\"hostname\":\"vmi2938167\",\"createdAt\":\"2026-07-29T09:42:32.652Z\"}}","{\"task\":\"TASK-90\",\"status\":\"PASS\",\"claim\":\"hermes:working -\u003e hermes:done\",\"report\":\"/opt/everythingAI/REPORTS/TASK-90-HERMES-WORKER-LIFECYCLE.md\",\"log\":\"/opt/everythingAI/LOGS/TASK-90-terminal.log\",\"finalCommitSha\":\"recorded in the final issue comment\",\"finalizationPattern\":\"Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.\"}"],"labels":["pm:ready","hermes:done","pm:review"],"number":90,"state":"OPEN","title":"DISPOSABLE-DRILL-069-RERUN-NOOP-20260729T094133Z"}
+--- live queue return ---
+[]
+--- retry policy transient and claim conflict simulation ---
+{
+  "first": {
+    "attempt": 1,
+    "failureClass": "TRANSIENT",
+    "lastEvidence": "sanitized transient timeout",
+    "updatedAt": "2026-07-29T09:45:00.000Z",
+    "startedAtMs": 1785318300000,
+    "nextRetryAt": "2026-07-29T09:45:00.100Z",
+    "delayMs": 100,
+    "retry": true,
+    "terminal": false
+  },
+  "conflict": {
+    "attempt": 2,
+    "failureClass": "CLAIM_CONFLICT",
+    "lastEvidence": "sanitized ownership conflict",
+    "updatedAt": "2026-07-29T09:45:00.100Z",
+    "startedAtMs": 1785318300000,
+    "nextRetryAt": "2026-07-29T09:45:00.300Z",
+    "delayMs": 200,
+    "retry": true,
+    "terminal": false
+  },
+  "reset": {}
+}
+--- structured history parser and redaction simulation ---
+{
+  "path": "C:\\Users\\MOHAME~1\\AppData\\Local\\Temp\\eai-task-046-rerun-history-JdsPBd\\events.ndjson",
+  "parsed": 7,
+  "types": [
+    "discovery",
+    "claim",
+    "start",
+    "retry",
+    "recovery",
+    "validation",
+    "completion"
+  ],
+  "secretCanaryPresent": false,
+  "credentialUrlPresent": false
+}
+--- worker crash recovery ---
+before
+NRestarts=0
+ActiveState=active
+SubState=running
+after
+Result=success
+NRestarts=1
+ActiveState=active
+SubState=running
+active
+--- stale heartbeat watchdog and recovery ---
+--- service restart and restart-storm check ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:44:15.789Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 5007,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 35731
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+=== runtime evidence collection complete 2026-07-29T09:44:16.5893382Z ===
+
+--- stale heartbeat watchdog rerun with corrected quoting 2026-07-29T09:44:35.7147437Z ---
+
+--- stale heartbeat watchdog rerun via ssh stdin script 2026-07-29T09:44:51.1053742Z ---
+stale_watchdog
+restored_watchdog
+{
+  "ok": true,
+  "result": "HEALTHY",
+  "service": "hermes-poller.service",
+  "ageMs": 4941
+}
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:45:26.943Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 5041,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 35600
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+
+=== post-completion bounded stability observation started 2026-07-29T09:45:57.9984093Z ===
+--- stability sample 1 2026-07-29T09:45:58.0352742Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:45:58.582Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 6654,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 67282
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 2 2026-07-29T09:46:59.2785393Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:47:00.516Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 8537,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 129286
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 3 2026-07-29T09:48:01.2785094Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:48:02.562Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 10523,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 191253
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 4 2026-07-29T09:49:03.2440026Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:49:04.645Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 12589,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 253502
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 5 2026-07-29T09:50:05.4901643Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:50:06.882Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 14765,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 315632
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 6 2026-07-29T09:51:07.6409351Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:51:08.841Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 16687,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 377519
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 7 2026-07-29T09:52:09.5094080Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:52:10.621Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 18419,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 439258
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 8 2026-07-29T09:53:11.2370325Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:53:12.396Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 20152,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 501063
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 9 2026-07-29T09:54:13.0390520Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:54:14.174Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 21921,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 562784
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+--- stability sample 10 2026-07-29T09:55:14.7574841Z ---
+active
+active
+active
+active
+Result=success
+NRestarts=0
+ActiveState=active
+
+Result=success
+NRestarts=0
+ActiveState=active
+{
+  "status": "DEGRADED",
+  "readOnly": true,
+  "generatedAt": "2026-07-29T09:55:15.947Z",
+  "queue": {
+    "available": true,
+    "ready": 0
+  },
+  "currentTask": "TASK-90",
+  "currentIssue": 90,
+  "lastCompletedTask": null,
+  "lastFailure": null,
+  "heartbeat": {
+    "present": true,
+    "ageMs": 23670,
+    "mode": "POLLING",
+    "lastResult": null
+  },
+  "locks": {
+    "claim": {
+      "present": false,
+      "ageMs": null
+    },
+    "supervisor": {
+      "present": true,
+      "ageMs": 624671
+    }
+  },
+  "retry": null,
+  "metrics": {
+    "discovered": 0,
+    "claimed": 0,
+    "completed": 0,
+    "blocked": 0,
+    "failed": 0,
+    "recovered": 0,
+    "retried": 0
+  },
+  "artifacts": {
+    "state": true,
+    "heartbeat": true,
+    "history": false,
+    "corrupt": false
+  }
+}
+=== post-completion bounded stability observation ended 2026-07-29T09:56:16.6479150Z ===
+
+=== Sanitized rerun evidence addendum ===
+- Fresh disposable issue: #90, DISPOSABLE-DRILL-069-RERUN-NOOP-20260729T094133Z.
+- Claim-conflict fixture: same-host active claim.lock caused the first manual worker attempt to return a claim conflict; the lock was removed before unattended processing.
+- Clean unattended completion: #90 had exactly one Hermes CLAIMED comment at 2026-07-29T09:42:35Z and one PASS comment at 2026-07-29T09:42:36Z.
+- Queue return: live open pm:ready + hermes:ready query returned [] after #90 completion.
+- Crash recovery: hermes-poller.service SIGKILL produced one bounded restart and returned active.
+- Watchdog stale path: corrected stdin-script rerun produced HEARTBEAT_STALE for a deliberately stale heartbeat, then restored heartbeat produced watchdog HEALTHY.
+- Stability observation: 10 samples from 2026-07-29T09:46:01Z through 2026-07-29T09:56:16Z showed hermes-runtime.target, hermes-supervisor.service, hermes-poller.service, and hermes-watchdog.timer active.
+- Final restart counters in stability samples: hermes-poller.service NRestarts=0, hermes-supervisor.service NRestarts=0 after the final controlled restart window.
+- Secret handling: no /etc/hermes/everythingai.env contents, tokens, credential values, or raw environment dumps were recorded.

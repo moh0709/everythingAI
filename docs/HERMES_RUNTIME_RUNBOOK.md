@@ -103,6 +103,8 @@ gh issue create --repo moh0709/everythingAI --title "DISPOSABLE-DRILL-<id>" --bo
 
 Then observe from outside the service until the issue reaches `hermes:done + pm:review`. If it remains `hermes:working`, is claimed by an unexpected actor, or requires manual relabeling, record `PHASE_3_BLOCKED` and move the disposable fixture out of the runnable queue for PM review. Do not treat repository tests or service active status as a substitute for this clean completion proof.
 
+For the bounded #69 rerun on 2026-07-29, the accepted clean path used disposable issue #90 after the #87 Atlas delegation fence was accepted. The fixture reached `hermes:done + pm:review`, the live `pm:ready + hermes:ready` queue returned empty, crash and stale-heartbeat recovery were observed, and no duplicate completion or restart storm was observed. This bounded gate does not replace a 24-hour soak; create a separate soak task before using the result to justify broader autonomous delegation.
+
 ## Stop, disable, uninstall
 
 ```bash
