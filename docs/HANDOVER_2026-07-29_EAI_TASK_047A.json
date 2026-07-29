@@ -1,0 +1,75 @@
+{
+  "task": "EAI-TASK-047A",
+  "issue": 93,
+  "agent": "Forge",
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "implementationCommitSha": "5a8e9f1f3b059ba091f6a78243166333c7287ff1",
+  "artifactCommitSha": "recorded in issue #93 final evidence comment after push",
+  "repository": {
+    "owner": "moh0709",
+    "name": "everythingAI",
+    "branch": "main",
+    "startingSha": "d47f597bf97f173dc6535856aa0f078265d71482"
+  },
+  "dependency": {
+    "issue92": "closed and accepted as truthful BLOCKED",
+    "preservedCommit": "a970335b7edf6b12c9a42aa5e9721df64ca099c5",
+    "issue69Modified": false,
+    "atlasAuthorized": false
+  },
+  "host": {
+    "name": "vmi2938167",
+    "address": "37.60.248.195",
+    "checkout": "/opt/everythingAI",
+    "observerService": "hermes-soak-observer.service",
+    "serviceEnabled": true,
+    "activeState": "active",
+    "subState": "running",
+    "mainPidAfterRestart": 1294207,
+    "nRestarts": 0
+  },
+  "observation": {
+    "startedAt": "2026-07-29T11:43:05.318Z",
+    "expectedCompletionAt": "2026-07-30T11:43:05.318Z",
+    "durationMs": 86400000,
+    "continuous24HourSoakCompleted": false,
+    "sampleCountAtSubmission": 4,
+    "deployedCommitSha": "5a8e9f1f3b059ba091f6a78243166333c7287ff1",
+    "observerIdentityAfterRestart": "vmi2938167:1294207",
+    "restartCount": 1
+  },
+  "artifacts": [
+    "REPORTS/EAI-TASK-047A-DURABLE-SOAK-OBSERVER.md",
+    "docs/HANDOVER_2026-07-29_EAI_TASK_047A.json",
+    "LOGS/EAI-TASK-047A-terminal.log",
+    "deploy/systemd/hermes-soak-observer.service",
+    "scripts/hermes-soak-observer.mjs",
+    "src/hermes-soak-observer.js",
+    "tests/hermes-soak-observer.test.mjs",
+    ".hermes/state.json"
+  ],
+  "validation": {
+    "frameworkDoctor": "PASS",
+    "targetedObserverRed": "PASS expected ERR_MODULE_NOT_FOUND before implementation",
+    "observerTests": "PASS 4/4",
+    "nodeTests": "PASS 169/169",
+    "npmTest": "PASS 169/169",
+    "systemdAnalyzeVerify": "PASS live host",
+    "liveStatus": "PASS observer enabled and active",
+    "restartContinuity": "PASS original start persisted after restart",
+    "duplicateInstance": "PASS OBSERVER_CONFLICT",
+    "initiatingSessionExitEvidence": "PASS service active after 70 second delay and sample count advanced",
+    "jsonParse": "PASS .hermes/state.json and handover JSON parsed before commit",
+    "gitDiffCheck": "PASS before artifact updates with CRLF normalization warnings only"
+  },
+  "secrets": {
+    "rawEnvironmentLogged": false,
+    "secretValuesRecorded": false,
+    "redaction": "observer uses event-history redaction and records only sanitized status fields"
+  },
+  "limitations": [
+    "The 24-hour soak is in progress and is not claimed complete in this task.",
+    "The live host pull left a prior runtime .hermes/state.json autostash conflict in the host checkout; the observer service and soak state are active, and this repository submission carries the current issue #93 state artifact."
+  ],
+  "nextGate": "After PM accepts and closes issue #93, create a separate verification task only after 2026-07-30T11:43:05.318Z."
+}

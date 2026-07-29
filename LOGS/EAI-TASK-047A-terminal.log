@@ -1,0 +1,88 @@
+EAI-TASK-047A durable soak observer terminal log
+Issue: #93
+Agent: Forge
+Sanitization: no raw environment values or secrets recorded.
+
+2026-07-29T11:37:10.505Z context loaded from .hermes/forge/context-93.json.
+2026-07-29T11:37:11Z live issue #93 claim comment observed; labels pm:ready + forge:working.
+Dependency check: issue #92 is closed with PM accepted truthful BLOCKED result; issue #69 not modified.
+
+Pre-existing unrelated local worktree changes preserved and not staged:
+- LOGS/EAI-TASK-046-terminal.log
+- apps/everything-ai-ui/src/planning.css
+- docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+
+TDD red:
+- Command: node --test tests/hermes-soak-observer.test.mjs
+- Result: expected failure before implementation, ERR_MODULE_NOT_FOUND for src/hermes-soak-observer.js.
+
+Implementation:
+- Added src/hermes-soak-observer.js.
+- Added scripts/hermes-soak-observer.mjs.
+- Added deploy/systemd/hermes-soak-observer.service.
+- Updated deploy/systemd/hermes-runtime.target.
+- Added tests/hermes-soak-observer.test.mjs.
+
+Targeted green:
+- Command: node --test tests/hermes-soak-observer.test.mjs
+- Result: PASS, 4/4.
+
+Repository validation before deployment:
+- Command: npm run framework:doctor
+- Result: PASS.
+- Command: node --test tests/*.test.mjs
+- Result: PASS, 169/169.
+- Command: npm test
+- Result: PASS, 169/169.
+- Command: git diff --check
+- Result: PASS with CRLF normalization warnings only.
+- Command: JSON.parse .hermes/state.json and docs/HANDOVER_2026-07-29_EAI_TASK_047A.json
+- Result: PASS.
+
+Initial implementation commit:
+- Commit: 5a8e9f1f3b059ba091f6a78243166333c7287ff1
+- Push: origin/main fast-forwarded from d47f597 to 5a8e9f1.
+
+Live host deployment:
+- Host: vmi2938167 / 37.60.248.195
+- Checkout: /opt/everythingAI
+- First root git pull attempt aborted safely because tracked .hermes/state.json had local runtime changes.
+- Retry used git pull --ff-only --autostash origin main.
+- Host HEAD after pull: 5a8e9f1f3b059ba091f6a78243166333c7287ff1.
+- Note: autostash could not reapply prior tracked .hermes/state.json cleanly and left stash@{0}; no secrets were printed.
+
+Systemd installation and syntax:
+- Installed deploy/systemd/hermes-runtime.target to /etc/systemd/system/hermes-runtime.target.
+- Installed deploy/systemd/hermes-soak-observer.service to /etc/systemd/system/hermes-soak-observer.service.
+- Command: systemctl daemon-reload.
+- Command: systemd-analyze verify hermes runtime/supervisor/poller/watchdog/timer/soak observer units.
+- Result: PASS, exit 0.
+- Command: systemctl enable hermes-soak-observer.service.
+- Result: enabled, symlink under hermes-runtime.target.wants created.
+- Command: systemctl restart hermes-soak-observer.service.
+- Result: active.
+
+Live observation start:
+- Service: hermes-soak-observer.service
+- MainPID initial: 1292803
+- ActiveState: active
+- SubState: running
+- NRestarts: 0
+- Persisted startedAt: 2026-07-29T11:43:05.318Z
+- Persisted expectedCompletionAt: 2026-07-30T11:43:05.318Z
+- Duration: 86,400,000 ms
+- deployedCommitSha: 5a8e9f1f3b059ba091f6a78243166333c7287ff1
+- continuous24HourSoakCompleted: false
+
+Duplicate-instance check:
+- Command: runuser -u hermes -- node scripts/hermes-soak-observer.mjs --root /opt/everythingAI --once
+- Result: OBSERVER_CONFLICT; evidence active observer lock present.
+
+Restart continuity and post-session activity check:
+- Before restart: startedAt 2026-07-29T11:43:05.318Z; expectedCompletionAt 2026-07-30T11:43:05.318Z; sampleCount 2.
+- Command: systemctl restart hermes-soak-observer.service; sleep 70; inspect service and state.
+- After restart: MainPID 1294207; ActiveState active; SubState running; NRestarts 0.
+- After restart persisted startedAt 2026-07-29T11:43:05.318Z; expectedCompletionAt 2026-07-30T11:43:05.318Z; restartCount 1; sampleCount 4.
+- Journal showed service stop/start and new observer startup retaining the original persisted start timestamp.
+
+No 24-hour soak completion is claimed in this task.

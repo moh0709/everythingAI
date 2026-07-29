@@ -1,51 +1,54 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 92,
-  "currentTask": "EAI-TASK-047",
-  "updatedAt": "2026-07-29T10:43:48.722Z",
-  "lastCheckedAt": "2026-07-29T10:43:48.722Z",
-  "status": "BLOCKED_READY_FOR_PM_SUBMISSION",
-  "result": "BLOCKED_READY_FOR_PM_SUBMISSION",
-  "startingCommitSha": "fc663333be93a080ab3b05c0f2ef3c2dae0528d6",
-  "implementationCommitSha": "a970335",
-  "artifactCommitSha": "a970335",
-  "finalPushedSha": "recorded in issue #92 final evidence comment after push",
+  "currentIssue": 93,
+  "currentTask": "EAI-TASK-047A",
+  "updatedAt": "2026-07-29T11:45:09.910Z",
+  "lastCheckedAt": "2026-07-29T11:45:09.910Z",
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "result": "DURABLE_OBSERVER_STARTED",
+  "startingCommitSha": "d47f597bf97f173dc6535856aa0f078265d71482",
+  "implementationCommitSha": "5a8e9f1f3b059ba091f6a78243166333c7287ff1",
+  "artifactCommitSha": "recorded in issue #93 final evidence comment after push",
   "host": "vmi2938167 / 37.60.248.195",
-  "serviceState": "SPOT_CHECK_ACTIVE_NOT_24H_SOAK",
+  "serviceState": "OBSERVER_ACTIVE_NOT_24H_COMPLETE",
   "observation": {
-    "startedAt": "2026-07-29T10:41:12.279Z",
-    "endedAt": "2026-07-29T10:43:48.722Z",
-    "duration": "PT2M36.443S",
+    "startedAt": "2026-07-29T11:43:05.318Z",
+    "expectedCompletionAt": "2026-07-30T11:43:05.318Z",
+    "durationMs": 86400000,
     "requiredDuration": "PT24H",
-    "continuous24HourSoakCompleted": false
+    "continuous24HourSoakCompleted": false,
+    "sampleCountAtSubmission": 4
   },
-  "blocker": {
-    "summary": "The required 24-hour continuous Hermes reliability soak was not completed in this bounded Forge worker session.",
-    "remediation": "Run a durable 24-hour observer and resubmit with exact sanitized evidence."
-  },
-  "finalizationRace": {
-    "confirmed": true,
-    "sourceIssue": 69,
-    "fixed": true,
-    "regression": "stale autonomous timeout does not downgrade already submitted Forge evidence"
+  "durableObserver": {
+    "service": "hermes-soak-observer.service",
+    "enabled": true,
+    "activeState": "active",
+    "subState": "running",
+    "mainPidAfterRestart": 1294207,
+    "nRestarts": 0,
+    "restartContinuity": "PASS: startedAt and expectedCompletionAt persisted across systemctl restart; restartCount advanced to 1",
+    "duplicateInstanceCheck": "PASS: second observer invocation returned OBSERVER_CONFLICT with active observer lock present",
+    "initiatingSessionExitEvidence": "PASS: service remained active after a 70 second SSH command delay and sampleCount advanced from 2 to 4"
   },
   "validation": {
     "frameworkDoctor": "PASS",
-    "targetedRegressionRed": "PASS expected failure observed before fix",
-    "targetedRegressionGreen": "PASS 12/12",
-    "nodeTests": "165/165 PASS",
-    "npmTest": "165/165 PASS",
-    "healthCliJson": "PASS parseable JSON; local UNKNOWN because no local runtime artifacts exist",
-    "historyParser": "PASS import",
-    "jsonChecks": "PASS handover and state JSON",
-    "gitDiffCheck": "PASS with CRLF normalization warnings only",
-    "systemdSpotEvidence": "PASS target reachable; runtime target, poller service, and watchdog timer active; poller NRestarts=0"
+    "targetedObserverRed": "PASS expected module-not-found failure before implementation",
+    "observerTests": "PASS 4/4",
+    "nodeTests": "PASS 169/169",
+    "npmTest": "PASS 169/169",
+    "systemdAnalyzeVerify": "PASS on live host for runtime, supervisor, poller, watchdog, timer, and soak observer units",
+    "liveStatus": "PASS hermes-soak-observer.service enabled and active; NRestarts=0",
+    "restartContinuity": "PASS",
+    "duplicateInstance": "PASS",
+    "jsonChecks": "PASS .hermes/state.json and handover JSON parsed before commit",
+    "gitDiffCheck": "PASS with CRLF normalization warnings only before artifact updates"
   },
   "queueLabels": [
     "forge:working"
   ],
-  "issue92": "BLOCKED_PENDING_FINAL_SUBMISSION",
+  "issue92": "ACCEPTED_BLOCKED_AND_CLOSED",
+  "issue69": "NOT_MODIFIED",
   "secrets": "none recorded",
-  "humanSummary": "EAI-TASK-047 cannot truthfully pass because the required 24-hour soak was not completed; finalization race was fixed and tested."
+  "humanSummary": "EAI-TASK-047A deployed a durable systemd Hermes soak observer and started the real 24-hour observation window. No 24-hour soak completion is claimed in this issue."
 }
