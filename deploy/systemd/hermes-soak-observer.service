@@ -1,0 +1,26 @@
+[Unit]
+Description=Hermes durable 24-hour soak observer
+After=hermes-runtime.target network-online.target
+Wants=hermes-runtime.target
+StartLimitIntervalSec=5min
+StartLimitBurst=4
+
+[Service]
+Type=simple
+User=hermes
+Group=hermes
+WorkingDirectory=/opt/everythingAI
+EnvironmentFile=-/etc/hermes/everythingai.env
+ExecStart=/usr/bin/node /opt/everythingAI/scripts/hermes-soak-observer.mjs --root /opt/everythingAI --interval-ms 60000
+Restart=on-failure
+RestartSec=15s
+KillSignal=SIGTERM
+TimeoutStopSec=30s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/everythingAI/.hermes
+
+[Install]
+WantedBy=hermes-runtime.target

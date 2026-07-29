@@ -1,6 +1,6 @@
 [Unit]
 Description=Hermes EverythingAI runtime
-Wants=hermes-supervisor.service hermes-poller.service
+Wants=hermes-supervisor.service hermes-poller.service hermes-soak-observer.service
 After=network-online.target
 Wants=network-online.target
 
