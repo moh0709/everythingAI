@@ -8,6 +8,7 @@
   "observationEndedAt": "2026-07-29T07:07:37Z",
   "observationWindow": "approximately 6 minutes",
   "startingSha": "985ce1c0b34f23447b33deb2951702017928a800",
+  "artifactCommitSha": "63265bd95fc3dd0146b74d2ea09f04d825e82c59",
   "host": "vmi2938167 / 37.60.248.195",
   "disposableIssue": 84,
   "decisionSummary": "Live services were active and bounded restart behavior was evidenced, but the unattended disposable queue task did not complete cleanly. The task was externally claimed by an Atlas poller comment and remained hermes:working until Forge moved the fixture to hermes:blocked + pm:review.",
