@@ -1,0 +1,63 @@
+{
+  "task": "EAI-TASK-047B",
+  "issue": 94,
+  "capturedAt": "2026-07-30T12:46:47.912Z",
+  "source": "sanitized summary derived from live /opt/everythingAI/.hermes/soak-observer.json and append-only .hermes/runtime/events.ndjson",
+  "observerSnapshot": {
+    "schemaVersion": 1,
+    "issueNumber": 93,
+    "taskId": "EAI-TASK-047A",
+    "status": "OBSERVING",
+    "startedAt": "2026-07-29T11:43:05.318Z",
+    "expectedCompletionAt": "2026-07-30T11:43:05.318Z",
+    "lastUpdatedAt": "2026-07-30T12:46:47.912Z",
+    "sampleCount": 1491,
+    "restartCount": 1,
+    "observerIdentity": "vmi2938167:1294207",
+    "deployedCommitSha": "5a8e9f1f3b059ba091f6a78243166333c7287ff1",
+    "samplesLengthInPersistedSnapshot": 100,
+    "firstStoredSample": "2026-07-29T11:43:05.325Z",
+    "lastStoredSample": "2026-07-29T13:22:10.799Z",
+    "queueOwnershipTransitionCount": 0,
+    "watchdogEventCount": 0,
+    "failureEventCount": 0
+  },
+  "eventHistorySummary": {
+    "eventSampleCount": 1491,
+    "firstEventTimestamp": "2026-07-29T11:43:05.325Z",
+    "lastEventTimestamp": "2026-07-30T12:46:47.912Z",
+    "durationMsFromPersistedStart": 90222594,
+    "requiredDurationMs": 86400000,
+    "maxGapMs": 70064,
+    "gapCountOver90s": 0,
+    "gapsOver90s": [],
+    "lastQueueWorkingIssues": [
+      94
+    ],
+    "lastHeartbeat": "2026-07-30T12:46:27.314Z",
+    "lastService": {
+      "available": true,
+      "service": "hermes-soak-observer.service",
+      "activeState": "active",
+      "subState": "running",
+      "nRestarts": 0
+    }
+  },
+  "service": {
+    "mainPid": 1294207,
+    "result": "success",
+    "nRestarts": 0,
+    "workingDirectory": "/opt/everythingAI",
+    "user": "hermes",
+    "group": "hermes",
+    "activeState": "active",
+    "subState": "running",
+    "unitFileState": "enabled",
+    "exactObserverProcessCount": 1
+  },
+  "security": {
+    "rawEnvironmentLogged": false,
+    "secretPatternScan": "PASS no matches for token, secret, password, passwd, api key, authorization, bearer, private key, or client secret"
+  },
+  "decision": "SOAK_VERIFIED_PASS"
+}

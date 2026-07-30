@@ -1,0 +1,83 @@
+{
+  "task": "EAI-TASK-047B",
+  "issue": 94,
+  "agent": "Forge",
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "decision": "SOAK_VERIFIED_PASS",
+  "startingSha": "c16940684e6961e7e025200b3d4ab0362516894f",
+  "repository": {
+    "owner": "moh0709",
+    "name": "everythingAI",
+    "branch": "main"
+  },
+  "dependency": {
+    "issue93": "CLOSED_ACCEPTED",
+    "issue69Modified": false,
+    "atlasAuthorized": false
+  },
+  "host": {
+    "name": "vmi2938167",
+    "address": "37.60.248.195",
+    "checkout": "/opt/everythingAI",
+    "observerService": "hermes-soak-observer.service",
+    "serviceEnabled": true,
+    "activeState": "active",
+    "subState": "running",
+    "mainPid": 1294207,
+    "nRestarts": 0,
+    "processCount": 1,
+    "serviceUser": "hermes",
+    "workingDirectory": "/opt/everythingAI"
+  },
+  "observation": {
+    "startedAt": "2026-07-29T11:43:05.318Z",
+    "expectedCompletionAt": "2026-07-30T11:43:05.318Z",
+    "finalObservationTimestamp": "2026-07-30T12:46:47.912Z",
+    "requiredDurationMs": 86400000,
+    "evidencedDurationMs": 90222594,
+    "sampleCount": 1491,
+    "eventSampleCount": 1491,
+    "maxGapMs": 70064,
+    "gapCountOver90s": 0,
+    "restartCount": 1,
+    "observerIdentity": "vmi2938167:1294207",
+    "deployedCommitShaInObserver": "5a8e9f1f3b059ba091f6a78243166333c7287ff1",
+    "continuous24HourSoakCompleted": true
+  },
+  "commitComparison": {
+    "localMainShaAtStart": "c16940684e6961e7e025200b3d4ab0362516894f",
+    "hostCheckoutSha": "c16940684e6961e7e025200b3d4ab0362516894f",
+    "originMainShaAtEvidenceCollection": "c16940684e6961e7e025200b3d4ab0362516894f",
+    "mismatchExplanation": "No host checkout mismatch was present. The observer snapshot's deployedCommitSha remains 5a8e9f1 because the service started before artifact-only commit c1694068."
+  },
+  "validation": {
+    "frameworkDoctor": "PASS",
+    "observerTests": "PASS 4/4",
+    "nodeTests": "PASS 169/169",
+    "npmTest": "PASS 169/169",
+    "healthCliJson": "PASS parseable JSON; local UNKNOWN without local heartbeat; live DEGRADED due conservative supervisor lock report with fresh heartbeat",
+    "historyParser": "PASS",
+    "systemdAnalyzeVerify": "PASS live host",
+    "jsonChecks": "PASS",
+    "gitDiffCheck": "PASS exit 0 with pre-existing CRLF normalization warning on LOGS/EAI-TASK-046-terminal.log",
+    "duplicateObserver": "PASS OBSERVER_CONFLICT",
+    "secretScan": "PASS no matches in observer state, runtime events, or heartbeat"
+  },
+  "artifacts": [
+    "REPORTS/EAI-TASK-047B-HERMES-24H-SOAK-VERIFICATION.md",
+    "docs/HANDOVER_2026-07-30_EAI_TASK_047B.json",
+    "LOGS/EAI-TASK-047B-terminal.log",
+    "LOGS/EAI-TASK-047B-sanitized-observer-snapshot.json",
+    ".hermes/state.json"
+  ],
+  "limitations": [
+    "The persisted observer snapshot stores only a redacted/truncated samples array of 100 entries; continuous sampling was verified with the append-only runtime event history.",
+    "The live health CLI reports DEGRADED because an existing supervisor lock is conservatively interpreted, while the actual heartbeat is fresh and systemd services are active."
+  ],
+  "secrets": {
+    "rawEnvironmentLogged": false,
+    "secretValuesRecorded": false,
+    "secretPatternScan": "PASS"
+  },
+  "completionTransition": "Submit forge:done + pm:review after commit push; do not close."
+}

@@ -1,0 +1,87 @@
+EAI-TASK-047B Hermes 24-hour soak verification terminal log
+Issue: #94
+Agent: Forge
+Sanitization: no raw environment values, tokens, credentials, or private payloads recorded.
+
+2026-07-30T12:43:11Z loaded .hermes/forge/context-94.json completely.
+2026-07-30T12:43:12Z live issue #94 claim comment observed; labels pm:ready + forge:working.
+Dependency check: issue #93 is closed with PM acceptance comment at 2026-07-29T12:38:42Z.
+
+Pre-existing unrelated local worktree changes preserved and not staged:
+- LOGS/EAI-TASK-046-terminal.log
+- apps/everything-ai-ui/src/planning.css
+- docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+
+Live host access:
+- Command: ssh root@37.60.248.195 "hostname && pwd && id -un"
+- Result: vmi2938167, /root, root.
+
+Repository comparison:
+- Local starting SHA: c16940684e6961e7e025200b3d4ab0362516894f.
+- Host command with one-shot safe.directory override reported HEAD c16940684e6961e7e025200b3d4ab0362516894f.
+- Host git status: main aligned with origin/main; untracked runtime evidence .hermes/soak-observer.json and .hermes/soak-observer.lock present.
+- Explanation: observer snapshot deployedCommitSha remains 5a8e9f1f3b059ba091f6a78243166333c7287ff1 because the service started before artifact-only commit c16940684e6961e7e025200b3d4ab0362516894f.
+
+Live observer service:
+- Command: systemctl show hermes-soak-observer.service --property=Id,LoadState,ActiveState,SubState,UnitFileState,MainPID,ExecMainPID,Result,NRestarts,RestartUSec,StartLimitBurst,StartLimitIntervalUSec,FragmentPath,User,Group,WorkingDirectory
+- Result: loaded, active/running, enabled, MainPID=1294207, ExecMainPID=1294207, Result=success, NRestarts=0, RestartUSec=15s, StartLimitIntervalUSec=5min, StartLimitBurst=4, User=hermes, Group=hermes, WorkingDirectory=/opt/everythingAI.
+- Command: pgrep exact observer command count.
+- Result: 1.
+
+Journal excerpts:
+- 2026-07-29T13:43:05+02:00 service started and printed startedAt 2026-07-29T11:43:05.318Z and expectedCompletionAt 2026-07-30T11:43:05.318Z.
+- 2026-07-29T13:44:09+02:00 controlled restart stopped and restarted the service.
+- 2026-07-29T13:44:09+02:00 restarted observer printed the same startedAt and expectedCompletionAt.
+
+Persisted observer snapshot:
+- Source: /opt/everythingAI/.hermes/soak-observer.json copied to a temp location for local parsing.
+- startedAt: 2026-07-29T11:43:05.318Z.
+- expectedCompletionAt: 2026-07-30T11:43:05.318Z.
+- lastUpdatedAt: 2026-07-30T12:46:47.912Z.
+- sampleCount: 1491.
+- restartCount: 1.
+- observerIdentity: vmi2938167:1294207.
+- deployedCommitSha: 5a8e9f1f3b059ba091f6a78243166333c7287ff1.
+- Note: persisted snapshot stores 100 redacted/truncated sample entries; append-only runtime events were used to verify continuous sample progression.
+
+Append-only observer events:
+- Source: /opt/everythingAI/.hermes/runtime/events.ndjson copied to a temp location for local parsing.
+- OBSERVER_SAMPLE event count: 1491.
+- First event timestamp: 2026-07-29T11:43:05.325Z.
+- Last event timestamp: 2026-07-30T12:46:47.912Z.
+- Duration from persisted start: 90,222,594 ms.
+- Max event gap: 70,064 ms.
+- Gaps over 90 seconds: 0.
+- Last heartbeat in observer event: 2026-07-30T12:46:27.314Z.
+- Last service state in observer event: active/running, NRestarts=0.
+- Last queue working issues observed: [94].
+
+Duplicate observer check:
+- Command: runuser -u hermes -- node scripts/hermes-soak-observer.mjs --root /opt/everythingAI --once
+- Result: OBSERVER_CONFLICT, active observer lock present.
+
+Queue and Atlas checks:
+- Command: gh issue list --state open --label forge:working --json number,title,labels,url --limit 100
+- Result: only issue #94.
+- Command: gh issue list --state open --label atlas:working --json number,title,labels,url --limit 100
+- Result: [].
+- Command: gh issue view 69
+- Result: issue #69 remained closed with forge:done; no mutation performed.
+
+Secret scan:
+- Command: grep sensitive-key patterns over .hermes/soak-observer.json, .hermes/runtime/events.ndjson, and .hermes/runtime/heartbeat.json on live host.
+- Result: no matches.
+
+Validation:
+- npm run framework:doctor: PASS.
+- node --test tests/hermes-soak-observer.test.mjs: PASS 4/4.
+- node --test tests/*.test.mjs: PASS 169/169.
+- npm test: PASS 169/169.
+- node scripts/hermes-health.mjs --json: valid JSON, exit 1 UNKNOWN locally because Windows checkout has no local heartbeat.
+- live node scripts/hermes-health.mjs --json: valid JSON, exit 1 DEGRADED due conservative supervisor lock report; heartbeat present and fresh with age 12650 ms.
+- history parser import/read: PASS.
+- live systemd-analyze verify runtime, supervisor, poller, watchdog, timer, and soak observer units: PASS exit 0.
+- JSON parse .hermes/state.json and handover JSON: PASS.
+- git diff --check: PASS exit 0 with pre-existing CRLF normalization warning on LOGS/EAI-TASK-046-terminal.log.
+
+Decision: SOAK_VERIFIED_PASS.
