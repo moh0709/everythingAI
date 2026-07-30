@@ -8,7 +8,7 @@
   "status": "SUBMITTED_PENDING_PM_REVIEW",
   "result": "SOAK_VERIFIED_PASS",
   "startingCommitSha": "c16940684e6961e7e025200b3d4ab0362516894f",
-  "artifactCommitSha": "recorded in issue #94 final evidence comment after push",
+  "artifactCommitSha": "fd9ae58403dbe6abe01095fe8bbd2aea9908e4ba",
   "host": "vmi2938167 / 37.60.248.195",
   "serviceState": "OBSERVER_ACTIVE_24H_VERIFIED",
   "observation": {

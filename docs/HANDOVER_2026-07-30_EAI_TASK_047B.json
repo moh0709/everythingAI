@@ -5,6 +5,7 @@
   "status": "SUBMITTED_PENDING_PM_REVIEW",
   "decision": "SOAK_VERIFIED_PASS",
   "startingSha": "c16940684e6961e7e025200b3d4ab0362516894f",
+  "artifactCommitSha": "fd9ae58403dbe6abe01095fe8bbd2aea9908e4ba",
   "repository": {
     "owner": "moh0709",
     "name": "everythingAI",
