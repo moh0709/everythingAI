@@ -9,8 +9,8 @@
   "result": "WORKER_FINAL_COMMIT_METADATA_SUBMITTED",
   "startingCommitSha": "3f75b9d720b8e1bba72b024fd2c4ce85b616c8b6",
   "preCommitArtifactSha": "PENDING_COMMIT_SHA",
-  "artifactCommitSha": "PENDING_METADATA_SYNC_COMMIT",
-  "finalPushedSha": "PENDING_METADATA_SYNC_COMMIT",
+  "artifactCommitSha": "f22566d4f2b9f4723bc278ae624feea7d34078e8",
+  "finalPushedSha": "f22566d4f2b9f4723bc278ae624feea7d34078e8",
   "finalShaSource": "GitHub issue comment after artifact push",
   "finalizationPattern": "Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment records the artifact commit SHA as the source of truth.",
   "implementation": [

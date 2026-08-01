@@ -3,8 +3,8 @@ EAI-TASK-005 Forge execution terminal log
 Repository: C:\temp\EverythingAI
 Branch: main
 Starting commit SHA: 3f75b9d720b8e1bba72b024fd2c4ce85b616c8b6
-Artifact commit SHA: PENDING_METADATA_SYNC_COMMIT
-Metadata sync commit SHA: PENDING_AFTER_METADATA_COMMIT
+Artifact commit SHA: f22566d4f2b9f4723bc278ae624feea7d34078e8
+Metadata sync commit SHA: recorded in final GitHub issue comment after push
 
 Preserved pre-existing uncommitted files:
 - LOGS/EAI-TASK-046-terminal.log
