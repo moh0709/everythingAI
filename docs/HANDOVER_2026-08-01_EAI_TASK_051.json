@@ -1,0 +1,79 @@
+{
+  "task": "EAI-TASK-051",
+  "issue": 99,
+  "status": "SUBMITTED_FOR_PM_REVIEW_PENDING_LIVE_LABEL_TRANSITION",
+  "startingSha": "8fc5c35378b602bf92d1590ce11cf36999575011",
+  "changedFiles": [
+    "src/agent-queue-policy.js",
+    "src/forge-trigger.js",
+    "scripts/forge-trigger.mjs",
+    "tests/forge-trigger.test.mjs",
+    "REPORTS/EAI-TASK-051-FORGE-PM-REVIEW-ELIGIBILITY.md",
+    "docs/HANDOVER_2026-08-01_EAI_TASK_051.json"
+  ],
+  "implementation": [
+    "Added centralized classifyForgeQueueIssue eligibility classification for released Forge queue items.",
+    "Routed Forge eligibility checks, released poller selection, and live claim revalidation through the shared classifier.",
+    "Added released queue skip evidence with released_summary and released_skip_reasons.",
+    "Added regression tests for PM-review terminal submissions that still carry pm:ready and forge:ready labels."
+  ],
+  "acceptance": [
+    {
+      "criterion": "Exclude forge:done + pm:review from eligibility.",
+      "status": "PASS",
+      "evidence": "#4 skipped awaiting_pm_review"
+    },
+    {
+      "criterion": "Exclude forge:blocked + pm:review from eligibility.",
+      "status": "PASS",
+      "evidence": "#5 skipped awaiting_pm_review"
+    },
+    {
+      "criterion": "Centralize eligibility logic in one function.",
+      "status": "PASS",
+      "evidence": "classifyForgeQueueIssue is the released Forge queue classifier used by boolean eligibility and poller selection"
+    },
+    {
+      "criterion": "Log the skip reason for every skipped issue.",
+      "status": "PASS",
+      "evidence": "released_summary=processed:803 skipped:801:awaiting_pm_review,802:awaiting_pm_review"
+    },
+    {
+      "criterion": "Add regression tests proving #4/#5-style issues are skipped.",
+      "status": "PASS",
+      "evidence": "tests/forge-trigger.test.mjs"
+    }
+  ],
+  "validation": {
+    "red": "node --test tests/forge-trigger.test.mjs failed before implementation: released poller claimed 801 instead of 803",
+    "focusedGreen": "node --test tests/forge-trigger.test.mjs: 23/23 PASS",
+    "frameworkDoctor": "npm run framework:doctor: PASS",
+    "fullNodeTest": "node --test tests/*.test.mjs: 182/182 PASS",
+    "npmTest": "npm test: 182/182 PASS",
+    "eligibilityOutput": [
+      "#4 skipped awaiting_pm_review",
+      "#5 skipped awaiting_pm_review",
+      "#99 eligible released_queue",
+      "#100 skipped missing_forge_ready"
+    ],
+    "artifactChecks": [
+      "python -m json.tool docs/HANDOVER_2026-08-01_EAI_TASK_051.json: PASS",
+      "git diff --check: PASS"
+    ]
+  },
+  "governance": {
+    "authoritativeDocumentsLoaded": true,
+    "issueLoadedFromGitHub": true,
+    "selfAccepted": false,
+    "issueClosed": false,
+    "dependentTasksReleased": false,
+    "secretsExposed": false,
+    "destructiveGitCommandsUsed": false
+  },
+  "unrelatedWorktreeFilesPreserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ],
+  "completionContract": "After commit push, move issue #99 to forge:done plus pm:review and verify live labels. PM must independently review."
+}

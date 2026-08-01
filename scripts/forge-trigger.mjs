@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   classifyForgeMaintenanceIssue,
+  classifyForgeIssueEligibility,
   claimForgeIssue,
   claimForgeMaintenanceIssue,
   FORGE_RESULTS,
@@ -40,7 +41,7 @@ function gitSha() {
 }
 
 function listIssues() {
-  return JSON.parse(gh(['issue', 'list', '--repo', repo, '--state', 'open', '--label', 'pm:ready', '--label', 'forge:ready', '--limit', '20', '--json', 'number,title,state,labels,url,body'])).filter(isForgeEligible);
+  return JSON.parse(gh(['issue', 'list', '--repo', repo, '--state', 'open', '--label', 'pm:ready', '--label', 'forge:ready', '--limit', '20', '--json', 'number,title,state,labels,url,body']));
 }
 
 function listMaintenanceIssues() {
@@ -87,9 +88,31 @@ function maintenanceSummary({ processedIssueNumber, skipped = [] } = {}) {
   return `maintenance_summary=processed:${processed} skipped:${skippedText}`;
 }
 
+function releasedSummary({ processedIssueNumber, skipped = [] } = {}) {
+  const processed = Number.isFinite(Number(processedIssueNumber)) ? String(Number(processedIssueNumber)) : 'none';
+  const skippedText = skipped.length ? skipped.map(({ number, reason }) => `${number}:${reason}`).join(',') : 'none';
+  return `released_summary=processed:${processed} skipped:${skippedText}`;
+}
+
 export async function pollForgeOnce({ list = listIssues, listMaintenance = listMaintenanceIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8'), controllerIssueNumber = defaultControllerIssueNumber, currentExecutingIssueNumber = defaultCurrentExecutingIssueNumber, maintenanceStatePath = resolve(repoRoot, '.hermes/forge/maintenance-state.json'), now = () => new Date() } = {}) {
-  const issues = await list();
-  if (issues.length) return claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
+  const releasedIssues = await list();
+  const releasedClassifications = releasedIssues.map((issue) => ({ issue, ...classifyForgeIssueEligibility(issue) }));
+  const releasedSkipped = releasedClassifications
+    .filter(({ eligible }) => !eligible)
+    .map(({ issue, skipReason }) => ({ number: issue.number, reason: skipReason ?? 'not_eligible' }));
+  const releasedSkipReasons = releasedSkipped.map(({ reason }) => reason).filter(Boolean);
+  const issues = releasedClassifications.filter(({ eligible }) => eligible).map(({ issue }) => issue);
+  if (issues.length) {
+    const result = await claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
+    return {
+      ...result,
+      evidence: [
+        ...(result.evidence ?? []),
+        releasedSummary({ processedIssueNumber: issues[0].number, skipped: releasedSkipped }),
+        ...(releasedSkipReasons.length ? [`released_skip_reasons=${[...new Set(releasedSkipReasons)].join(',')}`] : [])
+      ]
+    };
+  }
   const maintenanceIssues = await listMaintenance();
   const maintenanceOptions = { controllerIssueNumber, currentExecutingIssueNumber, statePath: maintenanceStatePath, currentHeadSha: sha, now };
   const maintenance = selectForgeMaintenanceIssue(maintenanceIssues, maintenanceOptions);
@@ -100,7 +123,7 @@ export async function pollForgeOnce({ list = listIssues, listMaintenance = listM
     .map(({ reason }) => reason)
     .filter(Boolean);
   if (!maintenance) {
-    return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs, evidence: [`no eligible released or maintenance issue${skipReasons.length ? `; skip_reasons=${[...new Set(skipReasons)].join(',')}` : ''}`, maintenanceSummary({ skipped })] };
+    return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs, evidence: [`no eligible released or maintenance issue${[...new Set([...releasedSkipReasons, ...skipReasons])].length ? `; skip_reasons=${[...new Set([...releasedSkipReasons, ...skipReasons])].join(',')}` : ''}`, releasedSummary({ skipped: releasedSkipped }), maintenanceSummary({ skipped })] };
   }
   const result = await claimForgeMaintenanceIssue({ issue: maintenance.issue, fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, statePath: maintenanceStatePath, controllerIssueNumber, currentExecutingIssueNumber, startingSha: sha, currentHeadSha: sha, projectState, bootstrap, reporter, execute, now });
   return {

@@ -29,6 +29,11 @@ test('Forge eligibility accepts only open pm:ready + forge:ready issues', () => 
   assert.equal(isForgeEligible({ ...issue(), state: 'closed' }), false);
 });
 
+test('Forge eligibility skips PM-review submissions even if ready labels remain', () => {
+  assert.equal(isForgeEligible(issue(['pm:ready', 'forge:ready', 'forge:done', 'pm:review'])), false);
+  assert.equal(isForgeEligible(issue(['pm:ready', 'forge:ready', 'forge:blocked', 'pm:review'])), false);
+});
+
 test('local lock gives exactly one concurrent claimant', async () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-concurrency-'));
   const lockPath = join(root, 'claim.lock');
@@ -226,6 +231,38 @@ test('maintenance poller default controller exclusion skips issue 96 and selects
   assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
   assert.equal(claimed, 78);
   assert.match(result.evidence.join('\n'), /maintenance_skip_reasons=self_controller/);
+});
+
+test('released poller reports PM-review skip reasons before claiming eligible issue', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-released-review-skip-'));
+  const issues = [
+    issue(['pm:ready', 'forge:ready', 'forge:done', 'pm:review']),
+    { ...issue(['pm:ready', 'forge:ready', 'forge:blocked', 'pm:review']), number: 802 },
+    { ...issue(['pm:ready', 'forge:ready']), number: 803 }
+  ];
+  let live = issues[2];
+  let claimed;
+  const update = async (number, labels) => {
+    claimed = number;
+    live = { ...live, labels: labels.map((name) => ({ name })) };
+  };
+  const result = await pollForgeOnce({
+    list: async () => issues,
+    listMaintenance: async () => [],
+    fetch: async () => live,
+    update,
+    comment: async () => ({ ok: true }),
+    reporter: async () => ({ sent: false }),
+    repoRoot: root,
+    sha: 'a'.repeat(40),
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    execute: null
+  });
+  assert.equal(result.result, FORGE_RESULTS.HUMAN_START_REQUIRED);
+  assert.equal(claimed, 803);
+  assert.match(result.evidence.join('\n'), /released_skip_reasons=awaiting_pm_review/);
+  assert.match(result.evidence.join('\n'), /released_summary=processed:803 skipped:801:awaiting_pm_review,802:awaiting_pm_review/);
 });
 
 test('maintenance poller records processed issue and advances on repeated ticks', async () => {

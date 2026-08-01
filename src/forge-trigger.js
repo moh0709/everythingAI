@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, openSync, readFileSync, closeSync, unlinkSync, renameSync, writeFileSync } from 'node:fs';
 import { hostname } from 'node:os';
 import { dirname, resolve } from 'node:path';
-import { isForgeEligibleForQueue, normalizeIssueLabels } from './agent-queue-policy.js';
+import { classifyForgeQueueIssue, isForgeEligibleForQueue, normalizeIssueLabels } from './agent-queue-policy.js';
 
 export const FORGE_RESULTS = Object.freeze({
   CLAIMED: 'CLAIMED',
@@ -21,6 +21,10 @@ export function normalizeLabels(issue) {
 
 export function isForgeEligible(issue) {
   return isForgeEligibleForQueue(issue);
+}
+
+export function classifyForgeIssueEligibility(issue) {
+  return classifyForgeQueueIssue(issue);
 }
 
 const MAINTENANCE_INACTIVE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
@@ -336,12 +340,14 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     atomicWriteJson(statePath, { ...existingState, status: 'CLAIMED', claimCommentPosted: true, recoveredAt: now().toISOString() });
     return { ok: true, result: FORGE_RESULTS.CLAIMED, issue: live, recovered: true };
   }
-  if (!isForgeEligible(live)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`live labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
+  const liveEligibility = classifyForgeIssueEligibility(live);
+  if (!liveEligibility.eligible) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`skip_reason=${liveEligibility.skipReason ?? 'not_eligible'} live labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
   const acquired = acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
   if (!acquired.ok) return { ok: false, ...acquired, issue: live };
   try {
     const verifiedBeforeMutation = await fetchLiveIssue(targetNumber);
-    if (!isForgeEligible(verifiedBeforeMutation)) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: ['readiness changed before mutation'] };
+    const verifiedEligibility = classifyForgeIssueEligibility(verifiedBeforeMutation);
+    if (!verifiedEligibility.eligible) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: [`skip_reason=${verifiedEligibility.skipReason ?? 'not_eligible'} readiness changed before mutation`] };
     const labels = normalizeLabels(verifiedBeforeMutation).filter((label) => label !== 'forge:ready');
     labels.push('forge:working');
     await updateLabels(targetNumber, labels);

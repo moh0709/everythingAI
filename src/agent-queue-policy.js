@@ -29,8 +29,22 @@ function hasOnlyAgentQueue(labels, readyLabel) {
     && !labels.some((label) => AGENT_LIFECYCLE_LABELS.has(label) && label !== readyLabel);
 }
 
+export function classifyForgeQueueIssue(issue) {
+  const labels = normalizeIssueLabels(issue);
+  if (!isOpen(issue)) return { eligible: false, skipReason: 'not_open' };
+  if ((labels.includes('forge:done') || labels.includes('forge:blocked')) && labels.includes('pm:review')) {
+    return { eligible: false, skipReason: 'awaiting_pm_review' };
+  }
+  if (!labels.includes('pm:ready')) return { eligible: false, skipReason: 'missing_pm_ready' };
+  if (!labels.includes('forge:ready')) return { eligible: false, skipReason: 'missing_forge_ready' };
+  if (labels.some((label) => AGENT_LIFECYCLE_LABELS.has(label) && label !== 'forge:ready')) {
+    return { eligible: false, skipReason: 'active_or_terminal_owner' };
+  }
+  return { eligible: true, priority: 'released_queue' };
+}
+
 export function isForgeEligibleForQueue(issue) {
-  return isOpen(issue) && hasOnlyAgentQueue(normalizeIssueLabels(issue), 'forge:ready');
+  return classifyForgeQueueIssue(issue).eligible;
 }
 
 export function isHermesEligibleForQueue(issue) {
