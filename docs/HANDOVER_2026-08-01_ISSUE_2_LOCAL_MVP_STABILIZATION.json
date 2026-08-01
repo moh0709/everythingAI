@@ -1,0 +1,89 @@
+{
+  "agent": "Forge",
+  "issue": 2,
+  "title": "Stabilize local MVP before next feature expansion",
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "repo": "moh0709/everythingAI",
+  "branch": "main",
+  "startingSha": "030c2c2762ebe40663513e4781c142f756915868",
+  "completedAt": "2026-08-01T15:40:51.302Z",
+  "scope": "maintenance validation and evidence handoff for stale open issue #2",
+  "implementation": {
+    "productCodeChanged": false,
+    "reason": "The requested route modularization, undo nested relative path handling, route validation helpers, local MVP documentation, and Windows smoke guide were already present in the starting tree.",
+    "evidenceArtifacts": [
+      "REPORTS/ISSUE-2-LOCAL-MVP-STABILIZATION-MAINTENANCE.md",
+      "docs/HANDOVER_2026-08-01_ISSUE_2_LOCAL_MVP_STABILIZATION.json",
+      "LOGS/ISSUE-2-local-mvp-stabilization-terminal.log"
+    ]
+  },
+  "acceptance": [
+    {
+      "id": "AC-1",
+      "requirement": "Legacy in-memory route confusion is removed.",
+      "status": "PASS",
+      "evidence": "services/api/src/server.js delegates to route modules; no /api/files/ingest route remains in services/api/src/server.js or services/api/src/routes."
+    },
+    {
+      "id": "AC-2",
+      "requirement": "Server routes are modularized.",
+      "status": "PASS",
+      "evidence": "services/api/src/routes/files.routes.js, search.routes.js, actions.routes.js, system.routes.js, integrations.routes.js and middleware/auth.js, middleware/errorHandler.js exist and are wired from services/api/src/server.js."
+    },
+    {
+      "id": "AC-3",
+      "requirement": "Undo path metadata is correct.",
+      "status": "PASS",
+      "evidence": "services/api/test/nestedUndoRegression.test.js passed in services/api npm test."
+    },
+    {
+      "id": "AC-4",
+      "requirement": "Route inputs are validated.",
+      "status": "PASS",
+      "evidence": "services/api/src/utils/request.js provides request validation helpers used by route modules."
+    },
+    {
+      "id": "AC-5",
+      "requirement": "Local MVP is clearly documented.",
+      "status": "PASS",
+      "evidence": "docs/LOCAL_MVP_VS_CENTRAL_PLATFORM.md."
+    },
+    {
+      "id": "AC-6",
+      "requirement": "Windows smoke test guide exists.",
+      "status": "PASS",
+      "evidence": "docs/WINDOWS_LOCAL_SMOKE_TEST.md."
+    },
+    {
+      "id": "AC-7",
+      "requirement": "npm test passes locally.",
+      "status": "PASS",
+      "evidence": "Root npm test passed 182/182; services/api npm test passed 172/172."
+    }
+  ],
+  "validation": [
+    {
+      "command": "npm test",
+      "workingDirectory": "C:\\temp\\EverythingAI",
+      "status": "PASS",
+      "summary": "182 tests, 182 pass, 0 fail"
+    },
+    {
+      "command": "npm test",
+      "workingDirectory": "C:\\temp\\EverythingAI\\services\\api",
+      "status": "PASS",
+      "summary": "172 tests, 172 pass, 0 fail"
+    }
+  ],
+  "preservedUnrelatedFiles": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ],
+  "queueLabels": [
+    "forge:done",
+    "pm:review"
+  ],
+  "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
+  "secrets": "none recorded"
+}
