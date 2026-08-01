@@ -41,3 +41,27 @@ Added a small, explicit API server wiring gate that only enables the guarded pro
 ## Commit metadata
 - Artifact commit SHA: `fe279fa751e97c7484d98493748041a3d060a8c8`
 - Final pushed commit SHA: `fe279fa751e97c7484d98493748041a3d060a8c8`
+
+## Forge maintenance revalidation - 2026-08-01
+
+Status: PASS
+
+Issue #58 was still open with prior Hermes PASS evidence already present. Forge re-read the required context, preserved unrelated local changes, confirmed the server wiring gate is already present on `main`, and reran the required validation commands from the current checkout.
+
+Revalidation results:
+
+- `git pull --ff-only` - PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` - PASS
+- `cd apps/everything-ai-ui && npm run typecheck` - PASS
+- `cd apps/everything-ai-ui && npm run build` - PASS
+- `cd services/api && npm test` - PASS (`173/173`)
+- `cd services/api && node --test test/serverWorkspaceContextGate.test.js test/productionWorkspaceContextMiddleware.test.js test/workspaceContext.test.js` - PASS (`11/11`)
+- `node -e "JSON.parse(...HANDOVER_2026-07-01_POST_EAI_TASK_036.json...)"` - PASS
+- `git diff --check` - PASS with line-ending warnings only for unrelated pre-existing local changes
+
+Fresh proof points:
+
+- `services/api/src/server.js` exports `resolveWorkspaceContextMiddleware`, which returns `attachWorkspaceContext` without invoking the production factory when `productionWorkspaceResolution` is absent.
+- Explicit `productionWorkspaceResolution` options are passed unchanged to `createProductionWorkspaceContextMiddleware`.
+- `services/api/test/serverWorkspaceContextGate.test.js` proves both the default disabled path and the explicit pass-through path.
+- No PostgreSQL client, pool, migration, connection string, credential, or environment-derived production persistence wiring was added during this maintenance pass.

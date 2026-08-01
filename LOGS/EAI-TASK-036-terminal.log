@@ -17,3 +17,21 @@ Add an explicit server wiring gate for the guarded production workspace context 
 - Default server composition keeps the read-only workspace context path.
 - Explicit `productionWorkspaceResolution` options are passed through the server gate only when provided.
 - No PostgreSQL server was required for validation.
+
+## Forge maintenance revalidation - 2026-08-01
+
+- `git pull --ff-only` from `C:\temp\EverythingAI` - PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` from `C:\temp\EverythingAI` - PASS
+- `npm run typecheck` from `C:\temp\EverythingAI\apps\everything-ai-ui` - PASS
+- `npm run build` from `C:\temp\EverythingAI\apps\everything-ai-ui` - PASS
+- `npm test` from `C:\temp\EverythingAI\services\api` - PASS (`173/173`)
+- `node --test test/serverWorkspaceContextGate.test.js test/productionWorkspaceContextMiddleware.test.js test/workspaceContext.test.js` from `C:\temp\EverythingAI\services\api` - PASS (`11/11`)
+- `node -e "JSON.parse(...HANDOVER_2026-07-01_POST_EAI_TASK_036.json...)"` from `C:\temp\EverythingAI` - PASS
+- `git diff --check` from `C:\temp\EverythingAI` - PASS with line-ending warnings only for unrelated pre-existing local changes
+
+Unrelated local changes preserved:
+
+- `LOGS/EAI-TASK-046-terminal.log`
+- `tests/task-worker-runtime-mode.test.mjs`
+- `apps/everything-ai-ui/src/planning.css`
+- `docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json`

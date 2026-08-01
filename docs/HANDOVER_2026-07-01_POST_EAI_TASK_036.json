@@ -38,5 +38,37 @@
     "b71a7058a87d5605767d7c05404bcd96635a914f",
     "ca309aeba8840c2d534fa69544290e96985a6afd"
   ],
+  "forge_maintenance_revalidation": {
+    "agent": "Forge",
+    "issue_number": 58,
+    "status": "PASS",
+    "generated_at": "2026-08-01T20:48:20+02:00",
+    "starting_sha": "9875ab09edd03773d23d25fdd8130d1b9a6d0a08",
+    "artifact_commit_sha": "RECORDED_IN_COMMIT_HISTORY_FOR_THIS_ARTIFACT_UPDATE",
+    "final_pushed_commit_sha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
+    "validation": {
+      "git_pull_ff_only": "PASS",
+      "framework_doctor": "PASS",
+      "ui_typecheck": "PASS",
+      "ui_build": "PASS",
+      "api_tests": "PASS 173/173",
+      "focused_gate_tests": "PASS 11/11",
+      "handover_json_parse": "PASS",
+      "git_diff_check": "PASS with line-ending warnings only for unrelated pre-existing local changes"
+    },
+    "proof": {
+      "default_local_startup": "resolveWorkspaceContextMiddleware returns attachWorkspaceContext and does not invoke the production factory when productionWorkspaceResolution is absent.",
+      "explicit_server_wiring": "productionWorkspaceResolution is passed unchanged to createProductionWorkspaceContextMiddleware for injected query/client/pool/repository use.",
+      "no_postgres_required": true,
+      "no_automatic_migrations": true,
+      "no_secrets_added": true
+    },
+    "unrelated_local_changes_preserved": [
+      "LOGS/EAI-TASK-046-terminal.log",
+      "tests/task-worker-runtime-mode.test.mjs",
+      "apps/everything-ai-ui/src/planning.css",
+      "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+    ]
+  },
   "report_file": "REPORTS/EAI-TASK-036-SERVER-WIRING-GATE-PRODUCTION-WORKSPACE-CONTEXT.md"
 }
