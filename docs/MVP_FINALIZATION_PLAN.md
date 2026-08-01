@@ -167,7 +167,7 @@ Completed:
 
 Remaining:
 
-- [ ] Add future provider interface for real neural embeddings
+- [x] Add future provider interface for real neural embeddings
 - [ ] Improve rich media/table/OCR extraction where useful
 - [ ] Evaluate OpenDataLoader PDF only as an optional connector if it clearly adds new extraction value
 

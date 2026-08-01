@@ -31,6 +31,10 @@ function getExistingEmbedding(db, fileId) {
   `).get(fileId);
 }
 
+function getEmbeddingProviderId(provider) {
+  return provider.providerId || provider.id || 'custom';
+}
+
 function upsertFileEmbeddingWithSourceHash(db, embedding) {
   db.prepare(`
     INSERT INTO file_embeddings (
@@ -122,6 +126,90 @@ export function generateEmbeddings(db, { fileId, limit = 1000, force = false, pr
   }
 
   return {
+    embedding_provider: getEmbeddingProviderId(embeddingProvider),
+    embedding_model: embeddingProvider.model,
+    generated: results.length,
+    skipped_unchanged: skipped.length,
+    results,
+    skipped,
+  };
+}
+
+export async function generateEmbeddingsAsync(db, { fileId, limit = 1000, force = false, provider } = {}) {
+  ensureEmbeddingSourceHashColumn(db);
+
+  const embeddingProvider = createEmbeddingProvider(provider);
+  const files = listExtractedFiles(db, { fileId, limit });
+  const generatedAt = new Date().toISOString();
+  const results = [];
+  const skipped = [];
+  const pending = [];
+
+  for (const file of files) {
+    const sourceText = `${file.filename}\n${file.extracted_text || ''}`;
+    const sourceHash = hashEmbeddingSource(sourceText);
+    const existing = getExistingEmbedding(db, file.id);
+
+    if (!force && existing?.embedding_model === embeddingProvider.model && existing.source_hash === sourceHash) {
+      skipped.push({ fileId: file.id, filename: file.filename, reason: 'unchanged' });
+      continue;
+    }
+
+    pending.push({
+      file,
+      sourceHash,
+      text: sourceText,
+    });
+  }
+
+  if (pending.length > 0) {
+    const batch = embeddingProvider.embedBatch
+      ? await embeddingProvider.embedBatch({
+        items: pending.map((item) => ({
+          id: String(item.file.id),
+          text: item.text,
+          metadata: {
+            fileId: item.file.id,
+            filename: item.file.filename,
+            relativePath: item.file.relative_path,
+          },
+        })),
+      })
+      : {
+        results: await Promise.all(pending.map(async (item) => ({
+          id: String(item.file.id),
+          ...(await embeddingProvider.embed(item.text, {
+            fileId: item.file.id,
+            filename: item.file.filename,
+            relativePath: item.file.relative_path,
+          })),
+        }))),
+      };
+
+    const byId = new Map((batch.results || []).map((embedding) => [String(embedding.id), embedding]));
+
+    for (const item of pending) {
+      const embedding = byId.get(String(item.file.id));
+      if (!embedding) {
+        throw new Error(`Embedding provider did not return a result for file ${item.file.id}.`);
+      }
+
+      const record = {
+        file_id: item.file.id,
+        embedding_model: embedding.model || embeddingProvider.model,
+        vector_json: JSON.stringify(embedding.vector),
+        token_count: embedding.tokenCount ?? null,
+        generated_at: generatedAt,
+        source_hash: item.sourceHash,
+      };
+
+      upsertFileEmbeddingWithSourceHash(db, record);
+      results.push({ fileId: item.file.id, filename: item.file.filename, tokenCount: embedding.tokenCount ?? null });
+    }
+  }
+
+  return {
+    embedding_provider: getEmbeddingProviderId(embeddingProvider),
     embedding_model: embeddingProvider.model,
     generated: results.length,
     skipped_unchanged: skipped.length,
