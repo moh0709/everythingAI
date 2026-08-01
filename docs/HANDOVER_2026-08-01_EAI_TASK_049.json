@@ -7,6 +7,7 @@
   "branch": "main",
   "startingSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
   "finalPushedSha": "recorded in issue #96 PM review comment after push",
+  "latestMaintenanceStartingSha": "2a7ac61c34741d4c3fbf9d5ede6c55d6c79b34d3",
   "implementation": [
     "src/forge-trigger.js",
     "scripts/forge-trigger.mjs",
@@ -15,6 +16,7 @@
     "docs/FORGE_AUTONOMOUS_EXECUTION_ARCHITECTURE.md",
     "docs/FORGE_TRIGGER_AND_REPORTING_RUNBOOK.md",
     "REPORTS/EAI-TASK-049-CONTINUOUS-OPEN-ISSUE-PROCESSING-LOOP.md",
+    "REPORTS/EAI-TASK-049-MAINTENANCE-PM-RECOMMENDATION-2026-08-01.md",
     "LOGS/EAI-TASK-049-terminal.log",
     ".hermes/state.json"
   ],
