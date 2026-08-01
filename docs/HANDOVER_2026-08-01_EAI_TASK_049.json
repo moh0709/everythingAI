@@ -6,8 +6,8 @@
   "repository": "moh0709/everythingAI",
   "branch": "main",
   "startingSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
-  "finalPushedSha": "82b2591281506da891f3195eec9e9a19d3980bcd",
-  "latestMaintenanceStartingSha": "77c6ad2ca47a9b358dbb99accf0363bc11e42728",
+  "finalPushedSha": "pending-current-maintenance-commit",
+  "latestMaintenanceStartingSha": "a5454d2c6173c72bcf26da31a0d453506b8aa2c8",
   "implementation": [
     "src/forge-trigger.js",
     "scripts/forge-trigger.mjs",
@@ -21,14 +21,15 @@
     ".hermes/state.json"
   ],
   "currentMaintenancePass": {
-    "claimedAt": "2026-08-01T13:11:13Z",
-    "startingSha": "77c6ad2ca47a9b358dbb99accf0363bc11e42728",
+    "claimedAt": "2026-08-01T13:16:13Z",
+    "startingSha": "a5454d2c6173c72bcf26da31a0d453506b8aa2c8",
     "liveIssueLabelsAtInspection": [
       "forge:working"
     ],
     "sourceChangeRequired": false,
-    "recommendation": "Submit issue #96 for PM review as forge:done plus pm:review after this refreshed evidence is committed, pushed, and live labels are verified.",
-    "openBacklogSummary": "Issue #96 is the active Forge-owned issue. Issue #78 and older governance/admin issues remain unowned backlog for later PM-directed processing. Issue #69 remains protected and was not modified or released."
+    "recommendation": "Submit issue #96 for PM review as forge:done plus pm:review after this current refreshed evidence is committed, pushed, and live labels are verified.",
+    "releasedForgeQueueAtInspection": [],
+    "openBacklogSummary": "Issue #96 is the active Forge-owned issue. Issue #78 and older governance/admin issues remain unowned backlog for later PM-directed processing. Issue #69 was inspected read-only and was not modified or released."
   },
   "behavior": {
     "releasedQueueFirst": true,
@@ -54,7 +55,8 @@
     "nodeTests": "PASS 173/173",
     "npmTest": "PASS 173/173",
     "gitDiffCheck": "PASS with CRLF normalization warnings only, including pre-existing LOGS/EAI-TASK-046-terminal.log",
-    "handoverJson": "PASS"
+    "handoverJson": "PASS",
+    "stateJson": "PASS"
   },
   "preservedUnrelatedPaths": [
     "LOGS/EAI-TASK-046-terminal.log",
