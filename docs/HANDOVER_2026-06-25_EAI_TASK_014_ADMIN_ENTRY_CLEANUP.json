@@ -45,7 +45,7 @@
     "forge:done",
     "pm:review"
   ],
-  "artifactCommitSha": "TO_BE_RECORDED_AFTER_ARTIFACT_COMMIT",
+  "artifactCommitSha": "5c37fbea9181fd1304032edfc0f94d19c932ef09",
   "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
   "secrets": "none recorded",

@@ -72,4 +72,4 @@ PM review of #36 stale-open maintenance refresh. Do not release dependent work f
 
 ## Artifact commit SHA
 
-TO_BE_RECORDED_AFTER_ARTIFACT_COMMIT
+5c37fbea9181fd1304032edfc0f94d19c932ef09
