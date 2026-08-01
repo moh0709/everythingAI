@@ -17,6 +17,15 @@ import {
   Zap,
 } from 'lucide-react';
 import { apiRequest, ApiOptions, AppStatus, IndexedFile, Suggestion } from './api';
+import {
+  calculateAiConfidence,
+  emptyFileFilters,
+  filterFiles,
+  getFileTags,
+  normalizeFilePreview,
+  PreviewSummary,
+  uniqueFileFilterValues,
+} from './appUiLogic';
 import { addSourcePath, listSourcePaths, pauseSourcePath, resumeSourcePath, SourcePathRecord } from './sourcePathsApi';
 import {
   getProviderModels,
@@ -78,6 +87,7 @@ export function App() {
   const [baseUrl, setBaseUrl] = useState(localStorage.getItem('everythingai.ui.baseUrl') || DEFAULT_API);
   const [token, setToken] = useState(localStorage.getItem('everythingai.ui.token') || DEFAULT_TOKEN);
   const [folderPath, setFolderPath] = useState(localStorage.getItem('everythingai.ui.folderPath') || '');
+  const [destinationFolder, setDestinationFolder] = useState(localStorage.getItem('everythingai.ui.destinationFolder') || 'Organized Files');
   const [sourcePaths, setSourcePaths] = useState<SourcePath[]>([]);
   const [status, setStatus] = useState<AppStatus | null>(null);
   const [files, setFiles] = useState<IndexedFile[]>([]);
@@ -93,6 +103,9 @@ export function App() {
   const [providerSettings, setProviderSettings] = useState<ProviderSettings | null>(null);
   const [providerModels, setProviderModels] = useState<ProviderModels | null>(null);
   const [connectionMessage, setConnectionMessage] = useState('');
+  const [filePreviews, setFilePreviews] = useState<Record<string, PreviewSummary>>({});
+  const [filePreviewLoadingId, setFilePreviewLoadingId] = useState<string | null>(null);
+  const [filePreviewErrors, setFilePreviewErrors] = useState<Record<string, string>>({});
 
   const options: ApiOptions = useMemo(() => ({ baseUrl, token }), [baseUrl, token]);
   const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
@@ -102,6 +115,7 @@ export function App() {
     acc[ext] = (acc[ext] || 0) + 1;
     return acc;
   }, {});
+  const aiConfidence = calculateAiConfidence(suggestions);
 
   async function run(label: string, task: () => Promise<void>) {
     setBusy(true);
@@ -323,14 +337,32 @@ export function App() {
     });
   }
 
+  async function loadFilePreview(fileId: string) {
+    setFilePreviewLoadingId(fileId);
+    setFilePreviewErrors((current) => ({ ...current, [fileId]: '' }));
+    try {
+      const payload = await apiRequest<any>(options, `/api/files/${encodeURIComponent(fileId)}/preview`);
+      setFilePreviews((current) => ({ ...current, [fileId]: normalizeFilePreview(payload) }));
+    } catch (err: any) {
+      setFilePreviewErrors((current) => ({ ...current, [fileId]: err.message || String(err) }));
+    } finally {
+      setFilePreviewLoadingId((current) => current === fileId ? null : current);
+    }
+  }
+
   function saveSettings() {
     localStorage.setItem('everythingai.ui.baseUrl', baseUrl);
     localStorage.setItem('everythingai.ui.token', token);
     localStorage.setItem('everythingai.ui.folderPath', folderPath);
+    localStorage.setItem('everythingai.ui.destinationFolder', destinationFolder);
     setMessage('Settings saved');
   }
 
   useEffect(() => { refreshAll().catch(() => undefined); }, []);
+  useEffect(() => {
+    if (!selectedFile?.id || filePreviews[selectedFile.id] || filePreviewLoadingId === selectedFile.id) return;
+    loadFilePreview(selectedFile.id).catch(() => undefined);
+  }, [selectedFile?.id, baseUrl, token]);
 
   return <div className="app">
     <Header section={section} setSection={setSection} loadAudit={loadAudit} activeProvider={providerSettings?.activeProvider || 'ollama'} />
@@ -341,9 +373,9 @@ export function App() {
       </div>
       {error && <div className="error">{error}</div>}
       <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : message}</div>
-      {section === 'dashboard' && <Dashboard files={files} totalSize={totalSize} fileTypes={fileTypes} folderPath={folderPath} setFolderPath={setFolderPath} selectFolder={selectFolder} addTypedSourcePath={addTypedSourcePath} deepAnalysis={deepAnalysis} setSection={setSection} busy={busy} sourcePaths={sourcePaths} rescanSource={rescanSource} pauseSource={pauseSource} resumeSource={resumeSource} removeSource={removeSource} />}
-      {section === 'explorer' && <Explorer files={files} selectedFile={selectedFile} setSelectedFileId={setSelectedFileId} query={query} setQuery={setQuery} searchEverything={searchEverything} />}
-      {section === 'planning' && <Planning files={files} suggestions={suggestions} previews={previews} selectedSuggestionIds={selectedSuggestionIds} setSelectedSuggestionIds={setSelectedSuggestionIds} previewSuggestion={previewSuggestion} previewSelected={previewSelected} executePreview={executePreview} executeSelectedPreviews={executeSelectedPreviews} deepAnalysis={deepAnalysis} busy={busy} openSettings={() => setSection('settings')} />}
+      {section === 'dashboard' && <Dashboard files={files} totalSize={totalSize} fileTypes={fileTypes} aiConfidence={aiConfidence} folderPath={folderPath} setFolderPath={setFolderPath} selectFolder={selectFolder} addTypedSourcePath={addTypedSourcePath} deepAnalysis={deepAnalysis} setSection={setSection} busy={busy} sourcePaths={sourcePaths} rescanSource={rescanSource} pauseSource={pauseSource} resumeSource={resumeSource} removeSource={removeSource} />}
+      {section === 'explorer' && <Explorer files={files} selectedFile={selectedFile} setSelectedFileId={setSelectedFileId} query={query} setQuery={setQuery} searchEverything={searchEverything} filePreviews={filePreviews} filePreviewLoadingId={filePreviewLoadingId} filePreviewErrors={filePreviewErrors} />}
+      {section === 'planning' && <Planning files={files} suggestions={suggestions} previews={previews} selectedSuggestionIds={selectedSuggestionIds} setSelectedSuggestionIds={setSelectedSuggestionIds} previewSuggestion={previewSuggestion} previewSelected={previewSelected} executePreview={executePreview} executeSelectedPreviews={executeSelectedPreviews} deepAnalysis={deepAnalysis} busy={busy} openSettings={() => setSection('settings')} destinationFolder={destinationFolder} setDestinationFolder={setDestinationFolder} />}
       {section === 'analytics' && <Analytics status={status} audit={audit} />}
       {section === 'settings' && <SettingsView baseUrl={baseUrl} setBaseUrl={setBaseUrl} token={token} setToken={setToken} folderPath={folderPath} setFolderPath={setFolderPath} saveSettings={saveSettings} sourcePaths={sourcePaths} providerSettings={providerSettings} providerModels={providerModels} saveAiSettings={saveAiSettings} testAiProvider={testAiProvider} refreshModels={refreshModels} connectionMessage={connectionMessage} />}
     </main>
@@ -356,23 +388,69 @@ function Header({ section, setSection, loadAudit, activeProvider }: any) {
 }
 
 function Dashboard(props: any) {
-  const { files, totalSize, fileTypes, folderPath, setFolderPath, selectFolder, addTypedSourcePath, deepAnalysis, setSection, busy, sourcePaths, rescanSource, pauseSource, resumeSource, removeSource } = props;
-  return <><section className="processing-card"><div className="hub-head"><div><h2><Brain /> AI File Processing Hub</h2><p>Intelligent content analysis • Pattern recognition • Smart organization</p></div><div className="button-row"><button className="outline" onClick={selectFolder}><Upload size={16} /> Add Folder</button><button className="outline purple-border" onClick={addTypedSourcePath}>Add Path</button></div></div><div className="drop-zone" onClick={selectFolder}><Upload size={44} /><h3>Add folders to EverythingAI Scope</h3><p>EverythingAI automatically indexes, extracts, embeds, analyzes, and plans from every backend-persisted source path.</p><div className="mini-tags"><span>Documents</span><span>Folders</span><span>Automatic Knowledge</span><span>Persistent Scope</span></div></div><div className="path-row"><input value={folderPath} onChange={(e) => setFolderPath(e.target.value)} placeholder="C:\\path\\to\\folder" /><button onClick={addTypedSourcePath} disabled={busy}>Add to Scope</button></div></section><SourcePathsPanel sourcePaths={sourcePaths} rescanSource={rescanSource} pauseSource={pauseSource} resumeSource={resumeSource} removeSource={removeSource} />{!files.length ? <section className="empty-card"><div className="big-icon"><FolderOpen /></div><h2>AI File Organization Ready</h2><p>Add source paths and EverythingAI will automatically consume the knowledge inside them.</p></section> : <><section className="stats-grid"><Stat title="Total Files" value={files.length} /><Stat title="Total Size" value={formatSize(totalSize)} /><Stat title="File Categories" value={Object.keys(fileTypes).length} /><Stat title="AI Confidence" value="100%" /></section><section className="two-col"><div className="panel"><h3>File Types Distribution</h3>{Object.entries(fileTypes).map(([key, value]) => <div className="bar" key={key}><span>{key}</span><div><b style={{ width: `${Math.min(100, Number(value) * 20)}%` }} /></div><small>{String(value)} files</small></div>)}</div><div className="panel"><h3>Largest Files</h3>{files.slice().sort((a: IndexedFile, b: IndexedFile) => (b.size_bytes || 0) - (a.size_bytes || 0)).slice(0, 5).map((file: IndexedFile) => <div className="file-line" key={file.id}><div><strong>{file.filename}</strong><small>{file.absolute_path}</small></div><span>{formatSize(file.size_bytes)}</span></div>)}</div></section><section className="success-card"><CheckCircle /><div><h2>AI Analysis Complete</h2><p>{files.length} files have been processed from the active source scope. EverythingAI will keep consuming watched folders automatically.</p><div className="button-row"><button className="outline" onClick={() => setSection('explorer')}>Explore Files</button><button onClick={() => setSection('planning')}>Start Planning</button><button className="outline" onClick={deepAnalysis}>Deep Analysis</button></div></div></section></>}</>;
+  const { files, totalSize, fileTypes, aiConfidence, folderPath, setFolderPath, selectFolder, addTypedSourcePath, deepAnalysis, setSection, busy, sourcePaths, rescanSource, pauseSource, resumeSource, removeSource } = props;
+  return <><section className="processing-card"><div className="hub-head"><div><h2><Brain /> AI File Processing Hub</h2><p>Intelligent content analysis • Pattern recognition • Smart organization</p></div><div className="button-row"><button className="outline" onClick={selectFolder}><Upload size={16} /> Add Folder</button><button className="outline purple-border" onClick={addTypedSourcePath}>Add Path</button></div></div><div className="drop-zone" onClick={selectFolder}><Upload size={44} /><h3>Add folders to EverythingAI Scope</h3><p>EverythingAI automatically indexes, extracts, embeds, analyzes, and plans from every backend-persisted source path.</p><div className="mini-tags"><span>Documents</span><span>Folders</span><span>Automatic Knowledge</span><span>Persistent Scope</span></div></div><div className="path-row"><input value={folderPath} onChange={(e) => setFolderPath(e.target.value)} placeholder="C:\\path\\to\\folder" /><button onClick={addTypedSourcePath} disabled={busy}>Add to Scope</button></div></section><SourcePathsPanel sourcePaths={sourcePaths} rescanSource={rescanSource} pauseSource={pauseSource} resumeSource={resumeSource} removeSource={removeSource} />{!files.length ? <section className="empty-card"><div className="big-icon"><FolderOpen /></div><h2>AI File Organization Ready</h2><p>Add source paths and EverythingAI will automatically consume the knowledge inside them.</p></section> : <><section className="stats-grid"><Stat title="Total Files" value={files.length} /><Stat title="Total Size" value={formatSize(totalSize)} /><Stat title="File Categories" value={Object.keys(fileTypes).length} /><Stat title="AI Confidence" value={aiConfidence} /></section><section className="two-col"><div className="panel"><h3>File Types Distribution</h3>{Object.entries(fileTypes).map(([key, value]) => <div className="bar" key={key}><span>{key}</span><div><b style={{ width: `${Math.min(100, Number(value) * 20)}%` }} /></div><small>{String(value)} files</small></div>)}</div><div className="panel"><h3>Largest Files</h3>{files.slice().sort((a: IndexedFile, b: IndexedFile) => (b.size_bytes || 0) - (a.size_bytes || 0)).slice(0, 5).map((file: IndexedFile) => <div className="file-line" key={file.id}><div><strong>{file.filename}</strong><small>{file.absolute_path}</small></div><span>{formatSize(file.size_bytes)}</span></div>)}</div></section><section className="success-card"><CheckCircle /><div><h2>AI Analysis Complete</h2><p>{files.length} files have been processed from the active source scope. EverythingAI will keep consuming watched folders automatically.</p><div className="button-row"><button className="outline" onClick={() => setSection('explorer')}>Explore Files</button><button onClick={() => setSection('planning')}>Start Planning</button><button className="outline" onClick={deepAnalysis}>Deep Analysis</button></div></div></section></>}</>;
 }
 
 function SourcePathsPanel({ sourcePaths, rescanSource, pauseSource, resumeSource, removeSource }: any) {
   return <section className="panel source-panel"><div className="panel-title"><div><h2><FolderOpen /> Source Paths</h2><p>Backend-persisted folders inside EverythingAI scope. Knowledge consumption is automatic for these paths.</p></div><span className="scope-pill">{sourcePaths.length} scoped path(s)</span></div>{!sourcePaths.length ? <div className="empty-source">No source paths added yet. Add a folder above to start automatic knowledge consumption.</div> : <div className="source-list">{sourcePaths.map((source: SourcePath) => <article className="source-card" key={source.id}><div><strong>{source.path}</strong><p>Status: <b>{source.status}</b> • Surveillance: <b>{source.watching ? 'On' : 'Off'}</b>{source.lastRun ? ` • Last run: ${new Date(source.lastRun).toLocaleString()}` : ''}</p>{source.error && <p className="source-error">{source.error}</p>}</div><div className="button-row"><button className="outline" onClick={() => rescanSource(source)}>Re-scan</button>{source.watching ? <button className="outline" onClick={() => pauseSource(source)}>Pause</button> : <button className="outline" onClick={() => resumeSource(source)}>Resume</button>}<button className="outline danger" onClick={() => removeSource(source)}>Remove</button></div></article>)}</div>}</section>;
 }
 
-function Explorer({ files, selectedFile, setSelectedFileId, query, setQuery, searchEverything }: any) { return <section><div className="explorer-search"><input value={query} onChange={(e: any) => setQuery(e.target.value)} placeholder="Search files by name, path, or tags..." /><button onClick={searchEverything}>Search</button><button className="outline" onClick={() => setQuery('')}>Clear</button></div><div className="chips"><span className="chip dark">All</span><span className="chip mint">Document</span><span className="chip blue">Spreadsheet</span><span className="chip orange">Presentation</span><span className="chip purple">Image</span></div><div className="explorer-grid"><table><thead><tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Last Modified</th></tr></thead><tbody>{files.map((file: IndexedFile) => <tr key={file.id} onClick={() => setSelectedFileId(file.id)} className={selectedFile?.id === file.id ? 'selected' : ''}><td>{file.filename}</td><td>{file.absolute_path}</td><td><span className="chip blue">{file.extension || 'file'}</span></td><td>{formatSize(file.size_bytes)}</td><td>{file.modified_at ? new Date(file.modified_at).toLocaleDateString() : '-'}</td></tr>)}</tbody></table><aside className="details"><h2>{selectedFile?.filename || 'Select a file'}</h2>{selectedFile && <><p><strong>Path:</strong> {selectedFile.absolute_path}</p><p><strong>Type:</strong> {selectedFile.extension}</p><p><strong>Size:</strong> {formatSize(selectedFile.size_bytes)}</p><h3>Tags</h3><div className="chips"><span className="chip blue">processed</span><span className="chip mint">document</span></div><h3>Content Preview</h3><div className="preview-box">Preview endpoint integration is next: /api/files/:fileId/preview</div></>}</aside></div></section>; }
+function Explorer({ files, selectedFile, setSelectedFileId, query, setQuery, searchEverything, filePreviews, filePreviewLoadingId, filePreviewErrors }: any) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filters, setFilters] = useState(emptyFileFilters);
+  const visibleFiles = filterFiles(files, filters);
+  const selectedVisibleFile = selectedFile && visibleFiles.some((file: IndexedFile) => file.id === selectedFile.id)
+    ? selectedFile
+    : visibleFiles[0];
+  const selectedPreview = selectedVisibleFile ? filePreviews[selectedVisibleFile.id] : null;
+  const selectedPreviewError = selectedVisibleFile ? filePreviewErrors[selectedVisibleFile.id] : '';
+  const tags = selectedVisibleFile ? getFileTags(selectedVisibleFile, selectedPreview) : [];
 
-function Planning({ files, suggestions, previews, selectedSuggestionIds, setSelectedSuggestionIds, previewSuggestion, previewSelected, executePreview, executeSelectedPreviews, deepAnalysis, busy, openSettings }: any) {
+  return <section>
+    <div className="explorer-search">
+      <input value={query} onChange={(e: any) => setQuery(e.target.value)} placeholder="Search files by name, path, or tags..." />
+      <button onClick={searchEverything}>Search</button>
+      <button className="outline" onClick={() => setFiltersOpen((open) => !open)}><Sliders size={16} /> Filters</button>
+      <button className="outline" onClick={() => setQuery('')}>Clear</button>
+    </div>
+    {filtersOpen && <div className="filter-panel">
+      <label>Extension
+        <select value={filters.extension} onChange={(e) => setFilters((current) => ({ ...current, extension: e.target.value }))}>
+          <option value="">All extensions</option>
+          {uniqueFileFilterValues(files, 'extension').map((value) => <option key={value} value={value}>{value}</option>)}
+        </select>
+      </label>
+      <label>Index Status
+        <select value={filters.indexStatus} onChange={(e) => setFilters((current) => ({ ...current, indexStatus: e.target.value }))}>
+          <option value="">All index statuses</option>
+          {uniqueFileFilterValues(files, 'index_status').map((value) => <option key={value} value={value}>{value}</option>)}
+        </select>
+      </label>
+      <label>Extraction Status
+        <select value={filters.extractionStatus} onChange={(e) => setFilters((current) => ({ ...current, extractionStatus: e.target.value }))}>
+          <option value="">All extraction statuses</option>
+          {uniqueFileFilterValues(files, 'extraction_status').map((value) => <option key={value} value={value}>{value}</option>)}
+        </select>
+      </label>
+      <button className="outline" onClick={() => setFilters(emptyFileFilters)}>Clear Filters</button>
+      <span>{visibleFiles.length} of {files.length} file(s) visible</span>
+    </div>}
+    <div className="chips"><span className="chip dark">{visibleFiles.length} visible</span><span className="chip blue">{files.length} total</span></div>
+    <div className="explorer-grid">
+      <table><thead><tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Last Modified</th></tr></thead><tbody>{visibleFiles.map((file: IndexedFile) => <tr key={file.id} onClick={() => setSelectedFileId(file.id)} className={selectedVisibleFile?.id === file.id ? 'selected' : ''}><td>{file.filename}</td><td>{file.absolute_path}</td><td><span className="chip blue">{file.extension || 'file'}</span></td><td>{formatSize(file.size_bytes)}</td><td>{file.modified_at ? new Date(file.modified_at).toLocaleDateString() : '-'}</td></tr>)}</tbody></table>
+      <aside className="details"><h2>{selectedVisibleFile?.filename || 'Select a file'}</h2>{selectedVisibleFile && <><p><strong>Path:</strong> {selectedVisibleFile.absolute_path}</p><p><strong>Type:</strong> {selectedVisibleFile.extension || 'file'}</p><p><strong>Size:</strong> {formatSize(selectedVisibleFile.size_bytes)}</p><h3>Tags</h3><div className="chips">{tags.map((tag) => <span className="chip blue" key={tag}>{tag}</span>)}</div><h3>Content Preview</h3><div className="preview-box text-preview">{filePreviewLoadingId === selectedVisibleFile.id ? 'Loading preview...' : selectedPreviewError ? `Preview unavailable: ${selectedPreviewError}` : selectedPreview ? <><strong>Preview Text</strong><p>{selectedPreview.previewText || 'No preview text returned.'}</p><strong>Insight Summary</strong><p>{selectedPreview.summary || 'No insight summary returned.'}</p><strong>Classification</strong><p>{selectedPreview.classification || 'Unclassified'}</p><strong>Metadata</strong><pre>{JSON.stringify(selectedPreview.metadata || {}, null, 2)}</pre></> : 'No preview loaded yet.'}</div></>}</aside>
+    </div>
+  </section>;
+}
+
+function Planning({ files, suggestions, previews, selectedSuggestionIds, setSelectedSuggestionIds, previewSuggestion, previewSelected, executePreview, executeSelectedPreviews, deepAnalysis, busy, openSettings, destinationFolder, setDestinationFolder }: any) {
   function toggleSuggestion(id: string) {
     const next = new Set(selectedSuggestionIds);
     if (next.has(id)) next.delete(id); else next.add(id);
     setSelectedSuggestionIds(next);
   }
-  return <section><div className="planning-head"><div><h1><Brain /> AI Planning Center</h1><p>Full planning workflow with AI settings, dry run previews, action selection, execution queue, and safety approval.</p></div><div className="button-row"><button className="outline" onClick={openSettings}><Sliders size={16} /> AI Settings</button><button className="purple" onClick={deepAnalysis} disabled={busy}>AI Analyze</button><button className="outline" onClick={previewSelected}>Dry Run Preview</button><button onClick={executeSelectedPreviews}>Execute Plan</button></div></div><div className="destination"><strong>Destination Folder</strong><input defaultValue="/Documents/Organized" /></div><div className="analysis-card"><h2><Brain /> AI Analysis Ready</h2><p>Processing {files.length} files with content analysis, pattern recognition, and business context understanding...</p><div className="progress"><span style={{ width: files.length ? '100%' : '40%' }} /></div><div className="process-tags"><span>Content Analysis</span><span>Pattern Recognition</span><span>Business Context</span><span>Structure Generation</span></div></div><div className="planning-grid advanced"><div className="panel"><h3>AI Plan Summary</h3><p>Files analyzed: <b>{files.length}</b></p><p>Actions suggested: <b>{suggestions.length}</b></p><p>Selected actions: <b>{selectedSuggestionIds.size}</b></p><p>Dry-run previews: <b>{previews.length}</b></p><p>Executable previews: <b>{previews.filter((p: PreviewRecord) => p.preview_status === 'ready').length}</b></p></div><div className="panel wide"><h3>Suggested Actions</h3>{suggestions.slice(0, 60).map((s: Suggestion) => <div className="suggestion-line selectable" key={s.id}><label><input type="checkbox" checked={selectedSuggestionIds.has(s.id)} onChange={() => toggleSuggestion(s.id)} /> <b>{s.action_type}</b> → {s.suggested_value}</label><span className="chip blue">{Math.round(Number(s.confidence || 0) * 100)}%</span><button onClick={() => previewSuggestion(s)}>Preview</button></div>)}</div><div className="panel wide"><h3>Dry Run / Execution Queue</h3>{!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}{previews.map((p: PreviewRecord) => <div className="suggestion-line" key={p.id}><div><b>{p.action_type}</b> → {p.target_path || p.suggested_value}<p className="muted">{p.preview_status === 'ready' ? 'Ready to execute' : `Blocked: ${p.blocked_reason}`}</p></div><span className={p.preview_status === 'ready' ? 'chip green' : 'chip orange'}>{p.preview_status}</span><button disabled={p.preview_status !== 'ready'} onClick={() => executePreview(p)}>Execute</button></div>)}</div></div></section>;
+  return <section><div className="planning-head"><div><h1><Brain /> AI Planning Center</h1><p>Full planning workflow with AI settings, dry run previews, action selection, execution queue, and safety approval.</p></div><div className="button-row"><button className="outline" onClick={openSettings}><Sliders size={16} /> AI Settings</button><button className="purple" onClick={deepAnalysis} disabled={busy}>AI Analyze</button><button className="outline" onClick={previewSelected}>Dry Run Preview</button><button onClick={executeSelectedPreviews}>Execute Plan</button></div></div><div className="destination"><strong>Destination Folder</strong><input value={destinationFolder} onChange={(e) => { setDestinationFolder(e.target.value); localStorage.setItem('everythingai.ui.destinationFolder', e.target.value); }} /><p className="muted">Planning label only. Executable filesystem targets come from backend-safe action previews.</p></div><div className="analysis-card"><h2><Brain /> AI Analysis Ready</h2><p>Processing {files.length} files with content analysis, pattern recognition, and business context understanding...</p><div className="progress"><span style={{ width: files.length ? '100%' : '40%' }} /></div><div className="process-tags"><span>Content Analysis</span><span>Pattern Recognition</span><span>Business Context</span><span>Structure Generation</span></div></div><div className="planning-grid advanced"><div className="panel"><h3>AI Plan Summary</h3><p>Files analyzed: <b>{files.length}</b></p><p>Actions suggested: <b>{suggestions.length}</b></p><p>Selected actions: <b>{selectedSuggestionIds.size}</b></p><p>Dry-run previews: <b>{previews.length}</b></p><p>Executable previews: <b>{previews.filter((p: PreviewRecord) => p.preview_status === 'ready').length}</b></p></div><div className="panel wide"><h3>Suggested Actions</h3>{suggestions.slice(0, 60).map((s: Suggestion) => <div className="suggestion-line selectable" key={s.id}><label><input type="checkbox" checked={selectedSuggestionIds.has(s.id)} onChange={() => toggleSuggestion(s.id)} /> <b>{s.action_type}</b> → {s.suggested_value}</label><span className="chip blue">{Math.round(Number(s.confidence || 0) * 100)}%</span><button onClick={() => previewSuggestion(s)}>Preview</button></div>)}</div><div className="panel wide"><h3>Dry Run / Execution Queue</h3>{!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}{previews.map((p: PreviewRecord) => <div className="suggestion-line" key={p.id}><div><b>{p.action_type}</b> → {p.target_path || p.suggested_value}<p className="muted">{p.preview_status === 'ready' ? 'Ready to execute' : `Blocked: ${p.blocked_reason}`}</p></div><span className={p.preview_status === 'ready' ? 'chip green' : 'chip orange'}>{p.preview_status}</span><button disabled={p.preview_status !== 'ready'} onClick={() => executePreview(p)}>Execute</button></div>)}</div></div></section>;
 }
 
 function Analytics({ status, audit }: any) { return <section><h1><BarChart3 /> Logging & Analytics Dashboard</h1><section className="stats-grid"><Stat title="Total Logs" value={audit.length} /><Stat title="Errors" value={audit.filter((e: any) => String(e.event_type).includes('failed')).length} /><Stat title="Actions" value={status?.executions || 0} /><Stat title="Active Watchers" value={status?.active_watch_roots || 0} /></section><div className="panel"><h2>Log Entries</h2><table><thead><tr><th>Timestamp</th><th>Category</th><th>Message</th></tr></thead><tbody>{audit.map((event: any) => <tr key={event.id}><td>{new Date(event.created_at).toLocaleString()}</td><td>{event.entity_type}</td><td>{event.event_type}</td></tr>)}</tbody></table></div></section>; }
