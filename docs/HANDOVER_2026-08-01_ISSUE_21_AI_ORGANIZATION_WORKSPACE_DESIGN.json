@@ -1,0 +1,99 @@
+{
+  "issue": 21,
+  "title": "Future Track: AI Organization Workspace / Managed Knowledge Archive",
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "result": "AI_ORGANIZATION_WORKSPACE_STAGE_1_DESIGN_CONTRACT_SUBMITTED",
+  "startedFromSha": "39ff9e8acf3e1b55f3c8de32e10733cf08e042d1",
+  "scopeDecision": {
+    "classification": "future-track product-design",
+    "runtimeCodeChanged": false,
+    "reason": "Issue #21 defines a future workflow separate from current local MVP finalization and carries product-design scope."
+  },
+  "artifacts": [
+    "docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md",
+    "REPORTS/ISSUE-21-AI-ORGANIZATION-WORKSPACE-DESIGN.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_21_AI_ORGANIZATION_WORKSPACE_DESIGN.json",
+    ".hermes/state.json"
+  ],
+  "designAdditions": [
+    "Stage-gate contract for nine future archive stages.",
+    "Archive profile model and validation rules.",
+    "Preview-only plan item contract.",
+    "Copy-first executor invariants.",
+    "Metadata sidecar schema with field-level AI provenance.",
+    "Source/archive fingerprint tracking requirements.",
+    "Conflict and stale archive state model.",
+    "UI review workspace requirements.",
+    "Safety acceptance matrix mapping issue criteria to future evidence."
+  ],
+  "acceptanceCriteriaDisposition": [
+    {
+      "criterion": "User can configure a source folder and archive destination.",
+      "status": "DEFERRED_TO_STAGE_2_AND_STAGE_6",
+      "evidence": "Archive profile model, validation rules, and UI workspace requirements are defined in docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md."
+    },
+    {
+      "criterion": "App can generate a preview-only organization plan.",
+      "status": "DEFERRED_TO_STAGE_3",
+      "evidence": "Preview-only plan item contract and deterministic planner requirement are defined."
+    },
+    {
+      "criterion": "App can copy approved files into an organized archive without modifying originals.",
+      "status": "DEFERRED_TO_STAGE_4",
+      "evidence": "Copy-first executor invariants and source-read-only safety rule are defined."
+    },
+    {
+      "criterion": "App writes metadata sidecars for archive files.",
+      "status": "DEFERRED_TO_STAGE_5",
+      "evidence": "Sidecar schema, filename convention, approval metadata, and AI provenance requirements are defined."
+    },
+    {
+      "criterion": "App records source and archive fingerprints.",
+      "status": "DEFERRED_TO_STAGE_4",
+      "evidence": "Source and archive fingerprint fields and execution evidence requirements are defined."
+    },
+    {
+      "criterion": "App detects stale archive copies when source files change.",
+      "status": "DEFERRED_TO_STAGE_7",
+      "evidence": "Stale detection states and allowed next actions are defined."
+    },
+    {
+      "criterion": "App keeps full audit/recovery trace.",
+      "status": "DEFERRED_TO_STAGE_4_STAGE_6_STAGE_7",
+      "evidence": "Audit/recovery linkage requirements are defined for plan, approval, execution, and fingerprints."
+    },
+    {
+      "criterion": "App never deletes or overwrites without explicit approval.",
+      "status": "DESIGN_RULE_CAPTURED_RUNTIME_PROOF_DEFERRED",
+      "evidence": "No-delete, no-overwrite, and conflict fail-closed rules are defined."
+    }
+  ],
+  "validation": {
+    "required": [
+      "npm run framework:doctor",
+      "node --test tests/*.test.mjs",
+      "npm test",
+      "git diff --check",
+      "node JSON parse check for handover and .hermes/state.json"
+    ],
+    "results": [
+      "npm run framework:doctor from C:\\temp\\EverythingAI: PASS",
+      "node --test tests/*.test.mjs from C:\\temp\\EverythingAI: 182/182 passed",
+      "npm test from C:\\temp\\EverythingAI: 182/182 passed",
+      "git diff --check from C:\\temp\\EverythingAI: exit 0 with line-ending warnings only",
+      "JSON parse check for docs/HANDOVER_2026-08-01_ISSUE_21_AI_ORGANIZATION_WORKSPACE_DESIGN.json and .hermes/state.json: passed",
+      "Focused secret scan for issue #21 artifacts: passed"
+    ]
+  },
+  "labelsForSubmission": [
+    "forge:done",
+    "pm:review"
+  ],
+  "protectedActions": {
+    "issueClosed": false,
+    "pmAccepted": false,
+    "dependentTasksReleased": false,
+    "secretsExposed": false,
+    "destructiveGitCommandsUsed": false
+  }
+}
