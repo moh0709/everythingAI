@@ -1,4 +1,4 @@
-function validateIdentityRecovery({
+export function validateIdentityRecovery({
   telemetryRebuilt = true,
   auditRebuilt = true,
   snapshotsRebuilt = true,
@@ -19,7 +19,3 @@ function validateIdentityRecovery({
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  validateIdentityRecovery
-};

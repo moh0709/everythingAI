@@ -24,4 +24,4 @@ const identityGovernanceContract = {
   ]
 };
 
-module.exports = identityGovernanceContract;
+export default identityGovernanceContract;

@@ -1,11 +1,11 @@
-function freezeTelemetryEvent(event = {}) {
+export function freezeTelemetryEvent(event = {}) {
   return Object.freeze({
     ...event,
     frozenAt: new Date().toISOString()
   });
 }
 
-function normalizeTelemetryOrdering(events = []) {
+export function normalizeTelemetryOrdering(events = []) {
   return [...events].sort((a, b) => {
     const first = a.timestamp || '';
     const second = b.timestamp || '';
@@ -14,7 +14,7 @@ function normalizeTelemetryOrdering(events = []) {
   });
 }
 
-function buildTelemetryEnvelope(event = {}, governanceVersion = '5.1') {
+export function buildTelemetryEnvelope(event = {}, governanceVersion = '5.1') {
   return freezeTelemetryEvent({
     governanceVersion,
     normalized: true,
@@ -22,13 +22,6 @@ function buildTelemetryEnvelope(event = {}, governanceVersion = '5.1') {
   });
 }
 
-function normalizeIdentityEvent(event = {}) {
+export function normalizeIdentityEvent(event = {}) {
   return buildTelemetryEnvelope(event);
 }
-
-module.exports = {
-  freezeTelemetryEvent,
-  normalizeTelemetryOrdering,
-  buildTelemetryEnvelope,
-  normalizeIdentityEvent
-};

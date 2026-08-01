@@ -1,17 +1,17 @@
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
-function buildCorrelationId() {
+export function buildCorrelationId() {
   return crypto.randomUUID();
 }
 
-function freezeCorrelationChain(chain = {}) {
+export function freezeCorrelationChain(chain = {}) {
   return Object.freeze({
     ...chain,
     frozenAt: new Date().toISOString()
   });
 }
 
-function linkCorrelationChains(chains = []) {
+export function linkCorrelationChains(chains = []) {
   return freezeCorrelationChain({
     correlationChainId: buildCorrelationId(),
     chains,
@@ -19,7 +19,7 @@ function linkCorrelationChains(chains = []) {
   });
 }
 
-function validateCorrelationConsistency(chain = {}) {
+export function validateCorrelationConsistency(chain = {}) {
   const valid = Boolean(chain.correlationChainId);
 
   return Object.freeze({
@@ -28,10 +28,3 @@ function validateCorrelationConsistency(chain = {}) {
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  buildCorrelationId,
-  freezeCorrelationChain,
-  linkCorrelationChains,
-  validateCorrelationConsistency
-};

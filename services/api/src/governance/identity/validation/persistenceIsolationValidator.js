@@ -1,4 +1,4 @@
-const FORBIDDEN_PERSISTENCE_FIELDS = Object.freeze([
+export const FORBIDDEN_PERSISTENCE_FIELDS = Object.freeze([
   'runtimeState',
   'executionAuthority',
   'lifecycleOwnership',
@@ -6,7 +6,7 @@ const FORBIDDEN_PERSISTENCE_FIELDS = Object.freeze([
   'executionPrivileges'
 ]);
 
-function validatePersistenceIsolation(target = {}) {
+export function validatePersistenceIsolation(target = {}) {
   const violations = FORBIDDEN_PERSISTENCE_FIELDS.filter((field) =>
     Object.prototype.hasOwnProperty.call(target, field)
   );
@@ -18,8 +18,3 @@ function validatePersistenceIsolation(target = {}) {
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  FORBIDDEN_PERSISTENCE_FIELDS,
-  validatePersistenceIsolation
-};

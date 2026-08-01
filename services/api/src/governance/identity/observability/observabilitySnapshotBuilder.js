@@ -1,13 +1,13 @@
-const crypto = require('crypto');
+import crypto from 'node:crypto';
 
-function freezeSnapshot(snapshot = {}) {
+export function freezeSnapshot(snapshot = {}) {
   return Object.freeze({
     ...snapshot,
     frozenAt: new Date().toISOString()
   });
 }
 
-function buildSnapshot({
+export function buildSnapshot({
   operators = [],
   roles = [],
   assignments = [],
@@ -29,7 +29,7 @@ function buildSnapshot({
   });
 }
 
-function reconstructSnapshot(snapshot = {}) {
+export function reconstructSnapshot(snapshot = {}) {
   return freezeSnapshot({
     ...snapshot,
     reconstructed: true,
@@ -37,7 +37,7 @@ function reconstructSnapshot(snapshot = {}) {
   });
 }
 
-function validateSnapshotConsistency(snapshot = {}) {
+export function validateSnapshotConsistency(snapshot = {}) {
   const valid = Boolean(snapshot.snapshotId);
 
   return Object.freeze({
@@ -46,10 +46,3 @@ function validateSnapshotConsistency(snapshot = {}) {
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  freezeSnapshot,
-  buildSnapshot,
-  reconstructSnapshot,
-  validateSnapshotConsistency
-};

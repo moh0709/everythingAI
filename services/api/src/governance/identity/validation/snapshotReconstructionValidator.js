@@ -1,4 +1,4 @@
-function validateSnapshotReconstruction(snapshotBuilder, input) {
+export function validateSnapshotReconstruction(snapshotBuilder, input) {
   const firstSnapshot = snapshotBuilder(input);
   const secondSnapshot = snapshotBuilder(input);
 
@@ -10,7 +10,3 @@ function validateSnapshotReconstruction(snapshotBuilder, input) {
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  validateSnapshotReconstruction
-};

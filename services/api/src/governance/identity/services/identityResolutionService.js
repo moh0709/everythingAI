@@ -1,4 +1,4 @@
-function buildIdentityContext({
+export function buildIdentityContext({
   operatorId,
   resolvedRoles = [],
   governanceVersion = '5.1',
@@ -15,7 +15,7 @@ function buildIdentityContext({
   });
 }
 
-function resolveOperator(operator) {
+export function resolveOperator(operator) {
   if (!operator || !operator.operatorId) {
     return null;
   }
@@ -27,7 +27,7 @@ function resolveOperator(operator) {
   });
 }
 
-function resolveOperatorRoles(assignments = []) {
+export function resolveOperatorRoles(assignments = []) {
   return Object.freeze(
     assignments
       .map((assignment) => assignment.roleName)
@@ -35,9 +35,3 @@ function resolveOperatorRoles(assignments = []) {
       .sort()
   );
 }
-
-module.exports = {
-  buildIdentityContext,
-  resolveOperator,
-  resolveOperatorRoles
-};

@@ -1,4 +1,4 @@
-function validateCorrelationIntegrity(chains = []) {
+export function validateCorrelationIntegrity(chains = []) {
   const ids = chains.map((chain) => chain.correlationId).filter(Boolean);
   const uniqueIds = new Set(ids);
 
@@ -12,7 +12,3 @@ function validateCorrelationIntegrity(chains = []) {
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  validateCorrelationIntegrity
-};

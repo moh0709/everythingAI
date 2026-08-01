@@ -14,4 +14,4 @@ const IdentityEvents = Object.freeze({
   IDENTITY_VALIDATION_FAILED: 'IDENTITY_VALIDATION_FAILED'
 });
 
-module.exports = IdentityEvents;
+export default IdentityEvents;

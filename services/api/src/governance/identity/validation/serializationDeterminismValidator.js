@@ -1,8 +1,8 @@
-function stableSerialize(value) {
+export function stableSerialize(value) {
   return JSON.stringify(value, Object.keys(value).sort());
 }
 
-function validateSerializationDeterminism(input) {
+export function validateSerializationDeterminism(input) {
   const first = stableSerialize(input);
   const second = stableSerialize(input);
 
@@ -14,8 +14,3 @@ function validateSerializationDeterminism(input) {
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  stableSerialize,
-  validateSerializationDeterminism
-};

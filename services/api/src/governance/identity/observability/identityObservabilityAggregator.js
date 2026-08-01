@@ -1,25 +1,25 @@
-function aggregateTelemetry(telemetry = []) {
+export function aggregateTelemetry(telemetry = []) {
   return Object.freeze({
     totalTelemetry: telemetry.length,
     telemetry
   });
 }
 
-function aggregateAuditArtifacts(auditArtifacts = []) {
+export function aggregateAuditArtifacts(auditArtifacts = []) {
   return Object.freeze({
     totalAuditArtifacts: auditArtifacts.length,
     auditArtifacts
   });
 }
 
-function aggregateCorrelationChains(correlationChains = []) {
+export function aggregateCorrelationChains(correlationChains = []) {
   return Object.freeze({
     totalCorrelationChains: correlationChains.length,
     correlationChains
   });
 }
 
-function buildGovernanceObservabilityView({
+export function buildGovernanceObservabilityView({
   telemetry = [],
   auditArtifacts = [],
   correlationChains = []
@@ -31,10 +31,3 @@ function buildGovernanceObservabilityView({
     generatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  aggregateTelemetry,
-  aggregateAuditArtifacts,
-  aggregateCorrelationChains,
-  buildGovernanceObservabilityView
-};

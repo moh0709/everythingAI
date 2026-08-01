@@ -1,4 +1,4 @@
-function createIdentityMetadataModel({
+export function createIdentityMetadataModel({
   metadataId,
   operatorId,
   source = 'governance',
@@ -13,7 +13,3 @@ function createIdentityMetadataModel({
     createdAt
   });
 }
-
-module.exports = {
-  createIdentityMetadataModel
-};

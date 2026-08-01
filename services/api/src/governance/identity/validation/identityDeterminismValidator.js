@@ -1,4 +1,4 @@
-function validateIdentityDeterminism({
+export function validateIdentityDeterminism({
   input,
   firstResult,
   secondResult
@@ -12,7 +12,3 @@ function validateIdentityDeterminism({
     evaluatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  validateIdentityDeterminism
-};

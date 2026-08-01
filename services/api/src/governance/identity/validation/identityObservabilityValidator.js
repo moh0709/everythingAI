@@ -1,4 +1,4 @@
-function validateIdentityObservability({
+export function validateIdentityObservability({
   telemetry = [],
   auditArtifacts = [],
   snapshots = []
@@ -16,7 +16,3 @@ function validateIdentityObservability({
     validatedAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  validateIdentityObservability
-};

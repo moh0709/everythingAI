@@ -17,4 +17,4 @@ const validationRegistry = Object.freeze({
   }
 });
 
-module.exports = validationRegistry;
+export default validationRegistry;

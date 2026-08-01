@@ -1,4 +1,4 @@
-function createOperatorRoleModel({
+export function createOperatorRoleModel({
   assignmentId,
   operatorId,
   roleId,
@@ -13,7 +13,3 @@ function createOperatorRoleModel({
     assignedAt
   });
 }
-
-module.exports = {
-  createOperatorRoleModel
-};

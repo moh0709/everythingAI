@@ -1,4 +1,4 @@
-function validateRuntimeIsolation(target = {}) {
+export function validateRuntimeIsolation(target = {}) {
   const forbiddenProperties = [
     'authorizeExecution',
     'denyExecution',
@@ -17,7 +17,3 @@ function validateRuntimeIsolation(target = {}) {
     severity: violations.length ? 'IV-4' : 'IV-0'
   });
 }
-
-module.exports = {
-  validateRuntimeIsolation
-};

@@ -1,4 +1,4 @@
-function createOperatorModel({
+export function createOperatorModel({
   operatorId,
   displayName,
   status = 'active',
@@ -15,7 +15,3 @@ function createOperatorModel({
     updatedAt
   });
 }
-
-module.exports = {
-  createOperatorModel
-};

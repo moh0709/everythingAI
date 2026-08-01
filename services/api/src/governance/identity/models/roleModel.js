@@ -1,4 +1,4 @@
-function createRoleModel({
+export function createRoleModel({
   roleId,
   roleName,
   roleDescription = null,
@@ -15,7 +15,3 @@ function createRoleModel({
     createdAt
   });
 }
-
-module.exports = {
-  createRoleModel
-};

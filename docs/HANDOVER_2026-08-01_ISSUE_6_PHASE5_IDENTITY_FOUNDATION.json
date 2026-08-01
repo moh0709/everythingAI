@@ -1,0 +1,95 @@
+{
+  "task": "Issue #6 - Phase 5.1 Identity & Role Foundation Governance Track",
+  "issue": 6,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "6d04744f2af61af3dd16a18bca65e4f4f9df1bb3",
+  "implementationSha": null,
+  "finalPushedSha": null,
+  "filesChanged": [
+    "services/api/src/governance/identity/contracts/identityGovernanceContract.js",
+    "services/api/src/governance/identity/models/identityMetadataModel.js",
+    "services/api/src/governance/identity/models/operatorModel.js",
+    "services/api/src/governance/identity/models/operatorRoleModel.js",
+    "services/api/src/governance/identity/models/roleModel.js",
+    "services/api/src/governance/identity/observability/identityCorrelationService.js",
+    "services/api/src/governance/identity/observability/identityEventPublisher.js",
+    "services/api/src/governance/identity/observability/identityObservabilityAggregator.js",
+    "services/api/src/governance/identity/observability/identityTelemetryService.js",
+    "services/api/src/governance/identity/observability/observabilitySnapshotBuilder.js",
+    "services/api/src/governance/identity/recovery/identityRecoveryHooks.js",
+    "services/api/src/governance/identity/services/identityAuditService.js",
+    "services/api/src/governance/identity/services/identityResolutionService.js",
+    "services/api/src/governance/identity/telemetry/identityEvents.js",
+    "services/api/src/governance/identity/validation/correlationIntegrityValidator.js",
+    "services/api/src/governance/identity/validation/identityDeterminismValidator.js",
+    "services/api/src/governance/identity/validation/identityIsolationValidator.js",
+    "services/api/src/governance/identity/validation/identityObservabilityValidator.js",
+    "services/api/src/governance/identity/validation/identityRecoveryValidator.js",
+    "services/api/src/governance/identity/validation/persistenceIsolationValidator.js",
+    "services/api/src/governance/identity/validation/serializationDeterminismValidator.js",
+    "services/api/src/governance/identity/validation/snapshotReconstructionValidator.js",
+    "services/api/src/governance/identity/validation/validationRegistry.js",
+    "services/api/test/phase5IdentityFoundation.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-6-PHASE5-IDENTITY-FOUNDATION.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_6_PHASE5_IDENTITY_FOUNDATION.json",
+    "LOGS/ISSUE-6-phase5-identity-foundation-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "operator identity model",
+      "evidence": [
+        "createOperatorModel",
+        "Phase 5.1 identity models persist only observational governance metadata"
+      ]
+    },
+    {
+      "criterion": "role model",
+      "evidence": [
+        "createRoleModel",
+        "createOperatorRoleModel",
+        "Phase 5.1 role resolution is deterministic and observational only"
+      ]
+    },
+    {
+      "criterion": "identity observability",
+      "evidence": [
+        "publishIdentityEvent",
+        "normalizeIdentityEvent",
+        "buildGovernanceObservabilityView",
+        "Phase 5.1 observability synchronizes telemetry, audit, snapshots, and validation"
+      ]
+    },
+    {
+      "criterion": "governance metadata",
+      "evidence": [
+        "identityGovernanceContract",
+        "Phase 5.1 identity contract preserves runtime sovereignty and disables enforcement"
+      ]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: identity modules did not provide ESM exports",
+    "targetedGreen": "PASS: 4/4",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: 180/180",
+    "rootNpmTest": "PASS: 180/180",
+    "serviceApiNpmTest": "PASS: 141/141",
+    "diffCheck": "PASS",
+    "jsonCheck": "PASS",
+    "finalValidation": "PASS"
+  },
+  "governance": {
+    "mode": "observational",
+    "enforcementLevel": "L0",
+    "runtimeGating": false,
+    "runtimeMutation": false,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "No runtime authorization, gating, or enforcement is activated by this rollout."
+  ]
+}

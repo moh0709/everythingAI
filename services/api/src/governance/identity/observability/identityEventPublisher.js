@@ -1,7 +1,7 @@
-const crypto = require('crypto');
-const IdentityEvents = require('../telemetry/identityEvents');
+import crypto from 'node:crypto';
+import IdentityEvents from '../telemetry/identityEvents.js';
 
-function publishIdentityEvent({
+export function publishIdentityEvent({
   eventType,
   operatorId = null,
   correlationId = null,
@@ -22,7 +22,3 @@ function publishIdentityEvent({
     metadata
   });
 }
-
-module.exports = {
-  publishIdentityEvent
-};

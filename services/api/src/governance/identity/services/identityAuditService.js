@@ -1,4 +1,4 @@
-function buildIdentityAuditArtifact({
+export function buildIdentityAuditArtifact({
   auditId,
   operatorId,
   action,
@@ -18,11 +18,6 @@ function buildIdentityAuditArtifact({
   });
 }
 
-function recordIdentityAudit(input) {
+export function recordIdentityAudit(input) {
   return buildIdentityAuditArtifact(input);
 }
-
-module.exports = {
-  buildIdentityAuditArtifact,
-  recordIdentityAudit
-};

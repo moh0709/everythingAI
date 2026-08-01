@@ -1,4 +1,4 @@
-function validateIdentityRecovery() {
+export function validateIdentityRecovery() {
   return Object.freeze({
     recoveryReady: true,
     evaluatedAt: new Date().toISOString(),
@@ -6,7 +6,7 @@ function validateIdentityRecovery() {
   });
 }
 
-function reconstructIdentityContext(identityContext = {}) {
+export function reconstructIdentityContext(identityContext = {}) {
   return Object.freeze({
     ...identityContext,
     reconstructed: true,
@@ -14,16 +14,10 @@ function reconstructIdentityContext(identityContext = {}) {
   });
 }
 
-function rebuildIdentityTelemetry(events = []) {
+export function rebuildIdentityTelemetry(events = []) {
   return Object.freeze({
     rebuilt: true,
     totalEvents: events.length,
     rebuiltAt: new Date().toISOString()
   });
 }
-
-module.exports = {
-  validateIdentityRecovery,
-  reconstructIdentityContext,
-  rebuildIdentityTelemetry
-};
