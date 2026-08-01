@@ -1,44 +1,69 @@
 EAI-TASK-014 terminal log
 =========================
 
-Repo root: /root/.hermes/projects/everythingAI
+Repo root: C:\temp\EverythingAI
 Issue: #36
 Task: EAI-TASK-014 - Targeted cleanup of redundant admin entry files
+Agent: Forge
+Refresh timestamp: 2026-08-01T19:18:41+02:00
+Starting SHA: 3fab1e8adf722edc7c9625a4e8980a088bd674d9
+
+Startup / governance checks
+---------------------------
+- Read .hermes/forge/context-36.json completely.
+- Loaded PROJECT_STATE.md and AI_BOOTSTRAP.md from the repository checkout.
+- gh issue view 36 confirmed issue #36 is OPEN with labels hermes:done and forge:working.
+- gh issue list --state open --label pm:ready --label hermes:ready returned [].
+- Existing unrelated local changes were identified and preserved:
+  - LOGS/EAI-TASK-046-terminal.log
+  - tests/task-worker-runtime-mode.test.mjs
+  - apps/everything-ai-ui/src/planning.css
+  - docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
 
 Reference checks
 ----------------
-Commands run:
-- gh issue view 36 --json number,title,body,labels,url
-- grep-style repository searches for:
-  - AdminAppV2
-  - src/admin/admin-main
-  - admin/admin-main
+Issue-required literal commands attempted:
+- grep -R "AdminAppV2" apps/everything-ai-ui/src apps/everything-ai-ui/*.html apps/everything-ai-ui/vite.config.* || true
+- grep -R "src/admin/admin-main" apps/everything-ai-ui/src apps/everything-ai-ui/*.html apps/everything-ai-ui/vite.config.* || true
+- grep -R "admin/admin-main" apps/everything-ai-ui/src apps/everything-ai-ui/*.html apps/everything-ai-ui/vite.config.* || true
 
-Results:
-- No matches were found for AdminAppV2 in apps/everything-ai-ui, vite.config.ts, or admin HTML files.
-- No matches were found for src/admin/admin-main.
-- No matches were found for admin/admin-main.
-- The checked redundant admin entry file paths are not present in this checkout.
+PowerShell result:
+- BLOCKED_BY_SHELL_SYNTAX: PowerShell rejected || true.
+
+Fallback attempt:
+- bash -lc with the same grep commands
+
+Fallback result:
+- BLOCKED_BY_ENVIRONMENT: WSL reported no installed Linux distributions.
+
+Equivalent validated searches:
+- rg -n "AdminAppV2" over apps/everything-ai-ui/src, concrete *.html files, concrete vite.config.* files: no matches
+- rg -n "src/admin/admin-main" over apps/everything-ai-ui/src, concrete *.html files, concrete vite.config.* files: no matches
+- rg -n "admin/admin-main" over apps/everything-ai-ui/src, concrete *.html files, concrete vite.config.* files: no matches
+- git ls-files apps/everything-ai-ui/src/admin/admin-main.tsx apps/everything-ai-ui/src/admin/AdminAppV2.tsx: no tracked files
+- Test-Path apps/everything-ai-ui/src/admin/admin-main.tsx: False
+- Test-Path apps/everything-ai-ui/src/admin/AdminAppV2.tsx: False
 
 Validation
 ----------
-Commands run from repo root:
-- git pull --ff-only
-- node scripts/framework-doctor.mjs
-- cd apps/everything-ai-ui && npm run typecheck
-- cd apps/everything-ai-ui && npm run build
-- cd ../../services/api && npm test
-
-Results:
-- git pull --ff-only: PASS (Already up to date.)
-- framework doctor: PASS
-- UI typecheck: PASS
-- UI build: PASS
-- API tests: PASS (114 tests total; 113 passed, 1 skipped, 0 failed)
+- git pull --ff-only from C:\temp\EverythingAI: PASS (Already up to date.)
+- node scripts/framework-doctor.mjs from C:\temp\EverythingAI: PASS
+- npm run typecheck from C:\temp\EverythingAI\apps\everything-ai-ui: PASS
+- npm run build from C:\temp\EverythingAI\apps\everything-ai-ui: PASS
+- npm test from C:\temp\EverythingAI\services\api: PASS (173 tests, 173 passed, 0 failed)
 
 Safety / boundary notes
 -----------------------
-- Active admin path preserved: apps/everything-ai-ui/admin.html -> src/admin-main.tsx -> src/admin/AdminApp.tsx -> src/admin/AdminRuntimeApp.tsx
-- No core application code was modified.
+- No source/application files were modified.
+- Active admin path preserved with no diffs:
+  - apps/everything-ai-ui/admin.html
+  - apps/everything-ai-ui/src/admin-main.tsx
+  - apps/everything-ai-ui/src/admin/AdminApp.tsx
+  - apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx
+  - apps/everything-ai-ui/src/admin/components/AdminShell.tsx
+  - apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx
 - No secrets or environment variables were exposed.
 
+Artifact commit SHA
+-------------------
+TO_BE_RECORDED_AFTER_ARTIFACT_COMMIT
