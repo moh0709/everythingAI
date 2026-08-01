@@ -873,3 +873,17 @@ ok 127 - createWorkspaceContextMiddleware can be configured for explicit product
 # todo 0
 # duration_ms 12352.399783
 [exit:0]
+
+=== Forge maintenance revalidation 2026-08-01T18:27Z ===
+Context: stale-open issue #54 maintenance claim; existing PM acceptance verified live from 2026-06-26 comments.
+Preserved unrelated local changes: LOGS/EAI-TASK-046-terminal.log, tests/task-worker-runtime-mode.test.mjs, apps/everything-ai-ui/src/planning.css, docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json.
+COMMAND: git pull --ff-only
+RESULT: PASS - Already up to date.
+COMMAND: node scripts/framework-doctor.mjs
+RESULT: PASS - status PASS, gh authenticated, required framework files present.
+COMMAND: cd apps/everything-ai-ui; npm run typecheck
+RESULT: PASS - tsc --noEmit exited 0.
+COMMAND: cd apps/everything-ai-ui; npm run build
+RESULT: PASS - vite build exited 0; 1556 modules transformed.
+COMMAND: cd services/api; npm test
+RESULT: PASS - node --test completed 173 tests, 173 pass, 0 fail.
