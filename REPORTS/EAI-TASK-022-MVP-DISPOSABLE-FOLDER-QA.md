@@ -100,4 +100,4 @@ PM review of this refreshed evidence and closure of stale issue #44 if accepted.
 
 ## Artifact commit SHA
 
-PENDING_FIRST_ARTIFACT_COMMIT
+2b8bdc5c084da367bcab23e44fc69e9ce56b192e
