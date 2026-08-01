@@ -9,7 +9,7 @@
   "started_at": "2026-08-01T19:30:19+02:00",
   "finished_at": "2026-08-01T19:30:39+02:00",
   "starting_sha": "215148068a484009de94710f4b6cbb0575b502c4",
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifact_commit_sha": "3c064c36614898598de7524fbda2fff1e04c57c6",
   "final_pushed_sha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "final_status": "PASS",
   "source_changes": "none",
