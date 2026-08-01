@@ -7660,3 +7660,6 @@ A l r e a d y   u p   t o   d a t e . 
 
 --- artifact SHA recorded ---
 artifact_commit_sha=7c15e03583248cc2746685653115a6e936e658fb
+
+--- final pushed SHA source marker ---
+final_pushed_sha_source=GitHub issue comment after push

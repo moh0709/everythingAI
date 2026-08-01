@@ -78,7 +78,7 @@
   ],
   "recommended_next_task": "PM review of this maintenance rerun, or a separate browser-level UI QA task if fresh UI evidence is required.",
   "artifact_commit_sha": "7c15e03583248cc2746685653115a6e936e658fb",
-  "final_pushed_sha": "PENDING_FINAL_PUSHED_SHA",
+  "final_pushed_sha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "issue_transition_required": [
     "forge:done",
     "pm:review"

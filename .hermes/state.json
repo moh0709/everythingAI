@@ -11,7 +11,7 @@
   "startingCommitSha": "4c5f07aa8f9c906ffc0c5f2b19feca45816d9cbc",
   "preCommitArtifactSha": "7c15e03583248cc2746685653115a6e936e658fb",
   "artifactCommitSha": "7c15e03583248cc2746685653115a6e936e658fb",
-  "finalPushedSha": "PENDING_FINAL_PUSHED_SHA",
+  "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "finalShaSource": "GitHub issue comment after metadata sync push",
   "finalizationPattern": "Two-step finalization: artifact evidence commit first, followed by metadata sync commit that records the artifact commit SHA as the source of truth.",
   "implementation": [
