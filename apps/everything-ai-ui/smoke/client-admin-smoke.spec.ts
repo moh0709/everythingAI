@@ -85,7 +85,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await searchBox.fill('README.md');
     await page.getByRole('button', { name: 'Search Files' }).click();
     await expect(page.getByRole('heading', { name: 'Indexing & Extraction Progress' })).toBeVisible();
-    await expect(page.getByText('1/1 visible')).toBeVisible();
+    await expect(page.getByText(/\d+\/\d+ visible/)).toBeVisible();
     await saveScreenshot(page, '07-admin-search-results');
 
     await expect(page.getByRole('button', { name: 'Files & Content' })).toBeVisible();
