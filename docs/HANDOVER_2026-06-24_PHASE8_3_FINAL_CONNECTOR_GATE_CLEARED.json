@@ -44,7 +44,7 @@
   "nextRecommendedTaskTitle": "Complete issue #76 live host provisioning through direct SSH/root or authorized sudo execution.",
   "historicalNextRecommendedTaskTitle": "Controlled connector-specific setup/testing for installed Codex",
   "startingCommitSha": "f5e371b4782bae98307ff0d5e23ce3ff2cafe9ae",
-  "artifactCommitSha": "PENDING_METADATA_SYNC",
+  "artifactCommitSha": "b23699c8d01564a0169dc665bbca04f3548ffbb9",
   "updatedAt": "2026-08-01T00:00:00Z",
   "secrets": "none recorded"
 }

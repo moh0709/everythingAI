@@ -78,4 +78,4 @@ Historical issue #32 first local-MVP implementation recommendation remains: **Co
 
 ## Artifact commit SHA
 
-`PENDING_METADATA_SYNC`
+`b23699c8d01564a0169dc665bbca04f3548ffbb9`
