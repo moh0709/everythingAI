@@ -17,6 +17,14 @@ async function loadModule() {
 
 const logic = await loadModule();
 
+test('UserApp delegates the ask workflow to useAskWorkflows', async () => {
+  const source = await readFile(new URL('./UserApp.tsx', import.meta.url), 'utf8');
+
+  assert.match(source, /import \{ useAskWorkflows \} from '\.\/user\/useAskWorkflows';/);
+  assert.match(source, /const \{ askQuestion, handleChatSubmit \} = useAskWorkflows\(/);
+  assert.doesNotMatch(source, /async function askQuestion/);
+});
+
 test('calculateAiConfidence averages positive finite backend suggestion confidence', () => {
   assert.equal(
     logic.calculateAiConfidence([

@@ -4,6 +4,7 @@ import type { IndexedFile } from './api';
 import type { ScanReport } from './user/scanReportTypes';
 import type { UserView, WikiPayload } from './user/types';
 import { useAskState } from './user/useAskState';
+import { useAskWorkflows } from './user/useAskWorkflows';
 import { useConnectionActions } from './user/useConnectionActions';
 import { useConnectionSettings } from './user/useConnectionSettings';
 import { useFileDocumentState } from './user/useFileDocumentState';
@@ -67,8 +68,7 @@ export function UserApp() {
     addAssistantMessage,
     chatInputRef,
     focusChatInput,
-    handleChatSubmit,
-  } = useAskState(() => askQuestion());
+  } = useAskState();
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
   const [scanReport, setScanReport] = useState<ScanReport | null>(null);
@@ -118,6 +118,20 @@ export function UserApp() {
 
   useInitialUserAppRefresh({ refreshFiles, refreshWiki, refreshWatcherStatus });
 
+  const { askQuestion, handleChatSubmit } = useAskWorkflows({
+    options,
+    busy,
+    chatInput,
+    run,
+    setView,
+    setQuery,
+    clearChatInput,
+    addUserMessage,
+    addAssistantMessage,
+    focusChatInput,
+    setStatus,
+  });
+
   async function buildKnowledgeWorkspace(pathOverride = folderPath) {
     const normalized = pathOverride.trim();
     if (!normalized) {
@@ -155,24 +169,6 @@ export function UserApp() {
       setView('wiki');
       setStatus(`Workspace ready with ${payload.files?.length || 0} indexed file(s), ${wikiPayload.wiki.page_count || 0} wiki page(s), and ${indexPayload.skipped || 0} skipped scan item(s).`);
     });
-  }
-
-  async function askQuestion(questionText = chatInput) {
-    const question = questionText.trim();
-    if (!question || busy) return;
-
-    setView('ask');
-    clearChatInput();
-    setQuery('');
-
-    await run('Asking indexed sources...', async () => {
-      addUserMessage(question);
-      const payload = await apiRequest<any>(options, '/api/chat', { question, limit: 5 }, 'POST');
-      addAssistantMessage(payload.answer || 'No answer returned.', payload.sources || []);
-      setStatus(`Answer prepared from ${payload.sources?.length || 0} referenced source(s).`);
-    });
-
-    focusChatInput();
   }
 
   const { askAboutWikiPage } = useWikiPageActions({ selectedWikiPage, askQuestion });

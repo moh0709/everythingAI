@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, FormEvent, SetStateAction } from 'react';
 import { apiRequest } from '../api';
 import type { ApiOptions } from '../api';
 import type { UserView } from './types';
@@ -55,5 +55,10 @@ export function useAskWorkflows({
     focusChatInput();
   }
 
-  return { askQuestion };
+  function handleChatSubmit(event: FormEvent) {
+    event.preventDefault();
+    askQuestion();
+  }
+
+  return { askQuestion, handleChatSubmit };
 }

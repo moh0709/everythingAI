@@ -1,7 +1,7 @@
-import { FormEvent, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { ChatMessage } from './types';
 
-export function useAskState(askQuestion: () => void) {
+export function useAskState() {
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -22,11 +22,6 @@ export function useAskState(askQuestion: () => void) {
     chatInputRef.current?.focus();
   }
 
-  function handleChatSubmit(event: FormEvent) {
-    event.preventDefault();
-    askQuestion();
-  }
-
   return {
     chatInput,
     setChatInput,
@@ -37,6 +32,5 @@ export function useAskState(askQuestion: () => void) {
     addAssistantMessage,
     chatInputRef,
     focusChatInput,
-    handleChatSubmit,
   };
 }
