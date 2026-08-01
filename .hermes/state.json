@@ -1,29 +1,36 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 24,
-  "currentTask": "EAI-TASK-002",
-  "updatedAt": "2026-08-01T18:14:50.055+02:00",
-  "lastCheckedAt": "2026-08-01T18:14:50.055+02:00",
+  "currentIssue": 26,
+  "currentTask": "EAI-TASK-004",
+  "updatedAt": "2026-08-01T18:20:17.0782091+02:00",
+  "lastCheckedAt": "2026-08-01T18:20:17.0782091+02:00",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "HERMES_FOUNDATION_EVIDENCE_REFRESH_SUBMITTED",
-  "startingCommitSha": "97b6d3694bf18a0a5b3312daff93c5fccf5b8569",
+  "result": "HERMES_WORKER_LIFECYCLE_EVIDENCE_REFRESH_SUBMITTED",
+  "startingCommitSha": "e485154814a99afacaac7ffa16e208dd75af55b2",
   "artifactCommitSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "implementation": [
     ".hermes/state.json",
-    "LOGS/EAI-TASK-002-terminal.log",
-    "REPORTS/EAI-TASK-002-HERMES-FRAMEWORK-FOUNDATION.md"
+    "LOGS/EAI-TASK-004-terminal.log",
+    "REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md"
+  ],
+  "validatedLifecycleFiles": [
+    "scripts/task-worker.mjs",
+    "scripts/task-poller.mjs",
+    "scripts/framework-doctor.mjs",
+    "src/task-queue.js",
+    "src/task-claim.js",
+    "templates/REPORT_TEMPLATE.md"
   ],
   "validation": [
-    "git pull --ff-only from C:\\temp\\EverythingAI: PASS, already up to date",
+    "git pull from C:\\temp\\EverythingAI: PASS, already up to date",
+    "npm test from C:\\temp\\EverythingAI: 182/182 PASS",
     "node scripts/framework-doctor.mjs from C:\\temp\\EverythingAI: PASS",
+    "npm run worker:once -- --dry-run from C:\\temp\\EverythingAI: PASS, no runnable issue found and no mutation required",
     "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
     "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS",
-    "npm test from C:\\temp\\EverythingAI: 182/182 PASS",
-    "git diff --check from C:\\temp\\EverythingAI: exit 0 with line-ending warnings only",
-    "JSON parse check for .hermes/state.json, templates/STATE_TEMPLATE.json, and skills/hermes-pm-framework.prompt.json: PASS"
+    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS"
   ],
   "queueLabels": [
     "forge:done",
@@ -31,5 +38,5 @@
   ],
   "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
   "secrets": "none recorded",
-  "humanSummary": "Issue #24 Hermes foundation evidence was refreshed for PM review. The framework foundation files are present, required validations passed, and final pushed SHA is recorded in the final GitHub issue comment after push."
+  "humanSummary": "Issue #26 Hermes worker lifecycle evidence was refreshed for PM review from the current main checkout. Required validations passed, the live dry-run queue was empty, and final pushed SHA is recorded in the final GitHub issue comment after push."
 }
