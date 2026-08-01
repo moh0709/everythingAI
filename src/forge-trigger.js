@@ -66,7 +66,7 @@ function readMaintenanceState(statePath) {
   }
 }
 
-export function markForgeMaintenanceProcessed({ statePath, issueNumber, cycleId, result, now = () => new Date() } = {}) {
+export function markForgeMaintenanceProcessed({ statePath, issueNumber, cycleId, result, headSha, now = () => new Date() } = {}) {
   const state = readMaintenanceState(statePath);
   const nextCycleId = cycleId ?? state.cycleId ?? maintenanceCycleId(now);
   const processed = state.cycleId === nextCycleId ? state.processedIssues : [];
@@ -74,31 +74,37 @@ export function markForgeMaintenanceProcessed({ statePath, issueNumber, cycleId,
   withoutDuplicate.push({
     issueNumber: Number(issueNumber),
     processedAt: now().toISOString(),
-    result: String(result ?? 'processed')
+    result: String(result ?? 'processed'),
+    headSha: typeof headSha === 'string' ? headSha : undefined
   });
   atomicWriteJson(statePath, { cycleId: nextCycleId, processedIssues: withoutDuplicate });
 }
 
-function processedMaintenanceIssue(issueNumber, { statePath, cycleId, now = () => new Date(), cooldownMs = MAINTENANCE_PROCESSED_COOLDOWN_MS } = {}) {
-  if (!statePath) return false;
+function processedMaintenanceSkipReason(issueNumber, { statePath, cycleId, now = () => new Date(), cooldownMs = MAINTENANCE_PROCESSED_COOLDOWN_MS, currentHeadSha } = {}) {
+  if (!statePath) return null;
   const state = readMaintenanceState(statePath);
   const effectiveCycleId = cycleId ?? maintenanceCycleId(now);
-  return state.processedIssues.some((entry) => {
-    if (Number(entry.issueNumber) !== Number(issueNumber)) return false;
-    if (state.cycleId === effectiveCycleId) return true;
+  const comparableHeadSha = /^[a-f0-9]{40}$/i.test(String(currentHeadSha ?? '')) ? currentHeadSha : null;
+  for (const entry of state.processedIssues) {
+    if (Number(entry.issueNumber) !== Number(issueNumber)) continue;
+    if (state.cycleId === effectiveCycleId) return 'already_processed';
+    if (comparableHeadSha && entry.headSha === comparableHeadSha) return 'head_unchanged';
     const processedAt = Date.parse(entry.processedAt ?? '');
-    return Number.isFinite(processedAt) && Math.max(0, now().getTime() - processedAt) <= cooldownMs;
-  });
+    if (Number.isFinite(processedAt) && Math.max(0, now().getTime() - processedAt) <= cooldownMs) return 'already_processed';
+  }
+  return null;
 }
 
-export function classifyForgeMaintenanceIssue(issue, { now = () => new Date(), inactiveAfterMs = MAINTENANCE_INACTIVE_AFTER_MS, controllerIssueNumber = DEFAULT_MAINTENANCE_CONTROLLER_ISSUE_NUMBER, statePath, cycleId, cooldownMs } = {}) {
+export function classifyForgeMaintenanceIssue(issue, { now = () => new Date(), inactiveAfterMs = MAINTENANCE_INACTIVE_AFTER_MS, controllerIssueNumber = DEFAULT_MAINTENANCE_CONTROLLER_ISSUE_NUMBER, currentExecutingIssueNumber, statePath, cycleId, cooldownMs, currentHeadSha } = {}) {
   const issueNumber = Number(issue?.number);
   if (!isOpen(issue)) return null;
+  if (issueNumber === Number(currentExecutingIssueNumber)) return { skipReason: 'currently_executing' };
   if (issueNumber === Number(controllerIssueNumber)) return { skipReason: 'self_controller' };
   if (PROTECTED_MAINTENANCE_ISSUES.has(issueNumber)) return { skipReason: 'dependency_blocked' };
   const labels = normalizeLabels(issue);
   if ((labels.includes('forge:done') || labels.includes('forge:blocked')) && labels.includes('pm:review')) return { skipReason: 'awaiting_pm_review' };
-  if (processedMaintenanceIssue(issueNumber, { statePath, cycleId, now, cooldownMs })) return { skipReason: 'already_processed' };
+  const processedSkipReason = processedMaintenanceSkipReason(issueNumber, { statePath, cycleId, now, cooldownMs, currentHeadSha });
+  if (processedSkipReason) return { skipReason: processedSkipReason };
   if (hasWorkingOwner(labels) || hasReadyOwner(labels)) return { skipReason: 'active_owner' };
   const updatedAt = Date.parse(issue?.updatedAt ?? issue?.createdAt ?? '');
   const isInactive = Number.isFinite(updatedAt) && Math.max(0, now().getTime() - updatedAt) >= inactiveAfterMs;
@@ -240,22 +246,23 @@ function blockedReviewLabels(issue) {
   return labels;
 }
 
-export async function claimForgeMaintenanceIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultMaintenanceStatePath(repoRoot), controllerIssueNumber, startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
+export async function claimForgeMaintenanceIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultMaintenanceStatePath(repoRoot), controllerIssueNumber, currentExecutingIssueNumber, startingSha = 'unknown', currentHeadSha = startingSha, projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
   const targetNumber = Number(issue?.number);
   if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
   const live = await fetchLiveIssue(targetNumber);
-  const selected = selectForgeMaintenanceIssue([live], { now, controllerIssueNumber, statePath });
+  const maintenanceOptions = { now, controllerIssueNumber, currentExecutingIssueNumber, statePath, currentHeadSha };
+  const selected = selectForgeMaintenanceIssue([live], maintenanceOptions);
   if (!selected) {
-    const classified = classifyForgeMaintenanceIssue(live, { now, controllerIssueNumber, statePath });
+    const classified = classifyForgeMaintenanceIssue(live, maintenanceOptions);
     return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`skip_reason=${classified?.skipReason ?? 'not_eligible'} maintenance labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
   }
   const acquired = acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
   if (!acquired.ok) return { ok: false, ...acquired, issue: live };
   try {
     const verifiedBeforeMutation = await fetchLiveIssue(targetNumber);
-    const verifiedSelection = selectForgeMaintenanceIssue([verifiedBeforeMutation], { now, controllerIssueNumber, statePath });
+    const verifiedSelection = selectForgeMaintenanceIssue([verifiedBeforeMutation], maintenanceOptions);
     if (!verifiedSelection) {
-      const classified = classifyForgeMaintenanceIssue(verifiedBeforeMutation, { now, controllerIssueNumber, statePath });
+      const classified = classifyForgeMaintenanceIssue(verifiedBeforeMutation, maintenanceOptions);
       return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: [`skip_reason=${classified?.skipReason ?? 'not_eligible'} maintenance eligibility changed before mutation`] };
     }
     await updateLabels(targetNumber, maintenanceClaimLabels(verifiedBeforeMutation));
@@ -273,7 +280,7 @@ export async function claimForgeMaintenanceIssue({ issue, fetchLiveIssue, update
     let execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
     const verifiedCompletion = await fetchLiveIssue(targetNumber);
     if (hasVerifiedForgeSubmission(verifiedCompletion)) {
-      markForgeMaintenanceProcessed({ statePath, issueNumber: targetNumber, result: 'SUBMITTED_FOR_PM_REVIEW', now });
+      markForgeMaintenanceProcessed({ statePath, issueNumber: targetNumber, result: 'SUBMITTED_FOR_PM_REVIEW', headSha: currentHeadSha, now });
       return { ok: true, result: FORGE_RESULTS.AUTONOMOUS_STARTED, issue: verifiedCompletion, contextPath: prepared.path, report, execution };
     }
     if (execution?.ok) {
@@ -300,7 +307,7 @@ export async function claimForgeMaintenanceIssue({ issue, fetchLiveIssue, update
     }));
     const blockedPosted = await postComment(verifiedBlocked, blockerComment);
     if (transitionVerified && blockedPosted?.ok) {
-      markForgeMaintenanceProcessed({ statePath, issueNumber: targetNumber, result: 'BLOCKED_FOR_PM_REVIEW', now });
+      markForgeMaintenanceProcessed({ statePath, issueNumber: targetNumber, result: 'BLOCKED_FOR_PM_REVIEW', headSha: currentHeadSha, now });
     }
     return {
       ok: false,

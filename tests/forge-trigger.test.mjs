@@ -335,6 +335,95 @@ test('maintenance restart cooldown prevents duplicate claim comments and executi
   assert.equal(executions, 0);
 });
 
+test('maintenance classification skips the currently executing issue even without owner labels', () => {
+  const candidate = {
+    number: 97,
+    title: 'EAI-TASK-050: Prevent duplicate Forge claims',
+    state: 'open',
+    labels: [],
+    updatedAt: '2026-07-20T12:00:00Z'
+  };
+  const classified = classifyForgeMaintenanceIssue(candidate, {
+    currentExecutingIssueNumber: 97,
+    now: () => new Date('2026-08-01T12:00:00Z')
+  });
+  assert.equal(classified.skipReason, 'currently_executing');
+});
+
+test('maintenance classification skips previously processed issue when HEAD is unchanged', () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-head-'));
+  const statePath = join(root, 'maintenance-state.json');
+  markForgeMaintenanceProcessed({
+    statePath,
+    issueNumber: 80,
+    cycleId: '2026-07-30',
+    result: 'SUBMITTED_FOR_PM_REVIEW',
+    headSha: 'b'.repeat(40),
+    now: () => new Date('2026-07-30T12:00:00Z')
+  });
+  const candidate = {
+    number: 80,
+    title: 'stale maintenance issue',
+    state: 'open',
+    labels: [],
+    updatedAt: '2026-07-20T12:00:00Z'
+  };
+  const classified = classifyForgeMaintenanceIssue(candidate, {
+    statePath,
+    currentHeadSha: 'b'.repeat(40),
+    now: () => new Date('2026-08-01T12:00:00Z'),
+    cooldownMs: 1
+  });
+  assert.equal(classified.skipReason, 'head_unchanged');
+});
+
+test('maintenance poller reports processed and skipped issue summary', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-summary-'));
+  const issues = [
+    {
+      number: 96,
+      title: 'Forge maintenance controller',
+      state: 'open',
+      url: 'https://github.com/moh0709/everythingAI/issues/96',
+      body: 'maintenance controller',
+      labels: [],
+      updatedAt: '2026-07-20T12:00:00Z'
+    },
+    {
+      number: 80,
+      title: 'older maintenance issue',
+      state: 'open',
+      url: 'https://github.com/moh0709/everythingAI/issues/80',
+      body: 'maintenance backlog',
+      labels: [],
+      updatedAt: '2026-07-20T12:00:00Z'
+    }
+  ];
+  const update = async (number, labels) => {
+    const target = issues.find((candidate) => candidate.number === number);
+    target.labels = labels.map((name) => ({ name }));
+  };
+  const result = await pollForgeOnce({
+    list: async () => [],
+    listMaintenance: async () => issues,
+    fetch: async (number) => issues.find((candidate) => candidate.number === number),
+    update,
+    comment: async () => ({ ok: true }),
+    reporter: async () => ({ sent: false }),
+    repoRoot: root,
+    sha: 'c'.repeat(40),
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    now: () => new Date('2026-08-01T12:00:00Z'),
+    execute: async ({ issue: target }) => {
+      await update(target.number, ['forge:done', 'pm:review']);
+      return { ok: true, result: 'COMPLETED' };
+    }
+  });
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.match(result.evidence.join('\n'), /maintenance_summary=processed:80 skipped:96:self_controller/);
+});
+
 test('maintenance stale label re-read aborts when PM review appears before mutation', async () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-stale-'));
   let reads = 0;

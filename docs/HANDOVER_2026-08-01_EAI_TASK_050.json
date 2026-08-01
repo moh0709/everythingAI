@@ -1,9 +1,9 @@
 {
   "task": "EAI-TASK-050",
-  "issue": 98,
-  "status": "IMPLEMENTED_VALIDATED_PENDING_LIVE_HANDOFF",
-  "startingSha": "bba8f2d5c5c52a9a70ba7ed95f9de9cd06e01002",
-  "summary": "Forge maintenance selection now skips controller self-selection, PM-review handoff states, already processed issues, active owners, and protected dependency issue 69. Processed maintenance identities are persisted with a restart-safe cooldown before duplicate claim comments or executions can occur.",
+  "issue": 97,
+  "status": "IMPLEMENTED_VALIDATED_PENDING_PUSH",
+  "startingSha": "825011bff5eefe8c0daa0b567e679cd163d998fd",
+  "summary": "Forge maintenance selection excludes the currently executing issue, controller self-selection, PM-review handoff states, already processed issues, active owners, protected dependency issue 69, and previously processed issues whose HEAD SHA has not changed. Maintenance passes now emit processed/skipped summary evidence.",
   "filesChanged": [
     "src/forge-trigger.js",
     "scripts/forge-trigger.mjs",
@@ -14,46 +14,60 @@
   ],
   "acceptanceCriteria": [
     {
-      "criterion": "Exclude current maintenance-controller issue from maintenance candidate selection.",
+      "criterion": "Never reclaim the issue currently executing.",
       "evidence": [
-        "tests/forge-trigger.test.mjs: maintenance poller default controller exclusion skips issue 96 and selects next older eligible issue",
-        "independent demo selected issue 78 while issue 96 returned self_controller"
+        "tests/forge-trigger.test.mjs: maintenance classification skips the currently executing issue even without owner labels"
       ]
     },
     {
-      "criterion": "Exclude Forge PM-review handoff states from maintenance execution.",
+      "criterion": "Persist processed-this-cycle list and prevent same-cycle duplicate execution.",
+      "evidence": [
+        "markForgeMaintenanceProcessed persists cycleId and processedIssues",
+        "tests/forge-trigger.test.mjs: maintenance restart cooldown prevents duplicate claim comments and execution commits"
+      ]
+    },
+    {
+      "criterion": "Skip issues whose HEAD commit has not changed.",
+      "evidence": [
+        "processedIssues entries include headSha",
+        "tests/forge-trigger.test.mjs: maintenance classification skips previously processed issue when HEAD is unchanged"
+      ]
+    },
+    {
+      "criterion": "After execution_completed, issue becomes ineligible until PM changes state.",
+      "evidence": [
+        "hasVerifiedForgeSubmission requires terminal forge labels plus pm:review",
+        "tests/forge-trigger.test.mjs: maintenance selection skips controller and PM-review handoff states"
+      ]
+    },
+    {
+      "criterion": "Skip forge:done + pm:review and forge:blocked + pm:review.",
       "evidence": [
         "tests/forge-trigger.test.mjs: maintenance selection skips controller and PM-review handoff states"
       ]
     },
     {
-      "criterion": "Persist processed identity and cooldown across ticks and restarts.",
+      "criterion": "Never allow the maintenance issue to process itself.",
       "evidence": [
-        "tests/forge-trigger.test.mjs: maintenance poller records processed issue and advances on repeated ticks",
-        "tests/forge-trigger.test.mjs: maintenance restart cooldown prevents duplicate claim comments and execution commits"
+        "self_controller default controller exclusion",
+        "currently_executing explicit runtime exclusion"
       ]
     },
     {
-      "criterion": "Re-read labels before mutation and abort stale ownership or review state.",
+      "criterion": "Log every skip reason and produce processed/skipped summary.",
       "evidence": [
-        "tests/forge-trigger.test.mjs: maintenance stale label re-read aborts when PM review appears before mutation"
-      ]
-    },
-    {
-      "criterion": "Terminal handoff does not leave forge:working.",
-      "evidence": [
-        "tests/forge-trigger.test.mjs: worker launch failure transitions the claimed issue to blocked PM review",
-        "tests/forge-trigger.test.mjs: maintenance claim marks unowned stale issue working and preserves verified done review submission"
+        "tests/forge-trigger.test.mjs: maintenance poller reports processed and skipped issue summary"
       ]
     }
   ],
   "validation": {
-    "targeted": "node --test tests/forge-trigger.test.mjs: 18/18 PASS",
-    "frameworkDoctor": "node scripts/framework-doctor.mjs: PASS",
-    "nodeTests": "node --test tests/*.test.mjs: 177/177 PASS",
-    "npmTest": "npm test: 177/177 PASS",
-    "diffCheck": "git diff --check: PASS with line-ending warnings only",
-    "issue96Demo": "issue96 skipReason self_controller; selectedIssue 78"
+    "targetedRed": "node --test tests/forge-trigger.test.mjs: failed before implementation for currently_executing, head_unchanged, and maintenance_summary expectations",
+    "targetedGreen": "node --test tests/forge-trigger.test.mjs: 21/21 PASS",
+    "frameworkDoctor": "npm run framework:doctor: PASS",
+    "nodeTests": "node --test tests/*.test.mjs: 180/180 PASS",
+    "npmTest": "npm test: 180/180 PASS",
+    "diffCheck": "git diff --check: exit 0 with line-ending warnings only",
+    "jsonCheck": "docs/HANDOVER_2026-08-01_EAI_TASK_050.json valid"
   },
   "governance": {
     "issue69Modified": false,

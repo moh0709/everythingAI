@@ -1,12 +1,12 @@
 # EAI-TASK-050: Forge Maintenance Idempotency
 
-Issue: #98
+Issue: #97
 Date: 2026-08-01
-Starting SHA: bba8f2d5c5c52a9a70ba7ed95f9de9cd06e01002
+Starting SHA: 825011bff5eefe8c0daa0b567e679cd163d998fd
 
 ## Summary
 
-Forge maintenance selection now fails closed for controller self-selection, PM-review handoff states, already processed maintenance issues, active owners, and the protected dependency issue #69. The poller persists completed maintenance issue identities in `.hermes/forge/maintenance-state.json` and applies a restart-safe cooldown before any second claim, comment, or execution for the same issue.
+Forge maintenance selection now excludes the currently executing issue, controller self-selection, PM-review handoff states, already processed maintenance issues, active owners, protected dependency issue #69, and issues already processed at the same HEAD commit. The poller records processed issue identity with HEAD SHA and emits a processed/skipped summary for each maintenance pass.
 
 ## Changed Files
 
@@ -21,28 +21,31 @@ Forge maintenance selection now fails closed for controller self-selection, PM-r
 
 | Requirement | Evidence |
 |---|---|
-| Exclude current maintenance controller | `maintenance poller default controller exclusion skips issue 96 and selects next older eligible issue` |
-| Exclude `forge:done + pm:review` and `forge:blocked + pm:review` | `maintenance selection skips controller and PM-review handoff states` |
-| Do not review or reprocess submitted Forge work | PM-review states return `awaiting_pm_review` skip reason |
-| Persist processed issue identity | `markForgeMaintenanceProcessed` writes cycle state; restart test reads it |
-| Cooldown across ticks and restarts | `maintenance restart cooldown prevents duplicate claim comments and execution commits` |
-| Re-read labels immediately before claim mutation | `maintenance stale label re-read aborts when PM review appears before mutation` |
-| Remove `forge:working` on terminal handoff | Existing blocked/done handoff tests verify terminal labels omit `forge:working` |
-| Duplicate claim comments and evidence commits | Repeated tick/restart tests assert one comment/execution per selected issue |
-| Explicit skip reasons | `self_controller`, `awaiting_pm_review`, `already_processed`, `active_owner`, `dependency_blocked` covered in tests |
+| Never reclaim the issue currently executing | `maintenance classification skips the currently executing issue even without owner labels` |
+| Persist a processed-this-cycle list | `markForgeMaintenanceProcessed` writes `.hermes/forge/maintenance-state.json` with `cycleId` and `processedIssues` |
+| Never execute the same issue twice during one maintenance cycle | `maintenance restart cooldown prevents duplicate claim comments and execution commits` |
+| Skip issues whose HEAD commit has not changed | `maintenance classification skips previously processed issue when HEAD is unchanged` |
+| After `execution_completed`, issue becomes ineligible until PM changes state | Verified Forge submissions require terminal `forge:done` or `forge:blocked` plus `pm:review`; PM-review states classify as `awaiting_pm_review` |
+| Skip `forge:done + pm:review` and `forge:blocked + pm:review` | `maintenance selection skips controller and PM-review handoff states` |
+| Never allow the maintenance issue to process itself | Default controller issue exclusion returns `self_controller`; explicit current-execution exclusion returns `currently_executing` |
+| Log every skip reason | Poller evidence includes per-issue skipped summary and skip-reason set |
+| Produce processed/skipped summary | `maintenance poller reports processed and skipped issue summary` |
 
 ## Validation
 
-- `node --test tests/forge-trigger.test.mjs`: 18/18 pass
-- `node scripts/framework-doctor.mjs`: PASS
-- `node --test tests/*.test.mjs`: 177/177 pass
-- `npm test`: 177/177 pass
-- `git diff --check`: exit 0; only Git line-ending warnings
-- Independent #96 demo: `issue96.skipReason = self_controller`, `selectedIssue = 78`
+- `node --test tests/forge-trigger.test.mjs`: 21/21 pass
+- `npm run framework:doctor`: PASS
+- `node --test tests/*.test.mjs`: 180/180 pass
+- `npm test`: 180/180 pass
+- `git diff --check`: exit 0 with line-ending warnings only
+- `docs/HANDOVER_2026-08-01_EAI_TASK_050.json`: valid JSON
 
 ## Boundaries
 
 - Issue #69 was not modified or released.
 - No issue was closed or accepted.
 - No secrets were included in artifacts.
-- Unrelated local files were preserved.
+- Unrelated local files were preserved:
+  - `LOGS/EAI-TASK-046-terminal.log`
+  - `apps/everything-ai-ui/src/planning.css`
+  - `docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json`

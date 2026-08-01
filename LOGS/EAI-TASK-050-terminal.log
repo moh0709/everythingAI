@@ -1,14 +1,15 @@
-2026-08-01 EAI-TASK-050 sanitized terminal evidence
+2026-08-01 EAI-TASK-050 issue #97 sanitized terminal evidence
 
 Context loaded:
-- C:\temp\EverythingAI\.hermes\forge\context-98.json
+- C:\temp\EverythingAI\.hermes\forge\context-97.json
 - PROJECT_STATE.md
 - AI_BOOTSTRAP.md
 - skills/hermes-pm-qa-first-pass/SKILL.md
 
 Initial repository evidence:
 - Branch: main
-- Starting SHA: bba8f2d5c5c52a9a70ba7ed95f9de9cd06e01002
+- Starting SHA: 825011bff5eefe8c0daa0b567e679cd163d998fd
+- Live issue #97 labels at startup: pm:ready, forge:working
 - Preserved unrelated local files:
   - LOGS/EAI-TASK-046-terminal.log
   - apps/everything-ai-ui/src/planning.css
@@ -16,30 +17,24 @@ Initial repository evidence:
 
 TDD red evidence:
 - Command: node --test tests/forge-trigger.test.mjs
-- Result: FAIL
-- Expected failure: SyntaxError because ../src/forge-trigger.js did not export markForgeMaintenanceProcessed
+- Result: FAIL, 18/21 pass, 3 fail
+- Expected failing assertions:
+  - currently executing issue did not classify as currently_executing
+  - previously processed unchanged HEAD did not classify as head_unchanged
+  - maintenance poller evidence did not include maintenance_summary
 
 Targeted green evidence:
 - Command: node --test tests/forge-trigger.test.mjs
-- Result: 18/18 PASS
+- Result: 21/21 PASS
 
-Required validation:
-- Command: node scripts/framework-doctor.mjs
+Final validation:
+- Command: npm run framework:doctor
 - Result: PASS
 - Command: node --test tests/*.test.mjs
-- Result: 177/177 PASS
+- Result: 180/180 PASS
 - Command: npm test
-- Result: 177/177 PASS
+- Result: 180/180 PASS
 - Command: git diff --check
-- Result: PASS with Git line-ending warnings only
-
-Independent issue #96 demonstration:
-- Command: node --input-type=module -e "<sanitized maintenance selection check>"
-- Result:
-  {
-    "issue96": {
-      "skipReason": "self_controller"
-    },
-    "selectedIssue": 78,
-    "selectedPriority": "stale_open_issue"
-  }
+- Result: exit 0 with line-ending warnings only
+- Command: JSON.parse docs/HANDOVER_2026-08-01_EAI_TASK_050.json
+- Result: valid json
