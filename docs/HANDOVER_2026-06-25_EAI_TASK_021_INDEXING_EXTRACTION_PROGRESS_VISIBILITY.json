@@ -3,31 +3,61 @@
   "issue_number": 43,
   "title": "Improve indexing and extraction progress visibility",
   "status": "PASS",
+  "forge_maintenance_refresh": {
+    "date": "2026-08-01",
+    "status": "PASS",
+    "reason": "Stale open issue maintenance validation for already implemented and PM-accepted EAI-TASK-021.",
+    "application_behavior_changed": false,
+    "artifact_commit_sha": "PENDING_UNTIL_COMMIT",
+    "final_transition": "PENDING_PUSH_AND_LIVE_ISSUE_LABEL_VERIFICATION"
+  },
   "files_changed": [
     "apps/everything-ai-ui/src/user/ExploreView.tsx",
     "apps/everything-ai-ui/src/admin/components/ExplorerView.tsx",
     "apps/everything-ai-ui/src/user/WikiRebuildPanel.tsx",
+    "apps/everything-ai-ui/src/shared/fileProgress.ts",
+    "LOGS/EAI-TASK-021-terminal.log",
+    "REPORTS/EAI-TASK-021-INDEXING-EXTRACTION-PROGRESS-VISIBILITY.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_021_INDEXING_EXTRACTION_PROGRESS_VISIBILITY.json"
+  ],
+  "forge_maintenance_files_changed": [
     "LOGS/EAI-TASK-021-terminal.log",
     "REPORTS/EAI-TASK-021-INDEXING-EXTRACTION-PROGRESS-VISIBILITY.md",
     "docs/HANDOVER_2026-06-25_EAI_TASK_021_INDEXING_EXTRACTION_PROGRESS_VISIBILITY.json"
   ],
   "behavior": [
-    "Added clearer user Explore progress snapshots based on existing file metadata.",
-    "Added progress-state and status details to file detail panes.",
-    "Added mirrored admin Explorer progress summaries for workspace monitoring.",
-    "Added Wiki rebuild job counts for queued, running, completed, and failed stages.",
-    "Preserved read-only monitoring and existing search/filter/preview flows."
+    "User Explore progress snapshots are based on existing file metadata.",
+    "File detail panes expose progress-state, index status, extraction status, next step, and reported issue details.",
+    "Admin Explorer progress summaries mirror the user progress visibility for workspace monitoring.",
+    "Wiki rebuild job counts expose queued, running, completed, and failed stages.",
+    "Read-only monitoring and existing search, filter, preview, indexing, extraction, and Knowledge Base flows remain preserved."
   ],
   "validation": {
     "git_pull_ff_only": "PASS",
     "framework_doctor": "PASS",
     "ui_typecheck": "PASS",
     "ui_build": "PASS",
-    "api_tests": "PASS"
+    "api_tests": "PASS",
+    "api_test_count": {
+      "passed": 173,
+      "failed": 0,
+      "skipped": 0
+    },
+    "evidence_log": "LOGS/EAI-TASK-021-terminal.log"
   },
-  "artifact_commit_sha": "ec7ee67e2bd429ad20436c970780230dc50d112a",
+  "risks": [
+    "Progress labels infer state from persisted metadata and do not provide a live percentage when no percentage source exists.",
+    "Maintenance refresh did not change application behavior; rollback is limited to reverting refreshed evidence artifacts."
+  ],
+  "rollback": [
+    "Revert the Forge maintenance evidence commit to remove refreshed artifacts.",
+    "For the accepted implementation itself, revert ExploreView.tsx, ExplorerView.tsx, WikiRebuildPanel.tsx, and shared/fileProgress.ts."
+  ],
+  "accepted_implementation_artifact_commit_sha": "ec7ee67e2bd429ad20436c970780230dc50d112a",
+  "artifact_commit_sha": "PENDING_UNTIL_COMMIT",
   "notes": [
-    "No .hermes/state.json file existed in this repository snapshot, so it was not modified.",
-    "Final issue comment should include the real artifact commit SHA after the metadata sync commit."
+    "Issue #43 already had prior PM PASS comments before this maintenance execution.",
+    "Unrelated local changes were preserved and not staged.",
+    "No secrets were recorded."
   ]
 }
