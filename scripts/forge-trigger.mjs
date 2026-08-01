@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
+  classifyForgeMaintenanceIssue,
   claimForgeIssue,
   claimForgeMaintenanceIssue,
   FORGE_RESULTS,
@@ -19,6 +20,9 @@ const repo = 'moh0709/everythingAI';
 const root = process.cwd();
 const intervalMs = Number(process.env.FORGE_TRIGGER_INTERVAL_MS ?? 60_000);
 const codexPath = process.env.FORGE_CODEX_PATH ?? 'codex';
+const defaultControllerIssueNumber = process.env.FORGE_MAINTENANCE_CONTROLLER_ISSUE_NUMBER
+  ? Number(process.env.FORGE_MAINTENANCE_CONTROLLER_ISSUE_NUMBER)
+  : undefined;
 
 function gh(args) {
   const result = spawnSync('gh', args, { cwd: root, encoding: 'utf8' });
@@ -74,12 +78,21 @@ async function executeWithReporting({ contextPath, issue, repoRoot, reporter }) 
   return result;
 }
 
-export async function pollForgeOnce({ list = listIssues, listMaintenance = listMaintenanceIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8') } = {}) {
+export async function pollForgeOnce({ list = listIssues, listMaintenance = listMaintenanceIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8'), controllerIssueNumber = defaultControllerIssueNumber, maintenanceStatePath = resolve(repoRoot, '.hermes/forge/maintenance-state.json'), now = () => new Date() } = {}) {
   const issues = await list();
   if (issues.length) return claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
-  const maintenance = selectForgeMaintenanceIssue(await listMaintenance());
-  if (!maintenance) return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs, evidence: ['no eligible released or maintenance issue'] };
-  return claimForgeMaintenanceIssue({ issue: maintenance.issue, fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
+  const maintenanceIssues = await listMaintenance();
+  const maintenanceOptions = { controllerIssueNumber, statePath: maintenanceStatePath, now };
+  const maintenance = selectForgeMaintenanceIssue(maintenanceIssues, maintenanceOptions);
+  const skipReasons = maintenanceIssues
+    .map((issue) => classifyForgeMaintenanceIssue(issue, maintenanceOptions)?.skipReason)
+    .filter(Boolean);
+  if (!maintenance) {
+    return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs, evidence: [`no eligible released or maintenance issue${skipReasons.length ? `; skip_reasons=${[...new Set(skipReasons)].join(',')}` : ''}`] };
+  }
+  const result = await claimForgeMaintenanceIssue({ issue: maintenance.issue, fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, statePath: maintenanceStatePath, controllerIssueNumber, startingSha: sha, projectState, bootstrap, reporter, execute, now });
+  if (!skipReasons.length) return result;
+  return { ...result, evidence: [...(result.evidence ?? []), `maintenance_skip_reasons=${[...new Set(skipReasons)].join(',')}`] };
 }
 
 export async function watchForge({ iterations = Infinity, pauseMs = intervalMs, ...options } = {}) {

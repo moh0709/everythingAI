@@ -1,0 +1,69 @@
+{
+  "task": "EAI-TASK-050",
+  "issue": 98,
+  "status": "IMPLEMENTED_VALIDATED_PENDING_LIVE_HANDOFF",
+  "startingSha": "bba8f2d5c5c52a9a70ba7ed95f9de9cd06e01002",
+  "summary": "Forge maintenance selection now skips controller self-selection, PM-review handoff states, already processed issues, active owners, and protected dependency issue 69. Processed maintenance identities are persisted with a restart-safe cooldown before duplicate claim comments or executions can occur.",
+  "filesChanged": [
+    "src/forge-trigger.js",
+    "scripts/forge-trigger.mjs",
+    "tests/forge-trigger.test.mjs",
+    "REPORTS/EAI-TASK-050-FORGE-MAINTENANCE-IDEMPOTENCY.md",
+    "docs/HANDOVER_2026-08-01_EAI_TASK_050.json",
+    "LOGS/EAI-TASK-050-terminal.log"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "Exclude current maintenance-controller issue from maintenance candidate selection.",
+      "evidence": [
+        "tests/forge-trigger.test.mjs: maintenance poller default controller exclusion skips issue 96 and selects next older eligible issue",
+        "independent demo selected issue 78 while issue 96 returned self_controller"
+      ]
+    },
+    {
+      "criterion": "Exclude Forge PM-review handoff states from maintenance execution.",
+      "evidence": [
+        "tests/forge-trigger.test.mjs: maintenance selection skips controller and PM-review handoff states"
+      ]
+    },
+    {
+      "criterion": "Persist processed identity and cooldown across ticks and restarts.",
+      "evidence": [
+        "tests/forge-trigger.test.mjs: maintenance poller records processed issue and advances on repeated ticks",
+        "tests/forge-trigger.test.mjs: maintenance restart cooldown prevents duplicate claim comments and execution commits"
+      ]
+    },
+    {
+      "criterion": "Re-read labels before mutation and abort stale ownership or review state.",
+      "evidence": [
+        "tests/forge-trigger.test.mjs: maintenance stale label re-read aborts when PM review appears before mutation"
+      ]
+    },
+    {
+      "criterion": "Terminal handoff does not leave forge:working.",
+      "evidence": [
+        "tests/forge-trigger.test.mjs: worker launch failure transitions the claimed issue to blocked PM review",
+        "tests/forge-trigger.test.mjs: maintenance claim marks unowned stale issue working and preserves verified done review submission"
+      ]
+    }
+  ],
+  "validation": {
+    "targeted": "node --test tests/forge-trigger.test.mjs: 18/18 PASS",
+    "frameworkDoctor": "node scripts/framework-doctor.mjs: PASS",
+    "nodeTests": "node --test tests/*.test.mjs: 177/177 PASS",
+    "npmTest": "npm test: 177/177 PASS",
+    "diffCheck": "git diff --check: PASS with line-ending warnings only",
+    "issue96Demo": "issue96 skipReason self_controller; selectedIssue 78"
+  },
+  "governance": {
+    "issue69Modified": false,
+    "issueClosed": false,
+    "selfAccepted": false,
+    "secretsExposed": false,
+    "unrelatedFilesPreserved": [
+      "LOGS/EAI-TASK-046-terminal.log",
+      "apps/everything-ai-ui/src/planning.css",
+      "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+    ]
+  }
+}

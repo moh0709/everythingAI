@@ -1,0 +1,45 @@
+2026-08-01 EAI-TASK-050 sanitized terminal evidence
+
+Context loaded:
+- C:\temp\EverythingAI\.hermes\forge\context-98.json
+- PROJECT_STATE.md
+- AI_BOOTSTRAP.md
+- skills/hermes-pm-qa-first-pass/SKILL.md
+
+Initial repository evidence:
+- Branch: main
+- Starting SHA: bba8f2d5c5c52a9a70ba7ed95f9de9cd06e01002
+- Preserved unrelated local files:
+  - LOGS/EAI-TASK-046-terminal.log
+  - apps/everything-ai-ui/src/planning.css
+  - docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+
+TDD red evidence:
+- Command: node --test tests/forge-trigger.test.mjs
+- Result: FAIL
+- Expected failure: SyntaxError because ../src/forge-trigger.js did not export markForgeMaintenanceProcessed
+
+Targeted green evidence:
+- Command: node --test tests/forge-trigger.test.mjs
+- Result: 18/18 PASS
+
+Required validation:
+- Command: node scripts/framework-doctor.mjs
+- Result: PASS
+- Command: node --test tests/*.test.mjs
+- Result: 177/177 PASS
+- Command: npm test
+- Result: 177/177 PASS
+- Command: git diff --check
+- Result: PASS with Git line-ending warnings only
+
+Independent issue #96 demonstration:
+- Command: node --input-type=module -e "<sanitized maintenance selection check>"
+- Result:
+  {
+    "issue96": {
+      "skipReason": "self_controller"
+    },
+    "selectedIssue": 78,
+    "selectedPriority": "stale_open_issue"
+  }

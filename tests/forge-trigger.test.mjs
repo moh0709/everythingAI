@@ -5,14 +5,17 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
   acquireForgeLock,
+  classifyForgeMaintenanceIssue,
   claimForgeIssue,
   claimForgeMaintenanceIssue,
   FORGE_RESULTS,
   isForgeEligible,
+  markForgeMaintenanceProcessed,
   recordForgeTriggerHeartbeat,
   sanitizeText,
   selectForgeMaintenanceIssue
 } from '../src/forge-trigger.js';
+import { pollForgeOnce } from '../scripts/forge-trigger.mjs';
 
 function issue(labels = ['pm:ready', 'forge:ready']) {
   return { number: 801, title: 'OPS-AUTO handshake', state: 'open', url: 'https://github.com/moh0709/everythingAI/issues/801', body: 'handshake', labels: labels.map((name) => ({ name })) };
@@ -121,14 +124,14 @@ test('claimed issue is handed to the autonomous executor when configured', async
   assert.match(execution.contextPath, /context-801\.json$/);
 });
 
-test('maintenance selection starts after queue exhaustion and follows review priority', () => {
+test('maintenance selection skips controller and PM-review handoff states', () => {
   const issues = [
     {
-      number: 78,
-      title: 'OPS-FIX: Make Atlas poller claim transition atomic and idempotent',
+      number: 96,
+      title: 'Forge maintenance controller',
       state: 'open',
       labels: [],
-      updatedAt: '2026-07-24T12:07:15Z'
+      updatedAt: '2026-07-20T12:00:00Z'
     },
     {
       number: 97,
@@ -138,7 +141,7 @@ test('maintenance selection starts after queue exhaustion and follows review pri
       updatedAt: '2026-07-30T12:00:00Z'
     },
     {
-      number: 98,
+      number: 95,
       title: 'Forge done review',
       state: 'open',
       labels: [{ name: 'forge:done' }, { name: 'pm:review' }],
@@ -150,11 +153,214 @@ test('maintenance selection starts after queue exhaustion and follows review pri
       state: 'open',
       labels: [],
       updatedAt: '2026-07-01T12:00:00Z'
+    },
+    {
+      number: 82,
+      title: 'already owned maintenance issue',
+      state: 'open',
+      labels: [{ name: 'forge:working' }],
+      updatedAt: '2026-07-19T12:00:00Z'
+    },
+    {
+      number: 78,
+      title: 'OPS-FIX: Make Atlas poller claim transition atomic and idempotent',
+      state: 'open',
+      labels: [],
+      updatedAt: '2026-07-24T12:07:15Z'
     }
   ];
   const selected = selectForgeMaintenanceIssue(issues, { now: () => new Date('2026-08-01T12:00:00Z') });
-  assert.equal(selected.issue.number, 98);
-  assert.equal(selected.priority, 'forge_done_review');
+  assert.equal(selected.issue.number, 78);
+  assert.equal(selected.priority, 'stale_open_issue');
+  assert.deepEqual(
+    issues.map((candidate) => classifyForgeMaintenanceIssue(candidate, { now: () => new Date('2026-08-01T12:00:00Z') })?.skipReason ?? null),
+    ['self_controller', 'awaiting_pm_review', 'awaiting_pm_review', 'dependency_blocked', 'active_owner', null]
+  );
+});
+
+test('maintenance poller default controller exclusion skips issue 96 and selects next older eligible issue', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-controller-'));
+  const issues = [
+    {
+      number: 96,
+      title: 'Forge maintenance controller',
+      state: 'open',
+      url: 'https://github.com/moh0709/everythingAI/issues/96',
+      body: 'maintenance controller',
+      labels: [],
+      updatedAt: '2026-07-20T12:00:00Z'
+    },
+    {
+      number: 78,
+      title: 'OPS-FIX: Make Atlas poller claim transition atomic and idempotent',
+      state: 'open',
+      url: 'https://github.com/moh0709/everythingAI/issues/78',
+      body: 'maintenance backlog',
+      labels: [],
+      updatedAt: '2026-07-24T12:07:15Z'
+    }
+  ];
+  let claimed;
+  const update = async (number, labels) => {
+    claimed = number;
+    const target = issues.find((candidate) => candidate.number === number);
+    target.labels = labels.map((name) => ({ name }));
+  };
+  const result = await pollForgeOnce({
+    list: async () => [],
+    listMaintenance: async () => issues,
+    fetch: async (number) => issues.find((candidate) => candidate.number === number),
+    update,
+    comment: async () => ({ ok: true }),
+    reporter: async () => ({ sent: false }),
+    repoRoot: root,
+    sha: 'a'.repeat(40),
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    now: () => new Date('2026-08-01T12:00:00Z'),
+    execute: async ({ issue: target }) => {
+      await update(target.number, ['forge:done', 'pm:review']);
+      return { ok: true, result: 'COMPLETED' };
+    }
+  });
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.equal(claimed, 78);
+  assert.match(result.evidence.join('\n'), /maintenance_skip_reasons=self_controller/);
+});
+
+test('maintenance poller records processed issue and advances on repeated ticks', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-cycle-'));
+  const issues = [
+    {
+      number: 80,
+      title: 'older maintenance issue',
+      state: 'open',
+      url: 'https://github.com/moh0709/everythingAI/issues/80',
+      body: 'maintenance backlog',
+      labels: [],
+      updatedAt: '2026-07-20T12:00:00Z'
+    },
+    {
+      number: 81,
+      title: 'next maintenance issue',
+      state: 'open',
+      url: 'https://github.com/moh0709/everythingAI/issues/81',
+      body: 'maintenance backlog',
+      labels: [],
+      updatedAt: '2026-07-21T12:00:00Z'
+    }
+  ];
+  const comments = [];
+  const executions = [];
+  const update = async (number, labels) => {
+    const target = issues.find((candidate) => candidate.number === number);
+    target.labels = labels.map((name) => ({ name }));
+  };
+  const first = await pollForgeOnce({
+    list: async () => [],
+    listMaintenance: async () => issues,
+    fetch: async (number) => issues.find((candidate) => candidate.number === number),
+    update,
+    comment: async (target, body) => { comments.push({ number: target.number, body }); return { ok: true }; },
+    reporter: async () => ({ sent: false }),
+    repoRoot: root,
+    sha: 'a'.repeat(40),
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    now: () => new Date('2026-08-01T12:00:00Z'),
+    execute: async ({ issue: target }) => {
+      executions.push(target.number);
+      await update(target.number, ['forge:done', 'pm:review']);
+      return { ok: true, result: 'COMPLETED' };
+    }
+  });
+  const second = await pollForgeOnce({
+    list: async () => [],
+    listMaintenance: async () => issues,
+    fetch: async (number) => issues.find((candidate) => candidate.number === number),
+    update,
+    comment: async (target, body) => { comments.push({ number: target.number, body }); return { ok: true }; },
+    reporter: async () => ({ sent: false }),
+    repoRoot: root,
+    sha: 'a'.repeat(40),
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    now: () => new Date('2026-08-01T12:01:00Z'),
+    execute: async ({ issue: target }) => {
+      executions.push(target.number);
+      await update(target.number, ['forge:done', 'pm:review']);
+      return { ok: true, result: 'COMPLETED' };
+    }
+  });
+  assert.equal(first.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.equal(second.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.deepEqual(executions, [80, 81]);
+  assert.deepEqual(comments.map(({ number }) => number), [80, 81]);
+});
+
+test('maintenance restart cooldown prevents duplicate claim comments and execution commits', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-restart-'));
+  const statePath = join(root, 'maintenance-state.json');
+  markForgeMaintenanceProcessed({
+    statePath,
+    issueNumber: 80,
+    cycleId: '2026-08-01',
+    result: 'SUBMITTED_FOR_PM_REVIEW',
+    now: () => new Date('2026-08-01T12:00:00Z')
+  });
+  const staleIssue = {
+    number: 80,
+    title: 'already submitted maintenance issue',
+    state: 'open',
+    labels: [],
+    updatedAt: '2026-07-20T12:00:00Z'
+  };
+  let comments = 0;
+  let executions = 0;
+  const result = await claimForgeMaintenanceIssue({
+    issue: staleIssue,
+    fetchLiveIssue: async () => staleIssue,
+    updateLabels: async () => { throw new Error('must not relabel processed issue'); },
+    postComment: async () => { comments += 1; return { ok: true }; },
+    lockPath: join(root, 'claim.lock'),
+    statePath,
+    repoRoot: root,
+    startingSha: 'a'.repeat(40),
+    now: () => new Date('2026-08-01T12:05:00Z'),
+    execute: async () => { executions += 1; return { ok: true, result: 'COMPLETED' }; }
+  });
+  assert.equal(result.result, FORGE_RESULTS.IGNORED_INELIGIBLE);
+  assert.match(result.evidence.join('\n'), /already_processed/);
+  assert.equal(comments, 0);
+  assert.equal(executions, 0);
+});
+
+test('maintenance stale label re-read aborts when PM review appears before mutation', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-stale-'));
+  let reads = 0;
+  const fetch = async () => {
+    reads += 1;
+    return {
+      number: 80,
+      title: 'maintenance issue',
+      state: 'open',
+      labels: reads < 3 ? [] : [{ name: 'forge:done' }, { name: 'pm:review' }],
+      updatedAt: '2026-07-20T12:00:00Z'
+    };
+  };
+  let updates = 0;
+  const result = await claimForgeMaintenanceIssue({
+    issue: await fetch(),
+    fetchLiveIssue: fetch,
+    updateLabels: async () => { updates += 1; },
+    postComment: async () => ({ ok: true }),
+    lockPath: join(root, 'claim.lock'),
+    repoRoot: root,
+    now: () => new Date('2026-08-01T12:00:00Z')
+  });
+  assert.equal(result.result, FORGE_RESULTS.CLAIM_CONFLICT);
+  assert.match(result.evidence.join('\n'), /awaiting_pm_review/);
+  assert.equal(updates, 0);
 });
 
 test('maintenance claim marks unowned stale issue working and preserves verified done review submission', async () => {
