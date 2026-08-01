@@ -1,45 +1,50 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 27,
-  "currentTask": "EAI-TASK-005",
-  "updatedAt": "2026-08-01T18:43:00+02:00",
-  "lastCheckedAt": "2026-08-01T18:43:00+02:00",
+  "currentIssue": 30,
+  "currentTask": "EAI-TASK-008",
+  "updatedAt": "2026-08-01T18:36:12+02:00",
+  "lastCheckedAt": "2026-08-01T18:36:12+02:00",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "WORKER_FINAL_COMMIT_METADATA_SUBMITTED",
-  "startingCommitSha": "3f75b9d720b8e1bba72b024fd2c4ce85b616c8b6",
+  "result": "CONNECTOR_CLI_INSTALLATION_VERIFIED",
+  "agent": "Forge",
+  "startingCommitSha": "629cddfa4e717e9d9db25cb09b19c151f65b747f",
   "preCommitArtifactSha": "PENDING_COMMIT_SHA",
-  "artifactCommitSha": "f22566d4f2b9f4723bc278ae624feea7d34078e8",
-  "finalPushedSha": "f22566d4f2b9f4723bc278ae624feea7d34078e8",
-  "finalShaSource": "GitHub issue comment after artifact push",
-  "finalizationPattern": "Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment records the artifact commit SHA as the source of truth.",
+  "artifactCommitSha": "PENDING_COMMIT_SHA",
+  "finalPushedSha": "PENDING_COMMIT_SHA",
   "implementation": [
-    "scripts/task-worker.mjs",
-    ".hermes/state.json",
-    "LOGS/EAI-TASK-005-terminal.log",
-    "REPORTS/EAI-TASK-005-WORKER-FINAL-COMMIT-METADATA.md"
-  ],
-  "validatedLifecycleFiles": [
-    "scripts/task-worker.mjs",
-    "scripts/task-poller.mjs",
-    "scripts/framework-doctor.mjs",
-    "src/task-queue.js",
-    "templates/REPORT_TEMPLATE.md"
+    "LOGS/EAI-TASK-008-terminal.log",
+    "REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md",
+    "docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json",
+    ".hermes/state.json"
   ],
   "validation": [
-    "git pull --ff-only from C:\\temp\\EverythingAI: PASS, already up to date",
+    "git pull --ff-only from C:\\temp\\EverythingAI: PASS",
     "node scripts/framework-doctor.mjs from C:\\temp\\EverythingAI: PASS",
-    "npm run worker:once -- --dry-run from C:\\temp\\EverythingAI: PASS, no runnable issue found and no mutation path executed",
+    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS",
+    "node src/scripts/detectAgentConnectors.js from C:\\temp\\EverythingAI\\services\\api: PASS, codex and claudeCode found on PATH",
+    "EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js from C:\\temp\\EverythingAI\\services\\api: PASS, codex and claudeCode version probes passed",
     "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
     "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS",
-    "node --test tests/task-worker-runtime-mode.test.mjs from C:\\temp\\EverythingAI: PASS after worker metadata fix"
+    "Git Bash command -v/version checks from C:\\temp\\EverythingAI: PASS"
   ],
+  "connectors": {
+    "codex": {
+      "path": "C:\\nvm4w\\nodejs\\codex.ps1",
+      "bashPath": "/c/nvm4w/nodejs/codex",
+      "version": "codex-cli 0.146.0"
+    },
+    "claudeCode": {
+      "path": "C:\\Users\\Mohamed Ismail\\.local\\bin\\claude.exe",
+      "bashPath": "/c/Users/Mohamed Ismail/.local/bin/claude",
+      "version": "2.1.209 (Claude Code)"
+    }
+  },
   "queueLabels": [
     "forge:done",
     "pm:review"
   ],
   "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
   "secrets": "none recorded",
-  "humanSummary": "Issue #27 worker final commit metadata was refreshed for PM review. Worker lifecycle output now uses explicit final SHA source-of-truth wording instead of unfinished placeholder metadata."
+  "humanSummary": "Issue #30 connector CLI installation evidence was refreshed. Codex and Claude Code are installed, visible on PATH, and pass safe version probes."
 }

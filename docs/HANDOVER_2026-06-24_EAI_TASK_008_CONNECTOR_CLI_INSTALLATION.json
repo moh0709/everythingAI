@@ -3,38 +3,49 @@
   "issueNumber": 30,
   "title": "Install and verify Codex and Claude Code CLIs for connector gate",
   "status": "PASS",
-  "summary": "Codex and Claude Code are installed and visible on PATH, safe version probes passed, and the connector readiness gate can be rerun with live CLI detection.",
+  "agent": "Forge",
+  "refreshedAt": "2026-08-01T18:36:12+02:00",
+  "summary": "Forge installed/PATH-enabled Codex CLI in the Windows Codex CLI environment, verified Claude Code was already present, reran connector detection and safe version probes, and completed the required validation suite.",
   "environment": {
-    "os": "Linux 6.8.0-100-generic x86_64",
-    "shell": "/usr/bin/bash",
-    "node": "v22.22.0",
-    "npm": "11.12.1"
+    "os": "Microsoft Windows 10.0.26200",
+    "shell": "PowerShell 5.1.26100.8972",
+    "safeShell": "C:\\Program Files\\Git\\bin\\bash.exe",
+    "node": "v22.15.0",
+    "npm": "10.9.2",
+    "repoRoot": "C:\\temp\\EverythingAI",
+    "branch": "main",
+    "startingSha": "629cddfa4e717e9d9db25cb09b19c151f65b747f"
   },
   "installActions": [
-    "npm install -g @openai/codex @anthropic-ai/claude-code",
-    "Verified codex at /usr/bin/codex",
-    "Verified claude at /usr/bin/claude"
+    "Checked existing codex and claude command availability.",
+    "Installed/PATH-enabled Codex CLI with npm install -g @openai/codex.",
+    "Verified Claude Code was already available on PATH.",
+    "Used Git Bash for command -v checks because Windows bash resolves to WSL and no WSL distribution is installed."
   ],
   "validation": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "apiTests": "PASS",
+    "apiTestsDetail": "173/173 passed",
     "detectAgentConnectors": "PASS",
     "probeAgentVersions": "PASS",
     "uiTypecheck": "PASS",
-    "uiBuild": "PASS"
+    "uiBuild": "PASS",
+    "safeShellChecks": "PASS"
   },
   "connectors": {
     "codex": {
       "detected": true,
-      "command": "/usr/bin/codex",
-      "version": "codex-cli 0.142.0",
+      "powerShellPath": "C:\\nvm4w\\nodejs\\codex.ps1",
+      "gitBashPath": "/c/nvm4w/nodejs/codex",
+      "version": "codex-cli 0.146.0",
       "usableToday": true
     },
     "claudeCode": {
       "detected": true,
-      "command": "/usr/bin/claude",
-      "version": "2.1.191 (Claude Code)",
+      "powerShellPath": "C:\\Users\\Mohamed Ismail\\.local\\bin\\claude.exe",
+      "gitBashPath": "/c/Users/Mohamed Ismail/.local/bin/claude",
+      "version": "2.1.209 (Claude Code)",
       "usableToday": true
     },
     "openCode": {
@@ -42,35 +53,37 @@
       "command": "opencode",
       "version": null,
       "usableToday": false,
-      "status": "skipped"
+      "status": "skipped_command_not_found"
     },
     "kiloCode": {
       "detected": false,
       "command": "kilo",
       "version": null,
       "usableToday": false,
-      "status": "skipped"
+      "status": "skipped_command_not_found"
     },
     "cline": {
       "detected": false,
       "command": "cline",
       "version": null,
       "usableToday": false,
-      "status": "skipped"
+      "status": "skipped_command_not_found"
     }
   },
   "safety": {
     "bridgeEnabledForVersionProbe": true,
     "chatEnabled": false,
     "unsafeCommandsBlocked": true,
-    "productionBehaviorChanged": false
+    "productionBehaviorChanged": false,
+    "secretsStored": false
   },
   "blockers": [],
-  "recommendedNextTask": "Rerun the connector readiness gate task now that Codex and Claude Code are available on PATH.",
+  "humanActionRequired": "None",
+  "recommendedNextTask": "Rerun the connector readiness gate that depends on live Codex and Claude Code CLI detection.",
   "artifacts": {
     "terminalLog": "LOGS/EAI-TASK-008-terminal.log",
     "report": "REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md",
     "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json",
-    "artifactCommitSha": "7cceab5"
+    "state": ".hermes/state.json"
   }
 }

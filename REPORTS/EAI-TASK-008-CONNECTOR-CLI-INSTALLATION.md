@@ -3,62 +3,90 @@
 **Final status:** PASS
 
 ## Summary
-Installed and PATH-verified the Codex and Claude Code CLIs on the Hermes machine, then reran the connector detection and safe version-probe workflow. No product code was changed. The EverythingAI API and UI validation suite passed, and the connector readiness path is now unblocked for a follow-up readiness gate rerun.
+Forge refreshed EAI-TASK-008 on 2026-08-01 from the Windows Codex CLI environment. Claude Code was already visible on PATH. Codex was not visible on PATH at the start of this run, so Forge installed/PATH-enabled Codex CLI with the approved npm package, reran connector detection and safe version probes, and completed the required validation suite. No EverythingAI production app behavior was changed.
 
-## Environment summary
-- OS: Linux 6.8.0-100-generic x86_64
-- Shell: /usr/bin/bash
-- Node: v22.22.0
-- npm: 11.12.1
-- PATH: includes `/usr/bin`, `/root/.local/bin`, and repo-local tooling paths
+## OS / Environment Summary
+- OS: Microsoft Windows 10.0.26200
+- Shell: PowerShell 5.1.26100.8972
+- Safe shell check shell: `C:\Program Files\Git\bin\bash.exe`
+- Node: v22.15.0
+- npm: 10.9.2
+- PATH: recorded in `LOGS/EAI-TASK-008-terminal.log`
+- Repository: `C:\temp\EverythingAI`
+- Branch: `main`
+- Starting SHA: `629cddfa4e717e9d9db25cb09b19c151f65b747f`
 
-## Install / PATH actions
-- Ran: `npm install -g @openai/codex @anthropic-ai/claude-code`
-- Result: both CLIs are available on PATH at `/usr/bin/codex` and `/usr/bin/claude`
-- No credentials, tokens, or environment secrets were printed or stored
-- No manual login was required during verification
+## Install / PATH Actions Taken
+- Checked existing CLI availability with PowerShell command discovery.
+- Found Claude Code at `C:\Users\Mohamed Ismail\.local\bin\claude.exe`.
+- Codex was initially not found on PATH.
+- Ran `npm install -g @openai/codex`.
+- Verified Codex on PATH after install at `C:\nvm4w\nodejs\codex.ps1`.
+- Used Git Bash for the required `command -v` checks because Windows `bash.exe` resolves to the WSL launcher and no WSL distribution is installed.
+- No credentials, tokens, or raw environment secrets were stored in repository artifacts.
 
-## Validation results
-- `git pull --ff-only` — PASS
-- `node scripts/framework-doctor.mjs` — PASS
-- `cd services/api && npm test` — PASS
-- `cd services/api && node src/scripts/detectAgentConnectors.js` — PASS
-- `cd services/api && EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode openCode kiloCode cline` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
-
-## Connector verification
+## Connector Verification
 ### Codex
-- Command: `/usr/bin/codex`
-- Version: `codex-cli 0.142.0`
-- Detection: PASS
-- Version probe: PASS
+- PowerShell path: `C:\nvm4w\nodejs\codex.ps1`
+- Git Bash path: `/c/nvm4w/nodejs/codex`
+- Version result: `codex-cli 0.146.0`
+- Detection result: PASS
+- Version probe result: PASS
 
 ### Claude Code
-- Command: `/usr/bin/claude`
-- Version: `2.1.191 (Claude Code)`
-- Detection: PASS
-- Version probe: PASS
+- PowerShell path: `C:\Users\Mohamed Ismail\.local\bin\claude.exe`
+- Git Bash path: `/c/Users/Mohamed Ismail/.local/bin/claude`
+- Version result: `2.1.209 (Claude Code)`
+- Detection result: PASS
+- Version probe result: PASS
 
-### Other default probe targets
-- OpenCode: skipped, command not found on PATH
-- Kilo Code: skipped, command not found on PATH
-- Cline: skipped, command not found on PATH
+### Other Default Probe Targets
+- OpenCode: skipped, command not found on PATH.
+- Kilo Code: skipped, command not found on PATH.
+- Cline: skipped, command not found on PATH.
 
-## Safety notes
-- Bridge execution stayed explicitly opt-in for the safe version-probe run only
-- Chat execution remained disabled
-- Unsafe arbitrary command execution remained blocked
-- No application behavior or production code was changed
+## Required Validation Results
+- `git pull --ff-only`: PASS
+- `node scripts/framework-doctor.mjs`: PASS
+- `cd services/api && npm test`: PASS, 173/173 tests passed
+- `cd services/api && node src/scripts/detectAgentConnectors.js`: PASS, Codex and Claude Code found on PATH
+- `cd services/api && $env:EVERYTHINGAI_AGENT_BRIDGE_ENABLED="true"; node src/scripts/probeAgentVersions.js`: PASS, Codex and Claude Code version probes passed
+- `cd apps/everything-ai-ui && npm run typecheck`: PASS
+- `cd apps/everything-ai-ui && npm run build`: PASS
+- Git Bash safe shell checks:
+  - `command -v codex || true`: `/c/nvm4w/nodejs/codex`
+  - `codex --version || true`: `codex-cli 0.146.0`
+  - `command -v claude || true`: `/c/Users/Mohamed Ismail/.local/bin/claude`
+  - `claude --version || true`: `2.1.209 (Claude Code)`
 
-## Human action required
-None for this task.
+## Acceptance Matrix
+| ID | Requirement | Evidence | Status | Limitation / Remediation |
+|---|---|---|---|---|
+| AC-1 | Check OS, shell, Node/npm, PATH, Codex, and Claude availability | `LOGS/EAI-TASK-008-terminal.log` | PASS | None |
+| AC-2 | Install or PATH-enable Codex CLI via approved method | `npm install -g @openai/codex`; Codex version probe | PASS | None |
+| AC-3 | Install or PATH-enable Claude Code CLI if needed | Claude already present and version probe passed | PASS | None |
+| AC-4 | Do not store credentials or secrets | Artifacts contain command/path/version evidence only | PASS | None |
+| AC-5 | Stop if login/manual auth required | Version probes did not require login/manual auth | PASS | None |
+| AC-6 | Rerun connector detection and version probes | Detection/probe sections in terminal log | PASS | None |
+| AC-7 | Required validation commands pass | Validation summary in terminal log | PASS | None |
+| AC-8 | Required artifacts exist and are updated | Log, report, handover JSON, state file | PASS | None |
+| AC-9 | No production app behavior changed | Diff limited to task artifacts | PASS | None |
 
-## Recommended next task
-Rerun `EAI-TASK-007` / connector readiness gate now that Codex and Claude Code are available on PATH.
+## Safety Notes
+- Bridge execution was enabled only for the safe local version-probe command.
+- Chat execution remained disabled.
+- Arbitrary shell command execution remained blocked by the probe script.
+- No production app code or behavior was changed.
+- Existing unrelated workspace changes were preserved and not included in this task.
+
+## Human Action Required
+None.
+
+## Recommended Next Task
+Rerun the connector readiness gate that depends on live Codex and Claude Code CLI detection.
 
 ## Artifacts
 - Terminal log: `LOGS/EAI-TASK-008-terminal.log`
+- Report: `REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json`
 - State file: `.hermes/state.json`
-- Artifact commit SHA: `7cceab5`
