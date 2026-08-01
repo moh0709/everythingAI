@@ -1,29 +1,50 @@
-EAI-TASK-005 terminal log
+EAI-TASK-005 Forge execution terminal log
 
-Repository: /root/.hermes/projects/everythingAI
+Repository: C:\temp\EverythingAI
 Branch: main
-Starting commit SHA: 29f0be988b49b68be5e3ed312139b502341fb9eb
-Artifact commit SHA: 4f2a7a7307d49a5dcb7be2edae495aeeecabe491
+Starting commit SHA: 3f75b9d720b8e1bba72b024fd2c4ce85b616c8b6
+Artifact commit SHA: PENDING_METADATA_SYNC_COMMIT
+Metadata sync commit SHA: PENDING_AFTER_METADATA_COMMIT
+
+Preserved pre-existing uncommitted files:
+- LOGS/EAI-TASK-046-terminal.log
+- apps/everything-ai-ui/src/planning.css
+- docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
 
 Validation commands run:
 1. git pull --ff-only
+   Exit code: 0
    Result: Already up to date.
 2. node scripts/framework-doctor.mjs
+   Exit code: 0
    Result: PASS
-   - gh authenticated
-   - .hermes/state.json: valid json
-   - required framework files present
+   Evidence: gh authenticated; .hermes/state.json valid json; required framework files present.
 3. npm run worker:once -- --dry-run
-   Result: PASS (no runnable issue found after claim; no mutation)
-4. cd apps/everything-ai-ui && npm run typecheck
+   Exit code: 0
    Result: PASS
-5. cd apps/everything-ai-ui && npm run build
+   Evidence: [task-worker] No runnable issue found.
+4. cd apps/everything-ai-ui; npm run typecheck
+   Exit code: 0
    Result: PASS
-6. cd services/api && npm test
+   Evidence: tsc --noEmit completed.
+5. cd apps/everything-ai-ui; npm run build
+   Exit code: 0
    Result: PASS
+   Evidence: vite build completed; 1555 modules transformed.
+6. cd services/api; npm test
+   Exit code: 0
+   Result: PASS
+   Evidence: 173/173 tests passed.
+
+Additional regression check:
+- node --test tests/task-worker-runtime-mode.test.mjs
+  Exit code: 0
+  Result: PASS after worker metadata fix.
+  Note: the temporary test-file edit used to drive the regression was removed from commit scope because issue #27 restricts modified files.
 
 Notes:
 - Dry-run did not mutate labels, comments, reports, or state.
-- No secrets, tokens, or environment variables were printed.
-- Worker/template changes were limited to Hermes framework files only.
-- A follow-up metadata commit will synchronize the final report and state with the artifact commit SHA above.
+- No secrets, tokens, environment variables, or private configuration values were recorded.
+- No production application logic was changed.
+- No Client Workspace/Admin Dashboard boundary changes were made.
+- No agent connector execution or chat behavior changes were made.

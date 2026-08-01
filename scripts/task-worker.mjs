@@ -27,6 +27,10 @@ const issueNumberArg = argv.find((value) => /^\d+$/.test(value));
 const issueNumber = issueNumberArg ? Number(issueNumberArg) : null;
 const reportTemplatePath = resolve(repoRoot, 'templates/REPORT_TEMPLATE.md');
 const statePath = resolve(repoRoot, '.hermes/state.json');
+const PRE_COMMIT_ARTIFACT_SHA = 'PENDING_COMMIT_SHA';
+const ARTIFACT_SHA_SOURCE_OF_TRUTH = 'GitHub issue comment after artifact push records the final artifact commit SHA';
+const FINAL_SHA_SOURCE_OF_TRUTH = 'GitHub issue comment after artifact push';
+const TWO_STEP_FINALIZATION_PATTERN = 'Two-step post-commit finalization: artifact files are written first, the artifact commit is created outside the worker lifecycle step, and the final GitHub issue comment records the pushed artifact commit SHA as the source of truth.';
 
 function nowIso() {
   return new Date().toISOString();
@@ -167,17 +171,17 @@ export async function executeClaimedTask({
 
     const details = {
       startingCommitSha: startSha,
-      preCommitArtifactSha: 'PENDING_COMMIT_SHA',
-      artifactCommitSha: 'recorded after artifact commit',
-      finalShaSource: 'GitHub issue comment after artifact push',
-      finalShaHandling: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.',
+      preCommitArtifactSha: PRE_COMMIT_ARTIFACT_SHA,
+      artifactCommitSha: ARTIFACT_SHA_SOURCE_OF_TRUTH,
+      finalShaSource: FINAL_SHA_SOURCE_OF_TRUTH,
+      finalShaHandling: TWO_STEP_FINALIZATION_PATTERN,
       filesChanged: '- `scripts/task-worker.mjs`\n- `scripts/task-poller.mjs`\n- `src/task-queue.js`\n- `src/task-claim.js`\n- `templates/REPORT_TEMPLATE.md`\n- `.hermes/state.json`\n- `LOGS/EAI-TASK-004-terminal.log`\n- `REPORTS/EAI-TASK-004-HERMES-WORKER-LIFECYCLE.md`',
       dryRun: 'N/A',
       frameworkDoctor: 'PENDING',
       uiTypecheck: 'PENDING',
       uiBuild: 'PENDING',
       apiTests: 'PENDING',
-      issueComment: JSON.stringify({ task: taskId, status: 'PASS', artifactCommitSha: 'recorded after artifact commit' }),
+      issueComment: JSON.stringify({ task: taskId, status: 'PASS', artifactCommitSha: ARTIFACT_SHA_SOURCE_OF_TRUTH, finalShaSource: FINAL_SHA_SOURCE_OF_TRUTH }),
       labels: 'hermes:working -> pm:review + hermes:done',
       skips: '- Validation commands are intentionally not run by the lifecycle worker itself.',
       followUp: '- PM review should inspect the selected issue, generated report, and terminal log.'
@@ -186,9 +190,10 @@ export async function executeClaimedTask({
     artifactWriter(claimedIssue, 'PASS', { ...details, logLines });
     stateWriter(claimedIssue, 'PASS', {
       startingCommitSha: startSha,
-      artifactCommitSha: 'recorded in the final issue comment',
-      finalCommitSha: 'recorded in the final issue comment',
-      finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then record the artifact commit SHA in the issue comment and state update.',
+      artifactCommitSha: ARTIFACT_SHA_SOURCE_OF_TRUTH,
+      finalCommitSha: ARTIFACT_SHA_SOURCE_OF_TRUTH,
+      finalShaSource: FINAL_SHA_SOURCE_OF_TRUTH,
+      finalizationPattern: TWO_STEP_FINALIZATION_PATTERN,
       startedAt: startTime,
       completedAt: nowIso()
     });
@@ -199,8 +204,10 @@ export async function executeClaimedTask({
       claim: 'hermes:working -> hermes:done',
       report: reportPath,
       log: logPath,
-      finalCommitSha: 'recorded in the final issue comment',
-      finalizationPattern: 'Two-step post-commit finalization: artifact commit first, then a follow-up metadata sync and issue comment that records the artifact SHA as the source of truth.'
+      artifactCommitSha: ARTIFACT_SHA_SOURCE_OF_TRUTH,
+      finalCommitSha: ARTIFACT_SHA_SOURCE_OF_TRUTH,
+      finalShaSource: FINAL_SHA_SOURCE_OF_TRUTH,
+      finalizationPattern: TWO_STEP_FINALIZATION_PATTERN
     };
     const commentResult = await Promise.resolve(
       ghRunner(['issue', 'comment', String(claimedIssue.number), '--repo', 'moh0709/everythingAI', '--body', JSON.stringify(commentBody)])
