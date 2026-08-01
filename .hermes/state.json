@@ -1,47 +1,25 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 58,
-  "currentTask": "EAI-TASK-036",
-  "updatedAt": "2026-08-01T20:48:20+02:00",
-  "lastCheckedAt": "2026-08-01T20:48:20+02:00",
-  "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "STALE_ISSUE_58_MAINTENANCE_REFRESH_PASS",
+  "currentIssue": 59,
+  "currentTask": "EAI-TASK-037",
+  "updatedAt": "2026-08-01T21:06:00+02:00",
+  "lastCheckedAt": "2026-08-01T21:06:00+02:00",
+  "status": "IN_PROGRESS",
+  "result": "FORGE_MAINTENANCE_REFRESH_IN_PROGRESS",
   "agent": "Forge",
-  "startingCommitSha": "9875ab09edd03773d23d25fdd8130d1b9a6d0a08",
-  "artifactCommitSha": "RECORDED_IN_COMMIT_HISTORY_FOR_THIS_ARTIFACT_UPDATE",
-  "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
+  "startingCommitSha": "1d4cafc5828edcbe68df89a3e6f21b4f623073b4",
   "implementation": [
-    "LOGS/EAI-TASK-036-terminal.log",
-    "REPORTS/EAI-TASK-036-SERVER-WIRING-GATE-PRODUCTION-WORKSPACE-CONTEXT.md",
-    "docs/HANDOVER_2026-07-01_POST_EAI_TASK_036.json",
+    "REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md",
+    "docs/HANDOVER_2026-07-14_EAI_TASK_037.json",
+    "LOGS/EAI-TASK-037-terminal.log",
     ".hermes/state.json"
   ],
-  "validation": [
-    "git pull --ff-only from C:\\temp\\EverythingAI: PASS",
-    "node scripts/framework-doctor.mjs from C:\\temp\\EverythingAI: PASS",
-    "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS"
-  ],
-  "proof": [
-    "Default server/app creation does not invoke production workspace middleware wiring.",
-    "resolveWorkspaceContextMiddleware returns attachWorkspaceContext when productionWorkspaceResolution is absent.",
-    "Explicit productionWorkspaceResolution options are passed through to the guarded production helper.",
-    "No PostgreSQL server, automatic migrations, secrets, or default production persistence wiring were introduced."
-  ],
-  "recommendedNextTask": "PM review of issue #58 maintenance revalidation evidence.",
-  "queueLabels": [
-    "forge:done",
-    "pm:review"
-  ],
-  "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
-  "secrets": "none recorded",
   "unrelatedLocalChangesPreserved": [
     "LOGS/EAI-TASK-046-terminal.log",
     "tests/task-worker-runtime-mode.test.mjs",
     "apps/everything-ai-ui/src/planning.css",
     "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
   ],
-  "humanSummary": "Issue #58 was already implemented and had prior PASS evidence. Forge reran the required validation commands from the current Windows workspace, refreshed the scoped EAI-TASK-036 evidence artifacts, preserved unrelated local changes, and submitted the stale open issue for PM review without application source changes."
+  "secrets": "none recorded"
 }

@@ -1,6 +1,16 @@
-[2026-07-14T15:02:05Z] Claimed issue #59 automatically after confirming it was open and labeled pm:ready + hermes:ready.
-[2026-07-14T15:02:05Z] Switched labels to hermes:working and posted the claim comment.
-[2026-07-14T15:02:11Z] Updated .hermes/state.json to IN_PROGRESS with currentIssue=59 and currentTask=EAI-TASK-037.
-[2026-07-14T15:02:11Z] Inspected task-queue, task-poller, task-worker, report template, and supporting repository docs.
-[2026-07-14T15:02:11Z] Wrote docs/HERMES_OPERATING_MANUAL_RC1.md, REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md, and docs/HANDOVER_2026-07-14_EAI_TASK_037.json.
-[2026-07-14T15:02:11Z] Next step: commit, validate, push, and update the issue comment with final SHA and result.
+[2026-08-01T21:06:00+02:00] Forge loaded .hermes/forge/context-59.json completely.
+[2026-08-01T21:06:00+02:00] Loaded PROJECT_STATE.md, AI_BOOTSTRAP.md, docs/ENGINEERINGOS_RC1.md, issue #59 live metadata/comments, docs/HERMES_OPERATING_MANUAL_RC1.md, current report, handover, and state.
+[2026-08-01T21:06:00+02:00] Confirmed live issue #59 is open with labels hermes:done and forge:working before refresh; pm:review was absent.
+[2026-08-01T21:06:00+02:00] Preserved unrelated local changes: LOGS/EAI-TASK-046-terminal.log, tests/task-worker-runtime-mode.test.mjs, apps/everything-ai-ui/src/planning.css, docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json.
+[2026-08-01T21:06:00+02:00] Confirmed original claim comment precedes original completion comment on issue #59.
+[2026-08-01T21:06:00+02:00] Confirmed docs/HERMES_OPERATING_MANUAL_RC1.md includes Trigger and Event Input Contract and reconciles docs/ENGINEERINGOS_RC1.md as present.
+[2026-08-01T21:06:00+02:00] Confirmed scripts/webhook-event-dispatcher.mjs implements explicit webhook mode and payload precedence.
+[2026-08-01T21:06:00+02:00] Confirmed tests/webhook-event-dispatcher.test.mjs includes missing-payload, irrelevant-event, ineligible-label, unknown-runtime, and duplicate-delivery negative coverage.
+[2026-08-01T21:06:00+02:00] Confirmed tests/task-poller-watch-loop.test.mjs covers continued queue watching after a dispatch cycle.
+[2026-08-01T21:06:00+02:00] git pull --ff-only: PASS (Already up to date.)
+[2026-08-01T21:07:00+02:00] node scripts/framework-doctor.mjs: PASS (status PASS; gh authenticated; required files present).
+[2026-08-01T21:07:00+02:00] node --test tests/webhook-event-dispatcher.test.mjs tests/task-poller-watch-loop.test.mjs tests/task-poller-runtime-mode.test.mjs tests/task-worker-runtime-mode.test.mjs: PASS (17/17).
+[2026-08-01T21:07:00+02:00] python -m json.tool docs/HANDOVER_2026-07-14_EAI_TASK_037.json: PASS.
+[2026-08-01T21:07:00+02:00] git diff --check -- .hermes/state.json REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md docs/HANDOVER_2026-07-14_EAI_TASK_037.json LOGS/EAI-TASK-037-terminal.log: PASS.
+[2026-08-01T21:08:00+02:00] npm test: PASS (182/182).
+[2026-08-01T21:08:00+02:00] gh issue view 59 --json number,title,state,labels,comments,url: PASS (issue open; labels hermes:done, forge:working before final label transition).

@@ -4,36 +4,81 @@
   "task_id": "EAI-TASK-037",
   "issue_number": 59,
   "title": "Create Hermes Operating Manual RC1 and verify autonomous task pickup",
-  "final_status": "PASS",
-  "generated_at": "2026-07-14T15:08:41Z",
+  "final_status": "SUBMITTED_FOR_PM_REVIEW",
+  "refreshed_by": "Forge",
+  "refreshed_at": "2026-08-01T21:06:00+02:00",
+  "starting_commit_sha": "1d4cafc5828edcbe68df89a3e6f21b4f623073b4",
   "source_of_truth": {
-    "issue_queue": "GitHub Issues",
+    "project_state": "PROJECT_STATE.md",
+    "bootstrap": "AI_BOOTSTRAP.md",
+    "engineering_os": "docs/ENGINEERINGOS_RC1.md",
+    "issue_queue": "GitHub issue #59",
     "state_file": ".hermes/state.json",
-    "report_dir": "REPORTS/"
+    "report_file": "REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md"
   },
   "implementation_summary": {
-    "manual_created": "docs/HERMES_OPERATING_MANUAL_RC1.md",
-    "claim_comment_posted": true,
-    "claim_labels": [
-      "pm:ready",
-      "hermes:working"
+    "manual": "docs/HERMES_OPERATING_MANUAL_RC1.md",
+    "manual_reconciled_to_engineeringos_rc1": true,
+    "trigger_contract_section_present": true,
+    "polling_primary_queue_path_documented": true,
+    "webhook_payload_precedence_documented": [
+      "GITHUB_EVENT_PATH",
+      "--event-path <file>",
+      "explicit --stdin-json"
+    ],
+    "machine_readable_failure_codes_documented": [
+      "BLOCKED_RUNTIME_CONTRACT",
+      "IGNORED_EVENT",
+      "IGNORED_INELIGIBLE",
+      "INVALID_EVENT_PAYLOAD",
+      "CLAIM_CONFLICT",
+      "UNKNOWN_RUNTIME_MODE"
+    ],
+    "current_gaps_documented": true
+  },
+  "runtime_contract_evidence": {
+    "poller_entry": "node scripts/task-poller.mjs --mode polling --watch",
+    "webhook_entry": "node scripts/webhook-event-dispatcher.mjs --mode webhook",
+    "webhook_payload_implementation": "scripts/webhook-event-dispatcher.mjs",
+    "queue_return_test": "tests/task-poller-watch-loop.test.mjs",
+    "negative_webhook_tests": "tests/webhook-event-dispatcher.test.mjs",
+    "corrective_commits": [
+      "a4df9b9302b28b5ff82ef94a77aa0472907457d2",
+      "3d2d1c13c0f40af49e80ba605264ac5af44fe9c3"
     ]
   },
-  "behavior": {
-    "autonomous_pickup_enabled": true,
-    "non_runnable_events_exit_silently": true,
-    "claim_before_execution": true,
-    "state_updated_to_in_progress": true,
-    "duplicate_prevention_uses_report_artifacts": true
+  "live_issue_evidence": {
+    "original_claim_comment_created_at": "2026-07-14T15:02:10Z",
+    "original_completion_comment_created_at": "2026-07-14T15:17:41Z",
+    "pm_changes_required_comment_created_at": "2026-07-14T15:34:14Z",
+    "forge_maintenance_claim_comment_created_at": "2026-08-01T18:51:10Z",
+    "claim_before_completion": true,
+    "original_claim_source": "GitHub issue label queue",
+    "manual_webhook_payload_needed_for_claim": false
   },
   "validation_status_summary": {
-    "issue_list_check": "PASS",
-    "issue_view_check": "PASS",
-    "git_status_check": "PASS",
-    "json_validation": "PASS",
-    "git_diff_check": "PASS"
+    "git_pull_ff_only": "PASS",
+    "framework_doctor": "PASS",
+    "focused_runtime_contract_tests": "PASS",
+    "npm_test": "PASS",
+    "git_diff_check_scoped": "PASS",
+    "handover_json_validation": "PASS",
+    "live_issue_view": "PASS"
   },
-  "artifact_commit_sha": "2d5cbef9dfe5e51ad65919a9576c923a719ea023",
-  "final_pushed_commit_sha": "recorded in the final issue comment",
-  "report_file": "REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md"
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT",
+  "final_pushed_commit_sha": "PENDING_FINAL_PUSH",
+  "queue_labels_expected_after_submission": [
+    "forge:done",
+    "pm:review"
+  ],
+  "pm_acceptance": "not self-accepted",
+  "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
+  "secrets": "none recorded",
+  "unrelated_local_changes_preserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ],
+  "recommended_next_task": "PM review of issue #59 refreshed evidence."
 }
