@@ -3,24 +3,82 @@
   "branch": "main",
   "task_id": "EAI-TASK-018",
   "issue_number": 40,
+  "execution_agent": "Forge",
+  "execution_type": "stale_open_issue_maintenance_refresh",
+  "context_path": ".hermes/forge/context-40.json",
+  "started_at": "2026-08-01T19:30:19+02:00",
+  "finished_at": "2026-08-01T19:30:39+02:00",
+  "starting_sha": "215148068a484009de94710f4b6cbb0575b502c4",
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "final_pushed_sha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "final_status": "PASS",
-  "validation": {
-    "git_pull": "PASS",
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
-  },
+  "source_changes": "none",
   "files_changed": [
     "LOGS/EAI-TASK-018-terminal.log",
     "REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md",
     "docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json"
   ],
-  "risk_notes": [
-    "UX depends on the existing __saved__ sentinel and clear/replace controls staying consistent.",
-    "No application source changes were required because the active UI already satisfied the requested lifecycle distinctions."
+  "unrelated_local_changes_preserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
   ],
-  "rollback_note": "Revert the artifact commits if future review requires a different report or handover record.",
-  "recommended_next_task": "Review the next ready admin-maintenance issue, likely EAI-TASK-016, unless it is intentionally rerun.",
-  "artifact_commit_sha": "98a10d5"
+  "ux_behavior_implemented": [
+    "Admin provider settings distinguish not configured, saved, replacement staged, clear pending, and new key staged API-key states.",
+    "Saved remote API keys remain masked through the __saved__ sentinel display path.",
+    "Operators can keep a saved key, type a replacement, intentionally clear a key, or test the saved provider configuration.",
+    "Test Saved Connection remains separate from Save AI Settings."
+  ],
+  "backend_behavior_preserved": [
+    "publicSettings masks stored remote API keys as __saved__.",
+    "preserveSavedKeys restores existing key values when incoming drafts submit __saved__.",
+    "Empty string remains a deliberate clear value distinct from __saved__ preservation.",
+    "Provider settings and tests continue through existing admin API route behavior."
+  ],
+  "validation": [
+    {
+      "command": "git pull --ff-only",
+      "cwd": "C:\\temp\\EverythingAI",
+      "status": "PASS",
+      "evidence": "Already up to date."
+    },
+    {
+      "command": "node scripts/framework-doctor.mjs",
+      "cwd": "C:\\temp\\EverythingAI",
+      "status": "PASS",
+      "evidence": "framework status PASS; gh authenticated; state valid json"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": "C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+      "status": "PASS",
+      "evidence": "tsc --noEmit exited 0"
+    },
+    {
+      "command": "npm run build",
+      "cwd": "C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+      "status": "PASS",
+      "evidence": "vite build exited 0"
+    },
+    {
+      "command": "npm test",
+      "cwd": "C:\\temp\\EverythingAI\\services\\api",
+      "status": "PASS",
+      "evidence": "173 tests passed; 0 failed; 0 skipped"
+    }
+  ],
+  "risk_notes": [
+    "No secrets were exposed; evidence records only masked sentinel behavior.",
+    "No application source files were modified in this rerun.",
+    "Unrelated local worktree changes were preserved and not staged."
+  ],
+  "rollback_note": "Revert the focused issue #40 evidence commit if PM rejects the refreshed evidence; no application source rollback is required for this rerun.",
+  "recommended_next_task": "PM review issue #40 and decide whether to accept and close the stale completed issue.",
+  "completion_labels_expected": [
+    "forge:done",
+    "pm:review"
+  ],
+  "issue_69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
+  "secrets": "none recorded"
 }

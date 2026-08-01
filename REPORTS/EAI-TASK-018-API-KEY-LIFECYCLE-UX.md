@@ -4,66 +4,84 @@
 
 **Final status:** PASS
 
-## Repository / environment
+## Repository / Environment
 
-- **Repository path used:** `/root/.hermes/projects/everythingAI`
-- **Current branch:** `main`
-- **Starting commit SHA:** `8ec22354e6121140f6021b03dc4bf89a33c57e33`
-- **Pre-commit artifact SHA placeholder:** `PENDING_COMMIT_SHA`
-- **Artifact commit SHA:** `98a10d5`
-- **Final SHA source of truth:** `GitHub issue comment after artifact push`
+- **Repository:** `moh0709/everythingAI`
+- **Repository path used:** `C:\temp\EverythingAI`
+- **Branch:** `main`
+- **Forge context:** `.hermes/forge/context-40.json`
+- **Starting SHA:** `215148068a484009de94710f4b6cbb0575b502c4`
+- **Artifact commit SHA:** `PENDING_ARTIFACT_COMMIT_SHA`
+- **Final pushed SHA:** `RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH`
 
-## Files changed
+## Files Changed
 
 - `LOGS/EAI-TASK-018-terminal.log`
 - `REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md`
 - `docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json`
 
-## UX behavior implemented
+## UX Behavior Implemented
 
-- The admin provider settings UI already distinguishes `not configured`, `saved`, `being replaced`, and `being cleared` states.
-- Saved remote API keys remain masked through the `__saved__` preservation flow.
-- Operators can keep the saved key, clear it intentionally, or stage a replacement key before saving.
-- The connection test action remains separate from save behavior and still tests the last saved provider config.
-- Client Workspace API-key controls are not exposed by this admin-only settings view.
+- The active Admin provider settings UI already distinguishes all required API-key lifecycle states:
+  - `No key configured`
+  - `Saved key preserved`
+  - `Replacement key staged`
+  - `Clear pending`
+  - `New key staged`
+- Saved remote API keys remain visually masked because `__saved__` drafts render as an empty password input with explicit saved-key status text.
+- Operators can intentionally:
+  - keep a saved key with `Keep saved key`,
+  - replace a key by typing a new value,
+  - clear a key with `Clear key`,
+  - test the saved provider configuration through `Test Saved Connection`.
+- Staged key changes are explicitly described as taking effect only through `Save AI Settings`.
+- Client Workspace API-key controls remain unaffected; this lifecycle UX is in the Admin settings component path.
 
-## Backend behavior preserved
+## Backend Behavior Preserved
 
-- `services/api/src/routes/providerSettings.routes.js` still masks stored remote API keys as `__saved__` in public responses.
-- `preserveSavedKeys()` still restores saved keys when the draft submits `__saved__`.
-- Empty-string clearing remains an intentional action through the clear-key flow.
-- Provider connection tests still operate through the existing provider settings test route.
-- Admin-only provider settings boundaries remain intact.
+- `services/api/src/routes/providerSettings.routes.js` still masks stored remote API keys as `__saved__` in public provider-settings responses.
+- `preserveSavedKeys()` still restores existing saved key values when incoming settings submit the `__saved__` sentinel.
+- Empty-string clearing remains distinct from saved-key preservation and only occurs when the operator intentionally stages a clear action.
+- Provider connection tests continue to load saved settings and execute through the existing `/provider-settings/test` route.
+- Provider settings remain behind the existing admin API boundary; no client workspace key-control surface was added.
 
-## Validation summary
+## Acceptance Matrix
 
-All requested validation commands passed:
+| ID | Requirement | Implementation / Evidence | Validation | Status |
+|---|---|---|---|---|
+| AC-1 | Admin UI clearly distinguishes saved, replace, clear, and unconfigured API-key states. | `apps/everything-ai-ui/src/admin/components/ProviderConfigurationPanel.tsx` computes and displays lifecycle status and action controls. | UI typecheck and build passed. | PASS |
+| AC-2 | API key masking remains intact. | Backend `publicSettings()` continues returning `__saved__` for stored remote keys. | API tests passed. | PASS |
+| AC-3 | Saved-key preservation remains intact. | Backend `preserveSavedKeys()` continues preserving keys submitted as `__saved__`. | API tests passed. | PASS |
+| AC-4 | Empty string clears only through intentional operator action. | Admin UI exposes a dedicated `Clear key` action and labels clear state as `Clear pending`. | UI typecheck and build passed. | PASS |
+| AC-5 | Provider settings remain Admin-only. | Work is limited to Admin settings evidence and existing admin route behavior. | Code inspection and API tests passed. | PASS |
+| AC-6 | Client Workspace remains unaffected. | No client workspace source files were changed. | UI build passed. | PASS |
+| AC-7 | Provider connection tests still work. | `SettingsView.tsx` keeps `Test Saved Connection`; backend test route unchanged. | UI typecheck/build and API tests passed. | PASS |
+| AC-8 | Required validation passes. | Current terminal log records every required command. | All commands exited 0. | PASS |
 
-- `git pull --ff-only` — PASS (`Already up to date.`)
-- `node scripts/framework-doctor.mjs` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS
+## Validation Command Results
 
-Additional notes:
+Fresh validation was run on 2026-08-01 from `C:\temp\EverythingAI`:
 
-- `framework-doctor` reported `gh authenticated` and a valid Hermes framework state.
-- UI build completed successfully and emitted both admin and user bundles.
-- API tests completed successfully with 113 passing tests and 1 skipped test.
+- `git pull --ff-only` - PASS, already up to date.
+- `node scripts/framework-doctor.mjs` - PASS, framework state valid and `gh` authenticated.
+- `cd apps/everything-ai-ui && npm run typecheck` - PASS.
+- `cd apps/everything-ai-ui && npm run build` - PASS.
+- `cd services/api && npm test` - PASS, 173 tests passed, 0 failed, 0 skipped.
 
-## Risks and rollback
+## Risks and Rollback
 
-- Risk: the admin provider key UX relies on the existing `__saved__` sentinel and the clear/replace controls staying consistent.
-- Mitigation: validation passed, and the backend masking/preservation logic was reviewed alongside the UI behavior.
-- Rollback: revert the artifact commit if needed, or revert any future UI refinement that changes the provider key control flow.
+- **Secret exposure risk:** Controlled. No secrets were printed or stored; API-key evidence references only `__saved__` sentinel behavior.
+- **UX regression risk:** Low. No production source changes were made during this Forge rerun; existing UI behavior was verified and documented.
+- **Backend regression risk:** Low. Backend masking and preservation code was inspected and API tests passed.
+- **Unrelated worktree risk:** Controlled. Existing unrelated local changes were preserved and not staged.
+- **Rollback note:** Revert the artifact evidence commit if PM rejects the refreshed evidence. No application source rollback is required for this rerun because no application source files changed.
 
-## Recommended next task
+## Recommended Next Task
 
-- Review the next ready admin-maintenance issue, likely the remaining admin navigation/header cleanup work, since this provider key lifecycle UX is already documented and validated.
+PM should review issue #40 and decide whether to accept and close the stale completed issue. No dependent task should be released by Forge.
 
-## Lifecycle notes
+## Finalization Notes
 
-- No production code changes were required for this task; the active UI already implements the requested saved/replace/clear distinction.
-- Issue comment will record the final PASS status, validation summary, files changed, and artifact commit SHA.
-- Labels to finish: `hermes:working -> pm:review + hermes:done`.
-- Final SHA handling: this report records the initial artifact commit SHA `98a10d5`; the GitHub issue comment will record the final synchronized metadata commit SHA after push.
+- This was a stale open issue maintenance execution. Prior implementation already satisfied the UX requirements, so the current Forge rerun refreshed evidence only.
+- Final GitHub issue comment must include status, validation summary, files changed, and artifact commit SHA.
+- Final live labels must include `forge:done` and `pm:review` before returning `SUBMITTED_FOR_PM_REVIEW`.
