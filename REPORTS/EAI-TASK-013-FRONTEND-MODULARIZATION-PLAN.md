@@ -138,4 +138,4 @@ Fresh validation was run on 2026-08-01 and recorded in `LOGS/EAI-TASK-013-termin
 
 ## Artifact commit SHA
 
-PENDING_ARTIFACT_COMMIT_SHA
+835cf4a0acb695d26ee291c26b29fa4939c36bfe
