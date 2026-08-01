@@ -25,7 +25,7 @@
 
 ## Governance Status
 - Blast Radius: BR-1
-- Enforcement: DISABLED
+- Enforcement: CONTROLLED ACTIVATION GOVERNANCE READY FOR PM REVIEW
 - Runtime Mutation: NOT DETECTED
 - Drift Status: STABLE
 
@@ -146,3 +146,43 @@
 - No hidden blocking paths
 - No runtime execution authority
 - Runtime safeguard supremacy preserved
+
+## Controlled Enforcement Activation Governance
+
+### Contracts
+- enforcementActivationContract.js
+
+### Services
+- enforcementActivationService.js
+- enforcementEvidenceService.js
+- operationalCertificationService.js
+
+### Observability
+- enforcementEventPublisher.js
+- enforcementTelemetryService.js
+- enforcementObservabilityAggregator.js
+- enforcementSnapshotBuilder.js
+
+### Telemetry
+- enforcementEvents.js
+
+### Validation
+- enforcementRollbackValidator.js
+- runtimeCompatibilityValidator.js
+- operationalReadinessCertificationValidator.js
+- enforcementInvariantValidator.js
+- governanceDriftValidator.js
+- recoverySimulationValidator.js
+- dueDiligenceReviewValidator.js
+- validationRegistry.js
+
+### Governance Controls
+- Phased activation only
+- Soft enforcement before controlled authorization blocking
+- Shadow maturity required before blocking
+- Rollback proof required before activation
+- Explainable blocking only
+- Observable enforcement only
+- Recoverable enforcement only
+- No hidden enforcement escalation
+- Runtime safeguards remain authoritative

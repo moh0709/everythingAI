@@ -1,0 +1,95 @@
+{
+  "task": "Issue #13 - Phase 5.8 Controlled Enforcement Activation Governance Track",
+  "issue": 13,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "3a397bd9ba16315c5c1ddb69ce9a19b6ebc9c443",
+  "finalPushedSha": "recorded in GitHub issue #13 completion comment after push",
+  "filesChanged": [
+    "services/api/src/governance/enforcement/contracts/enforcementActivationContract.js",
+    "services/api/src/governance/enforcement/telemetry/enforcementEvents.js",
+    "services/api/src/governance/enforcement/services/deepFreeze.js",
+    "services/api/src/governance/enforcement/services/enforcementActivationService.js",
+    "services/api/src/governance/enforcement/services/enforcementEvidenceService.js",
+    "services/api/src/governance/enforcement/services/operationalCertificationService.js",
+    "services/api/src/governance/enforcement/observability/enforcementEventPublisher.js",
+    "services/api/src/governance/enforcement/observability/enforcementTelemetryService.js",
+    "services/api/src/governance/enforcement/observability/enforcementSnapshotBuilder.js",
+    "services/api/src/governance/enforcement/observability/enforcementObservabilityAggregator.js",
+    "services/api/src/governance/enforcement/validation/enforcementRollbackValidator.js",
+    "services/api/src/governance/enforcement/validation/runtimeCompatibilityValidator.js",
+    "services/api/src/governance/enforcement/validation/operationalReadinessCertificationValidator.js",
+    "services/api/src/governance/enforcement/validation/enforcementInvariantValidator.js",
+    "services/api/src/governance/enforcement/validation/governanceDriftValidator.js",
+    "services/api/src/governance/enforcement/validation/recoverySimulationValidator.js",
+    "services/api/src/governance/enforcement/validation/dueDiligenceReviewValidator.js",
+    "services/api/src/governance/enforcement/validation/validationRegistry.js",
+    "services/api/test/phase5ControlledEnforcementActivation.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-governance-inventory.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-13-PHASE5-CONTROLLED-ENFORCEMENT-ACTIVATION.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_13_PHASE5_CONTROLLED_ENFORCEMENT_ACTIVATION.json",
+    "LOGS/ISSUE-13-phase5-controlled-enforcement-activation-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "phased runtime gating",
+      "evidence": ["buildEnforcementActivationPlan", "phaseSequence"]
+    },
+    {
+      "criterion": "soft enforcement activation",
+      "evidence": ["evaluateSoftEnforcementActivation"]
+    },
+    {
+      "criterion": "controlled authorization blocking",
+      "evidence": ["evaluateControlledAuthorizationBlocking"]
+    },
+    {
+      "criterion": "enforcement rollback architecture",
+      "evidence": ["executeEnforcementRollback", "validateEnforcementRollback"]
+    },
+    {
+      "criterion": "enforcement observability",
+      "evidence": ["publishEnforcementEvent", "normalizeEnforcementEvent", "buildEnforcementSnapshot", "buildEnforcementObservabilityView"]
+    },
+    {
+      "criterion": "operational certification workflows",
+      "evidence": ["certifyOperationalReadiness", "validateOperationalReadinessCertification"]
+    },
+    {
+      "criterion": "governance drift and recovery validation",
+      "evidence": ["validateGovernanceDrift", "validateRecoverySimulation", "validateDueDiligenceReview"]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: missing enforcementActivationContract module",
+    "targetedGreen": "PASS: 6/6",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: 182/182",
+    "rootNpmTest": "PASS: 182/182",
+    "serviceApiNpmTest": "PASS: 172/172",
+    "diffCheck": "PASS with line-ending warnings for local working copy files",
+    "jsonCheck": "PASS"
+  },
+  "governance": {
+    "mode": "phased_activation",
+    "baseEnforcementLevel": "L0",
+    "softEnforcementLevel": "L1",
+    "controlledBlockingLevel": "L2",
+    "phasedActivationOnly": true,
+    "runtimeSafeguardsAuthoritative": true,
+    "shadowMaturityRequiredBeforeBlocking": true,
+    "rollbackCapabilityMandatoryBeforeActivation": true,
+    "explainableBlockingOnly": true,
+    "observableEnforcementOnly": true,
+    "recoverableEnforcementOnly": true,
+    "hiddenEnforcementEscalation": false,
+    "additiveRolloutOnly": true,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "Controlled authorization blocking is represented as a governance decision artifact and is not wired into production runtime routes by this rollout."
+  ]
+}

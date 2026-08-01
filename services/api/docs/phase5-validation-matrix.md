@@ -126,6 +126,34 @@ Status: ACTIVE
 Purpose: authorization governance remains centralized shadow-only with no hidden blocking paths
 Status: ACTIVE
 
+### enforcementRollbackValidator
+Purpose: enforcement rollback restores shadow mode without runtime mutation
+Status: ACTIVE
+
+### runtimeCompatibilityValidator
+Purpose: controlled enforcement preserves authoritative runtime safeguards
+Status: ACTIVE
+
+### operationalReadinessCertificationValidator
+Purpose: operational certification is mandatory before activation
+Status: ACTIVE
+
+### enforcementInvariantValidator
+Purpose: phased activation, explainability, observability, rollback, and no hidden escalation invariants
+Status: ACTIVE
+
+### governanceDriftValidator
+Purpose: controlled enforcement activation cannot proceed with governance drift
+Status: ACTIVE
+
+### recoverySimulationValidator
+Purpose: recovery simulation proves rollback, telemetry, snapshot, and certification recovery
+Status: ACTIVE
+
+### dueDiligenceReviewValidator
+Purpose: due diligence evidence is complete before PM review
+Status: ACTIVE
+
 ## Runtime Isolation
 PASS
 
@@ -140,8 +168,8 @@ PASS
 
 ## Current Governance Classification
 - Blast Radius: BR-1
-- Enforcement Level: L0
-- Mode: Advisory / Shadow Only
+- Enforcement Level: L0 base, L1 soft enforcement eligible, L2 controlled blocking gated
+- Mode: Phased Controlled Activation Governance
 
 ## Issue 6 Acceptance Matrix
 
@@ -218,3 +246,21 @@ PASS
 | AUTHZ-5 | Shadow authorization evaluation | `executeShadowAuthorizationEvaluation` preserves runtime decisions without blocking or lifecycle mutation | PASS |
 | AUTHZ-6 | Governance observability and correlation support | authorization event, telemetry, evidence artifact, snapshot, observability view, and synchronization validator test | PASS |
 | AUTHZ-7 | Centralized authorization only; no inline runtime authorization, hidden blocking paths, runtime execution authority, or safeguard bypass | `authorizationGovernanceContract` and invariant validator forbid runtime blocking, lifecycle mutation, runtime execution authority, inline runtime authorization, hidden blocking paths, and safeguard bypass | PASS |
+
+## Issue 13 Acceptance Matrix
+
+| Criterion | Requirement | Evidence | Status |
+|---|---|---|---|
+| ENF-1 | Phased runtime gating | `buildEnforcementActivationPlan` enforces `shadow`, `soft_enforcement`, then `controlled_blocking` sequencing | PASS |
+| ENF-2 | Soft enforcement activation | `evaluateSoftEnforcementActivation` activates observable L1 enforcement without runtime blocking | PASS |
+| ENF-3 | Controlled authorization blocking | `evaluateControlledAuthorizationBlocking` allows L2 only with shadow maturity, rollback proof, runtime compatibility, certification, and explanations | PASS |
+| ENF-4 | Enforcement rollback architecture | `executeEnforcementRollback` restores shadow/L0 while preserving runtime decisions | PASS |
+| ENF-5 | Enforcement observability | enforcement telemetry, immutable evidence artifacts, snapshots, and observability views correlate activation evidence | PASS |
+| ENF-6 | Operational certification workflows | `certifyOperationalReadiness` and certification validator require rollback, runtime, observability, invariant, drift, recovery, and due diligence evidence | PASS |
+| ENF-7 | Enforcement rollback validation | `validateEnforcementRollback` verifies recoverable enforcement | PASS |
+| ENF-8 | Runtime compatibility validation | `validateRuntimeCompatibility` verifies runtime safeguards remain authoritative | PASS |
+| ENF-9 | Operational readiness certification | `validateOperationalReadinessCertification` verifies certification evidence before activation | PASS |
+| ENF-10 | Invariant enforcement validation | `validateEnforcementInvariants` verifies explainable, observable, recoverable, phased activation only | PASS |
+| ENF-11 | Governance drift validation | `validateGovernanceDrift` detects baseline/current mismatch | PASS |
+| ENF-12 | Recovery simulation validation | `validateRecoverySimulation` verifies rollback, telemetry, snapshot, and certification recovery | PASS |
+| ENF-13 | Due diligence review | `validateDueDiligenceReview` requires complete matrix, risk review, validation evidence, no secrets, and no dependent release | PASS |

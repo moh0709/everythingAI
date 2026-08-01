@@ -1,7 +1,7 @@
 # Phase 5 Implementation Status
 
 ## Current Phase
-5.7 - Authorization Decision Layer Governance Track
+5.8 - Controlled Enforcement Activation Governance Track
 
 ## Governance Classification
 - Blast Radius: BR-1
@@ -122,12 +122,29 @@ SUBMITTED FOR PM REVIEW
 - authorizationObservabilityValidator.js
 - authorizationInvariantValidator.js
 - authorizationValidationRegistry.js
+- enforcementActivationContract.js
+- enforcementEvents.js
+- enforcementActivationService.js
+- enforcementEvidenceService.js
+- operationalCertificationService.js
+- enforcementEventPublisher.js
+- enforcementTelemetryService.js
+- enforcementObservabilityAggregator.js
+- enforcementSnapshotBuilder.js
+- enforcementRollbackValidator.js
+- runtimeCompatibilityValidator.js
+- operationalReadinessCertificationValidator.js
+- enforcementInvariantValidator.js
+- governanceDriftValidator.js
+- recoverySimulationValidator.js
+- dueDiligenceReviewValidator.js
+- enforcementValidationRegistry.js
 
 ## Runtime Safety Status
 PASS
 
 ## Enforcement Status
-DISABLED
+CONTROLLED ACTIVATION GOVERNANCE READY FOR PM REVIEW
 
 ## Runtime Mutation Status
 NOT DETECTED
@@ -194,3 +211,12 @@ READY FOR PM REVIEW
 - Invariant validation: covered by `services/api/test/phase5AuthorizationDecisionLayer.test.js`
 - Immutable authorization evidence validation: covered by `createAuthorizationEvidenceArtifact`
 - Due diligence review: recorded in `REPORTS/ISSUE-12-PHASE5-AUTHORIZATION-DECISION-LAYER.md`
+
+## Issue 13 Validation Coverage
+- Enforcement rollback validation: covered by `services/api/test/phase5ControlledEnforcementActivation.test.js`
+- Runtime compatibility validation: covered by `validateRuntimeCompatibility`
+- Operational readiness certification: covered by `certifyOperationalReadiness` and `validateOperationalReadinessCertification`
+- Invariant enforcement validation: covered by `validateEnforcementInvariants`
+- Governance drift validation: covered by `validateGovernanceDrift`
+- Recovery simulation validation: covered by `validateRecoverySimulation`
+- Due diligence review: recorded in `REPORTS/ISSUE-13-PHASE5-CONTROLLED-ENFORCEMENT-ACTIVATION.md`

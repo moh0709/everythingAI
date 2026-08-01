@@ -1,0 +1,31 @@
+const enforcementActivationContract = Object.freeze({
+  governanceDomain: 'enforcement',
+  governanceVersion: '5.8',
+  mode: 'phased_activation',
+  enforcementLevel: 'L0',
+  phasedActivationOnly: true,
+  softEnforcementBeforeBlocking: true,
+  controlledAuthorizationBlockingOnly: true,
+  shadowMaturityRequiredBeforeBlocking: true,
+  rollbackRequiredBeforeActivation: true,
+  explainableBlockingOnly: true,
+  observableEnforcementOnly: true,
+  recoverableEnforcementOnly: true,
+  hiddenEnforcementEscalation: false,
+  hiddenEscalation: false,
+  runtimeSafeguardSupremacy: true,
+  runtimeSafeguardsAuthoritative: true,
+  lifecycleMutation: false,
+  phaseSequence: Object.freeze(['shadow', 'soft_enforcement', 'controlled_blocking']),
+  forbiddenDependencies: Object.freeze([
+    'hiddenEnforcementEscalation',
+    'runtimeSafeguardBypass',
+    'unexplainedBlocking',
+    'unobservableEnforcement',
+    'unrecoverableActivation',
+    'blockingBeforeShadowMaturity',
+    'blockingBeforeRollbackValidation',
+  ]),
+});
+
+export default enforcementActivationContract;

@@ -1,0 +1,53 @@
+Issue #13 Phase 5.8 Controlled Enforcement Activation terminal evidence
+Started: 2026-08-01T15:31:12.721Z
+Repository: C:\temp\EverythingAI
+Starting SHA: 3a397bd9ba16315c5c1ddb69ce9a19b6ebc9c443
+
+Context loaded:
+- C:\temp\EverythingAI\.hermes\forge\context-13.json
+- PROJECT_STATE.md via local repository context and supplied Forge context
+- AI_BOOTSTRAP.md via local repository context and supplied Forge context
+- GitHub issue #13 body and comments via gh issue view
+
+Preserved unrelated working tree entries:
+- LOGS/EAI-TASK-046-terminal.log
+- apps/everything-ai-ui/src/planning.css
+- docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+
+RED validation:
+$ node --test services/api/test/phase5ControlledEnforcementActivation.test.js
+Result: FAIL as expected
+Evidence: ERR_MODULE_NOT_FOUND for services/api/src/governance/enforcement/contracts/enforcementActivationContract.js
+
+GREEN validation:
+$ node --test services/api/test/phase5ControlledEnforcementActivation.test.js
+Result: PASS
+Count: 6/6
+
+Final validation:
+$ npm run framework:doctor
+Result: PASS
+Evidence: framework doctor returned status PASS and gh authenticated.
+
+$ node --test tests/*.test.mjs
+Result: PASS
+Count: 182/182
+
+$ npm test
+Working directory: C:\temp\EverythingAI
+Result: PASS
+Count: 182/182
+
+$ npm test
+Working directory: C:\temp\EverythingAI\services\api
+Result: PASS
+Count: 172/172
+
+$ git diff --check
+Result: PASS
+Evidence: exit 0 with line-ending warnings for local working copy files, including pre-existing LOGS/EAI-TASK-046-terminal.log.
+
+$ python -m json.tool docs\HANDOVER_2026-08-01_ISSUE_13_PHASE5_CONTROLLED_ENFORCEMENT_ACTIVATION.json
+$ python -m json.tool .hermes\state.json
+$ python -m json.tool .hermes\forge\context-13.json
+Result: PASS
