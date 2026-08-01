@@ -6,8 +6,8 @@
   "repository": "moh0709/everythingAI",
   "branch": "main",
   "startingSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
-  "finalPushedSha": "0fc57e6252cfa9f1240ed8ab21f7f2c33c8500d9",
-  "latestMaintenanceStartingSha": "2a7ac61c34741d4c3fbf9d5ede6c55d6c79b34d3",
+  "finalPushedSha": "PENDING_THIS_PASS",
+  "latestMaintenanceStartingSha": "77c6ad2ca47a9b358dbb99accf0363bc11e42728",
   "implementation": [
     "src/forge-trigger.js",
     "scripts/forge-trigger.mjs",
@@ -20,6 +20,16 @@
     "LOGS/EAI-TASK-049-terminal.log",
     ".hermes/state.json"
   ],
+  "currentMaintenancePass": {
+    "claimedAt": "2026-08-01T13:11:13Z",
+    "startingSha": "77c6ad2ca47a9b358dbb99accf0363bc11e42728",
+    "liveIssueLabelsAtInspection": [
+      "forge:working"
+    ],
+    "sourceChangeRequired": false,
+    "recommendation": "Submit issue #96 for PM review as forge:done plus pm:review after this refreshed evidence is committed, pushed, and live labels are verified.",
+    "openBacklogSummary": "Issue #96 is the active Forge-owned issue. Issue #78 and older governance/admin issues remain unowned backlog for later PM-directed processing. Issue #69 remains protected and was not modified or released."
+  },
   "behavior": {
     "releasedQueueFirst": true,
     "maintenanceFallback": true,
