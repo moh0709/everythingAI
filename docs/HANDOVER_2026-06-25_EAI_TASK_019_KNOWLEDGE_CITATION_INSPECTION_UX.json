@@ -9,28 +9,45 @@
     "framework_doctor": "PASS",
     "ui_typecheck": "PASS",
     "ui_build": "PASS",
-    "api_tests": "PASS"
+    "api_tests": "PASS: 173 passed, 0 failed"
   },
   "ux_behavior": [
-    "Source drawer now shows the active citation label.",
-    "Source drawer now shows a connected source snippet for the pinned citation.",
-    "Active chunks are visually labeled in the source preview list."
+    "Source drawer shows the active citation label.",
+    "Source drawer shows a connected source snippet for the pinned citation.",
+    "Active chunks are visually labeled in the source preview list.",
+    "No product code changes were required for this stale-open issue maintenance refresh."
   ],
   "preserved_behavior": [
     "Knowledge Base pages still load.",
     "Existing source rails still work.",
     "Existing diagnostics remain available.",
-    "Client Workspace remains read-only for knowledge inspection."
+    "Existing citation/source data model remains compatible.",
+    "Client Workspace remains read-only for knowledge inspection.",
+    "Admin governance and diagnostics remain unaffected."
   ],
   "files_changed": [
-    "apps/everything-ai-ui/src/user/WikiSourcePreviewDrawer.tsx",
-    "apps/everything-ai-ui/src/user/wikiMarkdown.css"
+    "LOGS/EAI-TASK-019-terminal.log",
+    "REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json",
+    ".hermes/state.json"
   ],
   "risks": [
-    "Slightly denser citation metadata in the source drawer.",
+    "Slightly denser citation metadata in the existing source drawer.",
     "No backend or data-model changes were made."
   ],
-  "rollback_note": "Revert the two UI files if the citation-inspection layout needs to be restored.",
-  "recommended_next_task": "EAI-TASK-018: Improve Admin API key lifecycle UX.",
-  "artifact_commit_sha": "PENDING_COMMIT_SHA"
+  "rollback_note": "Revert the task artifact commit. If product rollback is required, revert the accepted UI changes in WikiSourcePreviewDrawer.tsx and wikiMarkdown.css.",
+  "recommended_next_task": "PM review of stale-open issue maintenance submission.",
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "maintenance_refresh": {
+    "agent": "Forge",
+    "started_from_sha": "6874bd20f5d894af8f0a8d79014379c934a15a35",
+    "validated_at": "2026-08-01T18:49:50+02:00",
+    "product_code_changed": false,
+    "unrelated_local_changes_preserved": [
+      "LOGS/EAI-TASK-046-terminal.log",
+      "tests/task-worker-runtime-mode.test.mjs",
+      "apps/everything-ai-ui/src/planning.css",
+      "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+    ]
+  }
 }

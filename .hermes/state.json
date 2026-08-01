@@ -1,45 +1,32 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 32,
-  "currentTask": "EAI-TASK-010",
-  "updatedAt": "2026-08-01T18:00:00+02:00",
-  "lastCheckedAt": "2026-08-01T18:00:00+02:00",
+  "currentIssue": 41,
+  "currentTask": "EAI-TASK-019",
+  "updatedAt": "2026-08-01T18:49:50+02:00",
+  "lastCheckedAt": "2026-08-01T18:49:50+02:00",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "STALE_ISSUE_32_MAINTENANCE_REFRESH",
+  "result": "STALE_ISSUE_41_MAINTENANCE_REFRESH",
   "agent": "Forge",
-  "startingCommitSha": "f5e371b4782bae98307ff0d5e23ce3ff2cafe9ae",
-  "preCommitArtifactSha": "b23699c8d01564a0169dc665bbca04f3548ffbb9",
-  "artifactCommitSha": "b23699c8d01564a0169dc665bbca04f3548ffbb9",
+  "startingCommitSha": "6874bd20f5d894af8f0a8d79014379c934a15a35",
+  "preCommitArtifactSha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA",
   "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "finalShaSource": "GitHub issue comment after metadata sync push",
   "finalizationPattern": "Two-step finalization: artifact evidence commit first, followed by metadata sync commit that records the artifact commit SHA as the source of truth.",
   "implementation": [
-    "LOGS/EAI-TASK-010-terminal.log",
-    "REPORTS/EAI-TASK-010-PHASE8_3-CLOSEOUT-AND-NEXT-BACKLOG.md",
-    "docs/HANDOVER_2026-06-24_PHASE8_3_FINAL_CONNECTOR_GATE_CLEARED.json",
-    "docs/NEXT_IMPLEMENTATION_BACKLOG_2026-06-24.md",
+    "LOGS/EAI-TASK-019-terminal.log",
+    "REPORTS/EAI-TASK-019-KNOWLEDGE-CITATION-INSPECTION-UX.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_019_KNOWLEDGE_CITATION_INSPECTION_UX.json",
     ".hermes/state.json"
   ],
   "validation": [
     "git pull --ff-only from C:\\temp\\EverythingAI: PASS",
     "node scripts/framework-doctor.mjs from C:\\temp\\EverythingAI: PASS",
-    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS",
-    "node src/scripts/detectAgentConnectors.js from C:\\temp\\EverythingAI\\services\\api: PASS, codex and claudeCode found on PATH",
-    "EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode from C:\\temp\\EverythingAI\\services\\api: PASS",
     "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS"
+    "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
+    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS"
   ],
-  "connectors": {
-    "codex": {
-      "path": "C:\\nvm4w\\nodejs\\codex.cmd",
-      "version": "codex-cli 0.146.0"
-    },
-    "claudeCode": {
-      "path": "C:\\Users\\Mohamed Ismail\\.local\\bin\\claude.exe",
-      "version": "2.1.209 (Claude Code)"
-    }
-  },
   "queueLabels": [
     "forge:done",
     "pm:review"
@@ -52,5 +39,5 @@
     "apps/everything-ai-ui/src/planning.css",
     "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
   ],
-  "humanSummary": "Issue #32 stale closeout artifacts were refreshed with current validation evidence while preserving the newer canonical Phase 3 dependency gate."
+  "humanSummary": "Issue #41 stale Knowledge Base citation inspection UX artifacts were refreshed with current validation evidence; no product code changes were required."
 }
