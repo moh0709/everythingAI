@@ -1,0 +1,101 @@
+{
+  "task": "Issue #10 - Phase 5.5 Approval Workflow Foundation Governance Track",
+  "issue": 10,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "921065215ffff2056cd08eac453fb53bd6950174",
+  "finalPushedSha": "recorded in GitHub issue #10 completion comment after push",
+  "filesChanged": [
+    "services/api/src/governance/approval/contracts/approvalGovernanceContract.js",
+    "services/api/src/governance/approval/models/approvalRequestModel.js",
+    "services/api/src/governance/approval/models/approvalChainStepModel.js",
+    "services/api/src/governance/approval/services/approvalLifecycleService.js",
+    "services/api/src/governance/approval/services/approvalChainService.js",
+    "services/api/src/governance/approval/services/approvalAuditService.js",
+    "services/api/src/governance/approval/telemetry/approvalEvents.js",
+    "services/api/src/governance/approval/observability/approvalEventPublisher.js",
+    "services/api/src/governance/approval/observability/approvalTelemetryService.js",
+    "services/api/src/governance/approval/observability/approvalObservabilityAggregator.js",
+    "services/api/src/governance/approval/observability/approvalSnapshotBuilder.js",
+    "services/api/src/governance/approval/validation/approvalLifecycleValidator.js",
+    "services/api/src/governance/approval/validation/approvalDeterminismValidator.js",
+    "services/api/src/governance/approval/validation/approvalObservabilityValidator.js",
+    "services/api/src/governance/approval/validation/approvalInvariantValidator.js",
+    "services/api/src/governance/approval/validation/validationRegistry.js",
+    "services/api/test/phase5ApprovalWorkflowFoundation.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-governance-inventory.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-10-PHASE5-APPROVAL-WORKFLOW-FOUNDATION.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_10_PHASE5_APPROVAL_WORKFLOW_FOUNDATION.json",
+    "LOGS/ISSUE-10-phase5-approval-workflow-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "approval lifecycle",
+      "evidence": [
+        "createApprovalRequestModel",
+        "createApprovalChainStepModel",
+        "evaluateApprovalLifecycle",
+        "Phase 5.5 approval lifecycle is deterministic advisory and explainable"
+      ]
+    },
+    {
+      "criterion": "approval observability",
+      "evidence": [
+        "publishApprovalEvent",
+        "normalizeApprovalEvent",
+        "buildApprovalObservabilityView",
+        "buildApprovalSnapshot"
+      ]
+    },
+    {
+      "criterion": "approval auditability",
+      "evidence": [
+        "createApprovalAuditArtifact",
+        "Phase 5.5 approval audit artifacts are immutable and advisory only"
+      ]
+    },
+    {
+      "criterion": "approval state governance",
+      "evidence": [
+        "approvalGovernanceContract",
+        "validateApprovalLifecycle",
+        "validateApprovalInvariants"
+      ]
+    },
+    {
+      "criterion": "advisory mode only with no runtime blocking, enforcement authority, runtime mutation, or hidden approval bypasses",
+      "evidence": [
+        "approvalGovernanceContract",
+        "validateApprovalInvariants"
+      ]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: missing approvalGovernanceContract module",
+    "targetedGreen": "PASS: 4/4",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: 182/182",
+    "rootNpmTest": "PASS: 182/182",
+    "serviceApiNpmTest": "PASS: 157/157",
+    "diffCheck": "PASS with line-ending warnings for local working copy files",
+    "jsonCheck": "PASS"
+  },
+  "governance": {
+    "mode": "advisory",
+    "enforcementLevel": "L0",
+    "advisoryOnly": true,
+    "enforcementAuthority": false,
+    "runtimeBlocking": false,
+    "runtimeLifecycleMutation": false,
+    "runtimeSafeguardSupremacy": true,
+    "additiveRolloutOnly": true,
+    "hiddenApprovalBypasses": false,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "No runtime approval enforcement, runtime blocking, or lifecycle mutation is activated by this rollout."
+  ]
+}

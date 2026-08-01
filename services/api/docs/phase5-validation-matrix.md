@@ -74,6 +74,22 @@ Status: ACTIVE
 Purpose: advisory risk governance without runtime blocking or mutation
 Status: ACTIVE
 
+### approvalLifecycleValidator
+Purpose: advisory approval lifecycle outputs remain non-blocking and explainable
+Status: ACTIVE
+
+### approvalDeterminismValidator
+Purpose: deterministic approval lifecycle ordering and state derivation
+Status: ACTIVE
+
+### approvalObservabilityValidator
+Purpose: approval telemetry, audit artifacts, and snapshots remain synchronized
+Status: ACTIVE
+
+### approvalInvariantValidator
+Purpose: approval governance remains advisory-only with no hidden bypasses
+Status: ACTIVE
+
 ## Runtime Isolation
 PASS
 
@@ -132,3 +148,14 @@ PASS
 | RISK-4 | Escalation recommendation support | `recommendRiskEscalation` emits advisory recommendations without runtime effects | PASS |
 | RISK-5 | Advisory only; no runtime blocking, enforcement authority, or runtime mutation | `riskGovernanceContract` and runtime sovereignty validator forbid runtime blocking and lifecycle mutation | PASS |
 | RISK-6 | Governance event taxonomy | telemetry category `governance.risk.advisory` and taxonomy validator test | PASS |
+
+## Issue 10 Acceptance Matrix
+
+| Criterion | Requirement | Evidence | Status |
+|---|---|---|---|
+| APR-1 | Approval lifecycle | `createApprovalRequestModel`, `createApprovalChainStepModel`, `evaluateApprovalLifecycle`, and Phase 5.5 lifecycle test | PASS |
+| APR-2 | Approval determinism | stable chain ordering and `validateApprovalDeterminism` | PASS |
+| APR-3 | Approval observability | approval event, telemetry, audit artifact, snapshot, and observability view test | PASS |
+| APR-4 | Approval auditability | `createApprovalAuditArtifact` deep-freezes immutable advisory evidence | PASS |
+| APR-5 | Approval state governance | `approvalGovernanceContract`, `validateApprovalLifecycle`, and `validateApprovalInvariants` | PASS |
+| APR-6 | Advisory only; no runtime blocking, enforcement authority, or safeguard bypass | `approvalGovernanceContract` forbids runtime blocking, lifecycle mutation, enforcement blocking, safeguard bypass, and hidden approval bypass | PASS |

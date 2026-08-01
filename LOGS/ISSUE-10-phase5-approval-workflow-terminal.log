@@ -1,0 +1,49 @@
+Issue #10 Phase 5.5 Approval Workflow Foundation terminal evidence (sanitized)
+
+Context:
+- Repository: moh0709/everythingAI
+- Branch: main
+- Starting SHA: 921065215ffff2056cd08eac453fb53bd6950174
+- Live issue at claim verification: #10 open, label forge:working
+- Existing unrelated local changes preserved:
+  - modified LOGS/EAI-TASK-046-terminal.log
+  - untracked apps/everything-ai-ui/src/planning.css
+  - untracked docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+
+RED:
+- Command: node --test services/api/test/phase5ApprovalWorkflowFoundation.test.js
+- Result: FAIL as expected
+- Evidence: ERR_MODULE_NOT_FOUND for services/api/src/governance/approval/contracts/approvalGovernanceContract.js
+
+GREEN:
+- Command: node --test services/api/test/phase5ApprovalWorkflowFoundation.test.js
+- Result: PASS
+- Count: 4/4 tests passed
+
+Final validation:
+- Command: node scripts/framework-doctor.mjs
+- Result: PASS
+- Evidence: status PASS, gh authenticated, .hermes/state.json valid JSON
+
+- Command: node --test tests/*.test.mjs
+- Result: PASS
+- Count: 182/182 tests passed
+
+- Command: npm test
+- Result: PASS
+- Count: 182/182 tests passed
+
+- Command: npm test
+- Working directory: services/api
+- Result: PASS
+- Count: 157/157 tests passed
+
+- Command: git diff --check
+- Result: PASS
+- Note: command emitted line-ending warnings for local working copy files, including pre-existing LOGS/EAI-TASK-046-terminal.log; no whitespace errors were reported.
+
+- Command: python -m json.tool docs/HANDOVER_2026-08-01_ISSUE_10_PHASE5_APPROVAL_WORKFLOW_FOUNDATION.json
+- Result: PASS
+
+- Command: python -m json.tool .hermes/state.json
+- Result: PASS
