@@ -7,7 +7,7 @@
   "branch": "main",
   "startingSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
   "finalPushedSha": "d5d5e0f7179d24e87b3f5d8aa3fa57ebcc0598dd",
-  "latestMaintenanceStartingSha": "ada7dd6682cdd1d682ea812ff7aa9b8cfb69a829",
+  "latestMaintenanceStartingSha": "de8866ef033a44dc15bff9093a7dc9be87fb509c",
   "implementation": [
     "src/forge-trigger.js",
     "scripts/forge-trigger.mjs",
@@ -21,9 +21,9 @@
     ".hermes/state.json"
   ],
   "currentMaintenancePass": {
-    "claimedAt": "2026-08-01T13:31:10Z",
-    "startingSha": "ada7dd6682cdd1d682ea812ff7aa9b8cfb69a829",
-    "evidenceCommitSha": "d5d5e0f7179d24e87b3f5d8aa3fa57ebcc0598dd",
+    "claimedAt": "2026-08-01T13:36:11Z",
+    "startingSha": "de8866ef033a44dc15bff9093a7dc9be87fb509c",
+    "evidenceCommitSha": "PENDING_CURRENT_PASS_COMMIT",
     "liveIssueLabelsAtInspection": [
       "forge:working"
     ],
