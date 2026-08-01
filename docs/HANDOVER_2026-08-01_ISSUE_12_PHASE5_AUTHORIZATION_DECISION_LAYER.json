@@ -1,0 +1,110 @@
+{
+  "task": "Issue #12 - Phase 5.7 Authorization Decision Layer Governance Track",
+  "issue": 12,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "4a21b995e6e9bea82f026f8ac1750ba6bd1c4b34",
+  "finalPushedSha": "recorded in GitHub issue #12 completion comment after push",
+  "filesChanged": [
+    "services/api/src/governance/authorization/contracts/authorizationGovernanceContract.js",
+    "services/api/src/governance/authorization/models/authorizationSignalModel.js",
+    "services/api/src/governance/authorization/services/authorizationDecisionService.js",
+    "services/api/src/governance/authorization/services/authorizationChainService.js",
+    "services/api/src/governance/authorization/services/authorizationEvidenceService.js",
+    "services/api/src/governance/authorization/services/shadowAuthorizationEvaluationService.js",
+    "services/api/src/governance/authorization/telemetry/authorizationEvents.js",
+    "services/api/src/governance/authorization/observability/authorizationEventPublisher.js",
+    "services/api/src/governance/authorization/observability/authorizationTelemetryService.js",
+    "services/api/src/governance/authorization/observability/authorizationObservabilityAggregator.js",
+    "services/api/src/governance/authorization/observability/authorizationSnapshotBuilder.js",
+    "services/api/src/governance/authorization/validation/authorizationDeterminismValidator.js",
+    "services/api/src/governance/authorization/validation/shadowAuthorizationConsistencyValidator.js",
+    "services/api/src/governance/authorization/validation/authorizationExplainabilityValidator.js",
+    "services/api/src/governance/authorization/validation/authorizationObservabilityValidator.js",
+    "services/api/src/governance/authorization/validation/authorizationInvariantValidator.js",
+    "services/api/src/governance/authorization/validation/validationRegistry.js",
+    "services/api/test/phase5AuthorizationDecisionLayer.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-governance-inventory.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-12-PHASE5-AUTHORIZATION-DECISION-LAYER.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_12_PHASE5_AUTHORIZATION_DECISION_LAYER.json",
+    "LOGS/ISSUE-12-phase5-authorization-decision-layer-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "centralized authorization synthesis",
+      "evidence": [
+        "buildAuthorizationDecisionInput",
+        "synthesizeAuthorizationDecision",
+        "Phase 5.7 authorization synthesis is centralized deterministic shadow-only and explainable"
+      ]
+    },
+    {
+      "criterion": "explainable authorization chains",
+      "evidence": [
+        "buildExplainableAuthorizationChain",
+        "validateAuthorizationExplainability"
+      ]
+    },
+    {
+      "criterion": "immutable authorization artifacts",
+      "evidence": [
+        "createAuthorizationEvidenceArtifact",
+        "Phase 5.7 authorization evidence artifacts are immutable and correlated"
+      ]
+    },
+    {
+      "criterion": "shadow authorization evaluation",
+      "evidence": [
+        "executeShadowAuthorizationEvaluation",
+        "validateShadowAuthorizationConsistency"
+      ]
+    },
+    {
+      "criterion": "governance correlation support",
+      "evidence": [
+        "publishAuthorizationEvent",
+        "normalizeAuthorizationEvent",
+        "buildAuthorizationSnapshot",
+        "buildAuthorizationObservabilityView"
+      ]
+    },
+    {
+      "criterion": "centralized authorization only with no inline runtime authorization, hidden blocking paths, runtime execution authority, or safeguard bypass",
+      "evidence": [
+        "authorizationGovernanceContract",
+        "validateAuthorizationInvariants"
+      ]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: missing authorizationGovernanceContract module",
+    "targetedGreen": "PASS: 5/5",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: 182/182",
+    "rootNpmTest": "PASS: 182/182",
+    "serviceApiNpmTest": "PASS: 166/166",
+    "diffCheck": "PASS with line-ending warnings for local working copy files",
+    "jsonCheck": "PASS"
+  },
+  "governance": {
+    "mode": "shadow",
+    "enforcementLevel": "L0",
+    "centralizedAuthorizationOnly": true,
+    "inlineRuntimeAuthorization": false,
+    "hiddenBlockingPaths": false,
+    "immutableAuthorizationEvidenceRequired": true,
+    "runtimeSafeguardSupremacy": true,
+    "runtimeExecutionAuthority": false,
+    "enforcementAuthority": false,
+    "runtimeBlocking": false,
+    "runtimeLifecycleMutation": false,
+    "additiveRolloutOnly": true,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "No runtime authorization enforcement, execution authority, blocking authority, or lifecycle mutation is activated by this rollout."
+  ]
+}

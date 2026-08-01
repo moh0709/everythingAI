@@ -1,7 +1,7 @@
 # Phase 5 Implementation Status
 
 ## Current Phase
-5.6 - Escalation Governance Foundation Track
+5.7 - Authorization Decision Layer Governance Track
 
 ## Governance Classification
 - Blast Radius: BR-1
@@ -105,6 +105,23 @@ SUBMITTED FOR PM REVIEW
 - escalationObservabilityValidator.js
 - escalationContractValidator.js
 - escalationValidationRegistry.js
+- authorizationGovernanceContract.js
+- authorizationEvents.js
+- authorizationSignalModel.js
+- authorizationDecisionService.js
+- authorizationChainService.js
+- authorizationEvidenceService.js
+- shadowAuthorizationEvaluationService.js
+- authorizationEventPublisher.js
+- authorizationTelemetryService.js
+- authorizationObservabilityAggregator.js
+- authorizationSnapshotBuilder.js
+- authorizationDeterminismValidator.js
+- shadowAuthorizationConsistencyValidator.js
+- authorizationExplainabilityValidator.js
+- authorizationObservabilityValidator.js
+- authorizationInvariantValidator.js
+- authorizationValidationRegistry.js
 
 ## Runtime Safety Status
 PASS
@@ -168,3 +185,12 @@ READY FOR PM REVIEW
 - Governance contract validation: covered by `services/api/test/phase5EscalationGovernanceFoundation.test.js`
 - Immutable escalation audit artifact validation: covered by `createEscalationAuditArtifact`
 - Due diligence review: recorded in `REPORTS/ISSUE-11-PHASE5-ESCALATION-GOVERNANCE-FOUNDATION.md`
+
+## Issue 12 Validation Coverage
+- Authorization determinism validation: covered by `services/api/test/phase5AuthorizationDecisionLayer.test.js`
+- Shadow consistency validation: covered by `services/api/test/phase5AuthorizationDecisionLayer.test.js`
+- Authorization explainability validation: covered by `services/api/test/phase5AuthorizationDecisionLayer.test.js`
+- Governance observability validation: covered by `services/api/test/phase5AuthorizationDecisionLayer.test.js`
+- Invariant validation: covered by `services/api/test/phase5AuthorizationDecisionLayer.test.js`
+- Immutable authorization evidence validation: covered by `createAuthorizationEvidenceArtifact`
+- Due diligence review: recorded in `REPORTS/ISSUE-12-PHASE5-AUTHORIZATION-DECISION-LAYER.md`

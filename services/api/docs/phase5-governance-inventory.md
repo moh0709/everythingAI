@@ -104,3 +104,45 @@
 - No runtime orchestration authority
 - No execution blocking authority
 - No hidden escalation execution authority
+
+## Authorization Governance
+
+### Contracts
+- authorizationGovernanceContract.js
+
+### Models
+- authorizationSignalModel.js
+
+### Services
+- authorizationDecisionService.js
+- authorizationChainService.js
+- authorizationEvidenceService.js
+- shadowAuthorizationEvaluationService.js
+
+### Observability
+- authorizationEventPublisher.js
+- authorizationTelemetryService.js
+- authorizationObservabilityAggregator.js
+- authorizationSnapshotBuilder.js
+
+### Telemetry
+- authorizationEvents.js
+
+### Validation
+- authorizationDeterminismValidator.js
+- shadowAuthorizationConsistencyValidator.js
+- authorizationExplainabilityValidator.js
+- authorizationObservabilityValidator.js
+- authorizationInvariantValidator.js
+- validationRegistry.js
+
+### Governance Controls
+- Centralized authorization only
+- Shadow mode only
+- Immutable authorization evidence required
+- Explainable authorization chains
+- Governance correlation support
+- No inline runtime authorization
+- No hidden blocking paths
+- No runtime execution authority
+- Runtime safeguard supremacy preserved

@@ -106,6 +106,26 @@ Status: ACTIVE
 Purpose: escalation governance remains advisory-only with no hidden execution authority
 Status: ACTIVE
 
+### authorizationDeterminismValidator
+Purpose: deterministic centralized authorization synthesis
+Status: ACTIVE
+
+### shadowAuthorizationConsistencyValidator
+Purpose: shadow authorization evaluation preserves runtime decisions and lifecycle state
+Status: ACTIVE
+
+### authorizationExplainabilityValidator
+Purpose: explainable authorization chains remain complete and immutable
+Status: ACTIVE
+
+### authorizationObservabilityValidator
+Purpose: authorization telemetry, evidence artifacts, and snapshots remain synchronized
+Status: ACTIVE
+
+### authorizationInvariantValidator
+Purpose: authorization governance remains centralized shadow-only with no hidden blocking paths
+Status: ACTIVE
+
 ## Runtime Isolation
 PASS
 
@@ -186,3 +206,15 @@ PASS
 | ESC-4 | Escalation auditability | `createEscalationAuditArtifact` deep-freezes immutable advisory evidence | PASS |
 | ESC-5 | Escalation state governance | `escalationGovernanceContract`, `validateEscalationRouting`, and `validateEscalationContract` | PASS |
 | ESC-6 | Advisory only; no runtime orchestration authority, execution blocking authority, runtime mutation, or hidden execution authority | `escalationGovernanceContract` forbids runtime orchestration, runtime blocking, execution blocking, lifecycle mutation, and hidden escalation execution authority | PASS |
+
+## Issue 12 Acceptance Matrix
+
+| Criterion | Requirement | Evidence | Status |
+|---|---|---|---|
+| AUTHZ-1 | Centralized authorization synthesis | `buildAuthorizationDecisionInput`, `synthesizeAuthorizationDecision`, and centralized authority test | PASS |
+| AUTHZ-2 | Authorization determinism | stable signal ordering and `validateAuthorizationDeterminism` | PASS |
+| AUTHZ-3 | Explainable authorization chains | `buildExplainableAuthorizationChain` and `validateAuthorizationExplainability` | PASS |
+| AUTHZ-4 | Immutable authorization artifacts | `createAuthorizationEvidenceArtifact` deep-freezes evidence and correlation metadata | PASS |
+| AUTHZ-5 | Shadow authorization evaluation | `executeShadowAuthorizationEvaluation` preserves runtime decisions without blocking or lifecycle mutation | PASS |
+| AUTHZ-6 | Governance observability and correlation support | authorization event, telemetry, evidence artifact, snapshot, observability view, and synchronization validator test | PASS |
+| AUTHZ-7 | Centralized authorization only; no inline runtime authorization, hidden blocking paths, runtime execution authority, or safeguard bypass | `authorizationGovernanceContract` and invariant validator forbid runtime blocking, lifecycle mutation, runtime execution authority, inline runtime authorization, hidden blocking paths, and safeguard bypass | PASS |
