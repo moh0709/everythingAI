@@ -8,7 +8,7 @@
     "status": "PASS",
     "reason": "Stale open issue maintenance validation for already implemented and PM-accepted EAI-TASK-021.",
     "application_behavior_changed": false,
-    "artifact_commit_sha": "PENDING_UNTIL_COMMIT",
+    "artifact_commit_sha": "068c05f1293f47a15aeac66075bf36c7f5f16a51",
     "final_transition": "PENDING_PUSH_AND_LIVE_ISSUE_LABEL_VERIFICATION"
   },
   "files_changed": [
@@ -54,7 +54,7 @@
     "For the accepted implementation itself, revert ExploreView.tsx, ExplorerView.tsx, WikiRebuildPanel.tsx, and shared/fileProgress.ts."
   ],
   "accepted_implementation_artifact_commit_sha": "ec7ee67e2bd429ad20436c970780230dc50d112a",
-  "artifact_commit_sha": "PENDING_UNTIL_COMMIT",
+  "artifact_commit_sha": "068c05f1293f47a15aeac66075bf36c7f5f16a51",
   "notes": [
     "Issue #43 already had prior PM PASS comments before this maintenance execution.",
     "Unrelated local changes were preserved and not staged.",
