@@ -1,15 +1,27 @@
 {
   "task": "EAI-TASK-024",
+  "issue": 46,
   "title": "Re-run MVP disposable-folder QA after wiki repair",
+  "agent": "Forge",
   "final_status": "PASS",
+  "review_status": "PENDING_PM_REVIEW",
   "environment": {
-    "os": "Linux vmi2938167 6.8.0-100-generic x86_64",
-    "node": "v22.22.0",
-    "npm": "11.12.1",
-    "repository_head_start": "dde5eda",
-    "api_db": "/tmp/eai-task-024.Cxsuql/everythingai.sqlite",
-    "disposable_folder": "/tmp/eai-task-024.Cxsuql/disposable-alpha"
+    "repo": "moh0709/everythingAI",
+    "branch": "main",
+    "working_directory": "C:\\temp\\EverythingAI",
+    "starting_sha": "4c5f07aa8f9c906ffc0c5f2b19feca45816d9cbc",
+    "os": "Microsoft Windows 11 10.0.26200",
+    "node": "v22.15.0",
+    "npm": "10.9.2",
+    "api_db": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-024-2026-08-01T17-41-50-985Z\\everythingai.sqlite",
+    "disposable_folder": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-024-2026-08-01T17-41-50-985Z\\disposable-alpha"
   },
+  "disposable_test_folder_approach": [
+    "Created a fresh synthetic folder under .hermes/forge scoped to this repository worker.",
+    "Used only supplier-contract.txt, project-notes.md, and unsupported.bin disposable QA files.",
+    "Used a disposable SQLite database under the same ignored .hermes/forge run folder.",
+    "Did not use real user files, real business files, production folders, or destructive routes."
+  ],
   "workflow_steps_validated": {
     "prepare_disposable_folder": true,
     "index_files": true,
@@ -26,42 +38,61 @@
   "workflow_steps_not_validated": [
     {
       "step": "browser_level_ui_interaction",
-      "reason": "This run validated the backend/API routes and returned JSON evidence instead."
+      "reason": "This Forge maintenance rerun validated backend/API routes and returned JSON evidence. Browser UI validation is not claimed."
     }
   ],
   "validation_commands": [
-    { "command": "git pull --ff-only", "result": "PASS" },
+    { "command": "git pull --ff-only", "result": "PASS", "detail": "Already up to date." },
     { "command": "node scripts/framework-doctor.mjs", "result": "PASS" },
     { "command": "cd apps/everything-ai-ui && npm run typecheck", "result": "PASS" },
     { "command": "cd apps/everything-ai-ui && npm run build", "result": "PASS" },
-    { "command": "cd services/api && npm test", "result": "PASS" }
+    { "command": "cd services/api && npm test", "result": "PASS", "detail": "173 tests, 0 failures" }
   ],
   "runtime_qa": [
-    { "command": "GET /health", "result": "PASS" },
-    { "command": "POST /api/index", "result": "PASS" },
-    { "command": "POST /api/extract", "result": "PASS" },
-    { "command": "GET /api/files", "result": "PASS" },
-    { "command": "GET /api/search?q=supplier", "result": "PASS" },
-    { "command": "GET /api/files/:fileId/preview", "result": "PASS" },
-    { "command": "GET /api/intelligence/document-context/:fileId", "result": "PASS" },
-    { "command": "GET /api/status", "result": "PASS" },
-    { "command": "POST /api/wiki/build", "result": "PASS" },
-    { "command": "GET /api/wiki", "result": "PASS" },
-    { "command": "GET /api/wiki/pages/workspace-overview/evidence", "result": "PASS" },
-    { "command": "POST /api/wiki/pages/workspace-overview/validation-preview", "result": "PASS" },
-    { "command": "GET /api/wiki/pages/workspace-overview", "result": "PASS" },
-    { "command": "GET /api/wiki/diagnostics", "result": "PASS" }
+    { "command": "GET /health", "result": "PASS", "status": 200 },
+    { "command": "POST /api/index", "result": "PASS", "status": 201, "scanned": 3, "indexed": 3 },
+    { "command": "POST /api/extract", "result": "PASS", "status": 200, "extracted": 2, "unsupported": 1 },
+    { "command": "GET /api/files?limit=20", "result": "PASS", "status": 200, "file_count": 3 },
+    { "command": "GET /api/search?q=supplier&limit=10", "result": "PASS", "status": 200, "search_results": 2 },
+    { "command": "GET /api/files/:fileId/preview", "result": "PASS", "status": 200, "preview_readable": true },
+    { "command": "GET /api/intelligence/document-context/:fileId", "result": "PASS", "status": 200 },
+    { "command": "GET /api/status", "result": "PASS", "status": 200 },
+    { "command": "POST /api/wiki/build", "result": "PASS", "status": 200, "wiki_page_count": 7 },
+    { "command": "GET /api/wiki", "result": "PASS", "status": 200 },
+    { "command": "GET /api/wiki/pages/workspace-overview/evidence", "result": "PASS", "status": 200, "evidence_sources": 2 },
+    { "command": "POST /api/wiki/pages/workspace-overview/validation-preview", "result": "PASS", "status": 200, "recommendation": "pass" },
+    { "command": "GET /api/wiki/pages/workspace-overview", "result": "PASS", "status": 200 },
+    { "command": "GET /api/wiki/diagnostics", "result": "PASS", "status": 200, "diagnostics_trust": "healthy" }
   ],
   "files_changed": [
     "LOGS/EAI-TASK-024-terminal.log",
     "REPORTS/EAI-TASK-024-MVP-DISPOSABLE-FOLDER-QA-RERUN.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_024_MVP_DISPOSABLE_FOLDER_QA_RERUN.json"
+    "docs/HANDOVER_2026-06-25_EAI_TASK_024_MVP_DISPOSABLE_FOLDER_QA_RERUN.json",
+    ".hermes/state.json"
   ],
-  "risks": [
-    "No blocking issues found.",
-    "One unsupported file was intentionally included and safely reported.",
-    "Validation preview was checked through the API rather than a browser UI."
+  "source_code_changes": [],
+  "risks_and_blockers": [
+    "No backend/API runtime blocker found.",
+    "Browser UI behavior is not claimed because it was not validated.",
+    "Pre-existing unrelated dirty worktree entries were preserved and excluded from this task commit."
   ],
-  "recommended_next_task": "PM review, or a browser-level UI pass if needed.",
-  "artifact_commit_sha": "e70c35f"
+  "recommended_next_task": "PM review of this maintenance rerun, or a separate browser-level UI QA task if fresh UI evidence is required.",
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "final_pushed_sha": "PENDING_FINAL_PUSHED_SHA",
+  "issue_transition_required": [
+    "forge:done",
+    "pm:review"
+  ],
+  "protected_scope": {
+    "issue_69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
+    "secrets": "none recorded",
+    "destructive_git_commands": "none used",
+    "destructive_file_actions": "none used"
+  },
+  "unrelated_local_changes_preserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ]
 }

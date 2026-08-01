@@ -1,23 +1,23 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 40,
-  "currentTask": "EAI-TASK-018",
-  "updatedAt": "2026-08-01T19:30:39+02:00",
-  "lastCheckedAt": "2026-08-01T19:30:39+02:00",
+  "currentIssue": 46,
+  "currentTask": "EAI-TASK-024",
+  "updatedAt": "2026-08-01T19:41:50+02:00",
+  "lastCheckedAt": "2026-08-01T19:41:50+02:00",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "STALE_ISSUE_40_MAINTENANCE_REFRESH_PASS",
+  "result": "STALE_ISSUE_46_MAINTENANCE_REFRESH_PASS",
   "agent": "Forge",
-  "startingCommitSha": "215148068a484009de94710f4b6cbb0575b502c4",
-  "preCommitArtifactSha": "3c064c36614898598de7524fbda2fff1e04c57c6",
-  "artifactCommitSha": "3c064c36614898598de7524fbda2fff1e04c57c6",
-  "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
+  "startingCommitSha": "4c5f07aa8f9c906ffc0c5f2b19feca45816d9cbc",
+  "preCommitArtifactSha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "finalPushedSha": "PENDING_FINAL_PUSHED_SHA",
   "finalShaSource": "GitHub issue comment after metadata sync push",
   "finalizationPattern": "Two-step finalization: artifact evidence commit first, followed by metadata sync commit that records the artifact commit SHA as the source of truth.",
   "implementation": [
-    "LOGS/EAI-TASK-018-terminal.log",
-    "REPORTS/EAI-TASK-018-API-KEY-LIFECYCLE-UX.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_018_API_KEY_LIFECYCLE_UX.json",
+    "LOGS/EAI-TASK-024-terminal.log",
+    "REPORTS/EAI-TASK-024-MVP-DISPOSABLE-FOLDER-QA-RERUN.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_024_MVP_DISPOSABLE_FOLDER_QA_RERUN.json",
     ".hermes/state.json"
   ],
   "validation": [
@@ -25,8 +25,22 @@
     "node scripts/framework-doctor.mjs from C:\\temp\\EverythingAI: PASS",
     "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
     "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS"
+    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS",
+    "runtime disposable-folder API QA from C:\\temp\\EverythingAI: PASS"
   ],
+  "runtimeQa": {
+    "status": "PASS",
+    "folder": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-024-2026-08-01T17-41-50-985Z\\disposable-alpha",
+    "database": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-024-2026-08-01T17-41-50-985Z\\everythingai.sqlite",
+    "indexed": 3,
+    "extracted": 2,
+    "unsupported": 1,
+    "wikiPageCount": 7,
+    "evidenceSources": 2,
+    "validationPreviewRecommendation": "pass",
+    "diagnosticsTrust": "healthy",
+    "destructiveActionsCalled": false
+  },
   "queueLabels": [
     "forge:done",
     "pm:review"
@@ -39,5 +53,5 @@
     "apps/everything-ai-ui/src/planning.css",
     "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
   ],
-  "humanSummary": "Issue #40 stale API-key lifecycle UX artifacts were refreshed with current validation evidence. Required validation passed, existing admin saved/replace/clear/test behavior remains present, and no application source code changes were required."
+  "humanSummary": "Issue #46 stale disposable-folder QA artifacts were refreshed with current Windows validation evidence. Required validation passed, the persisted wiki/evidence/validation-preview/diagnostics API routes passed on fresh disposable data, and no application source code changes were required."
 }
