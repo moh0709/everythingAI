@@ -130,4 +130,4 @@ Non-goals:
 
 ## Artifact commit SHA
 
-PENDING_ARTIFACT_COMMIT_SHA
+b14d7d15aabc2ba3ce7021f7eca747ebba9cebc9

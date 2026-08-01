@@ -84,7 +84,7 @@
     "report": "REPORTS/EAI-TASK-016-ADMIN-NAVIGATION-HEADER-REVIEW.md",
     "handover": "docs/HANDOVER_2026-06-25_EAI_TASK_016_ADMIN_NAVIGATION_HEADER_REVIEW.json"
   },
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifact_commit_sha": "b14d7d15aabc2ba3ce7021f7eca747ebba9cebc9",
   "final_pushed_sha": "PENDING_FINAL_PUSHED_SHA",
   "state_file_updated": false,
   "state_file_reason": ".hermes/state.json currently records issue #40; it was preserved to avoid overwriting unrelated active maintenance state.",
