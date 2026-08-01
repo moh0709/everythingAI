@@ -22,6 +22,22 @@ Status: ACTIVE
 Purpose: telemetry, audit artifacts, and snapshots remain synchronized
 Status: ACTIVE
 
+### permissionRuntimeIsolationValidator
+Purpose: permission foundation remains observational and cannot block runtime execution
+Status: ACTIVE
+
+### permissionDeterminismValidator
+Purpose: deterministic permission resolution
+Status: ACTIVE
+
+### permissionInheritanceValidator
+Purpose: deterministic role-permission inheritance without duplicate effective grants
+Status: ACTIVE
+
+### permissionObservabilityValidator
+Purpose: permission telemetry, audit artifacts, and snapshots remain synchronized
+Status: ACTIVE
+
 ## Runtime Isolation
 PASS
 
@@ -48,3 +64,13 @@ PASS
 | ID-3 | Identity observability | identity event, telemetry, audit, snapshot, and observability view test | PASS |
 | ID-4 | Governance metadata | identity contract and metadata model test | PASS |
 | ID-5 | Observational only; no runtime gating or enforcement activation | runtime isolation and contract invariant test | PASS |
+
+## Issue 7 Acceptance Matrix
+
+| Criterion | Requirement | Evidence | Status |
+|---|---|---|---|
+| PERM-1 | Permissions model | `createPermissionModel`, `createRolePermissionModel`, and Phase 5.2 permission metadata test | PASS |
+| PERM-2 | Role-permission relationships | `resolveEffectivePermissions` and permission inheritance validation test | PASS |
+| PERM-3 | Permission observability | permission event, telemetry, audit, snapshot, and observability view test | PASS |
+| PERM-4 | Governance metadata | permission governance contract and runtime isolation validation test | PASS |
+| PERM-5 | Observational only; no runtime blocking or enforcement activation | permission contract forbids runtime execution and enforcement blocking | PASS |
