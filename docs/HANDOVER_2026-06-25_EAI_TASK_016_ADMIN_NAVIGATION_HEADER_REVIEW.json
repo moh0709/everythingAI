@@ -1,45 +1,107 @@
 {
-  "repository": "everythingAI",
+  "repository": "moh0709/everythingAI",
   "branch": "main",
   "task_id": "EAI-TASK-016",
   "issue_number": 38,
+  "execution_agent": "Forge",
+  "automation_boundary": "FULLY_AUTOMATIC_CODEX_CLI",
+  "context_path": "C:\\temp\\EverythingAI\\.hermes\\forge\\context-38.json",
+  "starting_sha": "aa2e746bee8c34aa8d7c219d0808826bb6110b7f",
   "final_status": "PASS",
-  "validation_status_summary": {
-    "git_pull_ff_only": "PASS",
-    "framework_doctor": "PASS",
-    "ui_typecheck": "PASS",
-    "ui_build": "PASS",
-    "api_tests": "PASS"
-  },
+  "product_behavior_changed": false,
+  "source_code_changed": false,
   "admin_header_usage_map": [
-    "AdminHeader renders the admin top nav from ADMIN_NAV_ITEMS and uses active-provider display.",
-    "AdminShell mounts AdminHeader as part of the admin page chrome.",
-    "AdminRuntimeApp owns admin section state and passes section controls into the shell.",
-    "adminNavigation defines the Agent Connectors nav target and anchors it to settings.",
-    "AdminViewRouter routes settings to SettingsView.",
-    "SettingsView renders AgentConnectorsPanel inside the admin settings page."
+    "AdminHeader renders the admin top navigation bar from ADMIN_NAV_ITEMS and displays the active provider pill.",
+    "AdminShell mounts AdminHeader and passes section controls plus activeProvider into it.",
+    "AdminRuntimeApp owns AdminSection state and passes admin-only controls through AdminShell and AdminViewRouter.",
+    "AdminApp is the admin React boundary and renders AdminRuntimeApp.",
+    "AdminViewRouter routes settings to SettingsView and does not render a dedicated agentConnectors section case.",
+    "types.ts defines AdminSection, including agentConnectors as a typed value."
   ],
-  "boundary_notes": [
-    "Client Workspace is unaffected: main.tsx renders UserApp and ToastProvider.",
-    "Admin entry remains separate via admin-main.tsx and AdminApp.",
-    "Agent Connectors remains inside admin-only navigation/settings."
+  "admin_navigation_sections": [
+    "adminNavigation.ts defines ADMIN_NAV_ITEMS as Dashboard, Files & Content, Planning, Ask AI, Agent Connectors, Analytics, and Settings.",
+    "Agent Connectors targets settings with #agent-connectors and scrolls to the Admin Agent Connectors panel.",
+    "Analytics uses loadAudit before entering the analytics section.",
+    "Settings and Agent Connectors active states are distinguished by the active hash."
   ],
-  "proposed_next_task": "Extract admin navigation into a single declarative source of truth and, if needed, split Agent Connectors into a dedicated nested settings subsection.",
+  "client_workspace_unaffected": true,
+  "client_workspace_boundary_evidence": [
+    "apps/everything-ai-ui/src/main.tsx renders UserApp and ToastProvider.",
+    "apps/everything-ai-ui/src/UserApp.tsx owns user-facing onboarding, explore, wiki, and ask views.",
+    "No Client Workspace import path inspected imports adminNavigation, AdminHeader, SettingsView, or AgentConnectorsPanel."
+  ],
+  "agent_connectors_admin_only": true,
+  "agent_connectors_boundary_evidence": [
+    "AdminHeader exposes Agent Connectors only through ADMIN_NAV_ITEMS.",
+    "adminNavigation.ts routes Agent Connectors to settings with #agent-connectors.",
+    "AdminViewRouter renders SettingsView for settings.",
+    "SettingsView renders AgentConnectorsPanel.",
+    "AgentConnectorsPanel states connector controls are admin/operator-only and not exposed in the Client Workspace."
+  ],
+  "proposed_next_maintainability_task": "Create a targeted admin navigation contract test and type cleanup task that preserves the current Agent Connectors settings-anchor behavior while clarifying whether agentConnectors should remain in AdminSection.",
   "likely_later_files": [
     "apps/everything-ai-ui/src/admin/adminNavigation.ts",
+    "apps/everything-ai-ui/src/admin/types.ts",
     "apps/everything-ai-ui/src/admin/components/AdminHeader.tsx",
-    "apps/everything-ai-ui/src/admin/components/AdminShell.tsx",
+    "apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx",
     "apps/everything-ai-ui/src/admin/components/SettingsView.tsx",
-    "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx",
-    "apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx",
-    "apps/everything-ai-ui/src/admin/AdminViewRouter.tsx",
-    "apps/everything-ai-ui/src/admin/types.ts"
+    "apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx"
   ],
-  "artifacts": {
-    "log": "LOGS/EAI-TASK-016-terminal.log",
-    "report": "REPORTS/EAI-TASK-016-ADMIN-NAVIGATION-HEADER-REVIEW.md"
+  "validation": {
+    "git_pull_ff_only": {
+      "status": "PASS",
+      "command": "git pull --ff-only",
+      "cwd": "C:\\temp\\EverythingAI",
+      "summary": "Already up to date."
+    },
+    "framework_doctor": {
+      "status": "PASS",
+      "command": "node scripts/framework-doctor.mjs",
+      "cwd": "C:\\temp\\EverythingAI",
+      "summary": "status PASS; gh authenticated; state valid json"
+    },
+    "ui_typecheck": {
+      "status": "PASS",
+      "command": "npm run typecheck",
+      "cwd": "C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+      "summary": "tsc --noEmit exited 0"
+    },
+    "ui_build": {
+      "status": "PASS",
+      "command": "npm run build",
+      "cwd": "C:\\temp\\EverythingAI\\apps\\everything-ai-ui",
+      "summary": "vite build exited 0; 1556 modules transformed"
+    },
+    "api_tests": {
+      "status": "PASS",
+      "command": "npm test",
+      "cwd": "C:\\temp\\EverythingAI\\services\\api",
+      "summary": "173 tests passed; 0 failed; 0 skipped"
+    }
   },
+  "artifacts": {
+    "terminal_log": "LOGS/EAI-TASK-016-terminal.log",
+    "report": "REPORTS/EAI-TASK-016-ADMIN-NAVIGATION-HEADER-REVIEW.md",
+    "handover": "docs/HANDOVER_2026-06-25_EAI_TASK_016_ADMIN_NAVIGATION_HEADER_REVIEW.json"
+  },
+  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "final_pushed_sha": "PENDING_FINAL_PUSHED_SHA",
   "state_file_updated": false,
-  "state_file_reason": ".hermes/state.json does not exist in this repository",
-  "artifact_commit_sha": "858e5f3"
+  "state_file_reason": ".hermes/state.json currently records issue #40; it was preserved to avoid overwriting unrelated active maintenance state.",
+  "unrelated_local_changes_preserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ],
+  "issue_completion_contract": {
+    "do_not_close_issue": true,
+    "do_not_self_accept_pm_work": true,
+    "do_not_release_dependent_tasks": true,
+    "target_labels_after_submission": [
+      "forge:done",
+      "pm:review"
+    ]
+  },
+  "secrets_exposed": false
 }

@@ -1,4 +1,4 @@
-# EAI-TASK-016: Admin navigation header structure review
+# EAI-TASK-016: Admin Navigation Header Structure Review
 
 ## Final status
 
@@ -6,100 +6,128 @@ PASS
 
 ## Scope checked
 
-Inspection-only task. No product behavior was changed.
+Inspection-only maintenance refresh for GitHub issue #38. No product behavior or application source code was changed.
 
 ## Current Admin header usage map
 
 - `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
-  - Renders the top admin nav bar and provider pill.
-  - Maps `ADMIN_NAV_ITEMS` into nav buttons.
-  - Uses `activateAdminNavItem()` and `isAdminNavItemActive()` from `adminNavigation.ts`.
+  - Renders the admin top navigation bar, EverythingAI admin badge, and active provider pill.
+  - Maps `ADMIN_NAV_ITEMS` into buttons.
+  - Delegates click behavior to `activateAdminNavItem()`.
+  - Delegates active-state calculation to `isAdminNavItemActive()`.
 - `apps/everything-ai-ui/src/admin/components/AdminShell.tsx`
-  - Mounts `AdminHeader` above the rest of the admin page chrome.
+  - Mounts `AdminHeader` above the admin page content.
+  - Passes `section`, `setSection`, `loadAudit`, and `activeProvider` into the header.
 - `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
-  - Owns admin section state and passes `setSection` / `loadAudit` into the shell.
-  - Keeps admin-only connector actions inside the admin runtime.
-- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
-  - Defines the admin nav items and the special `agentConnectors` nav target.
-  - Routes `Agent Connectors` to the `settings` section with `#agent-connectors` and scrolls to the panel.
+  - Owns admin section state with `useState<AdminSection>('dashboard')`.
+  - Defines the admin-only actions that are passed through `AdminShell` and `AdminViewRouter`.
+  - Keeps provider settings, agent connector diagnostics, and connector probes inside the admin runtime.
+- `apps/everything-ai-ui/src/admin/AdminApp.tsx`
+  - Provides the admin React boundary and renders `AdminRuntimeApp`.
+  - Does not import or mount the Client Workspace.
 - `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
+  - Switches on `AdminSection`.
   - Routes `settings` to `SettingsView`.
-- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
-  - Renders `AgentConnectorsPanel` inside the settings page.
+  - Has no rendered case for `agentConnectors`; the connector header item is handled as a settings anchor target.
+- `apps/everything-ai-ui/src/admin/types.ts`
+  - Defines `AdminSection` as `dashboard | explorer | planning | analytics | settings | agentConnectors | askai`.
+
+## Admin navigation sections
+
+- `apps/everything-ai-ui/src/admin/adminNavigation.ts` is the current single source for top-level admin nav items.
+- `ADMIN_NAV_ITEMS` defines the visible header labels:
+  - Dashboard -> `dashboard`
+  - Files & Content -> `explorer`
+  - Planning -> `planning`
+  - Ask AI -> `askai`
+  - Agent Connectors -> `settings` plus `#agent-connectors`
+  - Analytics -> `analytics`
+  - Settings -> `settings`
+- `activateAdminNavItem()` special-cases `agentConnectors` by setting `window.location.hash = '#agent-connectors'`, setting the active section to `settings`, and scrolling to the Agent Connectors panel.
+- `activateAdminSection()` special-cases `analytics` by calling `loadAudit()`; other section targets call `setSection(target)`.
+- `isAdminNavItemActive()` distinguishes Settings from Agent Connectors by comparing the active section and hash.
 
 ## Admin navigation boundary notes
 
-- `Agent Connectors` remains an Admin-only path.
-- The nav item does not open a separate workspace route; it targets `settings` inside the admin shell and anchors to the connectors panel.
-- The client workspace entry remains separate:
-  - `apps/everything-ai-ui/src/main.tsx` renders `UserApp` + `ToastProvider`.
+- Admin and Client Workspace entries remain mechanically separate.
+- Admin entry:
   - `apps/everything-ai-ui/src/admin-main.tsx` renders `AdminApp`.
-- `UserApp` is the client workspace entry and stays outside the admin navigation boundary.
+  - `AdminApp` renders `AdminRuntimeApp`.
+  - `AdminRuntimeApp` renders `AdminShell` and `AdminViewRouter`.
+- Client Workspace entry:
+  - `apps/everything-ai-ui/src/main.tsx` renders `UserApp` and `ToastProvider`.
+  - `UserApp` imports only user/client workspace modules.
+- No Client Workspace file imports `AdminHeader`, `AdminShell`, `AdminViewRouter`, `SettingsView`, `AgentConnectorsPanel`, or `adminNavigation.ts`.
 
 ## Client Workspace impact check
 
-Confirmed unaffected by this admin review:
+PASS. The Client Workspace is unaffected by this review.
 
-- `apps/everything-ai-ui/src/main.tsx`
-- `apps/everything-ai-ui/src/UserApp.tsx`
+Observed boundary:
 
-Those files continue to drive the user-facing workspace path and do not import admin navigation or admin connector components.
+- `apps/everything-ai-ui/src/main.tsx` renders `UserApp`.
+- `apps/everything-ai-ui/src/UserApp.tsx` owns the user-facing workspace views: onboarding, explore, wiki, and ask.
+- Agent connector controls are absent from the Client Workspace import path.
 
 ## Agent Connectors boundary check
 
-Confirmed still inside Admin-only navigation/settings:
+PASS. Agent Connectors remains inside Admin-only navigation/settings.
 
-- `apps/everything-ai-ui/src/admin/adminNavigation.ts`
-- `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
-- `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
+Observed path:
 
-No client workspace connector exposure was observed.
+- `AdminHeader` renders the Agent Connectors nav item from `ADMIN_NAV_ITEMS`.
+- `adminNavigation.ts` routes that item to the admin `settings` section with `#agent-connectors`.
+- `AdminViewRouter` renders `SettingsView` for `settings`.
+- `SettingsView` renders `AgentConnectorsPanel`.
+- `AgentConnectorsPanel` states the connectors are for admin/operator workflows only and are not exposed in the Client Workspace.
 
 ## Proposed next maintainability task
 
-Extract the admin navigation/configuration into a more declarative single source of truth and then split the connectors section into a dedicated nested settings subsection if the UI needs to grow.
+Create a targeted admin navigation contract test and type cleanup task.
 
-### Likely files involved later
+Recommended scope:
+
+- Add unit coverage for `ADMIN_NAV_ITEMS`, `activateAdminNavItem()`, `isAdminNavItemActive()`, and the Agent Connectors hash behavior.
+- Decide whether `agentConnectors` should remain in `AdminSection` or be modeled only as an `AdminNavItem`/settings subsection target, because `AdminViewRouter` does not render an `agentConnectors` section case.
+- Preserve the current UX: Agent Connectors stays admin-only and anchored inside Settings.
+
+## Exact files likely involved later
 
 - `apps/everything-ai-ui/src/admin/adminNavigation.ts`
+- `apps/everything-ai-ui/src/admin/types.ts`
 - `apps/everything-ai-ui/src/admin/components/AdminHeader.tsx`
-- `apps/everything-ai-ui/src/admin/components/AdminShell.tsx`
+- `apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx`
 - `apps/everything-ai-ui/src/admin/components/SettingsView.tsx`
 - `apps/everything-ai-ui/src/admin/components/AgentConnectorsPanel.tsx`
-- `apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx`
-- `apps/everything-ai-ui/src/admin/AdminViewRouter.tsx`
-- `apps/everything-ai-ui/src/admin/types.ts`
+- A new focused test file near the admin navigation module, if the UI test setup supports it.
 
-## Recommended acceptance criteria for the next task
+## Validation command results
 
-- Admin nav items are declared in one place.
-- `Agent Connectors` remains admin-only.
-- Client workspace files remain untouched.
-- Typecheck and build still pass.
-- No routing or behavior changes outside the admin settings subtree.
+- `git pull --ff-only` from `C:\temp\EverythingAI`: PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` from `C:\temp\EverythingAI`: PASS (`status: PASS`, `gh authenticated`, `state: valid json`)
+- `npm run typecheck` from `C:\temp\EverythingAI\apps\everything-ai-ui`: PASS (`tsc --noEmit`)
+- `npm run build` from `C:\temp\EverythingAI\apps\everything-ai-ui`: PASS (`vite build`, 1556 modules transformed)
+- `npm test` from `C:\temp\EverythingAI\services\api`: PASS (`173/173 pass`, `0 fail`, `0 skipped`)
 
-## Validation results
-
-- `git pull --ff-only` — PASS (`Already up to date.`)
-- `node scripts/framework-doctor.mjs` — PASS
-- `cd apps/everything-ai-ui && npm run typecheck` — PASS
-- `cd apps/everything-ai-ui && npm run build` — PASS
-- `cd services/api && npm test` — PASS
+Fresh validation evidence is captured in `LOGS/EAI-TASK-016-terminal.log`.
 
 ## Risks and non-goals
 
-### Risks
+Risks:
 
-- `Agent Connectors` is currently embedded within the admin settings page, so future expansion could make the settings page harder to scan.
-- Navigation state is split between header routing, hash handling, and settings-panel rendering.
+- `AdminSection` still includes `agentConnectors`, but `AdminViewRouter` does not render a dedicated `agentConnectors` case. The current behavior is intentional through the Settings anchor, but a future contributor could misread this as a missing route.
+- Active state for Settings versus Agent Connectors depends on `window.location.hash`; future routing changes should preserve or explicitly replace that contract.
+- Agent connector controls are powerful operator settings, so future navigation changes must keep them out of the Client Workspace.
 
-### Non-goals
+Non-goals:
 
 - No product behavior changes.
-- No admin/client boundary changes.
-- No core application code changes.
-- No `.hermes/state.json` update was made because the file does not exist in this repo.
+- No admin UI refactor.
+- No Client Workspace changes.
+- No connector execution or credential changes.
+- No issue closure or PM self-acceptance.
+- `.hermes/state.json` was not modified because it currently records a different active maintenance issue (#40), and changing it here would overwrite unrelated state.
 
 ## Artifact commit SHA
 
-858e5f3
+PENDING_ARTIFACT_COMMIT_SHA
