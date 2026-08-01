@@ -49,7 +49,7 @@ PASS
 
 ## Artifact commit SHA
 
-- `PENDING_ARTIFACT_COMMIT_SHA`
+- `848c9e8836499e7e619cca854b726a6b7d414a50`
 
 ## Notes
 

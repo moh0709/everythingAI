@@ -37,7 +37,7 @@
   ],
   "rollback_note": "Revert the task artifact commit. If product rollback is required, revert the accepted UI changes in WikiSourcePreviewDrawer.tsx and wikiMarkdown.css.",
   "recommended_next_task": "PM review of stale-open issue maintenance submission.",
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifact_commit_sha": "848c9e8836499e7e619cca854b726a6b7d414a50",
   "maintenance_refresh": {
     "agent": "Forge",
     "started_from_sha": "6874bd20f5d894af8f0a8d79014379c934a15a35",
