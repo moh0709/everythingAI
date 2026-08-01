@@ -3,56 +3,86 @@
   "branch": "main",
   "task_id": "EAI-TASK-022",
   "issue_number": 44,
-  "final_status": "BLOCKED",
+  "agent": "Forge",
+  "final_status": "PASS",
+  "starting_sha": "e083a3799e7c58489ff19894664cacadcb000afb",
   "environment": {
-    "repo_root": "/root/.hermes/projects/everythingAI",
-    "server_api": "http://127.0.0.1:4100",
-    "server_db": "/tmp/eai-task-022/everythingai.sqlite",
-    "disposable_test_folder": "/tmp/eai-task-022/disposable-alpha"
+    "repo_root": "C:\\temp\\EverythingAI",
+    "shell": "Windows PowerShell",
+    "server_api": "http://127.0.0.1:4194",
+    "server_db": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-022-disposable-20260801-190520\\everythingai-task-022.sqlite",
+    "disposable_test_folder": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-022-disposable-20260801-190520"
   },
   "disposable_folder_approach": {
-    "path": "/tmp/eai-task-022/disposable-alpha",
-    "files": ["alpha.txt", "subdir/beta.md"],
-    "safety_note": "No real user or business files were used."
+    "path": "C:\\temp\\EverythingAI\\.hermes\\forge\\eai-task-022-disposable-20260801-190520",
+    "files": [
+      "supplier-alpha.txt",
+      "operations-note.md"
+    ],
+    "safety_note": "No real user or business files were used. No destructive file-action endpoints were invoked."
   },
   "validated_steps": [
-    "git pull --ff-only",
-    "framework doctor",
-    "frontend typecheck",
-    "frontend build",
-    "backend tests",
-    "health endpoint",
-    "index disposable folder",
-    "extract disposable files",
-    "list indexed files",
-    "inspect extracted file preview",
-    "search indexed content",
-    "status endpoint",
-    "wiki generation endpoint",
-    "wiki diagnostics endpoint"
+    "prepared disposable test folder",
+    "indexed disposable folder through POST /api/index",
+    "extracted readable content through POST /api/extract",
+    "inspected status through GET /api/status",
+    "searched indexed content through GET /api/search",
+    "inspected extracted preview through GET /api/files/:fileId/preview",
+    "built persisted wiki through POST /api/wiki/build",
+    "inspected persisted wiki page and evidence routes",
+    "inspected wiki diagnostics and validation preview routes",
+    "confirmed no destructive file actions were performed"
   ],
-  "blocked_steps": [
-    "persisted wiki build",
-    "wiki source evidence endpoint",
-    "wiki validation preview endpoint"
+  "not_validated": [
+    {
+      "step": "browser UI click-through",
+      "reason": "Issue requested local runtime smoke where possible; this run validates API/runtime workflow and does not claim browser UI validation."
+    }
   ],
-  "blocked_reason": "POST /api/wiki/build returned HTTP 500 with FOREIGN KEY constraint failed on the disposable local database.",
   "results_summary": {
+    "git_pull_ff_only": "PASS",
     "framework_doctor": "PASS",
     "frontend_typecheck": "PASS",
     "frontend_build": "PASS",
-    "backend_tests": "PASS (112 passed / 0 failed / 1 skipped)",
-    "runtime_smoke": "PARTIAL_PASS",
-    "persisted_wiki_build": "FAIL"
+    "backend_tests": "PASS (173/173)",
+    "runtime_smoke": "PASS",
+    "persisted_wiki_build": "PASS",
+    "wiki_evidence_routes": "PASS",
+    "wiki_diagnostics": "PASS"
+  },
+  "runtime_smoke_summary": {
+    "indexed": 7,
+    "extracted": 2,
+    "files_returned": 7,
+    "preview_readable": true,
+    "search_results": 1,
+    "status_indexed_files": 7,
+    "wiki_build_mode": "full",
+    "wiki_page_count": 7,
+    "evidence_sources": 2,
+    "validation_recommendation": "pass",
+    "diagnostics_pages": 7,
+    "destructive_actions": "none performed"
   },
   "files_changed": [
     "LOGS/EAI-TASK-022-terminal.log",
     "REPORTS/EAI-TASK-022-MVP-DISPOSABLE-FOLDER-QA.md",
-    "docs/HANDOVER_2026-06-25_EAI_TASK_022_MVP_DISPOSABLE_FOLDER_QA.json"
+    "docs/HANDOVER_2026-06-25_EAI_TASK_022_MVP_DISPOSABLE_FOLDER_QA.json",
+    ".hermes/state.json"
+  ],
+  "unrelated_local_changes_preserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
   ],
   "risks_and_blockers": [
-    "Wiki persistence integrity issue blocks full evidence-route validation on disposable data."
+    "No current blocker reproduced.",
+    "Browser UI validation was not performed and is not claimed.",
+    "Runtime smoke indexed disposable DB/log byproducts because they were inside the disposable folder."
   ],
-  "recommended_next_task": "Investigate POST /api/wiki/build foreign-key failure using a fresh disposable database and a minimal wiki persistence repro.",
-  "artifact_commit_sha": "06495b6d84e144e763fa4e843cdeed463c3c2f52"
+  "recommended_next_task": "PM review and closure of stale issue #44 if accepted.",
+  "artifact_commit_sha": "PENDING_FIRST_ARTIFACT_COMMIT",
+  "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
+  "secrets": "none recorded"
 }
