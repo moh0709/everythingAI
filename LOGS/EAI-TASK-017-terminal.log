@@ -1,0 +1,66 @@
+EAI-TASK-017 Forge maintenance refresh terminal log
+Date: 2026-08-01
+Repository: moh0709/everythingAI
+Branch: main
+Starting SHA: 71ccc3db13b426ea376d0d6f4d023fe3cbb0bb0c
+Scope: issue #39, centralize admin navigation metadata
+
+Preflight:
+- Read .hermes/forge/context-39.json completely.
+- Loaded PROJECT_STATE.md and AI_BOOTSTRAP.md from the repository checkout.
+- Loaded skills/hermes-pm-qa-first-pass/SKILL.md.
+- Read live GitHub issue #39 through gh issue view.
+- Live issue labels before finalization: hermes:done, forge:working.
+- Existing live comments include prior PM acceptance on 2026-06-25 and Forge maintenance claim on 2026-08-01.
+- Preserved unrelated local changes:
+  - LOGS/EAI-TASK-046-terminal.log
+  - tests/task-worker-runtime-mode.test.mjs
+  - apps/everything-ai-ui/src/planning.css
+  - docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json
+
+Implementation inspection:
+- apps/everything-ai-ui/src/admin/adminNavigation.ts centralizes:
+  - ADMIN_NAV_ITEMS
+  - ADMIN_SECTION_ACTIONS
+  - AGENT_CONNECTORS_HASH
+  - activateAdminNavItem
+  - activateAdminSection
+  - isAdminNavItemActive
+- apps/everything-ai-ui/src/admin/components/AdminHeader.tsx consumes ADMIN_NAV_ITEMS and activateAdminNavItem.
+- apps/everything-ai-ui/src/admin/components/AdminHero.tsx consumes ADMIN_SECTION_ACTIONS and activateAdminSection.
+- No additional application source change was required for this maintenance refresh.
+
+Validation commands and results:
+1. git pull --ff-only
+   Result: PASS
+   Output summary: Already up to date.
+
+2. node scripts/framework-doctor.mjs
+   Result: PASS
+   Output summary: status PASS; gh authenticated; .hermes/state.json valid json; required framework files present.
+
+3. cd apps/everything-ai-ui; npm run typecheck
+   Result: PASS
+   Output summary: tsc --noEmit completed with exit code 0.
+
+4. cd apps/everything-ai-ui; npm run build
+   Result: PASS
+   Output summary: vite v5.4.2 built production assets successfully; 1556 modules transformed.
+
+5. cd services/api; npm test
+   Result: PASS
+   Output summary: node --test completed with 173 tests, 173 pass, 0 fail, 0 skipped.
+
+6. git diff --check
+   Result: PASS
+   Output summary: no whitespace errors; warnings only for unrelated pre-existing local file line-ending normalization.
+
+7. node -e JSON.parse handover
+   Result: PASS
+   Output summary: json ok.
+
+Finalization notes:
+- Required artifacts refreshed for issue #39.
+- Application behavior remains unchanged.
+- Artifact commit SHA is recorded in the report, handover, and state after the artifact commit is created.
+- Secrets recorded: none.

@@ -3,15 +3,34 @@
   "branch": "main",
   "taskId": "EAI-TASK-017",
   "issueNumber": 39,
+  "forgeMaintenanceRefresh": true,
   "finalStatus": "PASS",
+  "startingSha": "71ccc3db13b426ea376d0d6f4d023fe3cbb0bb0c",
   "validationStatus": {
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
     "uiTypecheck": "PASS",
     "uiBuild": "PASS",
-    "apiTests": "PASS"
+    "apiTests": "PASS",
+    "diffCheck": "PASS",
+    "jsonCheck": "PASS"
   },
+  "validationEvidence": [
+    "git pull --ff-only: PASS, already up to date",
+    "node scripts/framework-doctor.mjs: PASS, status PASS",
+    "npm run typecheck from apps/everything-ai-ui: PASS",
+    "npm run build from apps/everything-ai-ui: PASS, 1556 modules transformed",
+    "npm test from services/api: PASS, 173/173 tests passed",
+    "git diff --check: PASS, no whitespace errors; unrelated line-ending warnings only",
+    "handover JSON parse: PASS"
+  ],
   "filesChanged": [
+    "LOGS/EAI-TASK-017-terminal.log",
+    "REPORTS/EAI-TASK-017-ADMIN-NAVIGATION-METADATA.md",
+    "docs/HANDOVER_2026-06-25_EAI_TASK_017_ADMIN_NAVIGATION_METADATA.json",
+    ".hermes/state.json"
+  ],
+  "implementationFilesInspected": [
     "apps/everything-ai-ui/src/admin/adminNavigation.ts",
     "apps/everything-ai-ui/src/admin/components/AdminHeader.tsx",
     "apps/everything-ai-ui/src/admin/components/AdminHero.tsx"
@@ -27,8 +46,20 @@
     "Client Workspace remains unaffected",
     "Agent Connectors remains admin-only"
   ],
-  "risk": "Low-risk admin UI refactor that consolidates shared navigation metadata and click behavior.",
-  "rollbackNote": "Revert the three modified admin UI files to restore the previous navigation wiring.",
-  "recommendedNextTask": "Extract the remaining admin view-router section map into a shared config/helper for even tighter navigation centralization.",
-  "artifactCommitSha": "488c4e5"
+  "risk": "Low-risk evidence refresh for an already accepted admin UI refactor; no application source code was changed.",
+  "rollbackNote": "Revert the issue #39 artifact refresh commit if this maintenance evidence needs to be removed.",
+  "recommendedNextTask": "Keep issue #39 in PM review for stale-open maintenance confirmation; do not release dependent tasks from Forge.",
+  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "queueLabels": [
+    "forge:done",
+    "pm:review"
+  ],
+  "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
+  "secrets": "none recorded",
+  "unrelatedLocalChangesPreserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ]
 }
