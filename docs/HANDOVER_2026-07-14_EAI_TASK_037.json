@@ -65,8 +65,8 @@
     "handover_json_validation": "PASS",
     "live_issue_view": "PASS"
   },
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT",
-  "final_pushed_commit_sha": "PENDING_FINAL_PUSH",
+  "artifact_commit_sha": "7670af586bc15814a8d6cee6a3ac40a2f6e6cc40",
+  "final_pushed_commit_sha_source": "final GitHub issue #59 comment after push",
   "queue_labels_expected_after_submission": [
     "forge:done",
     "pm:review"

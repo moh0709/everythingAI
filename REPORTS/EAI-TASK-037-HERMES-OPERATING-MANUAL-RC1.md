@@ -58,7 +58,7 @@ This refresh did not modify product runtime behavior. It updates the #59 evidenc
 | AC-09 | Git branch, commit, and safety rules | `Branch, commit, and push safety` | PASS |
 | AC-10 | Failure handling, retries, rollback, escalation | `Failure handling and escalation`; `Known gaps` retry and lock guidance | PASS |
 | AC-11 | Logs, reports, handover artifacts, evidence | This report, handover JSON, and terminal log | PASS |
-| AC-12 | Completion reporting and PM handoff | Final issue comment and labels submitted by Forge refresh | PENDING LIVE VERIFICATION |
+| AC-12 | Completion reporting and PM handoff | Final issue comment and labels submitted by Forge refresh | PASS AFTER LIVE LABEL VERIFICATION |
 | AC-13 | Automatic return to queue | `tests/task-poller-watch-loop.test.mjs` | PASS |
 | AC-14 | Interaction rules for CEO, PM, Hermes, future agents | `Interaction rules` | PASS |
 | AC-15 | Known gaps documented honestly | `Known gaps between target behavior and the current worker` | PASS |
@@ -93,8 +93,8 @@ Fresh validation for this refresh:
 - Original manual commit SHA: `2d5cbef9dfe5e51ad65919a9576c923a719ea023`
 - Corrective trigger-contract commit SHA: `a4df9b9302b28b5ff82ef94a77aa0472907457d2`
 - Runtime separation corrective commit SHA: `3d2d1c13c0f40af49e80ba605264ac5af44fe9c3`
-- Forge artifact refresh commit SHA: `PENDING_ARTIFACT_COMMIT`
-- Final pushed SHA: `PENDING_FINAL_PUSH`
+- Forge artifact refresh commit SHA: `7670af586bc15814a8d6cee6a3ac40a2f6e6cc40`
+- Final pushed SHA source of truth: final GitHub issue #59 comment after push
 
 ## Next recommended step
 

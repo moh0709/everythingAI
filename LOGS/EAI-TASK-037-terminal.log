@@ -14,3 +14,5 @@
 [2026-08-01T21:07:00+02:00] git diff --check -- .hermes/state.json REPORTS/EAI-TASK-037-HERMES-OPERATING-MANUAL-RC1.md docs/HANDOVER_2026-07-14_EAI_TASK_037.json LOGS/EAI-TASK-037-terminal.log: PASS.
 [2026-08-01T21:08:00+02:00] npm test: PASS (182/182).
 [2026-08-01T21:08:00+02:00] gh issue view 59 --json number,title,state,labels,comments,url: PASS (issue open; labels hermes:done, forge:working before final label transition).
+[2026-08-01T21:09:00+02:00] git commit -m "chore: refresh issue 59 forge evidence": PASS (artifact commit 7670af586bc15814a8d6cee6a3ac40a2f6e6cc40).
+[2026-08-01T21:09:00+02:00] Replaced temporary artifact metadata with real artifact commit SHA; final pushed SHA will be recorded in the live GitHub issue comment after push.
