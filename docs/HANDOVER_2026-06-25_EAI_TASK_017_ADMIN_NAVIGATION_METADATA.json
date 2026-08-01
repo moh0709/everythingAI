@@ -49,7 +49,7 @@
   "risk": "Low-risk evidence refresh for an already accepted admin UI refactor; no application source code was changed.",
   "rollbackNote": "Revert the issue #39 artifact refresh commit if this maintenance evidence needs to be removed.",
   "recommendedNextTask": "Keep issue #39 in PM review for stale-open maintenance confirmation; do not release dependent tasks from Forge.",
-  "artifactCommitSha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifactCommitSha": "22c852ecd634cac0279dbb8764787f7d283ef412",
   "queueLabels": [
     "forge:done",
     "pm:review"
