@@ -3,7 +3,15 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { claimForgeIssue, FORGE_RESULTS, isForgeEligible, recordForgeTriggerHeartbeat, sanitizeText } from '../src/forge-trigger.js';
+import {
+  claimForgeIssue,
+  claimForgeMaintenanceIssue,
+  FORGE_RESULTS,
+  isForgeEligible,
+  recordForgeTriggerHeartbeat,
+  sanitizeText,
+  selectForgeMaintenanceIssue
+} from '../src/forge-trigger.js';
 import { sendForgeReport } from '../src/forge-reporting.js';
 import { startForgeExecution } from '../src/forge-execution.js';
 
@@ -28,8 +36,12 @@ function listIssues() {
   return JSON.parse(gh(['issue', 'list', '--repo', repo, '--state', 'open', '--label', 'pm:ready', '--label', 'forge:ready', '--limit', '20', '--json', 'number,title,state,labels,url,body'])).filter(isForgeEligible);
 }
 
+function listMaintenanceIssues() {
+  return JSON.parse(gh(['issue', 'list', '--repo', repo, '--state', 'open', '--limit', '100', '--json', 'number,title,state,labels,url,body,updatedAt,createdAt']));
+}
+
 function fetchIssue(number) {
-  return JSON.parse(gh(['issue', 'view', String(number), '--repo', repo, '--json', 'number,title,state,labels,url,body']));
+  return JSON.parse(gh(['issue', 'view', String(number), '--repo', repo, '--json', 'number,title,state,labels,url,body,updatedAt,createdAt']));
 }
 
 export function planLabelMutation(currentLabels, desiredLabels) {
@@ -62,10 +74,12 @@ async function executeWithReporting({ contextPath, issue, repoRoot, reporter }) 
   return result;
 }
 
-export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8') } = {}) {
+export async function pollForgeOnce({ list = listIssues, listMaintenance = listMaintenanceIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8') } = {}) {
   const issues = await list();
-  if (!issues.length) return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs };
-  return claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
+  if (issues.length) return claimForgeIssue({ issue: issues[0], fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
+  const maintenance = selectForgeMaintenanceIssue(await listMaintenance());
+  if (!maintenance) return { ok: true, result: FORGE_RESULTS.IDLE, intervalMs, evidence: ['no eligible released or maintenance issue'] };
+  return claimForgeMaintenanceIssue({ issue: maintenance.issue, fetchLiveIssue: fetch, updateLabels: update, postComment: comment, lockPath: resolve(repoRoot, '.hermes/forge/claim.lock'), repoRoot, startingSha: sha, projectState, bootstrap, reporter, execute });
 }
 
 export async function watchForge({ iterations = Infinity, pauseMs = intervalMs, ...options } = {}) {

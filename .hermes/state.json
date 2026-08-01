@@ -1,58 +1,30 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 94,
-  "currentTask": "EAI-TASK-047B",
-  "updatedAt": "2026-07-30T12:46:47.912Z",
-  "lastCheckedAt": "2026-07-30T12:46:47.912Z",
+  "currentIssue": 96,
+  "currentTask": "EAI-TASK-049",
+  "updatedAt": "2026-08-01T13:20:00.000Z",
+  "lastCheckedAt": "2026-08-01T13:20:00.000Z",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "SOAK_VERIFIED_PASS",
-  "startingCommitSha": "c16940684e6961e7e025200b3d4ab0362516894f",
-  "artifactCommitSha": "fd9ae58403dbe6abe01095fe8bbd2aea9908e4ba",
-  "host": "vmi2938167 / 37.60.248.195",
-  "serviceState": "OBSERVER_ACTIVE_24H_VERIFIED",
-  "observation": {
-    "startedAt": "2026-07-29T11:43:05.318Z",
-    "expectedCompletionAt": "2026-07-30T11:43:05.318Z",
-    "finalObservationTimestamp": "2026-07-30T12:46:47.912Z",
-    "durationMs": 90222594,
-    "requiredDurationMs": 86400000,
-    "requiredDuration": "PT24H",
-    "continuous24HourSoakCompleted": true,
-    "sampleCount": 1491,
-    "maxGapMs": 70064,
-    "gapCountOver90s": 0
-  },
-  "durableObserver": {
-    "service": "hermes-soak-observer.service",
-    "enabled": true,
-    "activeState": "active",
-    "subState": "running",
-    "mainPid": 1294207,
-    "nRestarts": 0,
-    "processCount": 1,
-    "restartCount": 1,
-    "observerIdentity": "vmi2938167:1294207",
-    "duplicateInstanceCheck": "PASS: second observer invocation returned OBSERVER_CONFLICT with active observer lock present",
-    "secretScan": "PASS: no sensitive-key matches in observer state, events, or heartbeat"
-  },
-  "validation": {
-    "frameworkDoctor": "PASS",
-    "observerTests": "PASS 4/4",
-    "nodeTests": "PASS 169/169",
-    "npmTest": "PASS 169/169",
-    "systemdAnalyzeVerify": "PASS on live host for runtime, supervisor, poller, watchdog, timer, and soak observer units",
-    "healthCliJson": "PASS parseable JSON; local UNKNOWN without local heartbeat; live DEGRADED due conservative supervisor lock report with fresh heartbeat",
-    "historyParser": "PASS",
-    "jsonChecks": "PASS",
-    "gitDiffCheck": "PASS with pre-existing CRLF normalization warning on LOGS/EAI-TASK-046-terminal.log"
-  },
-  "queueLabels": [
-    "forge:working"
+  "result": "FORGE_MAINTENANCE_LOOP_READY_FOR_REVIEW",
+  "startingCommitSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
+  "artifactCommitSha": "recorded in issue #96 PM review comment after push",
+  "implementation": [
+    "src/forge-trigger.js",
+    "scripts/forge-trigger.mjs",
+    "tests/forge-trigger.test.mjs",
+    "tests/forge-trigger-cli.test.mjs",
+    "docs/FORGE_AUTONOMOUS_EXECUTION_ARCHITECTURE.md",
+    "docs/FORGE_TRIGGER_AND_REPORTING_RUNBOOK.md",
+    "REPORTS/EAI-TASK-049-CONTINUOUS-OPEN-ISSUE-PROCESSING-LOOP.md",
+    "docs/HANDOVER_2026-08-01_EAI_TASK_049.json",
+    "LOGS/EAI-TASK-049-terminal.log"
   ],
-  "issue93": "ACCEPTED_AND_CLOSED",
-  "issue69": "INSPECTED_NOT_MODIFIED",
-  "atlasDelegation": "NONE_AUTHORIZED_NONE_USED",
+  "queueLabels": [
+    "forge:done",
+    "pm:review"
+  ],
+  "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
   "secrets": "none recorded",
-  "humanSummary": "EAI-TASK-047B independently verified the durable Hermes observer window exceeded 24 continuous hours with live host and append-only event evidence."
+  "humanSummary": "EAI-TASK-049 adds a maintenance fall-through loop so Forge continues with unowned open review, stale, or governance backlog issues only after the released Forge queue is empty."
 }

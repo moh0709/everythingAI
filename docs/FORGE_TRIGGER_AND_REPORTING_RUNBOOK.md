@@ -15,7 +15,16 @@ $env:FORGE_TRIGGER_ITERATIONS = '3'
 npm run forge:trigger -- --watch
 ```
 
-The trigger uses `gh issue list` with `--state open --label pm:ready --label forge:ready`, then performs a live issue read before and after label mutation. It claims one issue at a time using `.hermes/forge/claim.lock`. A stale same-host lock may be recovered only when its owner PID is dead and its age exceeds 15 minutes. Cross-host locks require manual review.
+The trigger first uses `gh issue list` with `--state open --label pm:ready --label forge:ready`, then performs a live issue read before and after label mutation. It claims one issue at a time using `.hermes/forge/claim.lock`. A stale same-host lock may be recovered only when its owner PID is dead and its age exceeds 15 minutes. Cross-host locks require manual review.
+
+If no released Forge issue exists, the trigger lists open issues and enters maintenance mode. Maintenance mode skips actively owned issues, skips protected issue #69, and selects one candidate in this order:
+
+1. `forge:done` + `pm:review`
+2. `forge:blocked` + `pm:review`
+3. older open issues with no recent activity
+4. governance or administrative backlog
+
+The selected maintenance issue is claimed with `forge:working` and launched through the same bounded Codex execution path. It must return as `forge:done + pm:review` or `forge:blocked + pm:review`. If neither released nor maintenance work exists, the trigger records `IDLE` with queue-empty evidence.
 
 ## Codex start boundary
 

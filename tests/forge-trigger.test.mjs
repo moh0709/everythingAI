@@ -3,7 +3,16 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { acquireForgeLock, claimForgeIssue, FORGE_RESULTS, isForgeEligible, recordForgeTriggerHeartbeat, sanitizeText } from '../src/forge-trigger.js';
+import {
+  acquireForgeLock,
+  claimForgeIssue,
+  claimForgeMaintenanceIssue,
+  FORGE_RESULTS,
+  isForgeEligible,
+  recordForgeTriggerHeartbeat,
+  sanitizeText,
+  selectForgeMaintenanceIssue
+} from '../src/forge-trigger.js';
 
 function issue(labels = ['pm:ready', 'forge:ready']) {
   return { number: 801, title: 'OPS-AUTO handshake', state: 'open', url: 'https://github.com/moh0709/everythingAI/issues/801', body: 'handshake', labels: labels.map((name) => ({ name })) };
@@ -110,6 +119,76 @@ test('claimed issue is handed to the autonomous executor when configured', async
   assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
   assert.equal(execution.issue.number, 801);
   assert.match(execution.contextPath, /context-801\.json$/);
+});
+
+test('maintenance selection starts after queue exhaustion and follows review priority', () => {
+  const issues = [
+    {
+      number: 78,
+      title: 'OPS-FIX: Make Atlas poller claim transition atomic and idempotent',
+      state: 'open',
+      labels: [],
+      updatedAt: '2026-07-24T12:07:15Z'
+    },
+    {
+      number: 97,
+      title: 'Forge blocked review',
+      state: 'open',
+      labels: [{ name: 'forge:blocked' }, { name: 'pm:review' }],
+      updatedAt: '2026-07-30T12:00:00Z'
+    },
+    {
+      number: 98,
+      title: 'Forge done review',
+      state: 'open',
+      labels: [{ name: 'forge:done' }, { name: 'pm:review' }],
+      updatedAt: '2026-07-31T12:00:00Z'
+    },
+    {
+      number: 69,
+      title: 'Protected reliability drill',
+      state: 'open',
+      labels: [],
+      updatedAt: '2026-07-01T12:00:00Z'
+    }
+  ];
+  const selected = selectForgeMaintenanceIssue(issues, { now: () => new Date('2026-08-01T12:00:00Z') });
+  assert.equal(selected.issue.number, 98);
+  assert.equal(selected.priority, 'forge_done_review');
+});
+
+test('maintenance claim marks unowned stale issue working and preserves verified done review submission', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-maintenance-'));
+  const lockPath = join(root, 'claim.lock');
+  let live = {
+    number: 78,
+    title: 'OPS-FIX: Make Atlas poller claim transition atomic and idempotent',
+    state: 'open',
+    url: 'https://github.com/moh0709/everythingAI/issues/78',
+    body: 'maintenance backlog',
+    labels: [],
+    updatedAt: '2026-07-24T12:07:15Z'
+  };
+  const fetch = async () => live;
+  const update = async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; };
+  const result = await claimForgeMaintenanceIssue({
+    issue: live,
+    fetchLiveIssue: fetch,
+    updateLabels: update,
+    postComment: async () => ({ ok: true }),
+    lockPath,
+    repoRoot: root,
+    startingSha: 'a'.repeat(40),
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    now: () => new Date('2026-08-01T12:00:00Z'),
+    execute: async () => {
+      live = { ...live, labels: [{ name: 'forge:done' }, { name: 'pm:review' }] };
+      return { ok: true, result: 'COMPLETED' };
+    }
+  });
+  assert.equal(result.result, FORGE_RESULTS.AUTONOMOUS_STARTED);
+  assert.deepEqual(live.labels.map(({ name }) => name).sort(), ['forge:done', 'pm:review']);
 });
 
 test('worker launch failure transitions the claimed issue to blocked PM review', async () => {

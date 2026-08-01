@@ -23,6 +23,53 @@ export function isForgeEligible(issue) {
   return isForgeEligibleForQueue(issue);
 }
 
+const MAINTENANCE_INACTIVE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
+const PROTECTED_MAINTENANCE_ISSUES = new Set([69]);
+const WORKING_LABELS = new Set(['forge:working', 'hermes:working', 'atlas:working']);
+const READY_LABELS = new Set(['forge:ready', 'hermes:ready', 'atlas:ready']);
+const REVIEW_LABELS = new Set(['forge:done', 'forge:blocked', 'pm:review']);
+const FORGE_LIFECYCLE_LABELS = new Set(['forge:ready', 'forge:working', 'forge:done', 'forge:blocked', 'pm:ready', 'pm:review']);
+
+function isOpen(issue) {
+  return String(issue?.state ?? '').toLowerCase() === 'open';
+}
+
+function hasWorkingOwner(labels) {
+  return labels.some((label) => WORKING_LABELS.has(label));
+}
+
+function hasReadyOwner(labels) {
+  return labels.some((label) => READY_LABELS.has(label));
+}
+
+function isGovernanceBacklog(issue, labels) {
+  const text = `${issue?.title ?? ''}\n${issue?.body ?? ''}\n${labels.join('\n')}`;
+  return /\b(governance|administrative|admin|backlog|ops|operations)\b/i.test(text);
+}
+
+function maintenancePriority(issue, { now = () => new Date(), inactiveAfterMs = MAINTENANCE_INACTIVE_AFTER_MS } = {}) {
+  if (!isOpen(issue) || PROTECTED_MAINTENANCE_ISSUES.has(Number(issue?.number))) return null;
+  const labels = normalizeLabels(issue);
+  if (hasWorkingOwner(labels) || hasReadyOwner(labels)) return null;
+  if (labels.includes('forge:done') && labels.includes('pm:review')) return { rank: 1, priority: 'forge_done_review' };
+  if (labels.includes('forge:blocked') && labels.includes('pm:review')) return { rank: 2, priority: 'forge_blocked_review' };
+  if (labels.some((label) => REVIEW_LABELS.has(label))) return null;
+  const updatedAt = Date.parse(issue?.updatedAt ?? issue?.createdAt ?? '');
+  const isInactive = Number.isFinite(updatedAt) && Math.max(0, now().getTime() - updatedAt) >= inactiveAfterMs;
+  if (isInactive) return { rank: 3, priority: 'stale_open_issue' };
+  if (isGovernanceBacklog(issue, labels)) return { rank: 4, priority: 'governance_backlog' };
+  return null;
+}
+
+export function selectForgeMaintenanceIssue(issues = [], options = {}) {
+  return issues
+    .map((issue) => ({ issue, ...maintenancePriority(issue, options) }))
+    .filter((entry) => Number.isFinite(entry.rank))
+    .sort((left, right) => left.rank - right.rank
+      || Date.parse(left.issue.updatedAt ?? left.issue.createdAt ?? 0) - Date.parse(right.issue.updatedAt ?? right.issue.createdAt ?? 0)
+      || Number(left.issue.number) - Number(right.issue.number))[0] ?? null;
+}
+
 function atomicWriteJson(path, value) {
   mkdirSync(dirname(path), { recursive: true });
   const temp = `${path}.${process.pid}.tmp`;
@@ -131,6 +178,88 @@ function hasVerifiedForgeSubmission(issue) {
     && labels.includes('pm:review')
     && !labels.includes('forge:working')
     && !labels.includes('pm:ready');
+}
+
+function maintenanceClaimLabels(issue) {
+  const labels = normalizeLabels(issue)
+    .filter((label) => !FORGE_LIFECYCLE_LABELS.has(label));
+  labels.push('forge:working');
+  return labels;
+}
+
+function blockedReviewLabels(issue) {
+  const labels = normalizeLabels(issue)
+    .filter((label) => !FORGE_LIFECYCLE_LABELS.has(label));
+  labels.push('forge:blocked', 'pm:review');
+  return labels;
+}
+
+export async function claimForgeMaintenanceIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
+  const targetNumber = Number(issue?.number);
+  if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
+  const live = await fetchLiveIssue(targetNumber);
+  const selected = selectForgeMaintenanceIssue([live], { now });
+  if (!selected) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`maintenance labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
+  const acquired = acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
+  if (!acquired.ok) return { ok: false, ...acquired, issue: live };
+  try {
+    const verifiedBeforeMutation = await fetchLiveIssue(targetNumber);
+    const verifiedSelection = selectForgeMaintenanceIssue([verifiedBeforeMutation], { now });
+    if (!verifiedSelection) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: ['maintenance eligibility changed before mutation'] };
+    await updateLabels(targetNumber, maintenanceClaimLabels(verifiedBeforeMutation));
+    const verifiedAfterMutation = await fetchLiveIssue(targetNumber);
+    const after = normalizeLabels(verifiedAfterMutation);
+    if (!after.includes('forge:working') || after.includes('forge:ready') || after.includes('pm:review') || after.includes('forge:done') || after.includes('forge:blocked')) {
+      return { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, issue: verifiedAfterMutation, evidence: ['maintenance claim label mutation did not verify'] };
+    }
+    const prepared = prepareForgeContext({ issue: verifiedAfterMutation, repoRoot, startingSha, projectState, bootstrap, now });
+    const comment = JSON.stringify({ agent: 'Forge', issue: targetNumber, status: 'MAINTENANCE_CLAIMED', priority: verifiedSelection.priority, startingSha, contextPath: prepared.path, automationBoundary: 'FULLY_AUTOMATIC_CODEX_CLI' });
+    const posted = await postComment(verifiedAfterMutation, comment);
+    if (!posted?.ok) return { ok: false, result: FORGE_RESULTS.REPORTING_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, evidence: ['maintenance claim acknowledgement delivery failed'] };
+    const report = await reporter({ event: 'maintenance_claimed', issue: verifiedAfterMutation, contextPath: prepared.path });
+    if (!execute) return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
+    let execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
+    const verifiedCompletion = await fetchLiveIssue(targetNumber);
+    if (hasVerifiedForgeSubmission(verifiedCompletion)) {
+      return { ok: true, result: FORGE_RESULTS.AUTONOMOUS_STARTED, issue: verifiedCompletion, contextPath: prepared.path, report, execution };
+    }
+    if (execution?.ok) {
+      execution = {
+        ...execution,
+        ok: false,
+        result: 'UNVERIFIED_COMPLETION',
+        evidence: [...(execution.evidence ?? []), 'maintenance worker exited without verified forge:done plus pm:review']
+      };
+    }
+    await updateLabels(targetNumber, blockedReviewLabels(verifiedCompletion));
+    const verifiedBlocked = await fetchLiveIssue(targetNumber);
+    const afterBlocked = normalizeLabels(verifiedBlocked);
+    const transitionVerified = afterBlocked.includes('forge:blocked')
+      && afterBlocked.includes('pm:review')
+      && !afterBlocked.includes('forge:working');
+    const blockerComment = JSON.stringify(sanitizeReport({
+      agent: 'Forge',
+      issue: targetNumber,
+      status: 'BLOCKED',
+      result: execution?.result ?? 'START_FAILURE',
+      evidence: execution?.evidence ?? ['maintenance Codex execution failed'],
+      contextPath: prepared.path
+    }));
+    const blockedPosted = await postComment(verifiedBlocked, blockerComment);
+    return {
+      ok: false,
+      result: FORGE_RESULTS.AUTONOMOUS_BLOCKED,
+      issue: verifiedBlocked,
+      contextPath: prepared.path,
+      report,
+      execution,
+      evidence: transitionVerified && blockedPosted?.ok
+        ? execution?.evidence ?? []
+        : ['maintenance blocked transition or acknowledgement did not verify']
+    };
+  } finally {
+    releaseForgeLock({ lockPath, lock: acquired.lock });
+  }
 }
 
 export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultStatePath(repoRoot), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {

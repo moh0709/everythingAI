@@ -1,0 +1,54 @@
+{
+  "issue": 96,
+  "task": "EAI-TASK-049",
+  "title": "Continuous Open-Issue Processing Loop",
+  "status": "READY_FOR_PM_REVIEW",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "startingSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
+  "finalPushedSha": "recorded in issue #96 PM review comment after push",
+  "implementation": [
+    "src/forge-trigger.js",
+    "scripts/forge-trigger.mjs",
+    "tests/forge-trigger.test.mjs",
+    "tests/forge-trigger-cli.test.mjs",
+    "docs/FORGE_AUTONOMOUS_EXECUTION_ARCHITECTURE.md",
+    "docs/FORGE_TRIGGER_AND_REPORTING_RUNBOOK.md",
+    "REPORTS/EAI-TASK-049-CONTINUOUS-OPEN-ISSUE-PROCESSING-LOOP.md",
+    "LOGS/EAI-TASK-049-terminal.log",
+    ".hermes/state.json"
+  ],
+  "behavior": {
+    "releasedQueueFirst": true,
+    "maintenanceFallback": true,
+    "priorityOrder": [
+      "forge:done + pm:review",
+      "forge:blocked + pm:review",
+      "older open issues lacking recent activity",
+      "governance/administrative backlog"
+    ],
+    "claimLabel": "forge:working",
+    "completionLabels": [
+      "forge:done + pm:review",
+      "forge:blocked + pm:review"
+    ],
+    "protectedIssues": [
+      69
+    ]
+  },
+  "validation": {
+    "targetedForgeTests": "PASS 18/18",
+    "frameworkDoctor": "PASS",
+    "nodeTests": "PASS 173/173",
+    "npmTest": "PASS 173/173",
+    "gitDiffCheck": "PASS with CRLF normalization warnings only, including pre-existing LOGS/EAI-TASK-046-terminal.log",
+    "handoverJson": "PASS"
+  },
+  "preservedUnrelatedPaths": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ],
+  "secrets": "none recorded",
+  "pmReview": "Do not self-accept. PM independently reviews issue #96 evidence and live labels."
+}
