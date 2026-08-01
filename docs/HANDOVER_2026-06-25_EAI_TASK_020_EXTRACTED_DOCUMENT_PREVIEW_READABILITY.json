@@ -3,8 +3,11 @@
   "task": "EAI-TASK-020",
   "title": "Improve extracted document preview readability",
   "status": "PASS",
-  "artifact_commit_sha": "647a5a1e263675d7cd13ada354854795fee7c364",
+  "artifact_commit_sha": "pending until the focused artifact commit is created and pushed; final issue comment records the pushed SHA",
   "files_changed": [
+    "apps/everything-ai-ui/src/shared/ExtractedTextPreviewImpl.tsx",
+    "apps/everything-ai-ui/src/shared/extractedTextPreviewModel.ts",
+    "apps/everything-ai-ui/src/shared/extractedTextPreviewModel.test.mjs",
     "LOGS/EAI-TASK-020-terminal.log",
     "REPORTS/EAI-TASK-020-EXTRACTED-DOCUMENT-PREVIEW-READABILITY.md",
     "docs/HANDOVER_2026-06-25_EAI_TASK_020_EXTRACTED_DOCUMENT_PREVIEW_READABILITY.json"
@@ -12,16 +15,22 @@
   "validation": {
     "git_pull_ff_only": "PASS",
     "framework_doctor": "PASS",
+    "preview_model_focused_tests": "PASS",
     "ui_typecheck": "PASS",
     "ui_build": "PASS",
     "api_tests": "PASS"
   },
-  "behavior_reviewed": [
-    "Structured headings, paragraphs, lists, and table-like rows in extracted previews",
-    "Normalized line endings and non-breaking spaces",
-    "Sparse and truncation guidance for short or limited extractions",
-    "Shared preview component usage in both user and admin views"
+  "behavior_implemented_or_reviewed": [
+    "Shared preview component remains used by User Explore and Admin Explorer",
+    "Preview parsing is isolated in a focused model for regression coverage",
+    "Numbered report sections are treated as headings before numeric list parsing",
+    "Common section labels such as Findings and Recommendations are treated as headings",
+    "Unicode bullet lists and table-like rows are grouped into structured preview blocks",
+    "Paragraph grouping, normalization, truncation guidance, and sparse extraction guidance are preserved"
   ],
-  "notes": "No application code changes were required; the existing preview implementation already met the readability goal.",
-  "recommended_next_task": "EAI-TASK-018: Improve Admin API key lifecycle UX"
+  "risks": [
+    "Heuristic parser may misclassify rare plain-text lines that resemble headings"
+  ],
+  "rollback": "Revert the focused preview model extraction commit to restore the prior inline parser.",
+  "recommended_next_task": "Improve indexing and extraction progress visibility for MVP testing."
 }
