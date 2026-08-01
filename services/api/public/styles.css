@@ -3,13 +3,14 @@
   --bg: #f9fafb;
   --surface: #ffffff;
   --surface-soft: #f3f6fb;
+  --panel-warm: #fff7ed;
   --ink: #111827;
   --muted: #6b7280;
   --line: #e5e7eb;
   --blue: #1e40af;
   --blue-dark: #1e3a8a;
-  --indigo: #4f46e5;
-  --purple: #7c3aed;
+  --indigo: #334155;
+  --purple: #0f766e;
   --green: #16a34a;
   --amber: #d97706;
   --red: #dc2626;
@@ -46,6 +47,14 @@ button {
   white-space: nowrap;
 }
 
+button.danger-disabled,
+button.danger-disabled:hover {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #991b1b;
+  cursor: not-allowed;
+}
+
 button:hover {
   background: var(--blue-dark);
 }
@@ -68,12 +77,12 @@ button.compact {
 
 button.gradient-action {
   border: 0;
-  background: linear-gradient(90deg, var(--purple), var(--indigo));
-  box-shadow: 0 10px 20px rgba(79, 70, 229, 0.22);
+  background: linear-gradient(90deg, var(--blue), var(--purple));
+  box-shadow: 0 10px 20px rgba(15, 118, 110, 0.18);
 }
 
 button.gradient-action:hover {
-  background: linear-gradient(90deg, #6d28d9, #4338ca);
+  background: linear-gradient(90deg, var(--blue-dark), #115e59);
 }
 
 button:disabled {
@@ -245,6 +254,62 @@ pre {
   margin-bottom: 1.5rem;
 }
 
+.workflow-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.workflow-step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.1rem 0.55rem;
+  align-items: center;
+  min-height: 76px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0.7rem;
+}
+
+.workflow-step span {
+  display: grid;
+  place-items: center;
+  grid-row: span 2;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #475569;
+  font-weight: 800;
+}
+
+.workflow-step strong,
+.workflow-step small {
+  min-width: 0;
+}
+
+.workflow-step small {
+  color: var(--muted);
+}
+
+.workflow-step.active {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.workflow-step.active span,
+.workflow-step.complete span {
+  background: var(--blue);
+  color: #fff;
+}
+
+.workflow-step.complete {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
 .topbar-copy {
   max-width: 780px;
   margin-bottom: 0;
@@ -370,16 +435,36 @@ pre {
 }
 
 .panel,
+.intake-hero,
 .card,
 .metric {
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--surface);
   box-shadow: var(--shadow);
 }
 
-.panel {
+.panel,
+.intake-hero {
   padding: 1.1rem;
+}
+
+.intake-hero {
+  background:
+    linear-gradient(135deg, rgba(239, 246, 255, 0.9), rgba(255, 247, 237, 0.82)),
+    var(--surface);
+}
+
+.safety-callout {
+  display: flex;
+  gap: 0.45rem;
+  align-items: start;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  margin-top: 0.85rem;
+  padding: 0.7rem 0.8rem;
+  background: #fff7ed;
+  color: #7c2d12;
 }
 
 .batch-panel {
@@ -389,7 +474,7 @@ pre {
 
 .batch-status {
   border: 1px dashed #a5b4fc;
-  border-radius: 10px;
+  border-radius: 8px;
   margin-bottom: 0.75rem;
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.72);
@@ -464,7 +549,7 @@ pre {
   position: absolute;
   inset: 0 auto 0 0;
   width: 4px;
-  background: linear-gradient(var(--blue), var(--indigo));
+  background: linear-gradient(var(--blue), var(--purple));
 }
 
 .metric span {
@@ -525,8 +610,8 @@ pre {
 
 .tree-node {
   border: 1px solid #c7d2fe;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #eef2ff, #fff);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #eff6ff, #fff);
   padding: 0.9rem;
 }
 
@@ -539,6 +624,91 @@ pre {
 .card {
   padding: 0.95rem;
   box-shadow: none;
+}
+
+.file-card,
+.action-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-card::before,
+.action-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--blue);
+}
+
+.action-card::before {
+  background: var(--purple);
+}
+
+.file-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.6rem 0;
+}
+
+.file-state span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.24rem 0.55rem;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.confidence-meter {
+  overflow: hidden;
+  height: 0.45rem;
+  border-radius: 999px;
+  margin: 0.65rem 0 0.4rem;
+  background: #e5e7eb;
+}
+
+.confidence-meter span {
+  display: block;
+  width: var(--confidence);
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--green));
+}
+
+.activity-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.8rem;
+  background: #fff;
+}
+
+.activity-row > span {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  margin-top: 0.35rem;
+  background: var(--blue);
+}
+
+.activity-row[data-tone="success"] > span {
+  background: var(--green);
+}
+
+.activity-row[data-tone="error"] > span {
+  background: var(--red);
+}
+
+.activity-row p {
+  margin-bottom: 0.2rem;
+  color: #475569;
+}
+
+.activity-row small {
+  color: var(--muted);
 }
 
 .card-title {
@@ -567,18 +737,23 @@ pre {
 }
 
 #log,
-#answer {
+#answer,
+#auditTrail {
   min-height: 12rem;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 8px;
   background: #f8fafc;
   padding: 1rem;
+}
+
+#auditTrail {
+  margin-top: 1rem;
 }
 
 dialog {
   width: min(620px, calc(100% - 2rem));
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--surface);
   color: var(--ink);
   box-shadow: 0 28px 90px rgba(15, 23, 42, 0.22);
@@ -623,6 +798,7 @@ dialog::backdrop {
     min-height: 44px;
   }
 
+  .workflow-strip,
   .folder-grid,
   .metrics,
   .batch-metrics {
@@ -649,6 +825,7 @@ dialog::backdrop {
   .dashboard-grid,
   .chat-layout,
   .plan-layout,
+  .workflow-strip,
   .folder-grid,
   .search-row,
   .global-search,

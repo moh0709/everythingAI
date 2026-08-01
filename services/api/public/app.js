@@ -4,6 +4,7 @@ const state = {
   planSuggestions: [],
   unifiedResults: null,
   busyCount: 0,
+  activityLog: [],
 };
 
 const els = {
@@ -33,6 +34,9 @@ const els = {
   ollamaNumPredict: document.querySelector('#ollamaNumPredict'),
   settingsStatus: document.querySelector('#settingsStatus'),
   statusGrid: document.querySelector('#statusGrid'),
+  pipelineSteps: document.querySelectorAll('[data-pipeline-step]'),
+  activityTimeline: document.querySelector('#activityTimeline'),
+  auditTrail: document.querySelector('#auditTrail'),
 };
 
 function showView(viewId) {
@@ -48,6 +52,51 @@ function setActivity(status, details = '', tone = 'ready') {
   els.activityStatus.textContent = status;
   els.activityDetails.textContent = details;
   els.activityStatus.closest('.activity-banner').dataset.tone = tone;
+  state.activityLog.unshift({
+    status,
+    details,
+    tone,
+    at: new Date().toISOString(),
+  });
+  renderActivityTimeline();
+}
+
+function updatePipeline(activeStep) {
+  const order = ['intake', 'scan', 'plan', 'review', 'approve'];
+  const activeIndex = order.indexOf(activeStep);
+  els.pipelineSteps.forEach((step) => {
+    const stepIndex = order.indexOf(step.dataset.pipelineStep);
+    step.classList.toggle('active', step.dataset.pipelineStep === activeStep);
+    step.classList.toggle('complete', activeIndex > stepIndex);
+  });
+}
+
+function formatPercent(value) {
+  return `${Math.round(Number(value || 0) * 100)}%`;
+}
+
+function safeValue(value, fallback = '') {
+  return String(value ?? fallback)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function renderActivityTimeline(items = state.activityLog) {
+  if (!els.activityTimeline) return;
+
+  els.activityTimeline.innerHTML = items.slice(0, 12).map((item) => `
+    <article class="activity-row" data-tone="${safeValue(item.tone)}">
+      <span></span>
+      <div>
+        <strong>${safeValue(item.status)}</strong>
+        <p>${safeValue(item.details)}</p>
+        <small>${new Date(item.at).toLocaleString()}</small>
+      </div>
+    </article>
+  `).join('') || '<p class="muted">No activity yet. Select a folder to start.</p>';
 }
 
 function showError(error) {
@@ -68,6 +117,7 @@ async function withUiState({ button, working = 'Working', details = 'Operation i
   state.busyCount += 1;
   clearError();
   setActivity(working, details, 'working');
+  updatePipeline('scan');
 
   if (button) {
     button.disabled = true;
@@ -105,6 +155,9 @@ function saveSettings() {
 
 function log(value) {
   els.log.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+  if (els.auditTrail) {
+    els.auditTrail.textContent = els.log.textContent;
+  }
 }
 
 async function api(path, { method = 'GET', body } = {}) {
@@ -131,16 +184,20 @@ async function api(path, { method = 'GET', body } = {}) {
 function renderFiles(files) {
   state.files = files;
   els.files.innerHTML = files.map((file) => `
-    <article class="card">
+    <article class="card file-card">
       <div class="card-title">
-        <h3>${file.filename}</h3>
-        <span class="pill">${file.extension || 'file'}</span>
+        <h3>${safeValue(file.filename)}</h3>
+        <span class="pill">${safeValue(file.extension || 'file')}</span>
       </div>
-      <p class="muted">${file.absolute_path}</p>
-      <p>Status: ${file.index_status} | Extraction: ${file.extraction_status || 'pending'}</p>
+      <p class="muted">${safeValue(file.absolute_path)}</p>
+      <div class="file-state">
+        <span>Index: <strong>${safeValue(file.index_status)}</strong></span>
+        <span>Extraction: <strong>${safeValue(file.extraction_status || 'pending')}</strong></span>
+        <span>Recovery: <strong>${safeValue(file.recovery_status || 'normal')}</strong></span>
+      </div>
       <div class="actions">
-        <button class="secondary" data-preview-file="${file.id}">Preview</button>
-        <button data-suggest="${file.id}">Organize</button>
+        <button class="secondary" data-preview-file="${safeValue(file.id)}">Preview</button>
+        <button data-suggest="${safeValue(file.id)}">Add to Plan</button>
       </div>
     </article>
   `).join('') || '<p class="muted">No files indexed yet.</p>';
@@ -149,18 +206,22 @@ function renderFiles(files) {
 function renderSuggestions(suggestions) {
   state.suggestions = suggestions;
   els.suggestions.innerHTML = suggestions.map((suggestion) => `
-    <article class="card">
+    <article class="card action-card" data-risk="${safeValue(suggestion.risk_level || 'unknown')}">
       <div class="card-title">
-        <h3>${suggestion.suggested_value}</h3>
-        <span class="pill">${suggestion.action_type}</span>
+        <h3>${safeValue(suggestion.suggested_value)}</h3>
+        <span class="pill">${safeValue(suggestion.action_type)}</span>
       </div>
-      <p>${suggestion.reason}</p>
-      <p class="muted">Risk: ${suggestion.risk_level} | Confidence: ${Math.round(Number(suggestion.confidence || 0) * 100)}%</p>
+      <p>${safeValue(suggestion.reason)}</p>
+      <div class="confidence-meter" style="--confidence: ${Math.min(100, Math.max(0, Math.round(Number(suggestion.confidence || 0) * 100)))}%">
+        <span></span>
+      </div>
+      <p class="muted">Risk: ${safeValue(suggestion.risk_level)} | Confidence: ${formatPercent(suggestion.confidence)}</p>
       <div class="actions">
-        <button class="secondary" data-preview="${suggestion.id}">Preview Action</button>
+        <button class="secondary" data-preview="${safeValue(suggestion.id)}">Safe Preview</button>
+        <button class="secondary danger-disabled" disabled>Delete Disabled</button>
       </div>
     </article>
-  `).join('') || '<p class="muted">No organize suggestions yet. Index files, then use Organize on a file or Suggest Visible Files.</p>';
+  `).join('') || '<p class="muted">No organize suggestions yet. Select a folder, scan it, then generate an organization plan.</p>';
 }
 
 function groupPlanSuggestions(suggestions) {
@@ -184,40 +245,46 @@ function renderPlan(suggestions) {
   els.planTree.innerHTML = Array.from(groups.entries()).map(([folder, items]) => `
     <article class="tree-node">
       <div class="card-title">
-        <strong>${folder}</strong>
+        <strong>${safeValue(folder)}</strong>
         <span class="pill">${items.length} actions</span>
       </div>
       <ul>
         ${items.slice(0, 6).map((item) => `
-          <li>${item.filename || item.file_id}: ${item.action_type} -> ${item.suggested_value}</li>
+          <li><strong>${safeValue(item.action_type)}</strong> ${safeValue(item.filename || item.file_id)} -> ${safeValue(item.suggested_value)}</li>
         `).join('')}
       </ul>
     </article>
-  `).join('') || '<p class="muted">No plan yet. Generate suggestions from the Library first.</p>';
+  `).join('') || '<p class="muted">No plan yet. Select a folder and run Scan and Plan.</p>';
 
   els.planActions.innerHTML = suggestions.map((suggestion) => `
-    <article class="card">
+    <article class="card action-card">
       <div class="card-title">
-        <h3>${suggestion.filename || suggestion.file_id}</h3>
-        <span class="pill">${suggestion.action_type}</span>
+        <h3>${safeValue(suggestion.filename || suggestion.file_id)}</h3>
+        <span class="pill">${safeValue(suggestion.action_type)}</span>
       </div>
-      <p><strong>${suggestion.suggested_value}</strong></p>
-      <p>${suggestion.reason}</p>
-      <p class="muted">Risk: ${suggestion.risk_level} | Confidence: ${Math.round(Number(suggestion.confidence || 0) * 100)}%</p>
+      <p><strong>${safeValue(suggestion.suggested_value)}</strong></p>
+      <p>${safeValue(suggestion.reason)}</p>
+      <div class="confidence-meter" style="--confidence: ${Math.min(100, Math.max(0, Math.round(Number(suggestion.confidence || 0) * 100)))}%">
+        <span></span>
+      </div>
+      <p class="muted">Risk: ${safeValue(suggestion.risk_level)} | Confidence: ${formatPercent(suggestion.confidence)}</p>
       <div class="actions">
-        <button class="secondary" data-preview="${suggestion.id}">Preview Action</button>
+        <button class="secondary" data-preview="${safeValue(suggestion.id)}">Safe Preview</button>
+        <button class="secondary danger-disabled" disabled>Delete Disabled</button>
       </div>
     </article>
   `).join('') || '<p class="muted">No actions ready for preview.</p>';
+
+  updatePipeline(suggestions.length ? 'plan' : 'intake');
 }
 
 function renderInsights(insights) {
   els.insights.innerHTML = insights.map((insight) => `
     <article class="card">
-      <h3>${insight.filename}</h3>
-      <p><strong>${insight.classification}</strong></p>
-      <p>${insight.summary}</p>
-      <p class="muted">Provider: ${insight.provider}</p>
+      <h3>${safeValue(insight.filename)}</h3>
+      <p><strong>${safeValue(insight.classification)}</strong></p>
+      <p>${safeValue(insight.summary)}</p>
+      <p class="muted">Provider: ${safeValue(insight.provider)}</p>
     </article>
   `).join('') || '<p class="muted">No insights generated yet.</p>';
 }
@@ -245,8 +312,8 @@ function renderStatus(payload) {
 
   els.statusGrid.innerHTML = metrics.map(([label, value]) => `
     <article class="metric">
-      <span>${label}</span>
-      <strong>${value}</strong>
+      <span>${safeValue(label)}</span>
+      <strong>${safeValue(value)}</strong>
     </article>
   `).join('');
 }
@@ -271,7 +338,7 @@ function renderUnifiedResults(payload) {
         <h3>${title}</h3>
         <span class="pill">${items.length}</span>
       </div>
-      <pre>${items.map(format).join('\n\n') || 'No matches.'}</pre>
+      <pre>${safeValue(items.map(format).join('\n\n') || 'No matches.')}</pre>
     </article>
   `).join('');
 
@@ -351,11 +418,14 @@ async function runAutoIndex(folderPath, button = document.querySelector('#indexB
     });
     await refreshDashboard();
     const suggestions = await refreshPlan();
+    renderSuggestions(suggestions);
     setActivity(
       'Ready',
       `Processed ${result.indexed || 0} file(s). Knowledge, semantic search, and ${suggestions.length} organization suggestion(s) are ready.`,
       'success',
     );
+    updatePipeline('plan');
+    showView('planView');
     log(result);
     return result;
   });
@@ -419,6 +489,7 @@ document.querySelector('#extractBtn').addEventListener('click', async (event) =>
     log(await api('/api/extract', { method: 'POST', body: {} }));
     await refreshStatus();
     setActivity('Ready', 'Text extraction complete.', 'success');
+    updatePipeline('scan');
   });
 });
 
@@ -431,6 +502,7 @@ document.querySelector('#embeddingsBtn').addEventListener('click', async (event)
     log(await api('/api/embeddings', { method: 'POST', body: { limit: 1000 } }));
     await refreshStatus();
     setActivity('Ready', 'Embeddings are ready for semantic search.', 'success');
+    updatePipeline('scan');
   });
 });
 
@@ -449,6 +521,7 @@ document.querySelector('#watchBtn').addEventListener('click', async (event) => {
     await refreshDashboard();
     await refreshPlan();
     setActivity('Ready', 'Folder is being watched. New and changed files will be automatically processed.', 'success');
+    updatePipeline('plan');
   });
 });
 
@@ -518,6 +591,7 @@ document.querySelector('#refreshPlanBtn').addEventListener('click', async (event
     const suggestions = await refreshPlan();
     log(`Loaded ${suggestions.length} plan suggestion(s).`);
     setActivity('Ready', 'Organization plan refreshed.', 'success');
+    updatePipeline(suggestions.length ? 'plan' : 'intake');
   });
 });
 
@@ -623,6 +697,7 @@ async function suggestVisibleFiles(button) {
     renderSuggestions(suggestions);
     log({ generated_suggestions: created.length, files: state.files.length });
     setActivity('Ready', `Generated ${created.length} suggestion(s).`, 'success');
+    updatePipeline('plan');
     showView('planView');
   });
 }
@@ -669,16 +744,48 @@ document.querySelector('#duplicatesBtn').addEventListener('click', async (event)
 });
 
 document.querySelector('#labelsBtn').addEventListener('click', async () => {
-  log(await api('/api/labels?limit=100'));
+  const payload = await api('/api/labels?limit=100');
+  log(payload);
+  els.insights.innerHTML = (payload.labels || payload.files || []).map((item) => `
+    <article class="card">
+      <h3>${safeValue(item.filename || item.file_id)}</h3>
+      <p>Category: <strong>${safeValue(item.category || 'Uncategorized')}</strong></p>
+      <p class="muted">${safeValue((item.tags || []).join(', ') || 'No tags')}</p>
+    </article>
+  `).join('') || '<p class="muted">No labels applied yet.</p>';
+  showView('knowledgeView');
 });
 
-document.querySelector('#executionsBtn').addEventListener('click', async () => {
-  log(await api('/api/action-executions?limit=100'));
-});
+async function loadExecutions() {
+  const payload = await api('/api/action-executions?limit=100');
+  log(payload);
+  const executions = payload.executions || payload.actionExecutions || [];
+  renderActivityTimeline(executions.map((execution) => ({
+    status: `${execution.action_type || 'action'}: ${execution.status || 'unknown'}`,
+    details: execution.filename || execution.file_id || execution.id,
+    tone: execution.status === 'executed' ? 'success' : 'ready',
+    at: execution.created_at || execution.executed_at || new Date().toISOString(),
+  })));
+  showView('activityView');
+}
 
-document.querySelector('#auditBtn').addEventListener('click', async () => {
-  log(await api('/api/audit-log?limit=100'));
-});
+async function loadAudit() {
+  const payload = await api('/api/audit-log?limit=100');
+  log(payload);
+  const events = payload.events || payload.audit || payload.auditLog || [];
+  renderActivityTimeline(events.map((event) => ({
+    status: event.event_type || event.type || 'audit',
+    details: event.message || event.entity_id || event.id,
+    tone: String(event.event_type || '').includes('failed') ? 'error' : 'ready',
+    at: event.created_at || event.timestamp || new Date().toISOString(),
+  })));
+  showView('activityView');
+}
+
+document.querySelector('#executionsBtn').addEventListener('click', loadExecutions);
+document.querySelector('#auditBtn').addEventListener('click', loadAudit);
+document.querySelector('#activityExecutionsBtn').addEventListener('click', loadExecutions);
+document.querySelector('#activityAuditBtn').addEventListener('click', loadAudit);
 
 document.querySelector('#knowledgeBtn').addEventListener('click', async (event) => {
   await buildKnowledge(event.currentTarget);
@@ -721,7 +828,8 @@ els.files.addEventListener('click', async (event) => {
     await refreshPlan();
     log(payload);
     setActivity('Ready', `Generated ${payload.suggestions.length} suggestion(s).`, 'success');
-    showView('organizeView');
+    updatePipeline('review');
+    showView('planView');
   });
 });
 
@@ -742,16 +850,17 @@ async function handlePreviewClick(event) {
 
     if (previewPayload.preview.preview_status !== 'ready') {
       setActivity('Ready', `Preview blocked: ${previewPayload.preview.blocked_reason || 'not executable'}.`, 'ready');
+      updatePipeline('review');
       return;
     }
 
     const approved = window.confirm([
-      `Execute ${previewPayload.preview.action_type}?`,
+      `Approve and execute ${previewPayload.preview.action_type}?`,
       '',
       `Source: ${previewPayload.preview.source_path || previewPayload.preview.current_value || 'app metadata'}`,
       `Target: ${previewPayload.preview.target_path || previewPayload.preview.suggested_value}`,
       '',
-      'This action is audited and can only run because you approved it.',
+      'This action is audited, delete actions are disabled, and move/rename changes can be reviewed in Activity / Audit.',
     ].join('\n'));
 
     if (!approved) {
@@ -767,6 +876,8 @@ async function handlePreviewClick(event) {
     await refreshDashboard();
     await refreshPlan();
     setActivity('Ready', `Action executed: ${executionPayload.execution.action_type}.`, 'success');
+    updatePipeline('approve');
+    showView('activityView');
   });
 }
 
@@ -774,6 +885,8 @@ els.suggestions.addEventListener('click', handlePreviewClick);
 els.planActions.addEventListener('click', handlePreviewClick);
 
 loadSettings();
+updatePipeline('intake');
+renderActivityTimeline();
 refreshProviderSettings()
   .then(refreshDashboard)
   .then(refreshPlan)

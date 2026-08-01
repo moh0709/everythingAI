@@ -3,23 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>EverythingAI Local App</title>
-    <link rel="stylesheet" href="/styles.css?v=mvp-finalization-1" />
+    <title>EverythingAI Organizor</title>
+    <link rel="stylesheet" href="/styles.css?v=organizer-main-mvp-1" />
   </head>
   <body>
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
-          <span class="brand-mark">EO</span>
-          <strong>EverythingAI Organizor</strong>
+          <span class="brand-mark">EA</span>
+          <strong>EverythingAI</strong>
         </div>
         <nav class="nav-list" aria-label="Primary">
-          <button class="nav-item active" data-view-target="dashboardView">Dashboard</button>
-          <button class="nav-item" data-view-target="filesView">Library</button>
+          <button class="nav-item active" data-view-target="dashboardView">Home / Intake</button>
+          <button class="nav-item" data-view-target="filesView">Files</button>
           <button class="nav-item" data-view-target="planView">Organize Plan</button>
-          <button class="nav-item" data-view-target="organizeView">Safe Actions</button>
+          <button class="nav-item" data-view-target="organizeView">Review Actions</button>
           <button class="nav-item" data-view-target="knowledgeView">Knowledge</button>
-          <button class="nav-item" data-view-target="chatView">Ask</button>
+          <button class="nav-item" data-view-target="chatView">Ask AI</button>
+          <button class="nav-item" data-view-target="activityView">Activity / Audit</button>
           <button class="nav-item" data-view-target="settingsView">Settings</button>
         </nav>
         <div class="sidebar-status">
@@ -32,9 +33,9 @@
       <main class="workspace">
         <header class="topbar">
           <div>
-            <p class="eyebrow">Organizor2 planning layer inside EverythingAI</p>
-            <h1>AI File Intelligence Center</h1>
-            <p class="topbar-copy">Analyze local files, generate organization plans, preview changes, and execute safely through EverythingAI.</p>
+            <p class="eyebrow">Local-first AI organizer</p>
+            <h1>Organize your files with a safe AI plan</h1>
+            <p class="topbar-copy">Select a folder, let EverythingAI scan and analyze it, then review a visual organization plan before any approved filesystem action can run.</p>
           </div>
           <div class="topbar-actions">
             <div class="global-search">
@@ -44,7 +45,7 @@
             </div>
             <div class="activity-banner">
               <strong id="activityStatus">Ready</strong>
-              <span id="activityDetails">Auto indexing prepares search, knowledge, and organization plans.</span>
+              <span id="activityDetails">Select a folder to start the Organizer workflow.</span>
             </div>
             <div id="errorPanel" class="error-panel" hidden>
               <strong>Action failed</strong>
@@ -56,12 +57,40 @@
           </div>
         </header>
 
+        <section class="workflow-strip" aria-label="Organizer workflow">
+          <div class="workflow-step active" data-pipeline-step="intake">
+            <span>1</span>
+            <strong>Intake</strong>
+            <small>Select folder</small>
+          </div>
+          <div class="workflow-step" data-pipeline-step="scan">
+            <span>2</span>
+            <strong>Analyze</strong>
+            <small>Index, extract, embed</small>
+          </div>
+          <div class="workflow-step" data-pipeline-step="plan">
+            <span>3</span>
+            <strong>Plan</strong>
+            <small>Suggested structure</small>
+          </div>
+          <div class="workflow-step" data-pipeline-step="review">
+            <span>4</span>
+            <strong>Review</strong>
+            <small>Safe preview</small>
+          </div>
+          <div class="workflow-step" data-pipeline-step="approve">
+            <span>5</span>
+            <strong>Approve</strong>
+            <small>Execute or undo</small>
+          </div>
+        </section>
+
         <section id="dashboardView" class="view active">
-          <section class="panel">
+          <section class="intake-hero">
             <div class="section-heading">
               <div>
-                <h2>Source Intake</h2>
-                <p class="muted">Pick a folder once. The app automatically loads files into SQLite, extracts text, creates embeddings, saves knowledge, and prepares organization suggestions.</p>
+                <h2>Home / Intake</h2>
+                <p class="muted">Pick a folder once. EverythingAI indexes files, extracts readable text, creates embeddings, builds knowledge, prepares organization suggestions, and keeps actions behind preview plus approval.</p>
               </div>
             </div>
             <div class="folder-grid">
@@ -73,19 +102,23 @@
                 Folder path
                 <input id="folderPath" placeholder="C:\path\to\folder" />
               </label>
-              <button id="openFolderBtn" class="secondary">Open Folder</button>
-              <button id="indexBtn">Auto Index</button>
-              <button id="extractBtn" class="secondary">Extract Text</button>
-              <button id="embeddingsBtn" class="secondary">Embeddings</button>
-              <button id="watchBtn">Auto Watch</button>
+              <button id="openFolderBtn">Select Folder</button>
+              <button id="indexBtn" class="gradient-action">Scan and Plan</button>
+              <button id="extractBtn" class="secondary">Extract</button>
+              <button id="embeddingsBtn" class="secondary">Embed</button>
+              <button id="watchBtn" class="secondary">Watch Folder</button>
+            </div>
+            <div class="safety-callout">
+              <strong>Safety gate:</strong>
+              <span>Move and rename actions require a backend safe preview and explicit approval. Delete actions disabled.</span>
             </div>
           </section>
 
           <section class="panel">
             <div class="section-heading">
               <div>
-                <h2>System Overview</h2>
-                <p class="muted">Current local index, extraction, embeddings, suggestions, safe actions, and sync state.</p>
+                <h2>Workspace Overview</h2>
+                <p class="muted">Current local index, extraction, embeddings, suggestions, safe actions, watcher state, and sync readiness.</p>
               </div>
             </div>
             <div id="statusGrid" class="metrics"></div>
@@ -93,16 +126,16 @@
 
           <section class="dashboard-grid">
             <div class="panel">
-              <h2>Organizor Layer</h2>
-              <p class="muted">Generate a folder plan from indexed files. Knowledge and suggestions are created automatically during indexing.</p>
+              <h2>Next: Organize Plan</h2>
+              <p class="muted">Use the plan view as the center of the workflow. Suggestions are grouped into target folders before preview.</p>
               <div class="quick-actions">
-                <button data-view-target="planView" class="gradient-action">Start Planning</button>
+                <button data-view-target="planView" class="gradient-action">Open Plan</button>
                 <button id="suggestVisibleBtn" class="secondary">Analyze Library</button>
               </div>
             </div>
             <div class="panel">
-              <h2>AnythingLLM Bridge</h2>
-              <p class="muted">Sync extracted documents or ask indexed sources through the same global search bar.</p>
+              <h2>Knowledge and Ask AI</h2>
+              <p class="muted">Sync extracted documents to AnythingLLM or ask indexed sources after the scan has prepared knowledge.</p>
               <div class="quick-actions">
                 <button id="anythingLlmSyncBtn" class="secondary">Sync AnythingLLM</button>
                 <button data-view-target="chatView">Ask Sources</button>
@@ -115,8 +148,8 @@
           <section class="panel">
             <div class="section-heading">
               <div>
-                <h2>Library</h2>
-                <p class="muted">Indexed files waiting for Organizor review.</p>
+                <h2>Files</h2>
+                <p class="muted">Indexed files available for search, preview, and organization suggestions.</p>
               </div>
               <button id="refreshBtn" class="secondary">Refresh Files</button>
             </div>
@@ -128,8 +161,8 @@
           <section class="panel">
             <div class="section-heading">
               <div>
-                <h2>Planning</h2>
-                <p class="muted">Organizor2-inspired plan view. Suggestions are grouped by target folder and action type before preview.</p>
+                <h2>Organize Plan</h2>
+                <p class="muted">The plan is the primary workspace after intake. Review proposed folders, labels, and rename actions before creating safe previews.</p>
               </div>
               <div class="button-row">
                 <button id="refreshPlanBtn">Refresh Plan</button>
@@ -138,11 +171,11 @@
             </div>
             <div class="plan-layout">
               <div>
-                <h3>Proposed Structure</h3>
+                <h3>Proposed Folder Groups</h3>
                 <div id="planTree" class="plan-tree"></div>
               </div>
               <div>
-                <h3>Plan Actions</h3>
+                <h3>Suggested Actions</h3>
                 <div id="planActions" class="cards"></div>
               </div>
             </div>
@@ -153,14 +186,13 @@
           <section class="panel">
             <div class="section-heading">
               <div>
-                <h2>Safe Actions</h2>
-                <p class="muted">Preview generated suggestions, then explicitly approve any rename, move, tag, or category action.</p>
+                <h2>Review Actions</h2>
+                <p class="muted">Create a safe preview first, then explicitly approve any rename, move, tag, or category action. Delete actions disabled.</p>
               </div>
               <div class="button-row">
-                <button id="insightsBtn">Generate Insights</button>
-                <button id="labelsBtn" class="secondary">Labels</button>
                 <button id="executionsBtn" class="secondary">Executions</button>
                 <button id="auditBtn" class="secondary">Audit</button>
+                <button class="secondary danger-disabled" disabled>Delete Disabled</button>
               </div>
             </div>
             <div id="suggestions" class="cards"></div>
@@ -184,7 +216,7 @@
             <div id="batchDetail" class="batch-detail"></div>
           </section>
           <section class="panel">
-            <h2>Action Log</h2>
+            <h2>Preview and Approval Log</h2>
             <pre id="log"></pre>
           </section>
         </section>
@@ -194,7 +226,7 @@
             <div class="panel">
               <div class="section-heading">
                 <div>
-                  <h2>Ask Sources</h2>
+                  <h2>Ask AI</h2>
                   <p class="muted">Use AnythingLLM/Ollama-style retrieval after files have been indexed and extracted.</p>
                 </div>
               </div>
@@ -222,9 +254,28 @@
                 <button id="knowledgeBtn">Build Knowledge</button>
                 <button id="knowledgeRefreshBtn">Knowledge</button>
                 <button id="duplicatesBtn" class="secondary">Find Duplicates</button>
+                <button id="insightsBtn" class="secondary">Generate Insights</button>
+                <button id="labelsBtn" class="secondary">Labels</button>
               </div>
             </div>
             <div id="insights" class="cards"></div>
+          </section>
+        </section>
+
+        <section id="activityView" class="view">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <h2>Activity / Audit</h2>
+                <p class="muted">Technical logs, execution history, and audit records stay available without making the app feel like an API console.</p>
+              </div>
+              <div class="button-row">
+                <button id="activityExecutionsBtn">Load Executions</button>
+                <button id="activityAuditBtn" class="secondary">Load Audit</button>
+              </div>
+            </div>
+            <div id="activityTimeline" class="cards"></div>
+            <pre id="auditTrail"></pre>
           </section>
         </section>
 
@@ -282,7 +333,7 @@
       </form>
     </dialog>
 
-    <script src="/app.js?v=mvp-finalization-1" type="module"></script>
+    <script src="/app.js?v=organizer-main-mvp-1" type="module"></script>
     <script src="/batch-ui.js?v=sprint6-batch-lifecycle-1" type="module"></script>
   </body>
 </html>
