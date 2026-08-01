@@ -18,3 +18,17 @@
 - Added a PostgreSQL-oriented identity persistence adapter behind explicit injection.
 - Default local MVP behavior remains opt-in and does not create or call PostgreSQL helpers.
 - Tests use injected fake/query-spy functions only; no real PostgreSQL server is required.
+
+## Forge maintenance revalidation - 2026-08-01
+- Context loaded from `C:\temp\EverythingAI\.hermes\forge\context-56.json`.
+- Live issue #56 inspection showed prior PM acceptance comment dated 2026-06-28 and stale labels `hermes:done` + `forge:working`.
+- Preserved unrelated existing working tree changes:
+  - `LOGS/EAI-TASK-046-terminal.log`
+  - `tests/task-worker-runtime-mode.test.mjs`
+  - `apps/everything-ai-ui/src/planning.css`
+  - `docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json`
+- `git pull --ff-only` -> PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` -> PASS (`status: PASS`)
+- `cd apps/everything-ai-ui && npm run typecheck` -> PASS (`tsc --noEmit`)
+- `cd apps/everything-ai-ui && npm run build` -> PASS (`vite build`, 1556 modules transformed)
+- `cd services/api && npm test` -> PASS (`173 pass`, `0 fail`)
