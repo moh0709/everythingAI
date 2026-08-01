@@ -84,6 +84,7 @@
     "terminalLog": "LOGS/EAI-TASK-008-terminal.log",
     "report": "REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md",
     "handover": "docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json",
-    "state": ".hermes/state.json"
+    "state": ".hermes/state.json",
+    "artifactCommitSha": "625f777cb08522446773f6039e02b4e46fb98944"
   }
 }

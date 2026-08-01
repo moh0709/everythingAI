@@ -90,3 +90,4 @@ Rerun the connector readiness gate that depends on live Codex and Claude Code CL
 - Report: `REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md`
 - Handover JSON: `docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json`
 - State file: `.hermes/state.json`
+- Artifact commit SHA: `625f777cb08522446773f6039e02b4e46fb98944`
