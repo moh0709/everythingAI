@@ -83,6 +83,24 @@ Focus next on Phase 8.3 connector-specific setup/testing for installed Codex and
 - `cd apps/everything-ai-ui && npm run build` — PASS
 - `cd services/api && npm test` — PASS (`114 tests, 0 failures, 1 skipped`)
 
+## Forge maintenance validation rerun
+
+On 2026-08-01, Forge reran the required validation from the repository root for live issue #48 transition verification:
+
+- `git pull --ff-only` — PASS (`Already up to date.`)
+- `node scripts/framework-doctor.mjs` — PASS
+- `cd apps/everything-ai-ui && npm run typecheck` — PASS
+- `cd apps/everything-ai-ui && npm run build` — PASS
+- `cd services/api && npm test` — PASS (`173 tests, 173 pass, 0 fail, 0 skipped`)
+
+Live issue context at rerun start:
+
+- Issue #48 was open.
+- Existing historical issue comments recorded `EAI-TASK-026 complete: PASS` and PM acceptance.
+- Live labels were `hermes:done` and `forge:working`; Forge completion must transition to `forge:done` and `pm:review`.
+
+No runtime or browser validation was rerun for this maintenance pass; browser and runtime evidence remain cited from EAI-TASK-024 and EAI-TASK-025.
+
 ## Files changed
 
 - `LOGS/EAI-TASK-026-terminal.log`
@@ -91,4 +109,4 @@ Focus next on Phase 8.3 connector-specific setup/testing for installed Codex and
 
 ## Artifact commit SHA
 
-a9770a9
+a9770a9 original artifact commit; Forge maintenance rerun evidence SHA 12f58d7455174b469fdb15fc31d7b4ac16b405ae.

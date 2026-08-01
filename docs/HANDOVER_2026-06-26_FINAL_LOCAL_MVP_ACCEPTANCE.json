@@ -69,10 +69,49 @@
     "further frontend modularization and release hardening"
   ],
   "recommended_next_phase": "Phase 8.3 connector-specific setup/testing for installed Codex and Claude Code, plus release hardening and controlled frontend cleanup before broader production-platform work.",
+  "forge_maintenance_rerun": {
+    "date": "2026-08-01",
+    "issue": 48,
+    "starting_sha": "490d8cc83c5377b8f94a1a7d82e0995d1de135cd",
+    "live_issue_start_labels": [
+      "hermes:done",
+      "forge:working"
+    ],
+    "historical_pm_acceptance_comment_present": true,
+    "validation_results": [
+      {
+        "command": "git pull --ff-only",
+        "result": "PASS (Already up to date.)"
+      },
+      {
+        "command": "node scripts/framework-doctor.mjs",
+        "result": "PASS"
+      },
+      {
+        "command": "cd apps/everything-ai-ui && npm run typecheck",
+        "result": "PASS"
+      },
+      {
+        "command": "cd apps/everything-ai-ui && npm run build",
+        "result": "PASS"
+      },
+      {
+        "command": "cd services/api && npm test",
+        "result": "PASS (173 tests, 173 pass, 0 fail, 0 skipped)"
+      }
+    ],
+    "runtime_browser_validation_rerun": false,
+    "notes": [
+      "Runtime and browser validation evidence remains cited from EAI-TASK-024 and EAI-TASK-025.",
+      "Unrelated pre-existing working tree changes were preserved and not included in this task commit."
+    ],
+    "forge_commit_sha": "12f58d7455174b469fdb15fc31d7b4ac16b405ae"
+  },
   "files_changed": [
     "LOGS/EAI-TASK-026-terminal.log",
     "REPORTS/EAI-TASK-026-FINAL-LOCAL-MVP-ACCEPTANCE.md",
     "docs/HANDOVER_2026-06-26_FINAL_LOCAL_MVP_ACCEPTANCE.json"
   ],
-  "artifact_commit_sha": "a9770a9"
+  "artifact_commit_sha": "a9770a9",
+  "latest_forge_artifact_commit_sha": "12f58d7455174b469fdb15fc31d7b4ac16b405ae"
 }
