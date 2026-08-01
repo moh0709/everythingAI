@@ -1,12 +1,12 @@
 # Phase 5 Implementation Status
 
 ## Current Phase
-5.3 - Policy Engine Shadow Governance Track
+5.4 - Risk Classification Foundation Governance Track
 
 ## Governance Classification
 - Blast Radius: BR-1
 - Enforcement Level: L0
-- Mode: Shadow Only
+- Mode: Advisory / Shadow Only
 
 ## Current Status
 SUBMITTED FOR PM REVIEW
@@ -60,6 +60,20 @@ SUBMITTED FOR PM REVIEW
 - policyInvariantValidator.js
 - policyObservabilityValidator.js
 - policyValidationRegistry.js
+- riskGovernanceContract.js
+- riskEvents.js
+- riskSignalModel.js
+- riskClassificationService.js
+- escalationRecommendationService.js
+- riskEventPublisher.js
+- riskTelemetryService.js
+- riskObservabilityAggregator.js
+- riskSnapshotBuilder.js
+- riskClassificationDeterminismValidator.js
+- riskGovernanceTaxonomyValidator.js
+- riskObservabilityValidator.js
+- riskRuntimeSovereigntyValidator.js
+- riskValidationRegistry.js
 
 ## Runtime Safety Status
 PASS
@@ -100,3 +114,10 @@ READY FOR PM REVIEW
 - Invariant validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
 - Governance observability validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
 - Due diligence review: recorded in `REPORTS/ISSUE-8-PHASE5-POLICY-ENGINE-SHADOW-GOVERNANCE.md`
+
+## Issue 9 Validation Coverage
+- Risk classification determinism validation: covered by `services/api/test/phase5RiskClassificationFoundation.test.js`
+- Observability synchronization validation: covered by `services/api/test/phase5RiskClassificationFoundation.test.js`
+- Governance event taxonomy validation: covered by `services/api/test/phase5RiskClassificationFoundation.test.js`
+- Runtime sovereignty validation: covered by `services/api/test/phase5RiskClassificationFoundation.test.js`
+- Due diligence review: recorded in `REPORTS/ISSUE-9-PHASE5-RISK-CLASSIFICATION-FOUNDATION.md`

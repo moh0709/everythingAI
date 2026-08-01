@@ -1,0 +1,96 @@
+{
+  "task": "Issue #9 - Phase 5.4 Risk Classification Foundation Governance Track",
+  "issue": 9,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "0e81abf3d93c9c977cfeae610ac040a5f3ed52ee",
+  "finalPushedSha": "recorded in GitHub issue #9 completion comment after push",
+  "filesChanged": [
+    "services/api/src/governance/risk/contracts/riskGovernanceContract.js",
+    "services/api/src/governance/risk/models/riskSignalModel.js",
+    "services/api/src/governance/risk/services/riskClassificationService.js",
+    "services/api/src/governance/risk/services/escalationRecommendationService.js",
+    "services/api/src/governance/risk/telemetry/riskEvents.js",
+    "services/api/src/governance/risk/observability/riskEventPublisher.js",
+    "services/api/src/governance/risk/observability/riskTelemetryService.js",
+    "services/api/src/governance/risk/observability/riskObservabilityAggregator.js",
+    "services/api/src/governance/risk/observability/riskSnapshotBuilder.js",
+    "services/api/src/governance/risk/validation/riskClassificationDeterminismValidator.js",
+    "services/api/src/governance/risk/validation/riskGovernanceTaxonomyValidator.js",
+    "services/api/src/governance/risk/validation/riskObservabilityValidator.js",
+    "services/api/src/governance/risk/validation/riskRuntimeSovereigntyValidator.js",
+    "services/api/src/governance/risk/validation/validationRegistry.js",
+    "services/api/test/phase5RiskClassificationFoundation.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-9-PHASE5-RISK-CLASSIFICATION-FOUNDATION.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_9_PHASE5_RISK_CLASSIFICATION_FOUNDATION.json",
+    "LOGS/ISSUE-9-phase5-risk-classification-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "operational risk classification",
+      "evidence": [
+        "classifyOperationalRisk",
+        "createRiskSignalModel",
+        "Phase 5.4 risk classification is deterministic advisory and explainable"
+      ]
+    },
+    {
+      "criterion": "governance risk metadata",
+      "evidence": [
+        "riskGovernanceContract",
+        "risk signal metadata",
+        "classification advisory metadata"
+      ]
+    },
+    {
+      "criterion": "risk observability",
+      "evidence": [
+        "publishRiskEvent",
+        "normalizeRiskEvent",
+        "buildRiskObservabilityView",
+        "buildRiskSnapshot"
+      ]
+    },
+    {
+      "criterion": "escalation recommendation support",
+      "evidence": [
+        "recommendRiskEscalation",
+        "Phase 5.4 escalation recommendations preserve runtime sovereignty"
+      ]
+    },
+    {
+      "criterion": "advisory mode only with no runtime blocking, enforcement authority, or runtime mutation",
+      "evidence": [
+        "riskGovernanceContract",
+        "validateRiskRuntimeSovereignty"
+      ]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: missing riskGovernanceContract module",
+    "targetedGreen": "PASS: 4/4",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: 182/182",
+    "rootNpmTest": "PASS: 182/182",
+    "serviceApiNpmTest": "PASS: 153/153",
+    "diffCheck": "PASS with line-ending warnings for local working copy files",
+    "jsonCheck": "PASS"
+  },
+  "governance": {
+    "mode": "advisory",
+    "enforcementLevel": "L0",
+    "advisoryOnly": true,
+    "enforcementAuthority": false,
+    "runtimeBlocking": false,
+    "runtimeLifecycleMutation": false,
+    "runtimeSovereigntyPreserved": true,
+    "additiveRolloutOnly": true,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "No runtime risk enforcement, runtime blocking, or lifecycle mutation is activated by this rollout."
+  ]
+}

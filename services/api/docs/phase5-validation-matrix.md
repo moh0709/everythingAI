@@ -58,6 +58,22 @@ Status: ACTIVE
 Purpose: policy telemetry and snapshots remain taxonomy-aligned
 Status: ACTIVE
 
+### riskClassificationDeterminismValidator
+Purpose: deterministic operational risk classification
+Status: ACTIVE
+
+### riskGovernanceTaxonomyValidator
+Purpose: risk governance event taxonomy alignment
+Status: ACTIVE
+
+### riskObservabilityValidator
+Purpose: risk telemetry and snapshot synchronization
+Status: ACTIVE
+
+### riskRuntimeSovereigntyValidator
+Purpose: advisory risk governance without runtime blocking or mutation
+Status: ACTIVE
+
 ## Runtime Isolation
 PASS
 
@@ -73,7 +89,7 @@ PASS
 ## Current Governance Classification
 - Blast Radius: BR-1
 - Enforcement Level: L0
-- Mode: Shadow Only
+- Mode: Advisory / Shadow Only
 
 ## Issue 6 Acceptance Matrix
 
@@ -105,3 +121,14 @@ PASS
 | POL-4 | Policy observability | policy event, telemetry, snapshot, observability view, and taxonomy aggregation test | PASS |
 | POL-5 | Governance taxonomy integration | telemetry category `governance.policy.shadow` and taxonomy aggregate test | PASS |
 | POL-6 | Runtime safeguard supremacy | `policyGovernanceContract` and runtime compatibility validator forbid runtime blocking and lifecycle mutation | PASS |
+
+## Issue 9 Acceptance Matrix
+
+| Criterion | Requirement | Evidence | Status |
+|---|---|---|---|
+| RISK-1 | Operational risk classification | `classifyOperationalRisk`, `createRiskSignalModel`, and Phase 5.4 deterministic risk classification test | PASS |
+| RISK-2 | Governance risk metadata | `riskGovernanceContract`, immutable risk signal metadata, and advisory classification output | PASS |
+| RISK-3 | Risk observability | risk event, telemetry, snapshot, observability view, and synchronization validator test | PASS |
+| RISK-4 | Escalation recommendation support | `recommendRiskEscalation` emits advisory recommendations without runtime effects | PASS |
+| RISK-5 | Advisory only; no runtime blocking, enforcement authority, or runtime mutation | `riskGovernanceContract` and runtime sovereignty validator forbid runtime blocking and lifecycle mutation | PASS |
+| RISK-6 | Governance event taxonomy | telemetry category `governance.risk.advisory` and taxonomy validator test | PASS |
