@@ -1,23 +1,24 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 30,
-  "currentTask": "EAI-TASK-008",
-  "updatedAt": "2026-08-01T18:36:12+02:00",
-  "lastCheckedAt": "2026-08-01T18:36:12+02:00",
+  "currentIssue": 32,
+  "currentTask": "EAI-TASK-010",
+  "updatedAt": "2026-08-01T18:00:00+02:00",
+  "lastCheckedAt": "2026-08-01T18:00:00+02:00",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "CONNECTOR_CLI_INSTALLATION_VERIFIED",
+  "result": "STALE_ISSUE_32_MAINTENANCE_REFRESH",
   "agent": "Forge",
-  "startingCommitSha": "629cddfa4e717e9d9db25cb09b19c151f65b747f",
-  "preCommitArtifactSha": "625f777cb08522446773f6039e02b4e46fb98944",
-  "artifactCommitSha": "625f777cb08522446773f6039e02b4e46fb98944",
+  "startingCommitSha": "f5e371b4782bae98307ff0d5e23ce3ff2cafe9ae",
+  "preCommitArtifactSha": "PENDING_METADATA_SYNC",
+  "artifactCommitSha": "PENDING_METADATA_SYNC",
   "finalPushedSha": "RECORDED_IN_FINAL_GITHUB_ISSUE_COMMENT_AFTER_PUSH",
   "finalShaSource": "GitHub issue comment after metadata sync push",
   "finalizationPattern": "Two-step finalization: artifact evidence commit first, followed by metadata sync commit that records the artifact commit SHA as the source of truth.",
   "implementation": [
-    "LOGS/EAI-TASK-008-terminal.log",
-    "REPORTS/EAI-TASK-008-CONNECTOR-CLI-INSTALLATION.md",
-    "docs/HANDOVER_2026-06-24_EAI_TASK_008_CONNECTOR_CLI_INSTALLATION.json",
+    "LOGS/EAI-TASK-010-terminal.log",
+    "REPORTS/EAI-TASK-010-PHASE8_3-CLOSEOUT-AND-NEXT-BACKLOG.md",
+    "docs/HANDOVER_2026-06-24_PHASE8_3_FINAL_CONNECTOR_GATE_CLEARED.json",
+    "docs/NEXT_IMPLEMENTATION_BACKLOG_2026-06-24.md",
     ".hermes/state.json"
   ],
   "validation": [
@@ -25,20 +26,17 @@
     "node scripts/framework-doctor.mjs from C:\\temp\\EverythingAI: PASS",
     "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 PASS",
     "node src/scripts/detectAgentConnectors.js from C:\\temp\\EverythingAI\\services\\api: PASS, codex and claudeCode found on PATH",
-    "EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js from C:\\temp\\EverythingAI\\services\\api: PASS, codex and claudeCode version probes passed",
+    "EVERYTHINGAI_AGENT_BRIDGE_ENABLED=true node src/scripts/probeAgentVersions.js codex claudeCode from C:\\temp\\EverythingAI\\services\\api: PASS",
     "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS",
-    "Git Bash command -v/version checks from C:\\temp\\EverythingAI: PASS"
+    "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: PASS"
   ],
   "connectors": {
     "codex": {
-      "path": "C:\\nvm4w\\nodejs\\codex.ps1",
-      "bashPath": "/c/nvm4w/nodejs/codex",
+      "path": "C:\\nvm4w\\nodejs\\codex.cmd",
       "version": "codex-cli 0.146.0"
     },
     "claudeCode": {
       "path": "C:\\Users\\Mohamed Ismail\\.local\\bin\\claude.exe",
-      "bashPath": "/c/Users/Mohamed Ismail/.local/bin/claude",
       "version": "2.1.209 (Claude Code)"
     }
   },
@@ -48,5 +46,11 @@
   ],
   "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
   "secrets": "none recorded",
-  "humanSummary": "Issue #30 connector CLI installation evidence was refreshed. Codex and Claude Code are installed, visible on PATH, and pass safe version probes."
+  "unrelatedLocalChangesPreserved": [
+    "LOGS/EAI-TASK-046-terminal.log",
+    "tests/task-worker-runtime-mode.test.mjs",
+    "apps/everything-ai-ui/src/planning.css",
+    "docs/AUTONOMOUS_FORGE_PM_RETEST_2026-07-29.json"
+  ],
+  "humanSummary": "Issue #32 stale closeout artifacts were refreshed with current validation evidence while preserving the newer canonical Phase 3 dependency gate."
 }

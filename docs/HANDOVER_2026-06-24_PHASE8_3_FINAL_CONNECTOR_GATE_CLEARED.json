@@ -1,19 +1,50 @@
 {
   "repository": "moh0709/everythingAI",
   "branch": "main",
-  "phaseClosed": "Phase 8.3",
-  "finalConnectorStatus": "Admin Connector readiness gate cleared; Codex and Claude Code detected and version-probed successfully.",
-  "hermesReadinessStatus": "Hermes onboarding complete; ready for real EverythingAI product-development tasks.",
+  "issueNumber": 32,
+  "taskId": "EAI-TASK-010",
+  "phaseClosed": "Phase 8.3 historical local-MVP connector-readiness stream",
+  "finalConnectorStatus": {
+    "status": "CLEARED",
+    "codex": {
+      "detectedOnPath": true,
+      "versionProbe": "PASS",
+      "version": "codex-cli 0.146.0"
+    },
+    "claudeCode": {
+      "detectedOnPath": true,
+      "versionProbe": "PASS",
+      "version": "2.1.209 (Claude Code)"
+    },
+    "chatExecution": "disabled",
+    "arbitraryShellExecution": "blocked"
+  },
+  "hermesReadinessStatus": {
+    "historicalIssue32Status": "Hermes onboarding complete for the Phase 8.3-era workflow.",
+    "currentCanonicalStatus": "Phase 3 is blocked at issues #68/#76 pending direct live host provisioning evidence."
+  },
   "validationSummary": {
+    "validatedAt": "2026-08-01",
     "gitPull": "PASS",
     "frameworkDoctor": "PASS",
-    "apiTests": "PASS",
+    "apiTests": {
+      "status": "PASS",
+      "tests": 173,
+      "passed": 173,
+      "failed": 0,
+      "skipped": 0
+    },
     "connectorDetection": "PASS",
-    "connectorProbe": "PASS",
+    "connectorVersionProbes": "PASS",
     "uiTypecheck": "PASS",
-    "uiBuild": "PASS"
+    "uiBuild": "PASS",
+    "logPath": "LOGS/EAI-TASK-010-terminal.log"
   },
-  "nextRecommendedPhase": "Phase 8.4 implementation work",
-  "nextRecommendedTaskTitle": "Controlled connector-specific setup/testing for installed Codex",
-  "artifactCommitSha": "c414d16"
+  "nextRecommendedPhase": "Current canonical Phase 3 live host deployment gate, then issue #69 only after #68 acceptance.",
+  "nextRecommendedTaskTitle": "Complete issue #76 live host provisioning through direct SSH/root or authorized sudo execution.",
+  "historicalNextRecommendedTaskTitle": "Controlled connector-specific setup/testing for installed Codex",
+  "startingCommitSha": "f5e371b4782bae98307ff0d5e23ce3ff2cafe9ae",
+  "artifactCommitSha": "PENDING_METADATA_SYNC",
+  "updatedAt": "2026-08-01T00:00:00Z",
+  "secrets": "none recorded"
 }
