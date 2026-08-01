@@ -1,0 +1,102 @@
+{
+  "task": "Issue #11 - Phase 5.6 Escalation Governance Foundation Track",
+  "issue": 11,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "996d2837d498414223d8ac72360b25a9c84a9b50",
+  "finalPushedSha": "recorded in GitHub issue #11 completion comment after push",
+  "filesChanged": [
+    "services/api/src/governance/escalation/contracts/escalationGovernanceContract.js",
+    "services/api/src/governance/escalation/models/escalationSignalModel.js",
+    "services/api/src/governance/escalation/models/escalationRouteModel.js",
+    "services/api/src/governance/escalation/services/escalationRoutingService.js",
+    "services/api/src/governance/escalation/services/escalationAuditService.js",
+    "services/api/src/governance/escalation/telemetry/escalationEvents.js",
+    "services/api/src/governance/escalation/observability/escalationEventPublisher.js",
+    "services/api/src/governance/escalation/observability/escalationTelemetryService.js",
+    "services/api/src/governance/escalation/observability/escalationObservabilityAggregator.js",
+    "services/api/src/governance/escalation/observability/escalationSnapshotBuilder.js",
+    "services/api/src/governance/escalation/validation/escalationRoutingValidator.js",
+    "services/api/src/governance/escalation/validation/escalationDeterminismValidator.js",
+    "services/api/src/governance/escalation/validation/escalationObservabilityValidator.js",
+    "services/api/src/governance/escalation/validation/escalationContractValidator.js",
+    "services/api/src/governance/escalation/validation/validationRegistry.js",
+    "services/api/test/phase5EscalationGovernanceFoundation.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-governance-inventory.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-11-PHASE5-ESCALATION-GOVERNANCE-FOUNDATION.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_11_PHASE5_ESCALATION_GOVERNANCE_FOUNDATION.json",
+    "LOGS/ISSUE-11-phase5-escalation-governance-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "escalation routing",
+      "evidence": [
+        "createEscalationSignalModel",
+        "createEscalationRouteModel",
+        "routeEscalationAdvisory",
+        "Phase 5.6 escalation routing is deterministic advisory and explainable"
+      ]
+    },
+    {
+      "criterion": "escalation observability",
+      "evidence": [
+        "publishEscalationEvent",
+        "normalizeEscalationEvent",
+        "buildEscalationObservabilityView",
+        "buildEscalationSnapshot"
+      ]
+    },
+    {
+      "criterion": "escalation auditability",
+      "evidence": [
+        "createEscalationAuditArtifact",
+        "Phase 5.6 escalation audit artifacts are immutable and advisory only"
+      ]
+    },
+    {
+      "criterion": "escalation state governance",
+      "evidence": [
+        "escalationGovernanceContract",
+        "validateEscalationRouting",
+        "validateEscalationContract"
+      ]
+    },
+    {
+      "criterion": "advisory mode only with no runtime orchestration authority, execution blocking authority, runtime mutation, or hidden escalation execution authority",
+      "evidence": [
+        "escalationGovernanceContract",
+        "validateEscalationContract"
+      ]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: missing escalationGovernanceContract module",
+    "targetedGreen": "PASS: 4/4",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: covered by root npm test 182/182",
+    "rootNpmTest": "PASS: 182/182",
+    "serviceApiNpmTest": "PASS: 161/161",
+    "diffCheck": "PASS with line-ending warnings for local working copy files",
+    "jsonCheck": "PASS"
+  },
+  "governance": {
+    "mode": "advisory",
+    "enforcementLevel": "L0",
+    "advisoryOnly": true,
+    "enforcementAuthority": false,
+    "runtimeBlocking": false,
+    "runtimeLifecycleMutation": false,
+    "runtimeOrchestrationAuthority": false,
+    "executionBlockingAuthority": false,
+    "runtimeSovereigntyPreserved": true,
+    "additiveRolloutOnly": true,
+    "hiddenEscalationExecutionAuthority": false,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "No runtime escalation enforcement, orchestration authority, execution blocking, or lifecycle mutation is activated by this rollout."
+  ]
+}

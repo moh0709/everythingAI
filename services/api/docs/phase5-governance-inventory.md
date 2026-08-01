@@ -66,3 +66,41 @@
 - No runtime blocking
 - No enforcement authority
 - No hidden approval bypasses
+
+## Escalation Governance
+
+### Contracts
+- escalationGovernanceContract.js
+
+### Models
+- escalationSignalModel.js
+- escalationRouteModel.js
+
+### Services
+- escalationRoutingService.js
+- escalationAuditService.js
+
+### Observability
+- escalationEventPublisher.js
+- escalationTelemetryService.js
+- escalationObservabilityAggregator.js
+- escalationSnapshotBuilder.js
+
+### Telemetry
+- escalationEvents.js
+
+### Validation
+- escalationRoutingValidator.js
+- escalationDeterminismValidator.js
+- escalationObservabilityValidator.js
+- escalationContractValidator.js
+- validationRegistry.js
+
+### Governance Controls
+- Advisory mode only
+- Additive rollout only
+- Immutable escalation audit artifacts
+- Explainable escalation chains
+- No runtime orchestration authority
+- No execution blocking authority
+- No hidden escalation execution authority

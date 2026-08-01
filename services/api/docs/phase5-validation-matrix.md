@@ -90,6 +90,22 @@ Status: ACTIVE
 Purpose: approval governance remains advisory-only with no hidden bypasses
 Status: ACTIVE
 
+### escalationRoutingValidator
+Purpose: advisory escalation routing remains explainable and non-blocking
+Status: ACTIVE
+
+### escalationDeterminismValidator
+Purpose: deterministic escalation chain ordering and severity-derived routing
+Status: ACTIVE
+
+### escalationObservabilityValidator
+Purpose: escalation telemetry, audit artifacts, and snapshots remain synchronized
+Status: ACTIVE
+
+### escalationContractValidator
+Purpose: escalation governance remains advisory-only with no hidden execution authority
+Status: ACTIVE
+
 ## Runtime Isolation
 PASS
 
@@ -159,3 +175,14 @@ PASS
 | APR-4 | Approval auditability | `createApprovalAuditArtifact` deep-freezes immutable advisory evidence | PASS |
 | APR-5 | Approval state governance | `approvalGovernanceContract`, `validateApprovalLifecycle`, and `validateApprovalInvariants` | PASS |
 | APR-6 | Advisory only; no runtime blocking, enforcement authority, or safeguard bypass | `approvalGovernanceContract` forbids runtime blocking, lifecycle mutation, enforcement blocking, safeguard bypass, and hidden approval bypass | PASS |
+
+## Issue 11 Acceptance Matrix
+
+| Criterion | Requirement | Evidence | Status |
+|---|---|---|---|
+| ESC-1 | Escalation routing | `createEscalationSignalModel`, `createEscalationRouteModel`, `routeEscalationAdvisory`, and routing validator test | PASS |
+| ESC-2 | Escalation determinism | stable severity and priority ordering plus `validateEscalationDeterminism` | PASS |
+| ESC-3 | Escalation observability | escalation event, telemetry, audit artifact, snapshot, observability view, and synchronization validator test | PASS |
+| ESC-4 | Escalation auditability | `createEscalationAuditArtifact` deep-freezes immutable advisory evidence | PASS |
+| ESC-5 | Escalation state governance | `escalationGovernanceContract`, `validateEscalationRouting`, and `validateEscalationContract` | PASS |
+| ESC-6 | Advisory only; no runtime orchestration authority, execution blocking authority, runtime mutation, or hidden execution authority | `escalationGovernanceContract` forbids runtime orchestration, runtime blocking, execution blocking, lifecycle mutation, and hidden escalation execution authority | PASS |
