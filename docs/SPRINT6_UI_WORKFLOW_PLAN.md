@@ -1,244 +1,113 @@
-# Sprint 6 UI Workflow Plan
+# Sprint 6 UI Workflow Rescope Plan
 
 ## Purpose
 
-Sprint 6 completes the browser UI workflows needed to make the local MVP usable without relying on manual API calls.
-
-Sprint 5 final decision:
-
-```text
-Backend/API MVP = PASS
-Browser UI MVP = PARTIAL
-```
-
-This plan keeps changes incremental and avoids a broad UI redesign.
-
-## Current baseline
-
-```text
-Backend local MVP: runnable through API
-Automated tests: 78 passed / 0 failed
-Manual API smoke test: passed
-Browser UI: partial MVP support
-```
-
-## Files to change
-
-Primary UI files:
+Issue #19 was created against the older static UI under:
 
 ```text
 services/api/public/index.html
 services/api/public/app.js
-services/api/public/styles.css
 ```
 
-Supporting docs:
+PM re-triage on 2026-05-21 changed the active direction. Sprint 6 work must now be evaluated against the official React user UI:
+
+```text
+apps/everything-ai-ui
+apps/everything-ai-ui/src/UserApp.tsx
+http://localhost:5151
+```
+
+This plan replaces the older static-UI implementation plan. It keeps the issue open for PM review, marks what is already satisfied in the current React UI, and splits the remaining real gaps into smaller runtime-safe follow-up tickets.
+
+## Current validated direction
+
+```text
+Official client UI: apps/everything-ai-ui/src/UserApp.tsx
+Official admin UI: apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx
+Legacy static UI: services/api/public/index.html and app.js are not the Sprint 6 target
+PM constraint: do not implement the old public UI workflow as-is
+PM constraint: do not perform broad UserApp.tsx refactoring until a smaller task is selected
+```
+
+## Files inspected
 
 ```text
 docs/MVP_UI_VALIDATION_GAPS.md
-docs/MVP_API_ROUTES.md
-docs/MVP_UI_SMOKE_TEST_RUNBOOK.md
-README.md
+docs/OPEN_TICKETS_TRIAGE_2026-05-21.md
+apps/everything-ai-ui/src/UserApp.tsx
+apps/everything-ai-ui/src/user/useFileDocumentWorkflows.ts
+apps/everything-ai-ui/src/user/ExploreView.tsx
+apps/everything-ai-ui/src/admin/components/PlanningView.tsx
+apps/everything-ai-ui/src/admin/hooks/useAdminPlanning.ts
+services/api/src/routes/actions.routes.js
+services/api/src/routes/executionBatches.routes.js
+services/api/src/routes/recovery.routes.js
+services/api/src/routes/intelligence.routes.js
 ```
 
-## Governance rules
+## Current UI capability matrix
 
-- Keep the existing UI layout and visual language.
-- Do not start a broad frontend rewrite.
-- Keep API calls aligned with implemented backend routes.
-- Do not bypass `approve=true` requirements.
-- Require explicit confirmation before sensitive actions.
-- Do not enable permanent purge in the local MVP.
-- Keep raw diagnostic JSON/log visibility while adding structured views.
-- Make each implementation step independently testable.
+| Original Sprint 6 area | Current React UI status | Evidence | Disposition |
+|---|---|---|---|
+| Index/select folder | Satisfied in Client Workspace | `UserApp.tsx` build workspace flow calls `/api/index`, `/api/extract`, `/api/insights`, and `/api/wiki`; onboarding accepts or selects a folder path. | No issue #19 code change needed. |
+| Search files | Satisfied in Client Workspace | `useFileDocumentWorkflows.ts` calls `/api/unified-search`; `ExploreView.tsx` renders search and indexed file list. | No issue #19 code change needed. |
+| Document context route alignment | Satisfied in Client Workspace | `useFileDocumentWorkflows.ts` calls `/api/intelligence/document-context/:fileId`; `ExploreView.tsx` displays filename, path, recovery status, progress, index status, extraction status, source reference, insight, and extracted text. | Mark closed for the current official user UI. |
+| Suggestions and dry-run previews | Partially satisfied in Admin Dashboard | `useAdminPlanning.ts` calls `/api/action-previews`; `PlanningView.tsx` renders suggested actions and dry-run previews. | Keep as admin/operator workflow unless PM explicitly requests client exposure. |
+| Single-action execution | Partially satisfied in Admin Dashboard | `useAdminPlanning.ts` calls `/api/action-executions` with `approve: true`; `PlanningView.tsx` executes ready previews individually. | Existing admin flow remains; do not broaden Client Workspace in this issue. |
+| Batch create/approve/run | Not satisfied in current React UI | Backend routes exist under `executionBatches.routes.js`; no React UI route usage was found for `/api/execution-batches`. | Split into a focused admin Planning Center ticket. |
+| Recovery Center restore | Not satisfied in current React UI | Backend routes exist under `recovery.routes.js`; no current React UI surface lists trash records or restores them. | Split into a focused admin Recovery Center ticket. |
+| Undo eligible filesystem executions | Partially satisfied in older/prototype React surfaces, not confirmed in current official split | Current admin planning hook executes previews, but the inspected current admin planning component does not expose structured execution refresh and undo controls. | Split into a focused admin safe-actions history ticket. |
+| Structured audit log filters | Partially satisfied in Admin Dashboard | Admin audit hook reads `/api/audit-log`, but issue-specific entity type/entity ID filtering and batch/recovery inspection remain absent. | Split into a focused admin audit-inspection ticket. |
+| UI smoke-test runbook | Satisfied by this pass | `docs/MVP_UI_SMOKE_TEST_RUNBOOK.md` records current Client Workspace/Admin Dashboard smoke steps and explicit Sprint 6 gap checks. | Submit for PM review. |
 
-## Step 01 — Plan and inspect current UI
+## Narrow follow-up tickets
 
-Status:
-
-```text
-This document
-```
-
-Current UI capabilities found in Sprint 5:
-
-```text
-folder path setup
-API token storage
-indexing
-extraction
-search
-semantic search
-file listing
-suggestions
-action previews
-single-action execution
-insights/knowledge
-raw audit/execution log views
-provider settings
-```
-
-Current UI gaps:
-
-```text
-execution batch workflow is API-only
-recovery workflow is API-only
-undo workflow is not clearly exposed in UI
-recovery snapshot visibility is missing
-audit/replay view is raw JSON
-file preview uses older /api/files/:fileId/preview route
-```
-
-## Step 02 — Document Context route alignment
+### Ticket A - Admin execution batch controls
 
 Goal:
 
 ```text
-Make the Library Preview button use the current document context route.
+Add batch creation, approval, run, detail refresh, status summary, and linked execution display to the Admin Planning Center.
 ```
 
-Change:
+Target files:
 
 ```text
-services/api/public/app.js
-```
-
-Replace preview call:
-
-```text
-GET /api/files/:fileId/preview
-```
-
-with:
-
-```text
-GET /api/intelligence/document-context/:fileId
-```
-
-Display:
-
-```text
-filename
-absolute path
-recovery status
-index status
-extraction status
-source reference
-insight summary if available
-preview text
-```
-
-Acceptance:
-
-```text
-Clicking Preview in Library opens document context in Ask/Source Context area.
-No backend route mismatch remains.
-```
-
-## Step 03 — Preview cart foundation
-
-Goal:
-
-```text
-Allow user to create action previews and collect ready previews for batch execution.
-```
-
-Changes:
-
-```text
-services/api/public/index.html
-services/api/public/app.js
-services/api/public/styles.css
-```
-
-Add state:
-
-```text
-selectedPreviews: []
-currentBatch: null
-```
-
-Add UI panel in Safe Actions:
-
-```text
-Selected Previews / Batch Queue
-Create Batch
-Clear Selection
-```
-
-Adjust preview behavior:
-
-```text
-Preview Action creates preview.
-If preview is ready, show options:
-- Execute Now
-- Add to Batch
-```
-
-Keep existing single-action execution available.
-
-Acceptance:
-
-```text
-User can create previews without executing immediately.
-User can add ready previews to a visible batch queue.
-Blocked previews show reason and are not added as executable batch items.
-```
-
-## Step 04 — Batch create/approve/run UI
-
-Goal:
-
-```text
-Expose Sprint 4 batch workflow in browser UI.
+apps/everything-ai-ui/src/admin/hooks/useAdminPlanning.ts
+apps/everything-ai-ui/src/admin/components/PlanningView.tsx
+apps/everything-ai-ui/src/api.ts
 ```
 
 Backend routes:
 
 ```text
 POST /api/execution-batches
+GET /api/execution-batches
 GET /api/execution-batches/:batchId
 POST /api/execution-batches/:batchId/approve
 POST /api/execution-batches/:batchId/run
 ```
 
-UI actions:
-
-```text
-Create Batch from selected preview IDs
-Approve Batch
-Run Batch
-Refresh Batch Detail
-```
-
-Display:
-
-```text
-batch id
-status
-total previews
-ready previews
-blocked previews
-executed count
-failed count
-started/completed timestamps
-linked executions
-error message
-```
-
 Acceptance:
 
 ```text
-User can create, approve, and run a batch from the UI.
-Batch results are visible after run.
+Admin user can create a batch from ready preview IDs, approve it, run it, refresh it, and inspect linked executions without manual API calls.
 ```
 
-## Step 05 — Recovery Center UI
+### Ticket B - Admin Recovery Center
 
 Goal:
 
 ```text
-Expose recovery records and restore workflow in browser UI.
+Add a small Admin Recovery Center view for trash records and explicit restore.
+```
+
+Target files:
+
+```text
+apps/everything-ai-ui/src/admin/AdminRuntimeApp.tsx
+apps/everything-ai-ui/src/admin/components/AdminViewRouter.tsx
+apps/everything-ai-ui/src/api.ts
 ```
 
 Backend routes:
@@ -249,30 +118,26 @@ POST /api/recovery/trash/:trashId/restore
 POST /api/recovery/trash/:trashId/purge
 ```
 
-UI options:
-
-```text
-Add Recovery view in sidebar
-List recovery records
-Filter active/restored if simple
-Restore button with confirmation
-Show retention_until
-Show permanent purge disabled policy
-```
-
 Acceptance:
 
 ```text
-User can see recovery records and restore eligible records from the UI.
-UI explains that permanent purge is disabled in local MVP.
+Admin user can list trash records, inspect retention metadata, restore eligible records with confirmation, and see that permanent purge is disabled for local MVP use.
 ```
 
-## Step 06 — Undo UI for filesystem executions
+### Ticket C - Admin safe-action execution history and undo
 
 Goal:
 
 ```text
-Expose undo for eligible filesystem actions.
+Expose structured action execution history and undo only for eligible filesystem executions.
+```
+
+Target files:
+
+```text
+apps/everything-ai-ui/src/admin/hooks/useAdminPlanning.ts
+apps/everything-ai-ui/src/admin/components/PlanningView.tsx
+apps/everything-ai-ui/src/api.ts
 ```
 
 Backend route:
@@ -281,29 +146,26 @@ Backend route:
 POST /api/action-executions/:executionId/undo
 ```
 
-UI changes:
-
-```text
-Render action executions in structured cards/table.
-Show Undo button only for executed move/rename actions.
-Require confirmation before undo.
-Refresh executions after undo.
-Log result clearly.
-```
-
 Acceptance:
 
 ```text
-User can undo eligible filesystem execution from UI.
-Unsupported app-level actions do not show misleading undo button.
+Admin user sees action executions in a structured list, can undo eligible move/rename executions after confirmation, and unsupported app-level actions do not show an undo affordance.
 ```
 
-## Step 07 — Structured Audit Log UI
+### Ticket D - Admin audit inspection filters
 
 Goal:
 
 ```text
-Make audit logs easier to inspect without removing raw JSON diagnostics.
+Add entity type and entity ID filters to the Admin Dashboard audit view while keeping raw JSON/debug visibility.
+```
+
+Target files:
+
+```text
+apps/everything-ai-ui/src/admin/hooks/useAdminAudit.ts
+apps/everything-ai-ui/src/admin/components
+apps/everything-ai-ui/src/api.ts
 ```
 
 Backend route:
@@ -312,99 +174,31 @@ Backend route:
 GET /api/audit-log
 ```
 
-UI changes:
-
-```text
-Add audit filters: entity type and entity ID.
-Render audit entries as cards/table.
-Keep raw JSON in Action Log.
-```
-
 Acceptance:
 
 ```text
-User can inspect batch audit, recovery audit, and action audit from UI.
+Admin user can filter and inspect action, batch, and recovery audit events by entity type and entity ID.
 ```
 
-## Step 08 — UI smoke test runbook
-
-Goal:
+## Deferred from issue #19
 
 ```text
-Create a browser-based smoke test for Sprint 6.
+Legacy services/api/public UI implementation
+Broad UserApp.tsx refactor
+Client Workspace exposure of admin/operator safe-action controls
+Permanent purge enablement
+Batch-level undo
+Recovery snapshot explorer
+Visual redesign
 ```
 
-File:
+## Final disposition for this pass
+
+Issue #19 should be submitted for PM review as a rescope/triage completion, not closed by the execution agent.
+
+PM should either:
 
 ```text
-docs/MVP_UI_SMOKE_TEST_RUNBOOK.md
-```
-
-Validate:
-
-```text
-start API
-open UI
-save token/folder
-index test folder
-search file
-open document context
-create suggestions
-create previews
-add previews to batch
-create batch
-approve batch
-run batch
-inspect batch result
-inspect audit
-inspect recovery records
-restore where applicable
-undo filesystem action where applicable
-```
-
-## Step 09 — Final validation
-
-Acceptance:
-
-```text
-npm test passes
-UI smoke runbook exists
-Sprint 5 UI gaps are closed or explicitly deferred
-README updated if needed
-Issue #19 updated and closed
-```
-
-## Implementation order
-
-Recommended sequence:
-
-```text
-1. Document Context route alignment
-2. Preview cart foundation
-3. Batch create/approve/run UI
-4. Structured execution list + undo buttons
-5. Recovery Center UI
-6. Structured audit log UI
-7. UI smoke-test runbook
-8. final validation and issue close
-```
-
-## Deferrals allowed
-
-These can be deferred if needed:
-
-```text
-advanced filtering
-visual redesign
-batch-level undo
-automatic rollback
-recovery snapshot explorer
-frontend framework migration
-```
-
-## Final Sprint 6 target
-
-```text
-Browser UI can run the main MVP workflow without manual API calls.
-Backend approval and recovery safety rules remain unchanged.
+1. accept the rescope and create the smaller tickets above; or
+2. return a narrower single implementation ticket if one of the follow-up items should be handled immediately.
 ```

@@ -1,0 +1,51 @@
+{
+  "issue": 19,
+  "title": "Sprint 6: MVP UI Workflow Completion",
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "result": "SPRINT6_UI_WORKFLOW_RESCOPED_TO_OFFICIAL_REACT_UI",
+  "startedFromSha": "30da45eca6dc3c8ef9d0cd4e30c0d44a769390d7",
+  "scopeDecision": {
+    "source": "GitHub issue #19 PM re-triage comment dated 2026-05-21",
+    "decision": "Do not implement the older services/api/public UI workflow as-is. Re-scope against apps/everything-ai-ui and UserApp.tsx before coding.",
+    "runtimeCodeChanged": false
+  },
+  "artifacts": [
+    "docs/SPRINT6_UI_WORKFLOW_PLAN.md",
+    "docs/MVP_UI_SMOKE_TEST_RUNBOOK.md",
+    "REPORTS/ISSUE-19-SPRINT6-UI-WORKFLOW-RESCOPE.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_19_SPRINT6_UI_WORKFLOW_RESCOPE.json"
+  ],
+  "currentUiFindings": [
+    "Client Workspace already uses GET /api/intelligence/document-context/:fileId through apps/everything-ai-ui/src/user/useFileDocumentWorkflows.ts.",
+    "Client Workspace document context display includes file metadata, recovery status, progress, index status, extraction status, source reference, insight summary when present, and extracted text.",
+    "Batch create/approve/run UI is not present in the current React UI and is split into a focused follow-up ticket.",
+    "Recovery Center restore UI is not present in the current React UI and is split into a focused follow-up ticket.",
+    "Structured undo and audit filtering require focused admin follow-up tickets."
+  ],
+  "validation": {
+    "required": [
+      "npm test",
+      "cd apps/everything-ai-ui; npm run typecheck",
+      "cd apps/everything-ai-ui; npm run build",
+      "git diff --check"
+    ],
+    "results": [
+      "npm test from C:\\temp\\EverythingAI: 182/182 passed",
+      "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: passed after npm ci refreshed package-lock dependencies",
+      "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: passed",
+      "git diff --check: passed with line-ending warnings only",
+      "JSON parse check for docs/HANDOVER_2026-08-01_ISSUE_19_SPRINT6_UI_WORKFLOW_RESCOPE.json and .hermes/state.json: passed"
+    ]
+  },
+  "labelsForSubmission": [
+    "forge:done",
+    "pm:review"
+  ],
+  "protectedActions": {
+    "issueClosed": false,
+    "pmAccepted": false,
+    "dependentTasksReleased": false,
+    "secretsExposed": false,
+    "destructiveGitCommandsUsed": false
+  }
+}

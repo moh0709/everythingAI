@@ -1,27 +1,27 @@
 {
   "repo": "moh0709/everythingAI",
   "branch": "main",
-  "currentIssue": 3,
-  "currentTask": "ISSUE-3-LOCAL-MVP-FINALIZATION",
-  "updatedAt": "2026-08-01T15:44:10.116Z",
-  "lastCheckedAt": "2026-08-01T15:44:10.116Z",
+  "currentIssue": 19,
+  "currentTask": "ISSUE-19-SPRINT6-UI-WORKFLOW-RESCOPE",
+  "updatedAt": "2026-08-01T16:10:00.000Z",
+  "lastCheckedAt": "2026-08-01T16:10:00.000Z",
   "status": "SUBMITTED_PENDING_PM_REVIEW",
-  "result": "LOCAL_MVP_FINALIZATION_READY_FOR_PM_REVIEW",
-  "startingCommitSha": "148f9157c5855419f0d718c8c0edcb4c1e61072c",
+  "result": "SPRINT6_UI_WORKFLOW_RESCOPED_TO_OFFICIAL_REACT_UI",
+  "startingCommitSha": "30da45eca6dc3c8ef9d0cd4e30c0d44a769390d7",
   "artifactCommitSha": null,
-  "latestMaintenanceStartingSha": "148f9157c5855419f0d718c8c0edcb4c1e61072c",
+  "latestMaintenanceStartingSha": "30da45eca6dc3c8ef9d0cd4e30c0d44a769390d7",
   "implementation": [
-    "services/api/src/embeddings/embeddingProviders.js",
-    "services/api/src/embeddings/embeddingService.js",
-    "services/api/test/embeddingProviderInterface.test.js",
-    "docs/MVP_FINALIZATION_PLAN.md",
-    "REPORTS/ISSUE-3-LOCAL-MVP-FINALIZATION-MAINTENANCE.md",
-    "docs/HANDOVER_2026-08-01_ISSUE_3_LOCAL_MVP_FINALIZATION.json",
-    "LOGS/ISSUE-3-local-mvp-finalization-terminal.log"
+    "docs/SPRINT6_UI_WORKFLOW_PLAN.md",
+    "docs/MVP_UI_SMOKE_TEST_RUNBOOK.md",
+    "REPORTS/ISSUE-19-SPRINT6-UI-WORKFLOW-RESCOPE.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_19_SPRINT6_UI_WORKFLOW_RESCOPE.json"
   ],
   "validation": [
-    "npm test from C:\\temp\\EverythingAI\\services\\api: 173/173 passed",
-    "npm test from C:\\temp\\EverythingAI: 182/182 passed"
+    "npm test from C:\\temp\\EverythingAI: 182/182 passed",
+    "npm run typecheck from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: passed after npm ci refreshed package-lock dependencies",
+    "npm run build from C:\\temp\\EverythingAI\\apps\\everything-ai-ui: passed",
+    "node JSON parse check for handover and .hermes/state.json: passed",
+    "git diff --check: passed with line-ending warnings only"
   ],
   "queueLabels": [
     "forge:done",
@@ -29,5 +29,5 @@
   ],
   "issue69": "PROTECTED_NOT_MODIFIED_NOT_RELEASED",
   "secrets": "none recorded",
-  "humanSummary": "Issue #3 is a stale open local MVP finalization umbrella. This pass implements the remaining backend embedding-provider interface item, validates the backend and repository test suites, and submits for PM review without closing or self-accepting it."
+  "humanSummary": "Issue #19 was re-triaged against the official React Client Workspace/Admin Dashboard direction. This pass documents satisfied current UI capabilities, splits remaining batch/recovery/undo/audit gaps into smaller follow-up tickets, adds a smoke-test runbook, and submits for PM review without closing or self-accepting the issue."
 }
