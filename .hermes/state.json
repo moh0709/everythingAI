@@ -8,7 +8,7 @@
   "status": "SUBMITTED_PENDING_PM_REVIEW",
   "result": "FORGE_MAINTENANCE_LOOP_READY_FOR_REVIEW",
   "startingCommitSha": "a6305e2f7ab95fcaee495434cd3c88ea168a8186",
-  "artifactCommitSha": "PENDING_THIS_PASS_EVIDENCE_COMMIT",
+  "artifactCommitSha": "5c14aa24dfcb6ed079f711e141b853a5da0966ee",
   "latestMaintenanceStartingSha": "ef0531160083befd1b6bdecc80b4096ff93003a2",
   "implementation": [
     "src/forge-trigger.js",
