@@ -1,12 +1,12 @@
 # Phase 5 Implementation Status
 
 ## Current Phase
-5.2 - Permission Foundation
+5.3 - Policy Engine Shadow Governance Track
 
 ## Governance Classification
 - Blast Radius: BR-1
 - Enforcement Level: L0
-- Mode: Observational Only
+- Mode: Shadow Only
 
 ## Current Status
 SUBMITTED FOR PM REVIEW
@@ -45,6 +45,21 @@ SUBMITTED FOR PM REVIEW
 - permissionModel.js
 - rolePermissionModel.js
 - permissionValidationRegistry.js
+- policyGovernanceContract.js
+- policyEvents.js
+- policyRuleModel.js
+- policyEvaluationService.js
+- shadowPolicyExecutionService.js
+- policyEventPublisher.js
+- policyTelemetryService.js
+- policyObservabilityAggregator.js
+- policySnapshotBuilder.js
+- policyDeterminismValidator.js
+- shadowConsistencyValidator.js
+- policyRuntimeCompatibilityValidator.js
+- policyInvariantValidator.js
+- policyObservabilityValidator.js
+- policyValidationRegistry.js
 
 ## Runtime Safety Status
 PASS
@@ -77,3 +92,11 @@ READY FOR PM REVIEW
 - Observability synchronization validation: covered by `services/api/test/phase5PermissionFoundation.test.js`
 - Governance contract validation: covered by `services/api/test/phase5PermissionFoundation.test.js`
 - Due diligence review: recorded in `REPORTS/ISSUE-7-PHASE5-PERMISSION-FOUNDATION.md`
+
+## Issue 8 Validation Coverage
+- Policy determinism validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
+- Shadow consistency validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
+- Runtime compatibility validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
+- Invariant validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
+- Governance observability validation: covered by `services/api/test/phase5PolicyEngineFoundation.test.js`
+- Due diligence review: recorded in `REPORTS/ISSUE-8-PHASE5-POLICY-ENGINE-SHADOW-GOVERNANCE.md`

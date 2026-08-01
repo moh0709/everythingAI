@@ -1,0 +1,97 @@
+{
+  "task": "Issue #8 - Phase 5.3 Policy Engine Shadow Governance Track",
+  "issue": 8,
+  "status": "SUBMITTED_PENDING_PM_REVIEW",
+  "startingSha": "9648fa869960f6c90dbc931ef24d07697eb7140c",
+  "finalPushedSha": "recorded in GitHub issue #8 completion comment after push",
+  "filesChanged": [
+    "services/api/src/governance/policy/contracts/policyGovernanceContract.js",
+    "services/api/src/governance/policy/models/policyRuleModel.js",
+    "services/api/src/governance/policy/services/policyEvaluationService.js",
+    "services/api/src/governance/policy/services/shadowPolicyExecutionService.js",
+    "services/api/src/governance/policy/telemetry/policyEvents.js",
+    "services/api/src/governance/policy/observability/policyEventPublisher.js",
+    "services/api/src/governance/policy/observability/policyTelemetryService.js",
+    "services/api/src/governance/policy/observability/policyObservabilityAggregator.js",
+    "services/api/src/governance/policy/observability/policySnapshotBuilder.js",
+    "services/api/src/governance/policy/validation/policyDeterminismValidator.js",
+    "services/api/src/governance/policy/validation/shadowConsistencyValidator.js",
+    "services/api/src/governance/policy/validation/policyRuntimeCompatibilityValidator.js",
+    "services/api/src/governance/policy/validation/policyInvariantValidator.js",
+    "services/api/src/governance/policy/validation/policyObservabilityValidator.js",
+    "services/api/src/governance/policy/validation/validationRegistry.js",
+    "services/api/test/phase5PolicyEngineFoundation.test.js",
+    "services/api/docs/phase5-implementation-status.md",
+    "services/api/docs/phase5-validation-matrix.md",
+    "REPORTS/ISSUE-8-PHASE5-POLICY-ENGINE-SHADOW-GOVERNANCE.md",
+    "docs/HANDOVER_2026-08-01_ISSUE_8_PHASE5_POLICY_ENGINE_SHADOW_GOVERNANCE.json",
+    "LOGS/ISSUE-8-phase5-policy-engine-terminal.log",
+    ".hermes/state.json"
+  ],
+  "acceptanceCriteria": [
+    {
+      "criterion": "deterministic policy evaluation",
+      "evidence": [
+        "evaluateEligibilityPolicies",
+        "validatePolicyDeterminism",
+        "Phase 5.3 policy rules are deterministic explainable and eligibility-only"
+      ]
+    },
+    {
+      "criterion": "explainable policy outputs",
+      "evidence": [
+        "evaluation explanations",
+        "policy rationale records"
+      ]
+    },
+    {
+      "criterion": "shadow policy execution",
+      "evidence": [
+        "executeShadowPolicyTrack",
+        "validateShadowConsistency"
+      ]
+    },
+    {
+      "criterion": "policy observability and taxonomy",
+      "evidence": [
+        "publishPolicyEvent",
+        "normalizePolicyEvent",
+        "buildPolicyObservabilityView",
+        "buildGovernanceEventTaxonomyView"
+      ]
+    },
+    {
+      "criterion": "runtime compatibility and invariants",
+      "evidence": [
+        "policyGovernanceContract",
+        "validatePolicyRuntimeCompatibility",
+        "validatePolicyInvariants"
+      ]
+    }
+  ],
+  "validation": {
+    "targetedRed": "FAIL as expected: missing policyGovernanceContract module",
+    "targetedGreen": "PASS: 4/4",
+    "frameworkDoctor": "PASS",
+    "rootNodeTests": "PASS: 182/182",
+    "rootNpmTest": "PASS: 182/182 after serial rerun; an earlier concurrent run failed on Windows runtime heartbeat lock contention",
+    "serviceApiNpmTest": "PASS: 149/149",
+    "diffCheck": "PASS with line-ending warnings for local working copy files",
+    "jsonCheck": "PASS"
+  },
+  "governance": {
+    "mode": "shadow",
+    "enforcementLevel": "L0",
+    "eligibilityOnly": true,
+    "hiddenEnforcement": false,
+    "runtimeBlocking": false,
+    "runtimeLifecycleMutation": false,
+    "runtimeSafeguardSupremacy": true,
+    "observabilityBeforeEnforcement": true,
+    "secretsRecorded": false
+  },
+  "knownLimitations": [
+    "PM review and acceptance remain pending.",
+    "No runtime policy enforcement, runtime blocking, or lifecycle mutation is activated by this rollout."
+  ]
+}
