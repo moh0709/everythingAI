@@ -102,4 +102,4 @@ PM review of this Forge maintenance rerun. If PM wants fresh browser evidence, r
 
 ## Artifact commit SHA
 
-`PENDING_ARTIFACT_COMMIT_SHA`
+`7c15e03583248cc2746685653115a6e936e658fb`

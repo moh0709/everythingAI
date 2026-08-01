@@ -77,7 +77,7 @@
     "Pre-existing unrelated dirty worktree entries were preserved and excluded from this task commit."
   ],
   "recommended_next_task": "PM review of this maintenance rerun, or a separate browser-level UI QA task if fresh UI evidence is required.",
-  "artifact_commit_sha": "PENDING_ARTIFACT_COMMIT_SHA",
+  "artifact_commit_sha": "7c15e03583248cc2746685653115a6e936e658fb",
   "final_pushed_sha": "PENDING_FINAL_PUSHED_SHA",
   "issue_transition_required": [
     "forge:done",
