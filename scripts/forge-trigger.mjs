@@ -118,6 +118,7 @@ export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, upd
   try {
     const issues = await list();
     const processingState = readForgeProcessingState(processingStatePath);
+    if (!processingState.valid) throw new Error(`processing state is invalid: ${processingState.error}`);
     const engineOptions = {
       issues,
       approvedReadyLabels,

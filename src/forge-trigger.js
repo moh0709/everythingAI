@@ -39,16 +39,20 @@ export function readForgeProcessingState(statePath) {
     const state = readJson(statePath);
     return {
       cycleId: typeof state?.cycleId === 'string' ? state.cycleId : null,
-      processedIssues: Array.isArray(state?.processedIssues) ? state.processedIssues : []
+      processedIssues: Array.isArray(state?.processedIssues) ? state.processedIssues : [],
+      valid: true,
+      error: null
     };
-  } catch {
-    return { cycleId: null, processedIssues: [] };
+  } catch (error) {
+    if (error?.code === 'ENOENT') return { cycleId: null, processedIssues: [], valid: true, error: null };
+    return { cycleId: null, processedIssues: [], valid: false, error: sanitizeText(error?.message ?? 'unknown processing state error') };
   }
 }
 
 export function markForgeProcessed({ statePath, issueNumber, cycleId, result, headSha, now = () => new Date() } = {}) {
   const state = readForgeProcessingState(statePath);
-  const nextCycleId = cycleId ?? state.cycleId ?? maintenanceCycleId(now);
+  if (!state.valid) throw new Error(`processing state is invalid: ${state.error}`);
+  const nextCycleId = cycleId ?? maintenanceCycleId(now);
   const processed = state.cycleId === nextCycleId ? state.processedIssues : [];
   const withoutDuplicate = processed.filter((entry) => Number(entry.issueNumber) !== Number(issueNumber));
   withoutDuplicate.push({
@@ -175,6 +179,7 @@ function evaluateForgeClaimCandidate({ issue, issueUniverse, processingStatePath
   const issues = (issueUniverse ?? [issue]).filter((candidate) => Number(candidate.number) !== targetNumber);
   issues.push(issue);
   const processingState = readForgeProcessingState(processingStatePath);
+  if (!processingState.valid) throw new Error(`processing state is invalid: ${processingState.error}`);
   const engine = new EligibilityEngine({
     ...eligibilityOptions,
     issues,

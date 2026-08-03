@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -174,4 +174,36 @@ test('scheduler cannot claim the same issue twice in one cycle at unchanged HEAD
   assert.ok(second.evidence.some((entry) => entry.includes('head_unchanged')));
   assert.equal(updates, 1);
   assert.equal(comments, 1);
+});
+
+test('scheduler fails closed when processing history is corrupt', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'forge-scheduler-corrupt-state-'));
+  const statePath = join(root, '.hermes', 'forge', 'maintenance-state.json');
+  mkdirSync(join(root, '.hermes', 'forge'), { recursive: true });
+  writeFileSync(statePath, '{invalid', 'utf8');
+  const target = candidate(100, ['pm:ready', 'forge:ready']);
+  let updates = 0;
+  let comments = 0;
+
+  const result = await pollForgeOnce({
+    list: async () => [target],
+    fetch: async () => target,
+    update: async () => { updates += 1; },
+    comment: async () => { comments += 1; return { ok: true }; },
+    reporter: async () => ({ sent: false }),
+    execute: null,
+    repoRoot: root,
+    processingStatePath: statePath,
+    sha: HEAD,
+    projectState: 'state',
+    bootstrap: 'bootstrap',
+    now: () => new Date('2026-08-03T12:00:00Z')
+  });
+
+  assert.equal(result.result, FORGE_RESULTS.RUNTIME_ERROR);
+  assert.ok(result.evidence.some((entry) => entry.includes('processing state')));
+  assert.equal(updates, 0);
+  assert.equal(comments, 0);
+  const report = JSON.parse(readFileSync(join(root, '.hermes', 'forge', 'eligibility-report.json'), 'utf8'));
+  assert.equal(report.outcome, FORGE_RESULTS.RUNTIME_ERROR);
 });
