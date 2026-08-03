@@ -1,4 +1,5 @@
 import { mkdirSync, renameSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { dirname } from 'node:path';
 
 import { normalizeIssueLabels } from './forge-eligibility.js';
@@ -91,7 +92,7 @@ export class EligibilityReport {
 
   write(path) {
     mkdirSync(dirname(path), { recursive: true });
-    const temporaryPath = `${path}.${process.pid}.${Date.now()}.tmp`;
+    const temporaryPath = `${path}.${process.pid}.${randomUUID()}.tmp`;
     writeFileSync(temporaryPath, `${JSON.stringify(this.toJSON(), null, 2)}\n`, 'utf8');
     renameSync(temporaryPath, path);
     return path;
