@@ -1,3 +1,5 @@
+import { classifyForgeEligibility, normalizeIssueLabels } from './forge-eligibility.js';
+
 const AGENT_LIFECYCLE_LABELS = new Set([
   'forge:ready',
   'forge:working',
@@ -13,11 +15,7 @@ const AGENT_LIFECYCLE_LABELS = new Set([
   'atlas:blocked'
 ]);
 
-export function normalizeIssueLabels(issue) {
-  return (issue?.labels ?? [])
-    .map((label) => (typeof label === 'string' ? label : label?.name))
-    .filter(Boolean);
-}
+export { normalizeIssueLabels };
 
 function isOpen(issue) {
   return String(issue?.state ?? '').toLowerCase() === 'open';
@@ -29,18 +27,15 @@ function hasOnlyAgentQueue(labels, readyLabel) {
     && !labels.some((label) => AGENT_LIFECYCLE_LABELS.has(label) && label !== readyLabel);
 }
 
-export function classifyForgeQueueIssue(issue) {
-  const labels = normalizeIssueLabels(issue);
-  if (!isOpen(issue)) return { eligible: false, skipReason: 'not_open' };
-  if ((labels.includes('forge:done') || labels.includes('forge:blocked')) && labels.includes('pm:review')) {
-    return { eligible: false, skipReason: 'awaiting_pm_review' };
-  }
-  if (!labels.includes('pm:ready')) return { eligible: false, skipReason: 'missing_pm_ready' };
-  if (!labels.includes('forge:ready')) return { eligible: false, skipReason: 'missing_forge_ready' };
-  if (labels.some((label) => AGENT_LIFECYCLE_LABELS.has(label) && label !== 'forge:ready')) {
-    return { eligible: false, skipReason: 'active_or_terminal_owner' };
-  }
-  return { eligible: true, priority: 'released_queue' };
+export function classifyForgeQueueIssue(issue, options = {}) {
+  const evaluation = classifyForgeEligibility(issue, options);
+  const awaitingPmReview = evaluation.reasons.includes('pm_review')
+    && (evaluation.reasons.includes('forge_done') || evaluation.reasons.includes('forge_blocked'));
+  return {
+    ...evaluation,
+    skipReason: awaitingPmReview ? 'awaiting_pm_review' : evaluation.primaryReason,
+    priority: evaluation.eligible ? 'released_queue' : undefined
+  };
 }
 
 export function isForgeEligibleForQueue(issue) {
