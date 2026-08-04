@@ -1,9 +1,13 @@
 # Forge Scheduler Eligibility Live Acceptance Evidence
 
-Date: 2026-08-04  
-Repository: `moh0709/everythingAI`  
-PR: `#100`  
-Branch: `codex/forge-eligibility-engine`  
+Date: 2026-08-04
+
+Repository: `moh0709/everythingAI`
+
+PR: `#100`
+
+Branch: `codex/forge-eligibility-engine`
+
 Tested HEAD: `bb3eada065b9d934be0d62afd593ab4379f4f6b9`
 
 ## Execution Boundary
@@ -65,7 +69,7 @@ These are the 23 issues that were open in the immutable pre-run snapshot. Reason
 
 - `run-1-eligibility-report.json`: complete atomic Eligibility Report for the successful claim run.
 - `run-2-eligibility-report.json`: complete atomic Eligibility Report for the unchanged repeat run.
-- `run-1-console.log` and `run-2-console.log`: complete scheduler console output.
+- `run-1-console.txt` and `run-2-console.txt`: complete scheduler console output.
 - `run-1-all-issue-decisions.csv` and `run-2-all-issue-decisions.csv`: every evaluated issue with decision and exact reason.
 - `open-issue-decisions.json`: all 23 initially open issues across both runs.
 - `acceptance-assertions.json`: machine-readable reconciliation and required-proof checks.
