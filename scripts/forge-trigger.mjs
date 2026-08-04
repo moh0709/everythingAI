@@ -31,6 +31,10 @@ const defaultApprovedReadyLabels = String(process.env.FORGE_APPROVED_READY_LABEL
   .split(',')
   .map((label) => label.trim())
   .filter(Boolean);
+const defaultDependencyHoldIssueNumbers = String(process.env.FORGE_DEPENDENCY_HOLD_ISSUE_NUMBERS ?? '69')
+  .split(',')
+  .map((number) => Number(number.trim()))
+  .filter(Number.isFinite);
 
 function gh(args) {
   const result = spawnSync('gh', args, { cwd: root, encoding: 'utf8' });
@@ -82,7 +86,7 @@ async function executeWithReporting({ contextPath, issue, repoRoot, reporter }) 
   return result;
 }
 
-export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8'), controllerIssueNumber = defaultControllerIssueNumber, currentExecutingIssueNumber = defaultCurrentExecutingIssueNumber, approvedReadyLabels = defaultApprovedReadyLabels, maintenanceIssueNumbers = [], processingStatePath = resolve(repoRoot, '.hermes/forge/maintenance-state.json'), eligibilityReportPath = resolve(repoRoot, '.hermes/forge/eligibility-report.json'), now = () => new Date() } = {}) {
+export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, update = updateLabels, comment = postComment, reporter = sendForgeReport, repoRoot = root, execute = (args) => executeWithReporting({ ...args, repoRoot, reporter }), sha = 'unknown', projectState = readFileSync(resolve(repoRoot, 'PROJECT_STATE.md'), 'utf8'), bootstrap = readFileSync(resolve(repoRoot, 'AI_BOOTSTRAP.md'), 'utf8'), controllerIssueNumber = defaultControllerIssueNumber, currentExecutingIssueNumber = defaultCurrentExecutingIssueNumber, approvedReadyLabels = defaultApprovedReadyLabels, maintenanceIssueNumbers = [], dependencyHoldIssueNumbers = defaultDependencyHoldIssueNumbers, processingStatePath = resolve(repoRoot, '.hermes/forge/maintenance-state.json'), eligibilityReportPath = resolve(repoRoot, '.hermes/forge/eligibility-report.json'), now = () => new Date() } = {}) {
   const startedAt = now().toISOString();
   const cycleId = startedAt.slice(0, 10);
   const report = new EligibilityReport({
@@ -126,6 +130,7 @@ export async function pollForgeOnce({ list = listIssues, fetch = fetchIssue, upd
       currentIssueNumber: currentExecutingIssueNumber,
       controllerIssueNumber,
       maintenanceIssueNumbers: [...maintenanceIssueNumbers, controllerIssueNumber].filter(Number.isFinite),
+      dependencyHoldIssueNumbers,
       cycleId,
       processedCycleId: processingState.cycleId,
       processedIssues: processingState.processedIssues

@@ -27,8 +27,8 @@ test('scheduler reports every issue and claims only the top genuinely eligible c
   const issues = [
     candidate(4, ['pm:ready', 'forge:ready', 'forge:done', 'pm:review']),
     candidate(5, ['pm:ready', 'forge:ready', 'forge:blocked', 'pm:review']),
-    candidate(68, [], { title: 'EAI-TASK-045: Host deployment', state: 'OPEN' }),
-    candidate(69, ['pm:ready', 'forge:ready'], { title: 'EAI-TASK-046: Reliability drill', body: 'Dependency: EAI-TASK-045 accepted and closed.' }),
+    candidate(68, [], { title: 'EAI-TASK-045: Host deployment', state: 'CLOSED' }),
+    candidate(69, ['forge:done'], { title: 'EAI-TASK-046: Reliability drill', state: 'CLOSED', body: 'Dependency: EAI-TASK-045 accepted and closed.' }),
     candidate(96, ['pm:ready', 'forge:ready'], { title: 'EAI-TASK-049: Forge scheduler maintenance' }),
     candidate(100, ['pm:ready', 'forge:ready', 'priority:critical'])
   ];
@@ -131,6 +131,7 @@ test('scheduler aborts claim when a dependency becomes open before mutation', as
     sha: HEAD,
     projectState: 'state',
     bootstrap: 'bootstrap',
+    dependencyHoldIssueNumbers: [],
     now: () => new Date('2026-08-03T12:00:00Z')
   });
 

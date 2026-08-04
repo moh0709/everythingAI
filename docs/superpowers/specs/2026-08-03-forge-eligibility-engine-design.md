@@ -54,6 +54,7 @@ The GitHub adapter builds normalized candidate input before evaluation:
 - Task identifiers such as `EAI-TASK-045` are resolved against task identifiers in issue titles.
 - An unresolved dependency declaration fails closed with `dependency_unresolved`.
 - A dependency that is not closed fails with `dependency_blocked`.
+- An issue under an explicit PM dependency hold fails with `dependency_blocked`, even when its declared dependencies are closed. EverythingAI defaults this hold to issue #69; PM can replace or clear the comma-separated list with `FORGE_DEPENDENCY_HOLD_ISSUE_NUMBERS`.
 - Cycles fail closed with `dependency_cycle`.
 
 Eligible issues are sorted deterministically by:
@@ -116,7 +117,7 @@ Tests will prove:
 - issue #4-style `forge:done + pm:review` state is skipped;
 - issue #5-style terminal review state is skipped;
 - `forge:done`, `forge:blocked`, and `pm:review` are independently terminal;
-- issue #69 is blocked when its dependency is unresolved or open;
+- issue #69 is blocked while its explicit PM dependency hold remains configured;
 - issue #96 cannot select itself as controller or currently executing issue;
 - unreleased issue #78 is skipped for missing explicit ready labels;
 - unchanged HEAD and same-cycle processing are skipped;

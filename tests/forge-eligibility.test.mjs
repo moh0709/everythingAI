@@ -89,6 +89,24 @@ test('EligibilityEngine fails closed for unresolved and open dependencies', () =
   assert.deepEqual(satisfied.evaluate(issue69).dependencies, [68]);
 });
 
+test('EligibilityEngine preserves explicit PM dependency holds after declared dependencies close', () => {
+  const dependency68 = issue({ number: 68, title: 'EAI-TASK-045: Host deployment', labels: [], state: 'CLOSED' });
+  const issue69 = issue({
+    number: 69,
+    title: 'EAI-TASK-046: Reliability drill',
+    state: 'CLOSED',
+    labels: ['forge:done'],
+    body: 'Dependency: EAI-TASK-045 accepted and closed.'
+  });
+  const engine = new EligibilityEngine({
+    issues: [dependency68, issue69],
+    currentHeadSha: HEAD,
+    dependencyHoldIssueNumbers: [69]
+  });
+
+  assert.ok(engine.evaluate(issue69).reasons.includes('dependency_blocked'));
+});
+
 test('EligibilityEngine skips same-cycle and unchanged-HEAD processing history', () => {
   const candidate = issue({ number: 80 });
   const sameCycle = new EligibilityEngine({

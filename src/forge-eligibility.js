@@ -52,6 +52,7 @@ export class EligibilityEngine {
     currentIssueNumber = null,
     controllerIssueNumber = null,
     maintenanceIssueNumbers = [],
+    dependencyHoldIssueNumbers = [],
     maintenanceLabels = ['maintenance'],
     cycleId = null,
     processedCycleId = null,
@@ -63,6 +64,7 @@ export class EligibilityEngine {
     this.currentIssueNumber = Number.isFinite(Number(currentIssueNumber)) ? Number(currentIssueNumber) : null;
     this.controllerIssueNumber = Number.isFinite(Number(controllerIssueNumber)) ? Number(controllerIssueNumber) : null;
     this.maintenanceIssueNumbers = new Set(maintenanceIssueNumbers.map(Number).filter(Number.isFinite));
+    this.dependencyHoldIssueNumbers = new Set(dependencyHoldIssueNumbers.map(Number).filter(Number.isFinite));
     this.maintenanceLabels = new Set(maintenanceLabels.filter(Boolean));
     this.cycleId = cycleId;
     this.processedCycleId = processedCycleId;
@@ -153,6 +155,7 @@ export class EligibilityEngine {
     }
     if (this.unresolvedDependencies.has(issueNumber)) reasons.push('dependency_unresolved');
     if (this.dependencyCycles.has(issueNumber)) reasons.push('dependency_cycle');
+    if (this.dependencyHoldIssueNumbers.has(issueNumber)) reasons.push('dependency_blocked');
     if (dependencies.some((number) => !this.issuesByNumber.has(number))) reasons.push('dependency_unresolved');
     if (dependencies.some((number) => {
       const dependency = this.issuesByNumber.get(number);
