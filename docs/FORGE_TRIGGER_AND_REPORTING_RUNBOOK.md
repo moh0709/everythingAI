@@ -15,20 +15,21 @@ $env:FORGE_TRIGGER_ITERATIONS = '3'
 npm run forge:trigger -- --watch
 ```
 
-The trigger first uses `gh issue list` with `--state open --label pm:ready --label forge:ready`, then performs a live issue read before and after label mutation. It claims one issue at a time using `.hermes/forge/claim.lock`. A stale same-host lock may be recovered only when its owner PID is dead and its age exceeds 15 minutes. Cross-host locks require manual review.
+The trigger lists all repository issues so every decision appears in `.hermes/forge/eligibility-report.json`, then performs a live issue-universe read before label mutation. It claims one issue at a time using `.hermes/forge/claim.lock`. A stale same-host lock may be recovered only when its owner PID is dead and its age exceeds 15 minutes. Cross-host locks require manual review.
 
-If no released Forge issue exists, the trigger lists open issues and enters maintenance mode. Maintenance mode skips actively owned issues, skips protected issue #69, and selects one candidate in this order:
+An issue is eligible only when it is open and carries `pm:ready + forge:ready` (or an explicitly configured ready equivalent). The centralized engine rejects terminal/review states, active or competing owners, controller/current/maintenance issues, unresolved or open dependencies, PM dependency holds, same-cycle processing, and unchanged-HEAD processing. Eligible issues are sorted by dependency depth, explicit priority, creation date, then issue number.
 
-1. `forge:done` + `pm:review`
-2. `forge:blocked` + `pm:review`
-3. older open issues with no recent activity
-4. governance or administrative backlog
+EverythingAI keeps issue #69 under an explicit PM dependency hold by default. PM may replace or clear the comma-separated hold list through the external environment:
 
-The selected maintenance issue is claimed with `forge:working` and launched through the same bounded Codex execution path. It must return as `forge:done + pm:review` or `forge:blocked + pm:review`. If neither released nor maintenance work exists, the trigger records `IDLE` with queue-empty evidence.
+```text
+$env:FORGE_DEPENDENCY_HOLD_ISSUE_NUMBERS = '69'
+```
+
+There is no maintenance fallback. If no explicitly released issue is eligible, the trigger records `IDLE`, prints `No eligible issues found`, and performs no GitHub mutation.
 
 ## Codex start boundary
 
-The trigger prepares `.hermes/forge/context-<issue>.json`. Open the repository in Codex desktop and start or resume the task using that context. The trigger reports `HUMAN_START_REQUIRED`; it does not fabricate an automatic Codex launch.
+The trigger prepares `.hermes/forge/context-<issue>.json` and normally starts the bounded Codex CLI execution path. A controlled acceptance harness may call `pollForgeOnce({ execute: null })` to verify the complete live claim transaction without launching a second coding worker; this returns `HUMAN_START_REQUIRED` after the claim, acknowledgement, and processing state are verified.
 
 ## Telegram
 

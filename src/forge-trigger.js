@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, openSync, readFileSync, closeSync, unlinkSync, r
 import { hostname } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { classifyForgeQueueIssue, isForgeEligibleForQueue, normalizeIssueLabels } from './agent-queue-policy.js';
+import { EligibilityEngine } from './forge-eligibility.js';
 
 export const FORGE_RESULTS = Object.freeze({
   CLAIMED: 'CLAIMED',
@@ -27,52 +28,31 @@ export function classifyForgeIssueEligibility(issue) {
   return classifyForgeQueueIssue(issue);
 }
 
-const MAINTENANCE_INACTIVE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
-const MAINTENANCE_PROCESSED_COOLDOWN_MS = 24 * 60 * 60 * 1000;
-const DEFAULT_MAINTENANCE_CONTROLLER_ISSUE_NUMBER = 96;
-const PROTECTED_MAINTENANCE_ISSUES = new Set([69]);
-const WORKING_LABELS = new Set(['forge:working', 'hermes:working', 'atlas:working']);
-const READY_LABELS = new Set(['forge:ready', 'hermes:ready', 'atlas:ready']);
-const FORGE_LIFECYCLE_LABELS = new Set(['forge:ready', 'forge:working', 'forge:done', 'forge:blocked', 'pm:ready', 'pm:review']);
-
-function isOpen(issue) {
-  return String(issue?.state ?? '').toLowerCase() === 'open';
-}
-
-function hasWorkingOwner(labels) {
-  return labels.some((label) => WORKING_LABELS.has(label));
-}
-
-function hasReadyOwner(labels) {
-  return labels.some((label) => READY_LABELS.has(label));
-}
-
-function isGovernanceBacklog(issue, labels) {
-  const text = `${issue?.title ?? ''}\n${issue?.body ?? ''}\n${labels.join('\n')}`;
-  return /\b(governance|administrative|admin|backlog|ops|operations)\b/i.test(text);
-}
-
 function maintenanceCycleId(now) {
   return now().toISOString().slice(0, 10);
 }
 
 function defaultMaintenanceStatePath(repoRoot) { return resolve(repoRoot, '.hermes/forge/maintenance-state.json'); }
 
-function readMaintenanceState(statePath) {
+export function readForgeProcessingState(statePath) {
   try {
     const state = readJson(statePath);
     return {
       cycleId: typeof state?.cycleId === 'string' ? state.cycleId : null,
-      processedIssues: Array.isArray(state?.processedIssues) ? state.processedIssues : []
+      processedIssues: Array.isArray(state?.processedIssues) ? state.processedIssues : [],
+      valid: true,
+      error: null
     };
-  } catch {
-    return { cycleId: null, processedIssues: [] };
+  } catch (error) {
+    if (error?.code === 'ENOENT') return { cycleId: null, processedIssues: [], valid: true, error: null };
+    return { cycleId: null, processedIssues: [], valid: false, error: sanitizeText(error?.message ?? 'unknown processing state error') };
   }
 }
 
-export function markForgeMaintenanceProcessed({ statePath, issueNumber, cycleId, result, headSha, now = () => new Date() } = {}) {
-  const state = readMaintenanceState(statePath);
-  const nextCycleId = cycleId ?? state.cycleId ?? maintenanceCycleId(now);
+export function markForgeProcessed({ statePath, issueNumber, cycleId, result, headSha, now = () => new Date() } = {}) {
+  const state = readForgeProcessingState(statePath);
+  if (!state.valid) throw new Error(`processing state is invalid: ${state.error}`);
+  const nextCycleId = cycleId ?? maintenanceCycleId(now);
   const processed = state.cycleId === nextCycleId ? state.processedIssues : [];
   const withoutDuplicate = processed.filter((entry) => Number(entry.issueNumber) !== Number(issueNumber));
   withoutDuplicate.push({
@@ -82,48 +62,6 @@ export function markForgeMaintenanceProcessed({ statePath, issueNumber, cycleId,
     headSha: typeof headSha === 'string' ? headSha : undefined
   });
   atomicWriteJson(statePath, { cycleId: nextCycleId, processedIssues: withoutDuplicate });
-}
-
-function processedMaintenanceSkipReason(issueNumber, { statePath, cycleId, now = () => new Date(), cooldownMs = MAINTENANCE_PROCESSED_COOLDOWN_MS, currentHeadSha } = {}) {
-  if (!statePath) return null;
-  const state = readMaintenanceState(statePath);
-  const effectiveCycleId = cycleId ?? maintenanceCycleId(now);
-  const comparableHeadSha = /^[a-f0-9]{40}$/i.test(String(currentHeadSha ?? '')) ? currentHeadSha : null;
-  for (const entry of state.processedIssues) {
-    if (Number(entry.issueNumber) !== Number(issueNumber)) continue;
-    if (state.cycleId === effectiveCycleId) return 'already_processed';
-    if (comparableHeadSha && entry.headSha === comparableHeadSha) return 'head_unchanged';
-    const processedAt = Date.parse(entry.processedAt ?? '');
-    if (Number.isFinite(processedAt) && Math.max(0, now().getTime() - processedAt) <= cooldownMs) return 'already_processed';
-  }
-  return null;
-}
-
-export function classifyForgeMaintenanceIssue(issue, { now = () => new Date(), inactiveAfterMs = MAINTENANCE_INACTIVE_AFTER_MS, controllerIssueNumber = DEFAULT_MAINTENANCE_CONTROLLER_ISSUE_NUMBER, currentExecutingIssueNumber, statePath, cycleId, cooldownMs, currentHeadSha } = {}) {
-  const issueNumber = Number(issue?.number);
-  if (!isOpen(issue)) return null;
-  if (issueNumber === Number(currentExecutingIssueNumber)) return { skipReason: 'currently_executing' };
-  if (issueNumber === Number(controllerIssueNumber)) return { skipReason: 'self_controller' };
-  if (PROTECTED_MAINTENANCE_ISSUES.has(issueNumber)) return { skipReason: 'dependency_blocked' };
-  const labels = normalizeLabels(issue);
-  if ((labels.includes('forge:done') || labels.includes('forge:blocked')) && labels.includes('pm:review')) return { skipReason: 'awaiting_pm_review' };
-  const processedSkipReason = processedMaintenanceSkipReason(issueNumber, { statePath, cycleId, now, cooldownMs, currentHeadSha });
-  if (processedSkipReason) return { skipReason: processedSkipReason };
-  if (hasWorkingOwner(labels) || hasReadyOwner(labels)) return { skipReason: 'active_owner' };
-  const updatedAt = Date.parse(issue?.updatedAt ?? issue?.createdAt ?? '');
-  const isInactive = Number.isFinite(updatedAt) && Math.max(0, now().getTime() - updatedAt) >= inactiveAfterMs;
-  if (isInactive) return { rank: 3, priority: 'stale_open_issue' };
-  if (isGovernanceBacklog(issue, labels)) return { rank: 4, priority: 'governance_backlog' };
-  return null;
-}
-
-export function selectForgeMaintenanceIssue(issues = [], options = {}) {
-  return issues
-    .map((issue) => ({ issue, ...classifyForgeMaintenanceIssue(issue, options) }))
-    .filter((entry) => Number.isFinite(entry.rank))
-    .sort((left, right) => left.rank - right.rank
-      || Date.parse(left.issue.updatedAt ?? left.issue.createdAt ?? 0) - Date.parse(right.issue.updatedAt ?? right.issue.createdAt ?? 0)
-      || Number(left.issue.number) - Number(right.issue.number))[0] ?? null;
 }
 
 function atomicWriteJson(path, value) {
@@ -236,100 +174,22 @@ function hasVerifiedForgeSubmission(issue) {
     && !labels.includes('pm:ready');
 }
 
-function maintenanceClaimLabels(issue) {
-  const labels = normalizeLabels(issue)
-    .filter((label) => !FORGE_LIFECYCLE_LABELS.has(label));
-  labels.push('forge:working');
-  return labels;
+function evaluateForgeClaimCandidate({ issue, issueUniverse, processingStatePath, eligibilityOptions = {} }) {
+  const targetNumber = Number(issue.number);
+  const issues = (issueUniverse ?? [issue]).filter((candidate) => Number(candidate.number) !== targetNumber);
+  issues.push(issue);
+  const processingState = readForgeProcessingState(processingStatePath);
+  if (!processingState.valid) throw new Error(`processing state is invalid: ${processingState.error}`);
+  const engine = new EligibilityEngine({
+    ...eligibilityOptions,
+    issues,
+    processedCycleId: processingState.cycleId,
+    processedIssues: processingState.processedIssues
+  });
+  return engine.evaluate(issue);
 }
 
-function blockedReviewLabels(issue) {
-  const labels = normalizeLabels(issue)
-    .filter((label) => !FORGE_LIFECYCLE_LABELS.has(label));
-  labels.push('forge:blocked', 'pm:review');
-  return labels;
-}
-
-export async function claimForgeMaintenanceIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultMaintenanceStatePath(repoRoot), controllerIssueNumber, currentExecutingIssueNumber, startingSha = 'unknown', currentHeadSha = startingSha, projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
-  const targetNumber = Number(issue?.number);
-  if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
-  const live = await fetchLiveIssue(targetNumber);
-  const maintenanceOptions = { now, controllerIssueNumber, currentExecutingIssueNumber, statePath, currentHeadSha };
-  const selected = selectForgeMaintenanceIssue([live], maintenanceOptions);
-  if (!selected) {
-    const classified = classifyForgeMaintenanceIssue(live, maintenanceOptions);
-    return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`skip_reason=${classified?.skipReason ?? 'not_eligible'} maintenance labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
-  }
-  const acquired = acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
-  if (!acquired.ok) return { ok: false, ...acquired, issue: live };
-  try {
-    const verifiedBeforeMutation = await fetchLiveIssue(targetNumber);
-    const verifiedSelection = selectForgeMaintenanceIssue([verifiedBeforeMutation], maintenanceOptions);
-    if (!verifiedSelection) {
-      const classified = classifyForgeMaintenanceIssue(verifiedBeforeMutation, maintenanceOptions);
-      return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: [`skip_reason=${classified?.skipReason ?? 'not_eligible'} maintenance eligibility changed before mutation`] };
-    }
-    await updateLabels(targetNumber, maintenanceClaimLabels(verifiedBeforeMutation));
-    const verifiedAfterMutation = await fetchLiveIssue(targetNumber);
-    const after = normalizeLabels(verifiedAfterMutation);
-    if (!after.includes('forge:working') || after.includes('forge:ready') || after.includes('pm:review') || after.includes('forge:done') || after.includes('forge:blocked')) {
-      return { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, issue: verifiedAfterMutation, evidence: ['maintenance claim label mutation did not verify'] };
-    }
-    const prepared = prepareForgeContext({ issue: verifiedAfterMutation, repoRoot, startingSha, projectState, bootstrap, now });
-    const comment = JSON.stringify({ agent: 'Forge', issue: targetNumber, status: 'MAINTENANCE_CLAIMED', priority: verifiedSelection.priority, startingSha, contextPath: prepared.path, automationBoundary: 'FULLY_AUTOMATIC_CODEX_CLI' });
-    const posted = await postComment(verifiedAfterMutation, comment);
-    if (!posted?.ok) return { ok: false, result: FORGE_RESULTS.REPORTING_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, evidence: ['maintenance claim acknowledgement delivery failed'] };
-    const report = await reporter({ event: 'maintenance_claimed', issue: verifiedAfterMutation, contextPath: prepared.path });
-    if (!execute) return { ok: true, result: FORGE_RESULTS.HUMAN_START_REQUIRED, issue: verifiedAfterMutation, contextPath: prepared.path, report };
-    let execution = await execute({ contextPath: prepared.path, issue: verifiedAfterMutation });
-    const verifiedCompletion = await fetchLiveIssue(targetNumber);
-    if (hasVerifiedForgeSubmission(verifiedCompletion)) {
-      markForgeMaintenanceProcessed({ statePath, issueNumber: targetNumber, result: 'SUBMITTED_FOR_PM_REVIEW', headSha: currentHeadSha, now });
-      return { ok: true, result: FORGE_RESULTS.AUTONOMOUS_STARTED, issue: verifiedCompletion, contextPath: prepared.path, report, execution };
-    }
-    if (execution?.ok) {
-      execution = {
-        ...execution,
-        ok: false,
-        result: 'UNVERIFIED_COMPLETION',
-        evidence: [...(execution.evidence ?? []), 'maintenance worker exited without verified forge:done plus pm:review']
-      };
-    }
-    await updateLabels(targetNumber, blockedReviewLabels(verifiedCompletion));
-    const verifiedBlocked = await fetchLiveIssue(targetNumber);
-    const afterBlocked = normalizeLabels(verifiedBlocked);
-    const transitionVerified = afterBlocked.includes('forge:blocked')
-      && afterBlocked.includes('pm:review')
-      && !afterBlocked.includes('forge:working');
-    const blockerComment = JSON.stringify(sanitizeReport({
-      agent: 'Forge',
-      issue: targetNumber,
-      status: 'BLOCKED',
-      result: execution?.result ?? 'START_FAILURE',
-      evidence: execution?.evidence ?? ['maintenance Codex execution failed'],
-      contextPath: prepared.path
-    }));
-    const blockedPosted = await postComment(verifiedBlocked, blockerComment);
-    if (transitionVerified && blockedPosted?.ok) {
-      markForgeMaintenanceProcessed({ statePath, issueNumber: targetNumber, result: 'BLOCKED_FOR_PM_REVIEW', headSha: currentHeadSha, now });
-    }
-    return {
-      ok: false,
-      result: FORGE_RESULTS.AUTONOMOUS_BLOCKED,
-      issue: verifiedBlocked,
-      contextPath: prepared.path,
-      report,
-      execution,
-      evidence: transitionVerified && blockedPosted?.ok
-        ? execution?.evidence ?? []
-        : ['maintenance blocked transition or acknowledgement did not verify']
-    };
-  } finally {
-    releaseForgeLock({ lockPath, lock: acquired.lock });
-  }
-}
-
-export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultStatePath(repoRoot), startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
+export async function claimForgeIssue({ issue, fetchLiveIssue, fetchIssueUniverse = null, updateLabels, postComment, lockPath, repoRoot = process.cwd(), statePath = defaultStatePath(repoRoot), processingStatePath = defaultMaintenanceStatePath(repoRoot), eligibilityOptions = {}, heldLock = null, startingSha = 'unknown', projectState = '', bootstrap = '', now = () => new Date(), pid = process.pid, host = hostname(), processChecker, reporter = async () => ({ sent: false, reason: 'not-configured' }), execute = null } = {}) {
   const targetNumber = Number(issue?.number);
   if (!Number.isFinite(targetNumber)) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, evidence: ['missing issue number'] };
   const live = await fetchLiveIssue(targetNumber);
@@ -340,23 +200,31 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
     atomicWriteJson(statePath, { ...existingState, status: 'CLAIMED', claimCommentPosted: true, recoveredAt: now().toISOString() });
     return { ok: true, result: FORGE_RESULTS.CLAIMED, issue: live, recovered: true };
   }
-  const liveEligibility = classifyForgeIssueEligibility(live);
-  if (!liveEligibility.eligible) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`skip_reason=${liveEligibility.skipReason ?? 'not_eligible'} live labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
-  const acquired = acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
+  if (!heldLock) {
+    const liveEligibility = evaluateForgeClaimCandidate({ issue: live, processingStatePath, eligibilityOptions });
+    if (!liveEligibility.eligible) return { ok: false, result: FORGE_RESULTS.IGNORED_INELIGIBLE, issue: live, evidence: [`skip_reasons=${liveEligibility.reasons.join('|') || 'not_eligible'} live labels=${normalizeLabels(live).join(', ') || '(none)'}`] };
+  }
+  const acquired = heldLock
+    ? { ok: true, lock: heldLock, externallyOwned: true }
+    : acquireForgeLock({ lockPath, issueNumber: targetNumber, pid, host, now, processChecker });
   if (!acquired.ok) return { ok: false, ...acquired, issue: live };
   try {
     const verifiedBeforeMutation = await fetchLiveIssue(targetNumber);
-    const verifiedEligibility = classifyForgeIssueEligibility(verifiedBeforeMutation);
-    if (!verifiedEligibility.eligible) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: [`skip_reason=${verifiedEligibility.skipReason ?? 'not_eligible'} readiness changed before mutation`] };
-    const labels = normalizeLabels(verifiedBeforeMutation).filter((label) => label !== 'forge:ready');
+    const issueUniverse = fetchIssueUniverse ? await fetchIssueUniverse() : [verifiedBeforeMutation];
+    const verifiedEligibility = evaluateForgeClaimCandidate({ issue: verifiedBeforeMutation, issueUniverse, processingStatePath, eligibilityOptions });
+    if (!verifiedEligibility.eligible) return { ok: false, result: FORGE_RESULTS.CLAIM_CONFLICT, issue: verifiedBeforeMutation, evidence: [`skip_reasons=${verifiedEligibility.reasons.join('|') || 'not_eligible'} eligibility changed before mutation`] };
+    const readyLabels = new Set(['forge:ready', ...(eligibilityOptions.approvedReadyLabels ?? [])]);
+    const labels = normalizeLabels(verifiedBeforeMutation).filter((label) => !readyLabels.has(label));
     labels.push('forge:working');
     await updateLabels(targetNumber, labels);
     const verifiedAfterMutation = await fetchLiveIssue(targetNumber);
     const after = normalizeLabels(verifiedAfterMutation);
-    if (!after.includes('pm:ready') || !after.includes('forge:working') || after.includes('forge:ready')) {
+    const readyLabelRemains = [...readyLabels].some((label) => after.includes(label));
+    if (!after.includes('pm:ready') || !after.includes('forge:working') || readyLabelRemains) {
       return { ok: false, result: FORGE_RESULTS.RUNTIME_ERROR, issue: verifiedAfterMutation, evidence: ['claim label mutation did not verify'] };
     }
     const prepared = prepareForgeContext({ issue: verifiedAfterMutation, repoRoot, startingSha, projectState, bootstrap, now });
+    markForgeProcessed({ statePath: processingStatePath, issueNumber: targetNumber, cycleId: eligibilityOptions.cycleId, result: 'CLAIMED', headSha: startingSha, now });
     const comment = JSON.stringify({ agent: 'Forge', issue: targetNumber, status: 'CLAIMED', startingSha, contextPath: prepared.path, automationBoundary: 'FULLY_AUTOMATIC_CODEX_CLI' });
     const posted = await postComment(verifiedAfterMutation, comment);
     if (!posted?.ok) {
@@ -416,6 +284,6 @@ export async function claimForgeIssue({ issue, fetchLiveIssue, updateLabels, pos
         : ['blocked transition or acknowledgement did not verify']
     };
   } finally {
-    releaseForgeLock({ lockPath, lock: acquired.lock });
+    if (!acquired.externallyOwned) releaseForgeLock({ lockPath, lock: acquired.lock });
   }
 }

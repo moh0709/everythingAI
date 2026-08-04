@@ -20,7 +20,7 @@ test('blocked execution label plan removes active ownership and requests PM revi
   assert.deepEqual(plan.remove.sort(), ['forge:working', 'pm:ready']);
 });
 
-test('poller falls through to maintenance backlog when released Forge queue is empty', async () => {
+test('poller reports and skips an unreleased maintenance backlog issue', async () => {
   const root = mkdtempSync(join(tmpdir(), 'forge-cli-maintenance-'));
   let live = {
     number: 78,
@@ -31,12 +31,13 @@ test('poller falls through to maintenance backlog when released Forge queue is e
     body: 'maintenance backlog',
     updatedAt: '2000-01-01T00:00:00Z'
   };
+  let updates = 0;
+  let comments = 0;
   const result = await pollForgeOnce({
-    list: async () => [],
-    listMaintenance: async () => [live],
+    list: async () => [live],
     fetch: async () => live,
-    update: async (number, labels) => { live = { ...live, labels: labels.map((name) => ({ name })) }; },
-    comment: async () => ({ ok: true }),
+    update: async () => { updates += 1; },
+    comment: async () => { comments += 1; return { ok: true }; },
     reporter: async () => ({ sent: false }),
     repoRoot: root,
     sha: 'a'.repeat(40),
@@ -48,10 +49,16 @@ test('poller falls through to maintenance backlog when released Forge queue is e
     }
   });
   assert.equal(result.ok, true);
-  assert.deepEqual(live.labels.map(({ name }) => name).sort(), ['forge:done', 'pm:review']);
+  assert.equal(result.result, 'IDLE');
+  assert.equal(result.message, 'No eligible issues found');
+  assert.equal(updates, 0);
+  assert.equal(comments, 0);
+  const report = JSON.parse(readFileSync(join(root, '.hermes', 'forge', 'eligibility-report.json'), 'utf8'));
+  assert.equal(report.selectedIssueNumber, null);
+  assert.deepEqual(report.issues[0].reasons, ['missing_pm_ready', 'missing_forge_ready']);
 });
 
-test('live maintenance issue reads include timestamps required for stale eligibility', async () => {
+test('live issue discovery includes fields required for eligibility and ordering', async () => {
   const source = readFileSync(new URL('../scripts/forge-trigger.mjs', import.meta.url), 'utf8');
-  assert.match(source, /issue', 'view'.*updatedAt,createdAt/s);
+  assert.match(source, /issue', 'list'.*state,labels,url,body,updatedAt,createdAt/s);
 });

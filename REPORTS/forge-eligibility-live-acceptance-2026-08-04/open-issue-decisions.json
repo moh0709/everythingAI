@@ -1,0 +1,186 @@
+﻿[
+    {
+        "issueNumber":  2,
+        "title":  "Stabilize local MVP before next feature expansion",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  3,
+        "title":  "Finalize and optimize local MVP",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  4,
+        "title":  "Make Organizor-style UI the main local MVP app",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  5,
+        "title":  "Fix remaining fake/static UI elements in EverythingAI React UI",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  6,
+        "title":  "Phase 5.1 - Identity \u0026 Role Foundation Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  7,
+        "title":  "Phase 5.2 - Permission Foundation Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  8,
+        "title":  "Phase 5.3 - Policy Engine Shadow Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  9,
+        "title":  "Phase 5.4 - Risk Classification Foundation Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  10,
+        "title":  "Phase 5.5 - Approval Workflow Foundation Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  11,
+        "title":  "Phase 5.6 - Escalation Governance Foundation Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  12,
+        "title":  "Phase 5.7 - Authorization Decision Layer Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  13,
+        "title":  "Phase 5.8 - Controlled Enforcement Activation Governance Track",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  19,
+        "title":  "Sprint 6: MVP UI Workflow Completion",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  21,
+        "title":  "Future Track: AI Organization Workspace / Managed Knowledge Archive",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  22,
+        "title":  "Phase 6: Controlled UserApp modularization after 88-test MVP baseline",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review"
+    },
+    {
+        "issueNumber":  24,
+        "title":  "EAI-TASK-002: Install Hermes framework foundation in EverythingAI",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner"
+    },
+    {
+        "issueNumber":  26,
+        "title":  "EAI-TASK-004: Implement Hermes worker lifecycle claim/report/state flow",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner"
+    },
+    {
+        "issueNumber":  27,
+        "title":  "EAI-TASK-005: Finalize worker-generated reports with real commit metadata",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner"
+    },
+    {
+        "issueNumber":  32,
+        "title":  "EAI-TASK-010: Close Phase 8.3 and prepare next implementation backlog",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner"
+    },
+    {
+        "issueNumber":  41,
+        "title":  "EAI-TASK-019: Improve Knowledge Base citation inspection UX",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner"
+    },
+    {
+        "issueNumber":  43,
+        "title":  "EAI-TASK-021: Improve indexing and extraction progress visibility",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready|forge_blocked|pm_review|competing_agent_owner",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready|forge_blocked|pm_review|competing_agent_owner"
+    },
+    {
+        "issueNumber":  78,
+        "title":  "OPS-FIX: Make Atlas poller claim transition atomic and idempotent",
+        "run1Decision":  "SKIP",
+        "run1ExactReason":  "missing_pm_ready|missing_forge_ready",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_pm_ready|missing_forge_ready"
+    },
+    {
+        "issueNumber":  101,
+        "title":  "OPS: Implement centralized Forge Eligibility Engine",
+        "run1Decision":  "CLAIM",
+        "run1ExactReason":  "eligible",
+        "run2Decision":  "SKIP",
+        "run2ExactReason":  "missing_forge_ready|forge_working|already_processed|head_unchanged"
+    }
+]
