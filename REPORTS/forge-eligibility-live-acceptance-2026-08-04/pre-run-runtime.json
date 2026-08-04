@@ -1,0 +1,15 @@
+﻿{
+    "capturedAt":  "2026-08-04T21:49:50.7021399Z",
+    "headSha":  "bb3eada065b9d934be0d62afd593ab4379f4f6b9",
+    "branch":  "codex/forge-eligibility-engine",
+    "issueCount":  99,
+    "openIssueCount":  23,
+    "scheduledTask":  {
+                          "name":  "EverythingAI Forge Trigger",
+                          "state":  "Disabled",
+                          "enabled":  false
+                      },
+    "activeForgeNodeProcesses":  [
+
+                                 ]
+}

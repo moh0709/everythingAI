@@ -1,0 +1,74 @@
+﻿{
+    "comments":  [
+                     {
+                         "id":  "IC_kwDOSLVgrM8AAAABNJ9oOQ",
+                         "author":  {
+                                        "login":  "moh0709"
+                                    },
+                         "authorAssociation":  "OWNER",
+                         "body":  "PM queue check: issue remains `pm:ready + forge:ready` with no claim or progress comment more than one scheduler interval after release. Forge should claim this issue before any other work, transition to `forge:working`, and post concise start evidence. Do not release or select issue #69. No Atlas delegation is authorized for this task.",
+                         "createdAt":  "2026-08-04T10:34:38Z",
+                         "includesCreatedEdit":  false,
+                         "isMinimized":  false,
+                         "minimizedReason":  "",
+                         "reactionGroups":  [
+
+                                            ],
+                         "url":  "https://github.com/moh0709/everythingAI/issues/101#issuecomment-5177829433",
+                         "viewerDidAuthor":  true
+                     },
+                     {
+                         "id":  "IC_kwDOSLVgrM8AAAABNKjlZg",
+                         "author":  {
+                                        "login":  "moh0709"
+                                    },
+                         "authorAssociation":  "OWNER",
+                         "body":  "PM escalation: Forge has still not claimed this authorized task after repeated queue checks. The issue remains `pm:ready + forge:ready`; there is no `forge:working` ownership, start evidence, implementation commit, or recent repository commit associated with #101. This is now an execution-runtime/poller blocker rather than a task-eligibility decision. CEO action is required on the Forge host to confirm the Forge process/poller is running, authenticated, reading `moh0709/everythingAI`, and configured to claim `pm:ready + forge:ready`. Do not delegate this task to Atlas and do not release issue #69. Once Forge claims #101, PM review will resume normally.",
+                         "createdAt":  "2026-08-04T11:36:44Z",
+                         "includesCreatedEdit":  false,
+                         "isMinimized":  false,
+                         "minimizedReason":  "",
+                         "reactionGroups":  [
+
+                                            ],
+                         "url":  "https://github.com/moh0709/everythingAI/issues/101#issuecomment-5178451302",
+                         "viewerDidAuthor":  true
+                     },
+                     {
+                         "id":  "IC_kwDOSLVgrM8AAAABNQ0k5w",
+                         "author":  {
+                                        "login":  "moh0709"
+                                    },
+                         "authorAssociation":  "OWNER",
+                         "body":  "{\"agent\":\"Forge\",\"issue\":101,\"status\":\"CLAIMED\",\"startingSha\":\"bb3eada065b9d934be0d62afd593ab4379f4f6b9\",\"contextPath\":\"C:\\\\temp\\\\EverythingAI\\\\.worktrees\\\\forge-eligibility-engine\\\\.hermes\\\\forge\\\\context-101.json\",\"automationBoundary\":\"FULLY_AUTOMATIC_CODEX_CLI\"}",
+                         "createdAt":  "2026-08-04T21:50:17Z",
+                         "includesCreatedEdit":  false,
+                         "isMinimized":  false,
+                         "minimizedReason":  "",
+                         "reactionGroups":  [
+
+                                            ],
+                         "url":  "https://github.com/moh0709/everythingAI/issues/101#issuecomment-5185021159",
+                         "viewerDidAuthor":  true
+                     }
+                 ],
+    "labels":  [
+                   {
+                       "id":  "LA_kwDOSLVgrM8AAAACoszbMA",
+                       "name":  "pm:ready",
+                       "description":  "",
+                       "color":  "ededed"
+                   },
+                   {
+                       "id":  "LA_kwDOSLVgrM8AAAACtrvWEA",
+                       "name":  "forge:working",
+                       "description":  "",
+                       "color":  "ededed"
+                   }
+               ],
+    "number":  101,
+    "state":  "OPEN",
+    "title":  "OPS: Implement centralized Forge Eligibility Engine",
+    "updatedAt":  "2026-08-04T21:50:17Z",
+    "url":  "https://github.com/moh0709/everythingAI/issues/101"
+}

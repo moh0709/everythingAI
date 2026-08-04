@@ -1,0 +1,2199 @@
+{
+  "schemaVersion": 1,
+  "runId": "forge-8604-1785880211732",
+  "cycleId": "2026-08-04",
+  "headSha": "bb3eada065b9d934be0d62afd593ab4379f4f6b9",
+  "startedAt": "2026-08-04T21:50:11.731Z",
+  "completedAt": "2026-08-04T21:50:17.986Z",
+  "currentIssueNumber": null,
+  "controllerIssueNumber": 96,
+  "approvedReadyLabels": [],
+  "issues": [
+    {
+      "issueNumber": 101,
+      "title": "OPS: Implement centralized Forge Eligibility Engine",
+      "state": "OPEN",
+      "labels": [
+        "pm:ready",
+        "forge:ready"
+      ],
+      "eligible": true,
+      "reasons": [],
+      "primaryReason": null,
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-08-04T09:25:38.000Z"
+    },
+    {
+      "issueNumber": 2,
+      "title": "Stabilize local MVP before next feature expansion",
+      "state": "OPEN",
+      "labels": [
+        "stabilization",
+        "mvp",
+        "must-have",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-04-27T11:42:42.000Z"
+    },
+    {
+      "issueNumber": 3,
+      "title": "Finalize and optimize local MVP",
+      "state": "OPEN",
+      "labels": [
+        "stabilization",
+        "mvp",
+        "must-have",
+        "optimization",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-04-28T07:18:18.000Z"
+    },
+    {
+      "issueNumber": 4,
+      "title": "Make Organizor-style UI the main local MVP app",
+      "state": "OPEN",
+      "labels": [
+        "mvp",
+        "must-have",
+        "ui",
+        "ux",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-04-28T14:25:31.000Z"
+    },
+    {
+      "issueNumber": 5,
+      "title": "Fix remaining fake/static UI elements in EverythingAI React UI",
+      "state": "OPEN",
+      "labels": [
+        "mvp",
+        "must-have",
+        "ui",
+        "cleanup",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-04-28T20:32:55.000Z"
+    },
+    {
+      "issueNumber": 6,
+      "title": "Phase 5.1 - Identity & Role Foundation Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:36:35.000Z"
+    },
+    {
+      "issueNumber": 7,
+      "title": "Phase 5.2 - Permission Foundation Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:36:51.000Z"
+    },
+    {
+      "issueNumber": 8,
+      "title": "Phase 5.3 - Policy Engine Shadow Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:37:01.000Z"
+    },
+    {
+      "issueNumber": 9,
+      "title": "Phase 5.4 - Risk Classification Foundation Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:38:50.000Z"
+    },
+    {
+      "issueNumber": 10,
+      "title": "Phase 5.5 - Approval Workflow Foundation Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:39:01.000Z"
+    },
+    {
+      "issueNumber": 11,
+      "title": "Phase 5.6 - Escalation Governance Foundation Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:39:41.000Z"
+    },
+    {
+      "issueNumber": 12,
+      "title": "Phase 5.7 - Authorization Decision Layer Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:39:51.000Z"
+    },
+    {
+      "issueNumber": 13,
+      "title": "Phase 5.8 - Controlled Enforcement Activation Governance Track",
+      "state": "OPEN",
+      "labels": [
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-09T15:39:58.000Z"
+    },
+    {
+      "issueNumber": 14,
+      "title": "Sprint 1: Complete smallest end-to-end local MVP proof path",
+      "state": "CLOSED",
+      "labels": [
+        "mvp",
+        "sprint-1",
+        "governance",
+        "recovery"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-10T01:48:07.000Z"
+    },
+    {
+      "issueNumber": 15,
+      "title": "Sprint 2: Search & Source Reference Hardening",
+      "state": "CLOSED",
+      "labels": [
+        "mvp",
+        "governance",
+        "sprint-2",
+        "search"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-10T17:51:05.000Z"
+    },
+    {
+      "issueNumber": 16,
+      "title": "Sprint 3: Planning & Execution Recovery Hardening",
+      "state": "CLOSED",
+      "labels": [
+        "mvp",
+        "governance",
+        "recovery",
+        "sprint-3",
+        "planning",
+        "execution"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-10T18:42:57.000Z"
+    },
+    {
+      "issueNumber": 17,
+      "title": "Sprint 4: Execution Batch and Plan Approval Workflow",
+      "state": "CLOSED",
+      "labels": [
+        "mvp",
+        "governance",
+        "recovery",
+        "planning",
+        "execution",
+        "sprint-4"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-10T19:23:42.000Z"
+    },
+    {
+      "issueNumber": 18,
+      "title": "Sprint 5: MVP Smoke Test, README, and UI/API Flow Validation",
+      "state": "CLOSED",
+      "labels": [
+        "documentation",
+        "mvp",
+        "sprint-5",
+        "validation",
+        "smoke-test"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-10T20:10:23.000Z"
+    },
+    {
+      "issueNumber": 19,
+      "title": "Sprint 6: MVP UI Workflow Completion",
+      "state": "OPEN",
+      "labels": [
+        "mvp",
+        "ui",
+        "validation",
+        "sprint-6",
+        "frontend",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-10T20:44:09.000Z"
+    },
+    {
+      "issueNumber": 20,
+      "title": "Validate watcher test fix on desktop",
+      "state": "CLOSED",
+      "labels": [
+        "validation",
+        "backend",
+        "watcher",
+        "phase-1"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-19T06:29:04.000Z"
+    },
+    {
+      "issueNumber": 21,
+      "title": "Future Track: AI Organization Workspace / Managed Knowledge Archive",
+      "state": "OPEN",
+      "labels": [
+        "future-track",
+        "product-design",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-22T21:39:42.000Z"
+    },
+    {
+      "issueNumber": 22,
+      "title": "Phase 6: Controlled UserApp modularization after 88-test MVP baseline",
+      "state": "OPEN",
+      "labels": [
+        "frontend",
+        "phase-6",
+        "mvp-finalization",
+        "safe-refactor",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-05-23T00:11:07.000Z"
+    },
+    {
+      "issueNumber": 23,
+      "title": "EAI-TASK-001: Hermes framework smoke test and readiness verification",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T05:58:43.000Z"
+    },
+    {
+      "issueNumber": 24,
+      "title": "EAI-TASK-002: Install Hermes framework foundation in EverythingAI",
+      "state": "OPEN",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T09:29:48.000Z"
+    },
+    {
+      "issueNumber": 25,
+      "title": "EAI-TASK-003: Harden Hermes finalization SHA/state/report synchronization",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T16:02:56.000Z"
+    },
+    {
+      "issueNumber": 26,
+      "title": "EAI-TASK-004: Implement Hermes worker lifecycle claim/report/state flow",
+      "state": "OPEN",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T19:04:12.000Z"
+    },
+    {
+      "issueNumber": 27,
+      "title": "EAI-TASK-005: Finalize worker-generated reports with real commit metadata",
+      "state": "OPEN",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T21:21:56.000Z"
+    },
+    {
+      "issueNumber": 28,
+      "title": "EAI-TASK-006: Run end-to-end Hermes operational readiness drill",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T21:35:11.000Z"
+    },
+    {
+      "issueNumber": 29,
+      "title": "EAI-TASK-007: Validate Admin Agent Connectors readiness gate",
+      "state": "CLOSED",
+      "labels": [],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T21:49:11.000Z"
+    },
+    {
+      "issueNumber": 30,
+      "title": "EAI-TASK-008: Install and verify Codex and Claude Code CLIs for connector gate",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T22:08:59.000Z"
+    },
+    {
+      "issueNumber": 31,
+      "title": "EAI-TASK-009: Rerun Admin Connector readiness after CLI install",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T22:33:35.000Z"
+    },
+    {
+      "issueNumber": 32,
+      "title": "EAI-TASK-010: Close Phase 8.3 and prepare next implementation backlog",
+      "state": "OPEN",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-24T23:00:18.000Z"
+    },
+    {
+      "issueNumber": 33,
+      "title": "EAI-TASK-011: Controlled Codex connector setup and safe probe verification",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T06:00:56.000Z"
+    },
+    {
+      "issueNumber": 34,
+      "title": "EAI-TASK-012: Verify Claude Code CLI readiness",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T07:44:51.000Z"
+    },
+    {
+      "issueNumber": 35,
+      "title": "EAI-TASK-013: Plan frontend modularization cleanup for admin UI",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T11:20:57.000Z"
+    },
+    {
+      "issueNumber": 36,
+      "title": "EAI-TASK-014: Targeted cleanup of redundant admin entry files",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T13:26:53.000Z"
+    },
+    {
+      "issueNumber": 37,
+      "title": "EAI-TASK-015: Review remaining legacy frontend prototypes",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T14:54:48.000Z"
+    },
+    {
+      "issueNumber": 38,
+      "title": "EAI-TASK-016: Review admin navigation header structure",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T17:00:23.000Z"
+    },
+    {
+      "issueNumber": 39,
+      "title": "EAI-TASK-017: Centralize admin navigation metadata",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T17:16:02.000Z"
+    },
+    {
+      "issueNumber": 40,
+      "title": "EAI-TASK-018: Improve Admin API key lifecycle UX",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T18:15:41.000Z"
+    },
+    {
+      "issueNumber": 41,
+      "title": "EAI-TASK-019: Improve Knowledge Base citation inspection UX",
+      "state": "OPEN",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T18:35:31.000Z"
+    },
+    {
+      "issueNumber": 42,
+      "title": "EAI-TASK-020: Improve extracted document preview readability",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T21:00:46.000Z"
+    },
+    {
+      "issueNumber": 43,
+      "title": "EAI-TASK-021: Improve indexing and extraction progress visibility",
+      "state": "OPEN",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_blocked",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T21:55:14.000Z"
+    },
+    {
+      "issueNumber": 44,
+      "title": "EAI-TASK-022: Run MVP disposable-folder QA drill",
+      "state": "CLOSED",
+      "labels": [],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T22:11:12.000Z"
+    },
+    {
+      "issueNumber": 45,
+      "title": "EAI-TASK-023: Repair persisted wiki build on disposable QA data",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T22:59:02.000Z"
+    },
+    {
+      "issueNumber": 46,
+      "title": "EAI-TASK-024: Re-run MVP disposable-folder QA after wiki repair",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-25T23:13:20.000Z"
+    },
+    {
+      "issueNumber": 47,
+      "title": "EAI-TASK-025: Browser-level UI QA for local MVP",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T10:26:54.000Z"
+    },
+    {
+      "issueNumber": 48,
+      "title": "EAI-TASK-026: Final local MVP acceptance and release-readiness handover",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T11:43:01.000Z"
+    },
+    {
+      "issueNumber": 49,
+      "title": "EAI-TASK-027: Production architecture and release-hardening plan",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T12:27:30.000Z"
+    },
+    {
+      "issueNumber": 50,
+      "title": "EAI-TASK-028: Design production auth users tenants and workspace model",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T12:55:43.000Z"
+    },
+    {
+      "issueNumber": 51,
+      "title": "EAI-TASK-029: Add production identity workspace schema foundation",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T13:11:14.000Z"
+    },
+    {
+      "issueNumber": 52,
+      "title": "EAI-TASK-030: Add guarded production migration loader and read-only workspace context",
+      "state": "CLOSED",
+      "labels": [],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T13:56:37.000Z"
+    },
+    {
+      "issueNumber": 53,
+      "title": "EAI-TASK-031: Add explicit production migration runner and persisted workspace resolution plan",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T15:56:43.000Z"
+    },
+    {
+      "issueNumber": 54,
+      "title": "EAI-TASK-032: Add production identity repository and guarded workspace persistence resolution",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-26T17:58:22.000Z"
+    },
+    {
+      "issueNumber": 55,
+      "title": "EAI-TASK-033: Wire production identity repository to guarded persistence adapter",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-27T00:33:54.000Z"
+    },
+    {
+      "issueNumber": 56,
+      "title": "EAI-TASK-034: Connect guarded production identity adapter to PostgreSQL persistence",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review",
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-27T22:37:38.000Z"
+    },
+    {
+      "issueNumber": 57,
+      "title": "EAI-TASK-035: Wire live PostgreSQL client/pool injection for guarded production identity resolution",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:accepted"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-06-30T06:53:38.000Z"
+    },
+    {
+      "issueNumber": 58,
+      "title": "EAI-TASK-036: Add explicit server wiring gate for production workspace context helper",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-01T19:37:28.000Z"
+    },
+    {
+      "issueNumber": 59,
+      "title": "EAI-TASK-037: Create Hermes Operating Manual RC1 and verify autonomous task pickup",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-14T14:51:01.000Z"
+    },
+    {
+      "issueNumber": 60,
+      "title": "EAI-TASK-038: Correct Hermes trigger contract and complete Operating Manual RC1",
+      "state": "CLOSED",
+      "labels": [
+        "pm:ready",
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-14T15:35:01.000Z"
+    },
+    {
+      "issueNumber": 61,
+      "title": "EAI-TASK-039: Harden atomic task claiming and duplicate-dispatch prevention",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-14T17:00:13.000Z"
+    },
+    {
+      "issueNumber": 62,
+      "title": "EPIC: Phase 3 Hermes Worker Reliability Program",
+      "state": "CLOSED",
+      "labels": [],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:36:57.000Z"
+    },
+    {
+      "issueNumber": 70,
+      "title": "EAI-TASK-039A: Separate polling and webhook runtime entry paths",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T14:18:15.000Z"
+    },
+    {
+      "issueNumber": 71,
+      "title": "EAI-TASK-039B: Deploy runtime-mode routing to live Hermes gateway",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T17:59:46.000Z"
+    },
+    {
+      "issueNumber": 72,
+      "title": "EAI-TASK-039C: Repair Hermes gateway platform import and restore message delivery",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:accepted"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-16T20:21:07.000Z"
+    },
+    {
+      "issueNumber": 73,
+      "title": "EAI-TASK-039B disposable positive control",
+      "state": "CLOSED",
+      "labels": [
+        "pm:ready",
+        "hermes:ready"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-17T11:27:17.000Z"
+    },
+    {
+      "issueNumber": 74,
+      "title": "EAI-TASK-039B disposable negative control",
+      "state": "CLOSED",
+      "labels": [
+        "pm:ready"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-17T11:27:18.000Z"
+    },
+    {
+      "issueNumber": 75,
+      "title": "EAI-TASK-039D: Restore Hermes poller queue consumption and prove automatic claim",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-17T22:17:01.000Z"
+    },
+    {
+      "issueNumber": 76,
+      "title": "EAI-TASK-045A: Provision Hermes host and complete live systemd lifecycle verification",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-19T13:01:12.000Z"
+    },
+    {
+      "issueNumber": 77,
+      "title": "OPS-TEST: Verify Atlas autonomous poller claim handshake",
+      "state": "CLOSED",
+      "labels": [
+        "atlas:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-24T10:58:54.000Z"
+    },
+    {
+      "issueNumber": 78,
+      "title": "OPS-FIX: Make Atlas poller claim transition atomic and idempotent",
+      "state": "OPEN",
+      "labels": [],
+      "eligible": false,
+      "reasons": [
+        "missing_pm_ready",
+        "missing_forge_ready"
+      ],
+      "primaryReason": "missing_pm_ready",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-24T12:07:15.000Z"
+    },
+    {
+      "issueNumber": 79,
+      "title": "OPS-AUTO: Establish Forge-triggered execution loop with Atlas reporting",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-28T22:35:52.000Z"
+    },
+    {
+      "issueNumber": 80,
+      "title": "OPS-AUTO HANDSHAKE: Forge trigger context and human-start boundary",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-28T23:02:17.000Z"
+    },
+    {
+      "issueNumber": 81,
+      "title": "OPS-AUTO PM TEST: Prove fully autonomous Forge execution",
+      "state": "CLOSED",
+      "labels": [
+        "forge:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_blocked"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-28T23:40:39.000Z"
+    },
+    {
+      "issueNumber": 82,
+      "title": "OPS-AUTO PM RETEST: Prove autonomous Forge execution after remediation",
+      "state": "CLOSED",
+      "labels": [
+        "forge:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_blocked"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T05:28:09.000Z"
+    },
+    {
+      "issueNumber": 83,
+      "title": "OPS-AUTO PM TEST 3: Repeat autonomous Forge execution after #82",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T05:42:49.000Z"
+    },
+    {
+      "issueNumber": 84,
+      "title": "DISPOSABLE-DRILL-069-NOOP-20260729T070138Z",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T07:01:39.000Z"
+    },
+    {
+      "issueNumber": 85,
+      "title": "EAI-TASK-046A: Fence Atlas queue ownership and prove clean Hermes disposable completion",
+      "state": "CLOSED",
+      "labels": [
+        "forge:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_blocked"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T07:33:52.000Z"
+    },
+    {
+      "issueNumber": 86,
+      "title": "DISPOSABLE-DRILL-085-NOOP-20260729T074216Z",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T07:42:17.000Z"
+    },
+    {
+      "issueNumber": 87,
+      "title": "EAI-TASK-046B: Restore authorized Hermes poller and prove clean disposable lifecycle",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T08:41:09.000Z"
+    },
+    {
+      "issueNumber": 88,
+      "title": "DISPOSABLE-DRILL-087-NOOP-20260729T104431Z",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:blocked",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T08:44:32.000Z"
+    },
+    {
+      "issueNumber": 89,
+      "title": "DISPOSABLE-DRILL-087-CLEAN-NOOP-20260729T104752Z",
+      "state": "CLOSED",
+      "labels": [
+        "pm:ready",
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T08:47:53.000Z"
+    },
+    {
+      "issueNumber": 90,
+      "title": "DISPOSABLE-DRILL-069-RERUN-NOOP-20260729T094133Z",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T09:41:35.000Z"
+    },
+    {
+      "issueNumber": 91,
+      "title": "DISPOSABLE-DRILL-069-CLAIM-CONFLICT-20260729T100653Z",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T10:06:54.000Z"
+    },
+    {
+      "issueNumber": 92,
+      "title": "EAI-TASK-047: Run 24-hour Hermes reliability soak and verify finalization race handling",
+      "state": "CLOSED",
+      "labels": [
+        "forge:blocked"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_blocked"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T10:40:59.000Z"
+    },
+    {
+      "issueNumber": 93,
+      "title": "EAI-TASK-047A: Deploy durable Hermes 24-hour soak observer",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-29T11:36:24.000Z"
+    },
+    {
+      "issueNumber": 94,
+      "title": "EAI-TASK-047B: Verify completed Hermes 24-hour reliability soak",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-30T12:42:12.000Z"
+    },
+    {
+      "issueNumber": 95,
+      "title": "EAI-TASK-048: Repository Backlog Reduction & Governance Cleanup",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-07-31T17:24:33.000Z"
+    },
+    {
+      "issueNumber": 96,
+      "title": "EAI-TASK-049: Continuous Open-Issue Processing Loop",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "self_controller",
+        "maintenance_issue"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-08-01T12:52:19.000Z"
+    },
+    {
+      "issueNumber": 97,
+      "title": "EAI-TASK-050: Prevent Duplicate Forge Claims & Self-Reclaim Loop",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-08-01T13:41:37.000Z"
+    },
+    {
+      "issueNumber": 98,
+      "title": "EAI-TASK-050: Prevent Duplicate Forge Claims and Maintenance Self-Reclaim",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-08-01T13:41:53.000Z"
+    },
+    {
+      "issueNumber": 99,
+      "title": "EAI-TASK-051: Enforce scheduler eligibility rules for PM review issues",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [],
+      "dependencyDepth": 0,
+      "priorityRank": 2,
+      "createdAt": "2026-08-01T14:28:22.000Z"
+    },
+    {
+      "issueNumber": 63,
+      "title": "EAI-TASK-040: Add runtime supervisor and heartbeat foundation",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:review"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "pm_review",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        61
+      ],
+      "dependencyDepth": 1,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:37:21.000Z"
+    },
+    {
+      "issueNumber": 64,
+      "title": "EAI-TASK-041: Add crash recovery and stale task reconciliation",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:accepted"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        63
+      ],
+      "dependencyDepth": 2,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:37:42.000Z"
+    },
+    {
+      "issueNumber": 65,
+      "title": "EAI-TASK-042: Add bounded retry backoff and failure classification",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:accepted"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        64
+      ],
+      "dependencyDepth": 3,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:38:04.000Z"
+    },
+    {
+      "issueNumber": 66,
+      "title": "EAI-TASK-043: Add structured event log and persistent execution history",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:accepted"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        65
+      ],
+      "dependencyDepth": 4,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:38:22.000Z"
+    },
+    {
+      "issueNumber": 67,
+      "title": "EAI-TASK-044: Add worker health CLI and operational metrics snapshot",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done",
+        "pm:accepted"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        66
+      ],
+      "dependencyDepth": 5,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:38:37.000Z"
+    },
+    {
+      "issueNumber": 68,
+      "title": "EAI-TASK-045: Add systemd deployment and watchdog recovery",
+      "state": "CLOSED",
+      "labels": [
+        "hermes:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "competing_agent_owner"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        67
+      ],
+      "dependencyDepth": 6,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:39:01.000Z"
+    },
+    {
+      "issueNumber": 69,
+      "title": "EAI-TASK-046: Run unattended reliability drill and close Phase 3",
+      "state": "CLOSED",
+      "labels": [
+        "forge:done"
+      ],
+      "eligible": false,
+      "reasons": [
+        "not_open",
+        "missing_pm_ready",
+        "missing_forge_ready",
+        "forge_done",
+        "dependency_blocked"
+      ],
+      "primaryReason": "not_open",
+      "dependencies": [
+        68
+      ],
+      "dependencyDepth": 7,
+      "priorityRank": 2,
+      "createdAt": "2026-07-15T06:39:29.000Z"
+    }
+  ],
+  "selectedIssueNumber": 101,
+  "outcome": "HUMAN_START_REQUIRED",
+  "message": "Claimed issue #101",
+  "evidence": [
+    "#2 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#3 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#4 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#5 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#6 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#7 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#8 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#9 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#10 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#11 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#12 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#13 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#14 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#15 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#16 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#17 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#18 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#19 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#20 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#21 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#22 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review",
+    "#23 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#24 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#25 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#26 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#27 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#28 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#29 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#30 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done|competing_agent_owner",
+    "#31 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#32 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#33 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#34 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#35 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#36 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#37 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#38 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#39 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#40 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#41 skipped missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#42 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#43 skipped missing_pm_ready|missing_forge_ready|forge_blocked|pm_review|competing_agent_owner",
+    "#44 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#45 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#46 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#47 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#48 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#49 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#50 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#51 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#52 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#53 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#54 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#55 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#56 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done|pm_review|competing_agent_owner",
+    "#57 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#58 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#59 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#60 skipped not_open|missing_forge_ready|pm_review|competing_agent_owner",
+    "#61 skipped not_open|missing_pm_ready|missing_forge_ready|pm_review|competing_agent_owner",
+    "#62 skipped not_open|missing_pm_ready|missing_forge_ready",
+    "#70 skipped not_open|missing_pm_ready|missing_forge_ready|pm_review|competing_agent_owner",
+    "#71 skipped not_open|missing_pm_ready|missing_forge_ready|pm_review|competing_agent_owner",
+    "#72 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#73 skipped not_open|missing_forge_ready|competing_agent_owner",
+    "#74 skipped not_open|missing_forge_ready",
+    "#75 skipped not_open|missing_pm_ready|missing_forge_ready|pm_review|competing_agent_owner",
+    "#76 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#77 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#78 skipped missing_pm_ready|missing_forge_ready",
+    "#79 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#80 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#81 skipped not_open|missing_pm_ready|missing_forge_ready|forge_blocked",
+    "#82 skipped not_open|missing_pm_ready|missing_forge_ready|forge_blocked",
+    "#83 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#84 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#85 skipped not_open|missing_pm_ready|missing_forge_ready|forge_blocked",
+    "#86 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#87 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#88 skipped not_open|missing_pm_ready|missing_forge_ready|pm_review|competing_agent_owner",
+    "#89 skipped not_open|missing_forge_ready|pm_review|competing_agent_owner",
+    "#90 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#91 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#92 skipped not_open|missing_pm_ready|missing_forge_ready|forge_blocked",
+    "#93 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#94 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#95 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#96 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done|self_controller|maintenance_issue",
+    "#97 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#98 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#99 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done",
+    "#63 skipped not_open|missing_pm_ready|missing_forge_ready|pm_review|competing_agent_owner",
+    "#64 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#65 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#66 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#67 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#68 skipped not_open|missing_pm_ready|missing_forge_ready|competing_agent_owner",
+    "#69 skipped not_open|missing_pm_ready|missing_forge_ready|forge_done|dependency_blocked"
+  ]
+}

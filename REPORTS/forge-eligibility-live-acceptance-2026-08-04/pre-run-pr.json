@@ -1,0 +1,42 @@
+﻿{
+    "baseRefName":  "main",
+    "headRefName":  "codex/forge-eligibility-engine",
+    "headRefOid":  "bb3eada065b9d934be0d62afd593ab4379f4f6b9",
+    "isDraft":  true,
+    "number":  100,
+    "state":  "OPEN",
+    "statusCheckRollup":  [
+                              {
+                                  "__typename":  "CheckRun",
+                                  "completedAt":  "2026-08-04T21:49:44Z",
+                                  "conclusion":  "SUCCESS",
+                                  "detailsUrl":  "https://github.com/moh0709/everythingAI/actions/runs/30953934348/job/92142420798",
+                                  "name":  "backend-tests",
+                                  "startedAt":  "2026-08-04T21:49:19Z",
+                                  "status":  "COMPLETED",
+                                  "workflowName":  "EverythingAI CI Smoke"
+                              },
+                              {
+                                  "__typename":  "CheckRun",
+                                  "completedAt":  "2026-08-04T21:49:39Z",
+                                  "conclusion":  "SUCCESS",
+                                  "detailsUrl":  "https://github.com/moh0709/everythingAI/actions/runs/30953934348/job/92142420954",
+                                  "name":  "frontend-build",
+                                  "startedAt":  "2026-08-04T21:49:20Z",
+                                  "status":  "COMPLETED",
+                                  "workflowName":  "EverythingAI CI Smoke"
+                              },
+                              {
+                                  "__typename":  "CheckRun",
+                                  "completedAt":  "0001-01-01T00:00:00Z",
+                                  "conclusion":  "",
+                                  "detailsUrl":  "https://github.com/moh0709/everythingAI/actions/runs/30953934348/job/92142519808",
+                                  "name":  "playwright-smoke",
+                                  "startedAt":  "2026-08-04T21:49:48Z",
+                                  "status":  "IN_PROGRESS",
+                                  "workflowName":  "EverythingAI CI Smoke"
+                              }
+                          ],
+    "title":  "Fix Forge scheduler eligibility and duplicate claims",
+    "url":  "https://github.com/moh0709/everythingAI/pull/100"
+}

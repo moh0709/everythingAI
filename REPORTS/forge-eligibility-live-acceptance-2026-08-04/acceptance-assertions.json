@@ -1,0 +1,132 @@
+﻿{
+    "capturedAt":  "2026-08-04T21:51:37.0339938Z",
+    "headSha":  "bb3eada065b9d934be0d62afd593ab4379f4f6b9",
+    "sameHeadBothRuns":  true,
+    "totalIssuesPreRun":  99,
+    "openIssuesPreRun":  23,
+    "run1Evaluated":  99,
+    "run2Evaluated":  99,
+    "run1CoversEveryIssue":  true,
+    "run2CoversEveryIssue":  true,
+    "run1CoversEveryOpenIssue":  true,
+    "run2CoversEveryOpenIssue":  true,
+    "run1EligibleIssues":  [
+                               101
+                           ],
+    "run1SelectedIssueNumber":  101,
+    "run1Outcome":  "HUMAN_START_REQUIRED",
+    "run2EligibleIssues":  [
+
+                           ],
+    "run2SelectedIssueNumber":  null,
+    "run2Outcome":  "IDLE",
+    "run2Message":  "No eligible issues found",
+    "issue101ClaimAcknowledgementsAtHead":  1,
+    "issue101PostRunLabels":  [
+                                  "pm:ready",
+                                  "forge:working"
+                              ],
+    "labelOrStateChanges":  [
+                                {
+                                    "issueNumber":  101,
+                                    "beforeState":  "OPEN",
+                                    "afterState":  "OPEN",
+                                    "beforeLabels":  "forge:ready,pm:ready",
+                                    "afterLabels":  "forge:working,pm:ready"
+                                }
+                            ],
+    "noCompletedIssueEligibleRun1":  true,
+    "noCompletedIssueEligibleRun2":  true,
+    "noPmReviewIssueEligibleRun1":  true,
+    "noPmReviewIssueEligibleRun2":  true,
+    "claimLockPresent":  false,
+    "specialIssues":  {
+                          "issue4":  {
+                                         "run1Reasons":  [
+                                                             "missing_pm_ready",
+                                                             "missing_forge_ready",
+                                                             "forge_done",
+                                                             "pm_review"
+                                                         ],
+                                         "run2Reasons":  [
+                                                             "missing_pm_ready",
+                                                             "missing_forge_ready",
+                                                             "forge_done",
+                                                             "pm_review"
+                                                         ],
+                                         "run1Decision":  "SKIP",
+                                         "run2Decision":  "SKIP"
+                                     },
+                          "issue5":  {
+                                         "run1Reasons":  [
+                                                             "missing_pm_ready",
+                                                             "missing_forge_ready",
+                                                             "forge_done",
+                                                             "pm_review"
+                                                         ],
+                                         "run2Reasons":  [
+                                                             "missing_pm_ready",
+                                                             "missing_forge_ready",
+                                                             "forge_done",
+                                                             "pm_review"
+                                                         ],
+                                         "run1Decision":  "SKIP",
+                                         "run2Decision":  "SKIP"
+                                     },
+                          "issue69":  {
+                                          "run1Reasons":  [
+                                                              "not_open",
+                                                              "missing_pm_ready",
+                                                              "missing_forge_ready",
+                                                              "forge_done",
+                                                              "dependency_blocked"
+                                                          ],
+                                          "run2Reasons":  [
+                                                              "not_open",
+                                                              "missing_pm_ready",
+                                                              "missing_forge_ready",
+                                                              "forge_done",
+                                                              "dependency_blocked"
+                                                          ],
+                                          "run1Decision":  "SKIP",
+                                          "run2Decision":  "SKIP"
+                                      },
+                          "issue96":  {
+                                          "run1Reasons":  [
+                                                              "not_open",
+                                                              "missing_pm_ready",
+                                                              "missing_forge_ready",
+                                                              "forge_done",
+                                                              "self_controller",
+                                                              "maintenance_issue"
+                                                          ],
+                                          "run2Reasons":  [
+                                                              "not_open",
+                                                              "missing_pm_ready",
+                                                              "missing_forge_ready",
+                                                              "forge_done",
+                                                              "self_controller",
+                                                              "maintenance_issue"
+                                                          ],
+                                          "run1Decision":  "SKIP",
+                                          "run2Decision":  "SKIP"
+                                      },
+                          "issue101":  {
+                                           "run1Reasons":  [
+
+                                                           ],
+                                           "run2Reasons":  [
+                                                               "missing_forge_ready",
+                                                               "forge_working",
+                                                               "already_processed",
+                                                               "head_unchanged"
+                                                           ],
+                                           "run1Decision":  "CLAIM",
+                                           "run2Decision":  "SKIP"
+                                       }
+                      },
+    "capturedRuntimeFiles":  [
+                                 "maintenance-state.json",
+                                 "state.json"
+                             ]
+}
