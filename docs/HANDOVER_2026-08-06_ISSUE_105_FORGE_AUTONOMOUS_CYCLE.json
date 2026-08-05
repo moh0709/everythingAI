@@ -1,0 +1,71 @@
+{
+  "issue": 105,
+  "title": "OPS-SOAK: Verify first post-fix autonomous Forge execution cycle",
+  "status": "BLOCKED",
+  "startingSha": "8cab443d452f90c42fc78388f081af9a4c659891",
+  "repository": "moh0709/everythingAI",
+  "branch": "main",
+  "contextPath": "C:\\temp\\EverythingAI-ForgeRuntime\\.hermes\\forge\\context-105.json",
+  "authoritativeDocumentsLoaded": [
+    "PROJECT_STATE.md",
+    "AI_BOOTSTRAP.md"
+  ],
+  "productionScheduler": {
+    "taskName": "\\EverythingAI Forge Trigger",
+    "actionExecutable": "powershell.exe",
+    "workingDirectory": "C:\\temp\\EverythingAI-ForgeRuntime",
+    "setsForgeCodexPath": "C:\\nvm4w\\nodejs\\codex.cmd",
+    "runs": "C:\\nvm4w\\nodejs\\node.exe scripts\\forge-trigger.mjs",
+    "multipleInstances": "IgnoreNew",
+    "executionTimeLimit": "PT35M",
+    "lastTaskResultObservedWhileWorkerRunning": 2147946720
+  },
+  "claimEvidence": {
+    "liveClaimCommentCreatedAt": "2026-08-05T23:54:14Z",
+    "localState": ".hermes/forge/state.json issueNumber=105 status=CLAIMED",
+    "maintenanceState": ".hermes/forge/maintenance-state.json contains one issueNumber=105 processed entry for cycle 2026-08-05"
+  },
+  "launchTelemetry": {
+    "resolvedExecutable": "C:\\nvm4w\\nodejs\\codex.cmd",
+    "launcherExecutable": "C:\\WINDOWS\\system32\\cmd.exe",
+    "workingDirectory": "C:\\temp\\EverythingAI-ForgeRuntime",
+    "platform": "win32",
+    "spawnErrorCode": null,
+    "spawnError": null,
+    "stdoutSnapshot": "",
+    "stderrSnapshot": "",
+    "warnings": [],
+    "exitCode": "parent trigger writes final exitCode after this worker exits; not used for PASS because scheduler LastTaskResult failed"
+  },
+  "validation": {
+    "codexVersion": "codex-cli 0.146.0",
+    "liveReadyQueue": "gh issue list --repo moh0709/everythingAI --state open --label pm:ready --label forge:ready returned []",
+    "issue69": "inspected only; not modified or released",
+    "frameworkDoctor": "PASS",
+    "nodeTests": "PASS 190/190",
+    "npmTest": "PASS 190/190",
+    "handoverJsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "changedFiles": [
+    "REPORTS/ISSUE-105-OPS-SOAK-FORGE-AUTONOMOUS-CYCLE.md",
+    "docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json"
+  ],
+  "knownLimitations": [
+    "The parent scheduler can only record the worker exit code after this Codex process returns.",
+    "The scheduled task LastTaskResult was observed as 2147946720 while the task was still running and must be rechecked as 0 after a clean post-exit scheduler cycle before PM acceptance."
+  ],
+  "blocker": {
+    "command": "Get-ScheduledTaskInfo -TaskName 'EverythingAI Forge Trigger'",
+    "observedLastTaskResult": 2147946720,
+    "impact": "Issue #105 cannot truthfully be submitted as forge:done plus pm:review.",
+    "safeNextAction": "Allow the current parent trigger to exit, then observe one unchanged scheduled cycle and verify LastTaskResult 0, no duplicate #105 claim, and live labels before resubmitting."
+  },
+  "governance": {
+    "selfAccepted": false,
+    "issueClosed": false,
+    "dependentTasksReleased": false,
+    "issue69Modified": false,
+    "secretsExposed": false
+  }
+}
