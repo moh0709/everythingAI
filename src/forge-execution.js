@@ -1,7 +1,7 @@
 import { appendFileSync, existsSync, mkdirSync, openSync, readFileSync, closeSync, unlinkSync, writeFileSync, renameSync } from 'node:fs';
 import { spawn } from 'node:child_process';
-import { hostname } from 'node:os';
-import { dirname, resolve } from 'node:path';
+import { hostname, platform } from 'node:os';
+import { dirname, extname, posix, resolve, win32 } from 'node:path';
 import { sanitizeReport, sanitizeText } from './forge-trigger.js';
 
 export const EXECUTION_RESULTS = Object.freeze({
@@ -90,6 +90,97 @@ function executionPrompt(contextPath, issueNumber) {
   return `You are Forge executing released EverythingAI issue #${issueNumber}. Read ${contextPath} completely before acting. Work only in the repository and scope defined by that context. Preserve unrelated files, especially any explicitly preserved untracked files. Do not close the issue, self-accept PM work, release dependent tasks, expose secrets, or use destructive Git commands. Use the installed local Git and GitHub CLI for repository and issue operations. Run the required validation, commit focused changes on main, push, and verify the live issue transition. Your final response must match the supplied JSON schema: status SUBMITTED_FOR_PM_REVIEW only after forge:done plus pm:review is verified live; otherwise status BLOCKED with concise sanitized evidence.`;
 }
 
+function isExplicitPath(value) {
+  return value.includes('/') || value.includes('\\') || /^[A-Za-z]:/.test(value);
+}
+
+function commandCandidates(command, platformName) {
+  if (platformName !== 'win32') return [command];
+  const extension = extname(command).toLowerCase();
+  if (extension) return [command];
+  return [`${command}.cmd`, `${command}.bat`, `${command}.exe`, command];
+}
+
+function resolveFromPath(command, { platformName, environment, executableExists }) {
+  if (isExplicitPath(command)) return executableExists(command) ? command : null;
+  const pathValue = environment.PATH ?? environment.Path ?? '';
+  const pathDelimiter = platformName === 'win32' ? ';' : ':';
+  const joinPath = platformName === 'win32' ? win32.join : posix.join;
+  for (const candidate of commandCandidates(command, platformName)) {
+    for (const directory of pathValue.split(pathDelimiter).filter(Boolean)) {
+      const fullPath = joinPath(directory, candidate);
+      if (executableExists(fullPath)) return fullPath;
+    }
+  }
+  return null;
+}
+
+function quoteWindowsArgument(value) {
+  const text = String(value);
+  let quoted = '"';
+  let backslashes = 0;
+  for (const character of text) {
+    if (character === '\\') {
+      backslashes += 1;
+      continue;
+    }
+    if (character === '"') {
+      quoted += '\\'.repeat(backslashes * 2 + 1);
+      quoted += '"';
+      backslashes = 0;
+      continue;
+    }
+    quoted += '\\'.repeat(backslashes);
+    quoted += character;
+    backslashes = 0;
+  }
+  quoted += '\\'.repeat(backslashes * 2);
+  return `${quoted}"`;
+}
+
+export function resolveCodexLaunch({ codexPath = 'codex', args = [], platformName = platform(), environment = process.env, executableExists = existsSync, logger = console } = {}) {
+  const warnings = [];
+  const overrideIsExplicit = isExplicitPath(codexPath);
+  let resolvedExecutable = overrideIsExplicit
+    ? (executableExists(codexPath) ? codexPath : null)
+    : resolveFromPath(codexPath, { platformName, environment, executableExists });
+
+  if (!resolvedExecutable && overrideIsExplicit) {
+    const warning = `FORGE_CODEX_PATH does not exist: ${codexPath}; falling back to PATH`;
+    warnings.push(warning);
+    logger.warn?.(`[Forge] ${warning}`);
+    resolvedExecutable = resolveFromPath('codex', { platformName, environment, executableExists });
+  }
+
+  if (!resolvedExecutable) {
+    return {
+      ok: false,
+      warnings,
+      resolvedExecutable: null,
+      launcherExecutable: null,
+      finalArgs: [],
+      command: [],
+      windowsVerbatimArguments: false
+    };
+  }
+
+  const isWindowsShim = platformName === 'win32' && ['.cmd', '.bat'].includes(extname(resolvedExecutable).toLowerCase());
+  const launcherExecutable = isWindowsShim ? (environment.ComSpec ?? environment.COMSPEC ?? 'cmd.exe') : resolvedExecutable;
+  const commandLine = [resolvedExecutable, ...args].map(quoteWindowsArgument).join(' ');
+  const finalArgs = isWindowsShim
+    ? ['/d', '/s', '/c', `"${commandLine}"`]
+    : args;
+  return {
+    ok: true,
+    warnings,
+    resolvedExecutable,
+    launcherExecutable,
+    finalArgs,
+    command: [launcherExecutable, ...finalArgs],
+    windowsVerbatimArguments: isWindowsShim
+  };
+}
+
 function readWorkerResult(outputPath) {
   try {
     const result = readJson(outputPath);
@@ -100,7 +191,7 @@ function readWorkerResult(outputPath) {
   }
 }
 
-export async function startForgeExecution({ contextPath, repoRoot, codexPath = 'codex', statePath, heartbeatPath, lockPath, logPath, outputPath, schemaPath, maxRuntimeMs = DEFAULT_MAX_RUNTIME_MS, maxContextAgeMs = DEFAULT_CONTEXT_MAX_AGE_MS, staleLockAfterMs = DEFAULT_MAX_RUNTIME_MS, now = () => new Date(), processChecker, spawnProcess = spawn, setIntervalFn = setInterval, clearIntervalFn = clearInterval, setTimeoutFn = setTimeout, clearTimeoutFn = clearTimeout } = {}) {
+export async function startForgeExecution({ contextPath, repoRoot, codexPath = 'codex', statePath, heartbeatPath, lockPath, logPath, outputPath, schemaPath, maxRuntimeMs = DEFAULT_MAX_RUNTIME_MS, maxContextAgeMs = DEFAULT_CONTEXT_MAX_AGE_MS, staleLockAfterMs = DEFAULT_MAX_RUNTIME_MS, now = () => new Date(), processChecker, spawnProcess = spawn, setIntervalFn = setInterval, clearIntervalFn = clearInterval, setTimeoutFn = setTimeout, clearTimeoutFn = clearTimeout, platformName = platform(), environment = process.env, executableExists = existsSync, logger = console } = {}) {
   statePath ??= resolve(repoRoot, '.hermes/forge/execution-state.json');
   heartbeatPath ??= resolve(repoRoot, '.hermes/forge/execution-heartbeat.json');
   lockPath ??= resolve(repoRoot, '.hermes/forge/execution.lock');
@@ -124,21 +215,54 @@ export async function startForgeExecution({ contextPath, repoRoot, codexPath = '
   atomicWrite(schemaPath, EXECUTION_RESULT_SCHEMA);
   if (existsSync(outputPath)) unlinkSync(outputPath);
   const startedAt = now().toISOString();
+  const args = ['exec', '--ephemeral', '--json', '--sandbox', 'danger-full-access', '--output-schema', schemaPath, '--output-last-message', outputPath, '-c', 'approval_policy="never"', '-C', repoRoot, executionPrompt(contextPath, issueNumber)];
+  const launch = resolveCodexLaunch({ codexPath, args, platformName, environment, executableExists, logger });
+  const telemetry = {
+    resolvedExecutable: launch.resolvedExecutable,
+    launcherExecutable: launch.launcherExecutable,
+    finalArgumentArray: launch.finalArgs,
+    workingDirectory: repoRoot,
+    platform: platformName,
+    exitCode: null,
+    signal: null,
+    spawnErrorCode: null,
+    spawnError: null,
+    stdout: '',
+    stderr: '',
+    warnings: launch.warnings
+  };
+  if (!launch.ok) {
+    const error = 'No valid Codex CLI executable was found in FORGE_CODEX_PATH or PATH';
+    const failedTelemetry = { ...telemetry, spawnErrorCode: 'ENOENT', spawnError: error };
+    atomicWrite(statePath, { issueNumber, status: 'BLOCKED', result: EXECUTION_RESULTS.START_FAILURE, error, startedAt, telemetry: failedTelemetry });
+    releaseExecutionLock(lockPath, lock);
+    return { ok: false, result: EXECUTION_RESULTS.START_FAILURE, issueNumber, exitCode: 1, evidence: [error], telemetry: failedTelemetry };
+  }
   let child;
   try {
-    const args = ['exec', '--ephemeral', '--json', '--sandbox', 'danger-full-access', '--output-schema', schemaPath, '--output-last-message', outputPath, '-c', 'approval_policy="never"', '-C', repoRoot, executionPrompt(contextPath, issueNumber)];
-    child = spawnProcess(codexPath, args, { cwd: repoRoot, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+    child = spawnProcess(launch.launcherExecutable, launch.finalArgs, {
+      cwd: repoRoot,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+      ...(launch.windowsVerbatimArguments ? { windowsVerbatimArguments: true } : {})
+    });
   } catch (error) {
-    atomicWrite(statePath, { issueNumber, status: 'BLOCKED', result: EXECUTION_RESULTS.START_FAILURE, error: sanitizeText(error.message), startedAt });
+    const failedTelemetry = { ...telemetry, spawnErrorCode: error.code ?? 'SPAWN_ERROR', spawnError: sanitizeText(error.message) };
+    atomicWrite(statePath, { issueNumber, status: 'BLOCKED', result: EXECUTION_RESULTS.START_FAILURE, error: sanitizeText(error.message), startedAt, telemetry: failedTelemetry });
     releaseExecutionLock(lockPath, lock);
-    return { ok: false, result: EXECUTION_RESULTS.START_FAILURE, issueNumber, evidence: ['Codex process could not start'] };
+    return { ok: false, result: EXECUTION_RESULTS.START_FAILURE, issueNumber, exitCode: 1, evidence: ['Codex process could not start', sanitizeText(error.message)], telemetry: failedTelemetry };
   }
-  const state = { issueNumber, status: 'RUNNING', result: EXECUTION_RESULTS.STARTED, pid: child.pid, startedAt, startingSha: context.startingSha, contextPath, maxRuntimeMs };
+  const state = { issueNumber, status: 'RUNNING', result: EXECUTION_RESULTS.STARTED, pid: child.pid, startedAt, startingSha: context.startingSha, contextPath, maxRuntimeMs, telemetry };
   atomicWrite(statePath, state);
   const writeHeartbeat = (status = 'RUNNING') => atomicWrite(heartbeatPath, { issueNumber, pid: child.pid, status, lastHeartbeat: now().toISOString(), startingSha: context.startingSha });
-  const appendOutput = (chunk) => appendFileSync(logPath, `${sanitizeText(chunk)}\n`);
-  child.stdout?.on('data', appendOutput);
-  child.stderr?.on('data', appendOutput);
+  const output = { stdout: '', stderr: '' };
+  const appendOutput = (stream, chunk) => {
+    const sanitized = sanitizeText(chunk);
+    output[stream] += sanitized;
+    appendFileSync(logPath, `${sanitized}\n`);
+  };
+  child.stdout?.on('data', (chunk) => appendOutput('stdout', chunk));
+  child.stderr?.on('data', (chunk) => appendOutput('stderr', chunk));
   writeHeartbeat();
   return await new Promise((resolvePromise) => {
     let settled = false;
@@ -153,21 +277,30 @@ export async function startForgeExecution({ contextPath, repoRoot, codexPath = '
       releaseExecutionLock(lockPath, lock);
       resolvePromise({ ok: false, result: EXECUTION_RESULTS.TIMEOUT, issueNumber });
     }, maxRuntimeMs);
-    const finish = (result, status, workerResult = null) => {
+    const finish = (result, status, workerResult = null, { exitCode = null, signal = null, error = null } = {}) => {
       if (settled) return;
       settled = true;
       clearTimeoutFn(timeoutTimer);
       clearIntervalFn(heartbeatTimer);
       writeHeartbeat('STOPPED');
-      atomicWrite(statePath, { ...state, status, result, workerResult, finishedAt: now().toISOString() });
+      const finishedTelemetry = {
+        ...telemetry,
+        exitCode,
+        signal,
+        spawnErrorCode: error?.code ?? telemetry.spawnErrorCode,
+        spawnError: error ? sanitizeText(error.message) : telemetry.spawnErrorCode ? telemetry.spawnError : null,
+        stdout: output.stdout,
+        stderr: output.stderr
+      };
+      atomicWrite(statePath, { ...state, status, result, workerResult, telemetry: finishedTelemetry, finishedAt: now().toISOString() });
       releaseExecutionLock(lockPath, lock);
-      resolvePromise({ ok: result === EXECUTION_RESULTS.COMPLETED, result, issueNumber, exitCode: result === EXECUTION_RESULTS.COMPLETED ? 0 : 1, evidence: workerResult?.evidence ?? [] });
+      resolvePromise({ ok: result === EXECUTION_RESULTS.COMPLETED, result, issueNumber, exitCode: result === EXECUTION_RESULTS.COMPLETED ? 0 : 1, evidence: workerResult?.evidence ?? [], telemetry: finishedTelemetry });
     };
-    child.once('error', (error) => finish(EXECUTION_RESULTS.START_FAILURE, 'BLOCKED'));
-    child.once('close', (code) => {
+    child.once('error', (error) => finish(EXECUTION_RESULTS.START_FAILURE, 'BLOCKED', null, { error }));
+    child.once('close', (code, signal) => {
       const workerResult = readWorkerResult(outputPath);
       const submitted = code === 0 && workerResult?.status === 'SUBMITTED_FOR_PM_REVIEW';
-      finish(submitted ? EXECUTION_RESULTS.COMPLETED : EXECUTION_RESULTS.WORKER_FAILED, submitted ? 'COMPLETED' : 'BLOCKED', workerResult);
+      finish(submitted ? EXECUTION_RESULTS.COMPLETED : EXECUTION_RESULTS.WORKER_FAILED, submitted ? 'COMPLETED' : 'BLOCKED', workerResult, { exitCode: code, signal });
     });
   });
 }

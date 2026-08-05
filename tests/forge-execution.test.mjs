@@ -4,7 +4,7 @@ import { EventEmitter } from 'node:events';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { hostname, tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { startForgeExecution, EXECUTION_RESULTS } from '../src/forge-execution.js';
+import { resolveCodexLaunch, startForgeExecution, EXECUTION_RESULTS } from '../src/forge-execution.js';
 
 function fixture() {
   const root = mkdtempSync(join(tmpdir(), 'forge-execution-'));
@@ -22,7 +22,10 @@ function fixture() {
     heartbeatPath: join(root, 'heartbeat.json'),
     lockPath: join(root, 'execution.lock'),
     outputPath: join(root, 'execution-result.json'),
-    schemaPath: join(root, 'execution-result.schema.json')
+    schemaPath: join(root, 'execution-result.schema.json'),
+    codexPath: 'C:\\tools\\codex.exe',
+    environment: { ComSpec: 'C:\\Windows\\System32\\cmd.exe', PATH: '' },
+    executableExists: () => true
   };
 }
 
@@ -41,7 +44,7 @@ test('starts exactly one bounded Codex execution and clears heartbeat on exit', 
   let launched;
   const promise = startForgeExecution({
     ...f,
-    codexPath: 'codex.exe',
+    codexPath: 'C:\\tools\\codex.exe',
     spawnProcess: (path, args, options) => { launched = { path, args, options }; return child; },
     maxRuntimeMs: 1000,
     now: () => new Date('2026-07-29T01:00:00Z')
@@ -55,9 +58,62 @@ test('starts exactly one bounded Codex execution and clears heartbeat on exit', 
   assert.equal(result.result, EXECUTION_RESULTS.COMPLETED);
   assert.equal(JSON.parse(readFileSync(f.statePath, 'utf8')).status, 'COMPLETED');
   assert.equal(JSON.parse(readFileSync(f.heartbeatPath, 'utf8')).status, 'STOPPED');
-  assert.equal(launched.path, 'codex.exe');
+  assert.equal(launched.path, 'C:\\tools\\codex.exe');
   assert.equal(launched.args[4], 'danger-full-access');
   assert.deepEqual(launched.args.slice(5, 9), ['--output-schema', f.schemaPath, '--output-last-message', f.outputPath]);
+});
+
+test('launches Windows .cmd and .bat shims through cmd.exe', () => {
+  for (const shim of ['codex.cmd', 'codex.bat']) {
+    const launch = resolveCodexLaunch({
+      codexPath: `C:\\Program Files\\Codex\\${shim}`,
+      args: ['exec', 'path with spaces'],
+      platformName: 'win32',
+      environment: { ComSpec: 'C:\\Windows\\System32\\cmd.exe', PATH: '' },
+      executableExists: (path) => path.endsWith(shim)
+    });
+    assert.equal(launch.ok, true);
+    assert.equal(launch.launcherExecutable, 'C:\\Windows\\System32\\cmd.exe');
+    assert.deepEqual(launch.finalArgs.slice(0, 3), ['/d', '/s', '/c']);
+    assert.match(launch.finalArgs[3], /^""C:\\Program Files\\Codex\\codex\.(cmd|bat)"/);
+    assert.match(launch.finalArgs[3], /"path with spaces"/);
+    assert.equal(launch.windowsVerbatimArguments, true);
+  }
+});
+
+test('launches Windows .exe directly and keeps non-Windows paths direct', () => {
+  const windowsExe = resolveCodexLaunch({
+    codexPath: 'C:\\Program Files\\Codex\\codex.exe',
+    args: ['--version'],
+    platformName: 'win32',
+    environment: { ComSpec: 'C:\\Windows\\System32\\cmd.exe', PATH: '' },
+    executableExists: () => true
+  });
+  assert.equal(windowsExe.launcherExecutable, windowsExe.resolvedExecutable);
+  assert.deepEqual(windowsExe.finalArgs, ['--version']);
+
+  const unix = resolveCodexLaunch({
+    codexPath: '/opt/codex/codex.cmd',
+    args: ['--version'],
+    platformName: 'linux',
+    environment: { PATH: '' },
+    executableExists: () => true
+  });
+  assert.equal(unix.launcherExecutable, '/opt/codex/codex.cmd');
+  assert.deepEqual(unix.finalArgs, ['--version']);
+});
+
+test('falls back from an invalid override to a CLI shim on PATH', () => {
+  const launch = resolveCodexLaunch({
+    codexPath: 'C:\\missing\\codex.cmd',
+    args: ['--version'],
+    platformName: 'win32',
+    environment: { ComSpec: 'C:\\Windows\\System32\\cmd.exe', PATH: 'C:\\nvm4w\\nodejs;C:\\Windows\\System32' },
+    executableExists: (path) => path === 'C:\\nvm4w\\nodejs\\codex.cmd'
+  });
+  assert.equal(launch.ok, true);
+  assert.equal(launch.resolvedExecutable, 'C:\\nvm4w\\nodejs\\codex.cmd');
+  assert.equal(launch.warnings.length, 1);
 });
 
 test('rejects duplicate execution while the recorded worker is alive', async () => {
@@ -81,6 +137,24 @@ test('converts worker start failure into a blocked result', async () => {
   const result = await startForgeExecution({ ...f, spawnProcess: () => { throw new Error('codex unavailable'); } });
   assert.equal(result.result, EXECUTION_RESULTS.START_FAILURE);
   assert.equal(JSON.parse(readFileSync(f.statePath, 'utf8')).status, 'BLOCKED');
+});
+
+test('returns complete telemetry when the child emits a spawn error', async () => {
+  const f = fixture();
+  const child = childHarness();
+  const promise = startForgeExecution({ ...f, spawnProcess: () => child });
+  await new Promise((resolve) => setImmediate(resolve));
+  child.emit('error', Object.assign(new Error('spawn failed'), { code: 'ENOENT' }));
+  const result = await promise;
+  assert.equal(result.result, EXECUTION_RESULTS.START_FAILURE);
+  assert.equal(result.telemetry.resolvedExecutable, 'C:\\tools\\codex.exe');
+  assert.equal(result.telemetry.launcherExecutable, 'C:\\tools\\codex.exe');
+  assert.equal(result.telemetry.workingDirectory, f.repoRoot);
+  assert.equal(result.telemetry.platform, process.platform);
+  assert.equal(result.telemetry.spawnErrorCode, 'ENOENT');
+  assert.equal(result.telemetry.exitCode, null);
+  assert.equal(result.telemetry.signal, null);
+  assert.equal(JSON.parse(readFileSync(f.statePath, 'utf8')).telemetry.spawnErrorCode, 'ENOENT');
 });
 
 test('bounds a running worker and records timeout recovery', async () => {
