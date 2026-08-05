@@ -1,0 +1,282 @@
+{
+  "task": "PM-AUDIT open issue reconciliation",
+  "issue": 103,
+  "repository": "moh0709/everythingAI",
+  "generatedAt": "2026-08-06T01:25:00+02:00",
+  "startingSha": "ab67e1f51a8048ad1c3371e4281e52704d8bb3af",
+  "sourceEvidence": {
+    "context": ".hermes/forge/context-103.json",
+    "authoritativeFilesLoaded": [
+      "PROJECT_STATE.md",
+      "AI_BOOTSTRAP.md"
+    ],
+    "liveIssueSource": "gh issue list/view --repo moh0709/everythingAI",
+    "openIssueCount": 24,
+    "queueCheck": {
+      "pmReadyHermesReady": 0,
+      "pmReadyForgeReady": 0,
+      "activeForgeIssue": 103
+    },
+    "issue69": "not modified"
+  },
+  "summaryCounts": {
+    "ready_for_pm_close": 4,
+    "needs_pm_verification": 13,
+    "legitimately_blocked": 2,
+    "future_unreleased": 1,
+    "stale_or_duplicate": 4,
+    "total": 24
+  },
+  "validation": {
+    "allOpenIssuesAppearExactlyOnce": true,
+    "uniqueIssueNumbers": true,
+    "noActiveRunnableIssueMisclassifiedCompleted": true,
+    "ownershipBoundariesPreserved": true,
+    "sourceCodeChanged": false,
+    "repositoryTestsRequired": false
+  },
+  "classifications": [
+    {
+      "issue": 2,
+      "title": "Stabilize local MVP before next feature expansion",
+      "labels": ["stabilization", "mvp", "must-have", "pm:review", "forge:done"],
+      "classification": "ready_for_pm_close",
+      "evidence": ["PM validation comment 2026-05-21 says local MVP stabilization complete", "Forge maintenance commit 148f915 submitted PASS evidence"],
+      "recommendedPmAction": "Close as satisfied",
+      "reason": "Historical stabilization scope has explicit PM validation evidence and refreshed Forge review evidence."
+    },
+    {
+      "issue": 3,
+      "title": "Finalize and optimize local MVP",
+      "labels": ["stabilization", "mvp", "must-have", "optimization", "pm:review", "forge:done"],
+      "classification": "stale_or_duplicate",
+      "evidence": ["Forge maintenance submission finalPushedSha 30da45eca6dc3c8ef9d0cd4e30c0d44a769390d7", "Local MVP finalization baseline is covered by later accepted MVP and Phase 8 artifacts"],
+      "recommendedPmAction": "Review, then close as superseded/satisfied",
+      "reason": "Broad historical MVP finalization issue overlaps later validated MVP baseline; do not keep as active backlog."
+    },
+    {
+      "issue": 4,
+      "title": "Make Organizor-style UI the main local MVP app",
+      "labels": ["mvp", "must-have", "ui", "ux", "pm:review", "forge:done"],
+      "classification": "stale_or_duplicate",
+      "evidence": ["Forge completion commit b952332", "Submission records framework doctor, root tests, API tests, and JS syntax checks passing"],
+      "recommendedPmAction": "Review, then close as historically completed or superseded by current React UI direction",
+      "reason": "Issue targets an older services/api/public UI surface; current roadmap uses the React Client Workspace/Admin Dashboard."
+    },
+    {
+      "issue": 5,
+      "title": "Fix remaining fake/static UI elements in EverythingAI React UI",
+      "labels": ["mvp", "must-have", "ui", "cleanup", "pm:review", "forge:done"],
+      "classification": "stale_or_duplicate",
+      "evidence": ["Historical completion comment 2026-04-28", "Forge completion commit 6d04744f2af61af3dd16a18bca65e4f4f9df1bb3"],
+      "recommendedPmAction": "Review current UI state, then close as satisfied",
+      "reason": "The open ticket is stale after direct implementation and later UI work; remaining work should be tracked in narrower issues."
+    },
+    {
+      "issue": 6,
+      "title": "Phase 5.1 - Identity & Role Foundation Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge finalPushedSha 8fc5c35378b602bf92d1590ce11cf36999575011", "Report REPORTS/ISSUE-6-PHASE5-IDENTITY-FOUNDATION.md"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 7,
+      "title": "Phase 5.2 - Permission Foundation Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge finalPushedSha 9648fa869960f6c90dbc931ef24d07697eb7140c", "Validation summary reports targeted 4/4 and root/API tests passing"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 8,
+      "title": "Phase 5.3 - Policy Engine Shadow Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge commit 0e81abf3d93c9c977cfeae610ac040a5f3ed52ee", "Report REPORTS/ISSUE-8-PHASE5-POLICY-ENGINE-SHADOW-GOVERNANCE.md"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Shadow-only governance work is submitted, but PM acceptance is not recorded."
+    },
+    {
+      "issue": 9,
+      "title": "Phase 5.4 - Risk Classification Foundation Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge completion commit 9210652", "Submission records advisory-only scope and validation evidence"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 10,
+      "title": "Phase 5.5 - Approval Workflow Foundation Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge finalPushedSha 996d2837d498414223d8ac72360b25a9c84a9b50", "Report REPORTS/ISSUE-10-PHASE5-APPROVAL-WORKFLOW-FOUNDATION.md"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 11,
+      "title": "Phase 5.6 - Escalation Governance Foundation Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge commit 4a21b995e6e9bea82f026f8ac1750ba6bd1c4b34", "Report REPORTS/ISSUE-11-PHASE5-ESCALATION-GOVERNANCE-FOUNDATION.md"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 12,
+      "title": "Phase 5.7 - Authorization Decision Layer Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge finalPushedSha 3a397bd9ba16315c5c1ddb69ce9a19b6ebc9c443", "Targeted test 5/5 and framework/root/API validations reported passing"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 13,
+      "title": "Phase 5.8 - Controlled Enforcement Activation Governance Track",
+      "labels": ["pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge completion commit 030c2c2762ebe40663513e4781c142f756915868", "Submission records controlled enforcement scope and validations"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 19,
+      "title": "Sprint 6: MVP UI Workflow Completion",
+      "labels": ["mvp", "ui", "validation", "sprint-6", "frontend", "pm:review", "forge:done"],
+      "classification": "stale_or_duplicate",
+      "evidence": ["PM re-triage comment 2026-05-21 narrowed old UI assumptions", "Forge commit 39ff9e8 refreshed rescope evidence"],
+      "recommendedPmAction": "Close as rescope/triage complete and keep only narrower follow-ups",
+      "reason": "The broad Sprint 6 issue is superseded by current React UI planning and should not remain an active implementation ticket."
+    },
+    {
+      "issue": 21,
+      "title": "Future Track: AI Organization Workspace / Managed Knowledge Archive",
+      "labels": ["future-track", "product-design", "pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge finalPushedSha 850555ef8b69caa9cf7161320a0b776c2a5e62ae", "docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md states runtime work must be tracked in future stage-specific tasks"],
+      "recommendedPmAction": "Verify design artifact, then close this design ticket or relabel as future only",
+      "reason": "This is product-design output, not released runtime work; PM should decide whether the design ticket is accepted."
+    },
+    {
+      "issue": 22,
+      "title": "Phase 6: Controlled UserApp modularization after 88-test MVP baseline",
+      "labels": ["frontend", "phase-6", "mvp-finalization", "safe-refactor", "pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Forge completion comment 2026-08-01 records UserApp extraction scope and validations", "Prior documentation-only validation commit 07def04f302841e34fdcc4f20894b4fabf5e09e9"],
+      "recommendedPmAction": "Verify evidence and close if accepted",
+      "reason": "Submitted by Forge but still awaits independent PM acceptance."
+    },
+    {
+      "issue": 24,
+      "title": "EAI-TASK-002: Install Hermes framework foundation in EverythingAI",
+      "labels": ["hermes:done", "pm:review", "forge:done"],
+      "classification": "ready_for_pm_close",
+      "evidence": ["PM accepted with follow-up on 2026-06-24 for commit f0b071a1f370350eb029dedf0beb0fc3d62e9f7f", "Forge refresh finalPushedSha e485154814a99afacaac7ffa16e208dd75af55b2"],
+      "recommendedPmAction": "Close as accepted historical work",
+      "reason": "PM acceptance exists; remaining open state is stale."
+    },
+    {
+      "issue": 26,
+      "title": "EAI-TASK-004: Implement Hermes worker lifecycle claim/report/state flow",
+      "labels": ["hermes:done", "pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Hermes PASS commit 12c09a9a7740f33d64358fb260ef90ee9723c9b4", "Forge refresh commit 3f75b9d720b8e1bba72b024fd2c4ce85b616c8b6"],
+      "recommendedPmAction": "Verify refreshed evidence and close if accepted",
+      "reason": "Completion evidence exists, but no explicit PM acceptance comment was found in the reviewed live comments."
+    },
+    {
+      "issue": 27,
+      "title": "EAI-TASK-005: Finalize worker-generated reports with real commit metadata",
+      "labels": ["hermes:done", "pm:review", "forge:done"],
+      "classification": "needs_pm_verification",
+      "evidence": ["Historical artifact commit 4f2a7a7307d49a5dcb7be2edae495aeeecabe491", "Forge refresh artifact commit f22566d4f2b9f4723bc278ae624feea7d34078e8 and metadata sync 629cddfa4e717e9d9db25cb09b19c151f65b747f"],
+      "recommendedPmAction": "Verify refreshed evidence and close if accepted",
+      "reason": "Completion evidence exists, but PM acceptance is not recorded in the reviewed live comments."
+    },
+    {
+      "issue": 32,
+      "title": "EAI-TASK-010: Close Phase 8.3 and prepare next implementation backlog",
+      "labels": ["hermes:done", "pm:review", "forge:done"],
+      "classification": "ready_for_pm_close",
+      "evidence": ["2026-06-24 comment states EAI-TASK-010 complete PASS and Phase 8.3 formally closed", "Forge maintenance refresh on 2026-08-01 updated closeout artifacts with current validation"],
+      "recommendedPmAction": "Close as completed historical planning work",
+      "reason": "The phase-closeout objective is complete and should not remain active backlog."
+    },
+    {
+      "issue": 41,
+      "title": "EAI-TASK-019: Improve Knowledge Base citation inspection UX",
+      "labels": ["hermes:done", "pm:review", "forge:done"],
+      "classification": "ready_for_pm_close",
+      "evidence": ["PM review 2026-06-25 accepted with PASS", "Forge maintenance refresh 2026-08-01 records current validation passing"],
+      "recommendedPmAction": "Close as accepted historical work",
+      "reason": "PM acceptance exists; remaining open state is stale."
+    },
+    {
+      "issue": 43,
+      "title": "EAI-TASK-021: Improve indexing and extraction progress visibility",
+      "labels": ["hermes:done", "pm:review", "forge:blocked"],
+      "classification": "legitimately_blocked",
+      "evidence": ["PM review 2026-08-03 blocked because metadata-sync commit 3fab1e8ea0c23c6601c7bec12321f1e36fa95b49 could not be verified", "Forge evidence refresh commit 068c05f1293f47a15aeac66075bf36c7f5f16a51 exists but mismatch remains"],
+      "recommendedPmAction": "Keep blocked until Forge submits corrected verifiable metadata or PM accepts artifact commit as source of truth",
+      "reason": "The live PM blocker is specific and unresolved."
+    },
+    {
+      "issue": 78,
+      "title": "OPS-FIX: Make Atlas poller claim transition atomic and idempotent",
+      "labels": [],
+      "classification": "future_unreleased",
+      "evidence": ["Issue body says recorded for follow-up only and not released", "PM rejected stale Forge claim on 2026-08-01 and restored unreleased backlog status"],
+      "recommendedPmAction": "Leave open and unreleased until PM adds atlas queue labels in dependency order",
+      "reason": "Atlas ownership must be preserved; Forge must not execute this issue."
+    },
+    {
+      "issue": 103,
+      "title": "PM-AUDIT: Reconcile open completed/review issues and prepare closure decisions",
+      "labels": ["pm:ready", "forge:working"],
+      "classification": "needs_pm_verification",
+      "evidence": ["This reconciliation report and machine-readable JSON are the deliverables", "Issue comments show prior START_FAILURE attempts; current execution began from ab67e1f51a8048ad1c3371e4281e52704d8bb3af"],
+      "recommendedPmAction": "Review this submission after forge:done + pm:review is posted",
+      "reason": "This is the active Forge audit issue and must remain under PM review after submission."
+    },
+    {
+      "issue": 104,
+      "title": "OPS-FIX: Diagnose Forge START_FAILURE and restore autonomous execution",
+      "labels": ["pm:review", "forge:blocked"],
+      "classification": "legitimately_blocked",
+      "evidence": ["PM diagnosis 2026-08-04 identified stale FORGE_CODEX_PATH and working CLI C:\\nvm4w\\nodejs\\codex.cmd", "Current repository HEAD ab67e1f is Fix Forge Windows Codex CLI launch"],
+      "recommendedPmAction": "Review the startup-fix evidence and close only after live scheduler behavior is verified",
+      "reason": "A live operational correction is present but the issue remains forge:blocked + pm:review pending PM decision."
+    }
+  ],
+  "orderedPmQueue": [
+    24,
+    41,
+    2,
+    32,
+    3,
+    4,
+    5,
+    19,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    21,
+    22,
+    26,
+    27,
+    103,
+    43,
+    104,
+    78
+  ]
+}
