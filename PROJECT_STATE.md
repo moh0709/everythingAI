@@ -44,7 +44,7 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 1. Obtain and independently verify #105 clean scheduler soak evidence.
 2. Keep the open-issue closure/review queue evidence-based.
 3. Maintain the five-track canonical state across this file and both roadmaps.
-4. Define and validate the local MVP release-candidate scope.
+4. Keep issue #106 unreleased until #105 is accepted, then use it to validate the defined local MVP release-candidate baseline.
 5. Resume dependency-ordered execution without broad feature expansion.
 
 ## Evidence baseline
@@ -52,6 +52,8 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 - CEO-approved reconciliation: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`
 - Latest accepted issue audit: #103 and commit `1816018e38639a2f59a6af478d13abf8bf73bda8`
 - Current Forge blocker: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
+- Defined release-candidate scope: `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`
+- Prepared next validation task: issue #106 (open, unreleased, dependent on #105)
 - Last verified repository head before this synchronization: `1816018e38639a2f59a6af478d13abf8bf73bda8`
 
 ---
