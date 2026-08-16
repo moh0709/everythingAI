@@ -1,3 +1,48 @@
+# 2026-08-16 CEO-Approved Operating Addendum
+
+> This addendum supersedes conflicting role, queue, phase, and immediate-priority statements later in this document. Existing detailed controls remain binding where they do not conflict with this addendum. Source decision: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`.
+
+## Program model
+
+Every run must maintain five separately named tracks:
+
+1. Product and UX
+2. Knowledge and Safe Action
+3. Enterprise Platform
+4. Engineering Operations
+5. Governance and Autonomous Delivery
+
+Do not use an unqualified phase number as the sole project-status statement. Always name the track.
+
+## Current authority and ownership
+
+- CEO: final business, strategic, commercial, and materially scope-changing decisions.
+- ChatGPT: sole PM and release authority; architecture, dependency order, issue reconciliation, acceptance decisions, and milestone reporting.
+- Forge: primary code executor only after issue #105 is independently accepted.
+- Hermes: only explicitly assigned, non-overlapping operational or infrastructure work.
+- Human operator: privileged host operations, SSH/root/sudo, secret provisioning, and actions that safe automation cannot perform.
+
+No worker may invent a maintenance queue, claim unreleased work, self-accept, or infer authorization from a useful repository commit. A commit may remain valid evidence while its issue submission remains unaccepted.
+
+## Current gates
+
+- #103: accepted and closed.
+- #105: blocked pending a clean unchanged post-exit scheduler cycle, scheduler result 0, label integrity, and no duplicate claim.
+- #69: protected; no modification or release without explicit CEO authorization.
+- #3–#13 and #19: open, unreleased backlog after PM queue correction.
+- #78: future/unreleased Atlas work.
+- #68/#76: explicit Engineering Operations / infrastructure track, not a silent global product blocker.
+
+## Temporary release control
+
+No new major feature may be released until open-issue reconciliation, Forge soak proof, explicit execution ownership, canonical-document synchronization, and a defined local MVP release-candidate baseline are complete.
+
+Small, reversible, evidence-backed documentation, governance, issue-triage, QA, and engineering actions may proceed autonomously within existing authority. Escalate only strategic, architectural, commercial, security, legal, irreversible, privileged, or materially scope-changing decisions.
+
+Report completed phases, major tasks, important dependency clearances, and meaningful capability leaps. Routine progress and recoverable blockers proceed without CEO interruption.
+
+---
+
 # EverythingAI — Enterprise AI Bootstrap and Operating Governance
 
 ## 1. Purpose
