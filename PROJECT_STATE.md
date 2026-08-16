@@ -1,3 +1,61 @@
+# 2026-08-16 CEO-Approved Reconciliation Overlay
+
+> This section is the current operating state and supersedes conflicting phase labels, role assignments, dependency conclusions, and “immediate next action” statements later in this historical document. The detailed legacy sections remain for evidence and traceability. Full decision record: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`.
+
+## Current program stage
+
+EverythingAI is in **Reconciliation and Release Control**. Progress is tracked across five independent tracks instead of one overloaded phase number:
+
+1. Product and UX
+2. Knowledge and Safe Action
+3. Enterprise Platform
+4. Engineering Operations
+5. Governance and Autonomous Delivery
+
+The next product milestone is a **local MVP release candidate**. A temporary major-feature freeze remains active until:
+
+1. open issue state is reconciled;
+2. Forge completes the clean operational soak gate;
+3. execution ownership is explicit;
+4. canonical state and roadmaps are synchronized; and
+5. the local MVP release-candidate baseline is defined.
+
+## Verified governance state
+
+- Issue #103 is PM-accepted and closed.
+- Issue #105 remains truthfully blocked at `forge:blocked + pm:review` pending one unchanged post-exit Windows scheduler cycle with result 0 and no duplicate claim.
+- Issue #69 is protected and must not be modified or released without explicit CEO authorization.
+- Issues #3–#13 and #19 are open and intentionally unreleased after PM rejected unauthorized Forge maintenance claims; their repository commits remain evidence only, not acceptance.
+- Issue #78 remains future/unreleased Atlas work.
+- Linux systemd issues #68/#76 belong to the Engineering Operations / infrastructure track. They do not silently block unrelated product work unless required by the selected milestone.
+
+## Execution authority
+
+- Product Owner / CEO: Mohammad Ismail.
+- Sole PM and release authority: ChatGPT.
+- Primary code executor: Forge, only after #105 passes independent PM review.
+- Hermes: explicitly assigned, non-overlapping infrastructure or operational work only.
+- Human operator: privileged host, SSH, root, sudo, secret, and other actions outside safe automation boundaries.
+
+Exactly one dependency-satisfied task may be released at a time for each authorized queue, and queue ownership must remain mutually exclusive.
+
+## Immediate priority order
+
+1. Obtain and independently verify #105 clean scheduler soak evidence.
+2. Keep the open-issue closure/review queue evidence-based.
+3. Maintain the five-track canonical state across this file and both roadmaps.
+4. Define and validate the local MVP release-candidate scope.
+5. Resume dependency-ordered execution without broad feature expansion.
+
+## Evidence baseline
+
+- CEO-approved reconciliation: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`
+- Latest accepted issue audit: #103 and commit `1816018e38639a2f59a6af478d13abf8bf73bda8`
+- Current Forge blocker: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
+- Last verified repository head before this synchronization: `1816018e38639a2f59a6af478d13abf8bf73bda8`
+
+---
+
 # EverythingAI — Enterprise Canonical Project State
 
 ## 1. Document Authority
