@@ -1,3 +1,55 @@
+# 2026-08-16 Implementation Control Overlay
+
+> This is the active implementation sequence. It supersedes conflicting immediate-priority and “next phase” statements later in this historical roadmap. Decision source: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`.
+
+## Phase 0 — Reconciliation and Release Control
+
+### Objective
+
+Create one accepted program state, one exclusive execution model, and one dependency-satisfied next task before further major feature expansion.
+
+### Required work
+
+- [x] CEO approval of the five-track reconciliation baseline.
+- [x] Independent acceptance and closure of issue #103.
+- [x] Correct unauthorized queue-state changes and preserve issue #69 protection.
+- [x] Add the approved reconciliation baseline to repository documentation.
+- [x] Add current-authority overlays to canonical state and roadmap documents.
+- [ ] Obtain #105 clean post-exit scheduler result 0.
+- [ ] Prove no duplicate #105 claim during an unchanged second cycle.
+- [ ] Independently accept or correct #105.
+- [ ] Confirm mutually exclusive ChatGPT / Forge / Hermes / human-operator ownership.
+- [ ] Define the local MVP release-candidate scope and acceptance matrix.
+- [ ] Complete release-candidate QA and evidence review.
+- [ ] Lift the temporary major-feature freeze only after all Phase 0 exit conditions pass.
+
+### Execution rules
+
+- ChatGPT is the sole PM and release authority.
+- Forge becomes the primary code executor only after #105 acceptance.
+- Hermes receives only explicitly assigned, non-overlapping infrastructure or operational work.
+- Privileged host work remains human-controlled.
+- Exactly one dependency-satisfied task is released at a time.
+- Useful code or documentation produced from an unauthorized claim remains evidence only and cannot self-authorize acceptance.
+- #69 must not be modified or released without explicit CEO authorization.
+
+### Exit gate
+
+1. Open issues are reconciled.
+2. Forge passes the clean operational soak gate.
+3. Execution ownership is explicit and non-overlapping.
+4. Canonical state and roadmaps agree.
+5. A local MVP release-candidate baseline is defined.
+
+## Work after the exit gate
+
+1. Run the local MVP release-candidate validation program.
+2. Resolve only defects and gaps required by that baseline.
+3. Produce a release decision with tests, build results, smoke evidence, limitations, and rollback notes.
+4. Resume the five tracks in dependency order; do not collapse them back into one phase number.
+
+---
+
 # Enterprise Implementation Roadmap
 
 ## Purpose
