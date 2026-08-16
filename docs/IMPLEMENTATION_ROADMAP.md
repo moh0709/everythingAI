@@ -19,7 +19,7 @@ Create one accepted program state, one exclusive execution model, and one depend
 - [ ] Prove no duplicate #105 claim during an unchanged second cycle.
 - [ ] Independently accept or correct #105.
 - [ ] Confirm mutually exclusive ChatGPT / Forge / Hermes / human-operator ownership.
-- [ ] Define the local MVP release-candidate scope and acceptance matrix.
+- [x] Define the local MVP release-candidate scope and acceptance matrix in `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`.
 - [ ] Complete release-candidate QA and evidence review.
 - [ ] Lift the temporary major-feature freeze only after all Phase 0 exit conditions pass.
 
