@@ -31,6 +31,7 @@ No worker may invent a maintenance queue, claim unreleased work, self-accept, or
 - #69: protected; no modification or release without explicit CEO authorization.
 - #3–#13 and #19: open, unreleased backlog after PM queue correction.
 - #78: future/unreleased Atlas work.
+- #106: prepared local MVP release-candidate validation task; open and unreleased until #105 is independently accepted.
 - #68/#76: explicit Engineering Operations / infrastructure track, not a silent global product blocker.
 
 ## Temporary release control
