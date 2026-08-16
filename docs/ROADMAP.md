@@ -1,3 +1,36 @@
+# 2026-08-16 Roadmap Reconciliation
+
+> Current roadmap authority: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`. This overlay supersedes conflicting “next phase” statements below while preserving historical roadmap detail.
+
+## Current five-track roadmap
+
+| Track | Verified position | Current exit gate |
+|---|---|---|
+| Product and UX | Local Client Workspace and Admin Dashboard foundations implemented | Define and validate the local MVP release-candidate scope |
+| Knowledge and Safe Action | Source-backed knowledge, planning, preview, approval, execution, undo, and audit foundations exist | Validate end-to-end release-candidate workflows and evidence UX |
+| Enterprise Platform | Target architecture documented; production platform incomplete | Keep future until CEO selects the production-platform milestone |
+| Engineering Operations | Repository reliability foundation exists; Linux systemd work remains explicit infrastructure backlog | Resolve or formally supersede #68/#76 when required by the chosen milestone |
+| Governance and Autonomous Delivery | Issue #103 accepted; Forge foundations implemented; #105 soak still blocked | Accept one clean autonomous Forge cycle and maintain exclusive execution ownership |
+
+## Active sequence
+
+1. Reconcile live issue state and preserve corrected queue ownership.
+2. Complete #105 with clean unchanged scheduler evidence, result 0, and no duplicate claim.
+3. Keep ChatGPT as sole PM/release authority; activate Forge as primary code executor only after #105 acceptance.
+4. Keep Hermes isolated to explicitly assigned infrastructure/operational work.
+5. Synchronize canonical documents with this five-track model.
+6. Establish and validate the local MVP release-candidate baseline.
+7. Lift the temporary major-feature freeze only after the Phase 0 exit gate is met.
+
+## Protected and unreleased work
+
+- #69 remains protected and unchanged unless the CEO explicitly changes that rule.
+- #3–#13 and #19 remain open and unreleased; implementation evidence does not equal PM acceptance.
+- #78 remains future/unreleased Atlas work.
+- No bare phase number may be treated as the complete program status.
+
+---
+
 # ROADMAP
 
 ## Current roadmap position
