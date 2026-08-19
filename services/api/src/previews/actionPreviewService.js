@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { getAppSetting, getOrganizationSuggestionById, insertActionPreview, updateActionPreviewExecutability } from '../db/client.js';
 import { getDefaultAiProviderSettings, mergeAiProviderSettings } from '../settings/aiProviderSettings.js';
+import { deriveIndexedRoot, isInsideDirectory } from '../actions/pathBoundary.js';
 
 const SETTINGS_KEY = 'ai_provider_settings';
 
@@ -15,11 +16,6 @@ function createPreviewId(suggestionId) {
 
 function hasPathSeparators(value) {
   return value.includes('/') || value.includes('\\');
-}
-
-function isInsideDirectory(candidatePath, parentDirectory) {
-  const relative = path.relative(parentDirectory, candidatePath);
-  return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function isDryRunOnly(db) {
@@ -87,8 +83,24 @@ async function resolveTargetPath(suggestion, destinationFolder = null) {
     const baseDir = (destinationFolder && path.isAbsolute(destinationFolder))
       ? destinationFolder
       : path.dirname(suggestion.absolute_path);
+    const indexedRoot = deriveIndexedRoot(suggestion.absolute_path, suggestion.relative_path);
+
+    if (!indexedRoot || !isInsideDirectory(path.resolve(baseDir), indexedRoot)) {
+      return {
+        targetPath: null,
+        blockedReason: 'Move destination is outside the indexed source root.',
+      };
+    }
+
     const targetDir = path.resolve(baseDir, suggestion.suggested_value);
     const targetPath = path.resolve(targetDir, suggestion.filename);
+
+    if (!isInsideDirectory(targetPath, indexedRoot)) {
+      return {
+        targetPath: null,
+        blockedReason: 'Move target is outside the indexed source root.',
+      };
+    }
 
     if (path.resolve(suggestion.absolute_path) === targetPath) {
       return {

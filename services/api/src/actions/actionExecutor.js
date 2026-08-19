@@ -23,6 +23,7 @@ import {
   RECOVERY_SNAPSHOT_TYPES,
 } from '../recovery/recoverySnapshotService.js';
 import { getActiveTrashRecordByFileId } from '../recovery/trashService.js';
+import { deriveIndexedRoot, isInsideDirectory } from './pathBoundary.js';
 
 const SUPPORTED_ACTION_TYPES = new Set(['tag', 'category', 'rename', 'move']);
 
@@ -182,6 +183,13 @@ function assertSafeFilesystemPreview(preview) {
     const targetDir = path.dirname(targetPath);
     if (sourceDir.toLowerCase() !== targetDir.toLowerCase()) {
       throw new Error('Rename target must be in the same directory as the source file.');
+    }
+  }
+
+  if (preview.action_type === 'move') {
+    const indexedRoot = deriveIndexedRoot(preview.absolute_path, preview.relative_path);
+    if (!indexedRoot || !isInsideDirectory(targetPath, indexedRoot)) {
+      throw new Error('Move target is outside the indexed source root.');
     }
   }
 }

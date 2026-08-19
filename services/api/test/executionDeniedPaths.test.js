@@ -98,6 +98,34 @@ test('blocked preview cannot execute and is rejected before mutation', async () 
   db.close();
 });
 
+test('move preview rejects an explicit destination outside the indexed source root', async () => {
+  const root = await createFixture();
+  const outsideRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'everythingai-outside-root-'));
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  const file = fileByName(db, 'Denied Contract Notes.md');
+  const suggestions = generatePreviewSuggestions(db, { fileId: file.id });
+  const moveSuggestion = suggestions.find((item) => item.action_type === 'move');
+  const preview = await createActionPreview(db, {
+    suggestionId: moveSuggestion.id,
+    destinationFolder: outsideRoot,
+  });
+
+  assert.equal(preview.preview_status, 'blocked');
+  assert.equal(preview.can_execute, 0);
+  assert.equal(preview.target_path, null);
+  assert.match(preview.blocked_reason, /outside the indexed source root/i);
+  await assert.rejects(
+    () => executeActionPreview(db, { previewId: preview.id, approve: true }),
+    /Action preview failed validation/,
+  );
+  assert.equal(await fs.readFile(file.absolute_path, 'utf8'), '# Denied\nSupplier contract denied execution test');
+  assert.equal(listActionExecutions(db, { fileId: file.id }).length, 0);
+
+  db.close();
+});
+
 test('source missing creates failed execution, failed audit, and no snapshot', async () => {
   const root = await createFixture();
   const db = openDatabase(tempDbPath());
