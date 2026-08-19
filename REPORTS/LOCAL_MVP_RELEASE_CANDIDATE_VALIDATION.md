@@ -31,6 +31,8 @@ The required manual product sequence has not been executed against a disposable 
 
 The local `audit_log` table stores event type, entity type, entity ID, payload, and timestamp, but no explicit actor identity. Request-context scaffolding exists, yet action, batch, undo, trash, restore, and purge audit writers do not persist that actor context. This leaves RC-AUD-01 incomplete.
 
+Remediation checkpoint: commit `a671c7c3a913e102b3dca31581c4c2a2ff52bf70` adds actor/request columns, non-destructive legacy migration, request-context propagation, truthful system defaults, and regression coverage. RC-AUD-01 remains incomplete until that candidate passes the full CI gate.
+
 ## Safety disposition
 
 - No protected issue #69 action was taken.
