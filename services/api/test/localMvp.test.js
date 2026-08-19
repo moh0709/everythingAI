@@ -155,6 +155,23 @@ test('extracts supported readable files and records failures without aborting', 
   db.close();
 });
 
+test('file listings include persisted extraction state', async () => {
+  const root = await createFixture();
+  const db = openDatabase(tempDbPath());
+
+  await indexFixture(root, db);
+  await extractIndexedFiles(db, { logger: { error: () => {} } });
+
+  const files = listIndexedFiles(db, { limit: 100 });
+  const notes = files.find((file) => file.filename === 'Alpha Notes.md');
+  const brokenPdf = files.find((file) => file.filename === 'broken.pdf');
+
+  assert.equal(notes.extraction_status, 'extracted');
+  assert.equal(brokenPdf.extraction_status, 'failed');
+
+  db.close();
+});
+
 test('searches filename, path, and extracted content with snippets', async () => {
   const root = await createFixture();
   const db = openDatabase(tempDbPath());
