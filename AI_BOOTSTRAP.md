@@ -32,14 +32,14 @@ No worker may invent a maintenance queue, claim unreleased work, self-accept, or
 - #69: protected; no modification or release without explicit CEO authorization.
 - #6–#13 and #5: independently PM-accepted and closed as completed on 2026-08-19.
 - #4 and #19: closed as superseded/not planned; their obsolete umbrella UI scope is not an active implementation queue.
-- #3: remains open pending the final local MVP release-candidate decision.
+- #3: local MVP finalization is PM-accepted for closure after the release-candidate matrix passed.
 - #78: future/unreleased Atlas work.
-- #106: active local MVP release-candidate validation task under direct ChatGPT execution authority; current decision is `RC_PARTIAL` pending disposable-folder validation. Explicit audit-actor context is implemented and CI-verified.
+- #106: complete with `RC_PASS` on candidate `b89e91a2a362914a0c71f60be95725acb8363aff`; disposable-folder acceptance, audit identity, safety, recovery, backend, frontend, and browser gates passed in CI Smoke #438.
 - #68/#76: explicit Engineering Operations / infrastructure track, not a silent global product blocker.
 
 ## Temporary release control
 
-No new major feature may be released until open-issue reconciliation, explicit execution ownership, canonical-document synchronization, a defined local MVP release-candidate baseline, and a complete `RC_PASS` acceptance matrix are achieved.
+The temporary major-feature freeze was lifted on 2026-08-20 after open-issue reconciliation, explicit execution ownership, canonical-document synchronization, a defined local MVP release-candidate baseline, and a complete `RC_PASS` acceptance matrix were achieved. Production, privileged-host, protected-issue, and materially scope-changing work retains its own approval gates.
 
 Small, reversible, evidence-backed documentation, governance, issue-triage, QA, and engineering actions may proceed autonomously within existing authority. Escalate only strategic, architectural, commercial, security, legal, irreversible, privileged, or materially scope-changing decisions.
 

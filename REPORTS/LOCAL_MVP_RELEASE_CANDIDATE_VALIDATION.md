@@ -1,44 +1,69 @@
 # Local MVP Release-Candidate Validation
 
-**Decision:** `RC_PARTIAL`  
-**Candidate:** `b92ec3492d759936bb996daf9f18eb4673a1578e`
-**Branch:** `main`  
-**Validation date:** 2026-08-20  
+**Decision:** `RC_PASS`
+
+**Candidate:** `b89e91a2a362914a0c71f60be95725acb8363aff`
+
+**Branch:** `main`
+
+**Validation date:** 2026-08-20
+
 **Issue:** #106
 
 ## Outcome
 
-The automated candidate is healthy, but the release-candidate gate is not complete. The temporary major-feature freeze remains active.
+Every required local MVP release-candidate gate passed on one unchanged candidate. The temporary major-feature freeze is lifted. This decision accepts the local MVP boundary only; it does not claim enterprise production readiness.
 
-## Passed evidence
+## Validation evidence
 
-- Framework doctor exited successfully and verified all required framework files. It reported a local-only warning because GitHub CLI authentication was unavailable in the sandbox; GitHub issue and workflow access was independently verified through the connected GitHub application.
+- Framework doctor exited successfully and found every required framework artifact. It reported only the known local `gh` authentication warning; repository and workflow access was independently verified through the connected GitHub application.
 - Root reliability suite: 190 passed, 0 failed, 0 skipped.
-- Backend CI suite: 173 tests; 172 passed, 1 skipped, 0 failed.
+- Backend CI suite: 177 tests; 176 passed, 1 skipped, 0 failed.
 - Frontend TypeScript typecheck: passed.
-- Frontend production build: passed (`vite`, 1.81 seconds in CI).
+- Frontend production build: passed.
 - Playwright Client/Admin smoke: 5 passed, 0 failed.
-- CI workflow: all three jobs passed in [EverythingAI CI Smoke #428](https://github.com/moh0709/everythingAI/actions/runs/32306414605).
-- Issue reconciliation: #6–#13 and #5 independently accepted and closed; #4 and #19 closed as superseded/not planned; #105 truthfully closed not planned; #69 unchanged.
-- Audit actor identity: implemented with non-destructive schema migration, API request-context propagation, explicit system/internal defaults, and two regression tests. CI Smoke #432 passed all jobs on the candidate SHA.
+- Disposable-folder Playwright acceptance: passed.
+- Final workflow: [EverythingAI CI Smoke #438](https://github.com/moh0709/everythingAI/actions/runs/32309409263); backend, frontend, and Playwright jobs all passed.
+- Exact validated head `b89e91a2a362914a0c71f60be95725acb8363aff` was fast-forwarded to `main` before this evidence-only synchronization.
 
-## Remaining blockers
+## Disposable-folder acceptance
 
-### 1. Disposable-folder acceptance evidence is absent
+The automated browser/API sequence created fresh temporary folders and disposable TXT, Markdown, CSV, and intentionally invalid PDF fixtures. It verified:
 
-The required manual product sequence has not been executed against a disposable runtime folder in this validation environment. Existing unit/integration tests cover indexing, extraction, search, knowledge, safe previews, approval, execution, undo, recovery, purge rejection, and path safety, but the baseline explicitly requires one end-to-end disposable-folder run.
+1. Client Workspace folder intake and indexing.
+2. Supported extraction plus explicit invalid-document failure state.
+3. Search and extracted document context.
+4. Source-backed Knowledge Base pages and evidence chunks.
+5. Safe Ask AI degradation when no provider answer is available.
+6. Non-mutating planning before approval.
+7. Preview and explicit approval gating.
+8. Denied execution without mutation.
+9. Approved move with actor/request audit identity.
+10. Undo restoring original content and location.
+11. Out-of-root path rejection without mutation.
+12. Trash, permanent-purge denial, and restore.
+13. Client/Admin separation.
+14. Cleanup of all disposable runtime folders.
 
-## Safety disposition
+## Defect found and repaired during acceptance
 
-- No protected issue #69 action was taken.
-- No permanent purge or delete capability was enabled.
-- No provider secret or arbitrary command path was exposed.
-- No candidate was released.
-- The feature freeze remains active.
+CI Smoke #436 exposed a real API contract defect: extraction state was persisted but `/api/files` omitted it, causing the Client Workspace to report zero extracted files and preventing the acceptance assertion from observing the state.
 
-## Next safe action
+A focused regression test was added first. CI Smoke #437 failed on that test with expected `undefined` extraction state. The minimal repair joined persisted extraction metadata into `listIndexedFiles`; CI Smoke #438 then passed the regression and the full disposable-folder sequence.
 
-Execute the disposable-folder acceptance sequence and re-run the remaining partial gates against the unchanged candidate SHA.
+The acceptance work also preserves defense-in-depth path validation: previews and execution reject explicit move targets outside the indexed source root.
 
-Validation note: pull request #107 was used only to obtain independent CI evidence, then closed without merging; candidate `b92ec3492d759936bb996daf9f18eb4673a1578e` was fast-forwarded to `main` after CI passed.
-\nValidation trigger: this branch exists only to obtain independent CI evidence for the disposable-folder acceptance candidate.\n
+## Governance and safety disposition
+
+- Issue reconciliation is complete for the Phase 0/local-MVP scope.
+- Execution ownership is explicit: ChatGPT is the direct executor and sole PM/release authority for this decision; Forge is not a dependency.
+- Issue #69 remained protected and unchanged.
+- Permanent purge remains denied.
+- No provider secret, raw environment value, personal document, arbitrary command path, or production filesystem path appears in the evidence.
+- Issue #78 remains a separately scoped, unreleased autonomous-delivery task and does not invalidate the local MVP decision.
+
+## Release decision
+
+`RC_PASS` is accepted for the local MVP. Issues #106 and #3 may be closed as completed. The temporary major-feature freeze is lifted; future enterprise-platform, privileged-host, production-security, and protected-issue work remains subject to its own gates.
+
+Validation PR #108 was used to obtain independent CI evidence. Advancing `main` to the exact validated head caused GitHub to mark the PR merged without creating a separate merge commit.

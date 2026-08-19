@@ -3,7 +3,7 @@
 **Defined:** 2026-08-16  
 **Repository:** `moh0709/everythingAI`  
 **Branch:** `main`  
-**Status:** `RC_PARTIAL` (2026-08-20; candidate `b92ec3492d759936bb996daf9f18eb4673a1578e`)
+**Status:** `RC_PASS` (2026-08-20; candidate `b89e91a2a362914a0c71f60be95725acb8363aff`)
 **Authority:** `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`
 
 ## 1. Purpose
@@ -158,9 +158,9 @@ A required build/test fails, a core workflow fails, evidence conflicts materiall
 
 ## 9. Freeze-lift rule
 
-Defining this baseline does not lift the temporary major-feature freeze.
+Defining this baseline did not itself lift the temporary major-feature freeze.
 
-The freeze may be lifted only after:
+The freeze was lifted on 2026-08-20 after:
 
 1. #105 is truthfully dispositioned without claiming the missing Forge soak passed;
 2. execution ownership remains explicit and non-overlapping;
@@ -170,12 +170,12 @@ The freeze may be lifted only after:
 
 ## 10. Immediate next work
 
-1. Execute the disposable-folder intake, extraction, search, knowledge, Ask, preview, approval, execution, undo/restore, purge rejection, and path-boundary checks.
-2. Re-run the remaining partial gates on the unchanged candidate SHA.
-3. Promote to `RC_PASS` only when every required gate has evidence.
+1. Preserve CI Smoke #438 and the disposable-folder Playwright sequence as regression evidence.
+2. Keep enterprise production-readiness gaps separate from the accepted local MVP.
+3. Resume bounded, dependency-ordered work across the five tracks.
 
 ## 11. Current validation result
 
-The candidate passed root reliability tests (190/190), the backend CI job including explicit audit-actor regression coverage, frontend typecheck, frontend production build, and five Playwright Client/Admin smoke tests. GitHub Actions run #432 completed successfully.
+Candidate `b89e91a2a362914a0c71f60be95725acb8363aff` passed root reliability tests (190/190), backend CI tests (177 total; 176 passed; 1 skipped), frontend typecheck, frontend production build, five Client/Admin Playwright smoke tests, and the disposable-folder end-to-end acceptance sequence. GitHub Actions CI Smoke #438 completed successfully.
 
-The result remains `RC_PARTIAL` only because the required disposable-folder product run has not been executed in this validation environment. Explicit audit actor/request identity is now persisted and CI-verified. Full evidence is in `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md` and `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_ACCEPTANCE_MATRIX.json`.
+The result is `RC_PASS`. The acceptance run also exposed and repaired a real `/api/files` contract defect: extraction state was persisted but omitted from file listings. A regression test failed before the fix and passed with the complete candidate. Full evidence is in `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md` and `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_ACCEPTANCE_MATRIX.json`.

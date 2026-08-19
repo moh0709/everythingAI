@@ -1,26 +1,28 @@
 {
   "task": "Issue #106 - Local MVP release-candidate validation",
   "date": "2026-08-20",
-  "candidateSha": "b92ec3492d759936bb996daf9f18eb4673a1578e",
-  "decision": "RC_PARTIAL",
-  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32307967933",
+  "candidateSha": "b89e91a2a362914a0c71f60be95725acb8363aff",
+  "decision": "RC_PASS",
+  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32309409263",
   "passed": {
-    "rootTests": "190 passed, 0 failed",
-    "backendTests": "PASS, including audit actor identity regression coverage",
+    "rootTests": "190 passed, 0 failed, 0 skipped",
+    "backendTests": "177 total; 176 passed; 1 skipped; 0 failed",
     "frontendTypecheck": "PASS",
     "frontendBuild": "PASS",
-    "playwrightSmoke": "5 passed, 0 failed"
+    "playwrightSmoke": "5 passed, 0 failed",
+    "disposableFolderAcceptance": "PASS"
   },
-  "blockers": [
-    "Required disposable-folder product acceptance sequence has not been executed in this validation environment."
+  "defectsResolved": [
+    "File listings now include persisted extraction status and metadata.",
+    "Explicit move targets outside the indexed source root are blocked in preview and revalidated at execution."
   ],
   "issueReconciliation": {
-    "completed": [5, 6, 7, 8, 9, 10, 11, 12, 13],
-    "superseded": [4, 19],
-    "stillOpen": [3, 78, 106],
+    "completed": [3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 106],
+    "superseded": [4, 19, 105],
+    "futureUnreleased": [78],
     "protectedUnchanged": 69
   },
-  "freeze": "ACTIVE",
-  "nextSafeAction": "Execute the disposable-folder acceptance matrix against the unchanged candidate SHA.",
-  "rollback": "Revert the audit actor identity commit and the subsequent evidence-only commits; the database migration is additive and existing rows retain explicit system/internal defaults."
+  "freeze": "LIFTED_FOR_LOCAL_MVP_FOLLOW_ON_WORK",
+  "nextSafeAction": "Select the next bounded five-track priority; keep production, privileged-host, Atlas, and protected issue #69 work behind their explicit gates.",
+  "rollback": "Revert the two candidate fix commits from b89e91a2a362914a0c71f60be95725acb8363aff if required; audit schema changes remain additive and existing rows retain explicit system/internal defaults."
 }

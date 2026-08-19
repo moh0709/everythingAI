@@ -19,8 +19,8 @@ Create one accepted program state, one exclusive execution model, and one depend
 - [x] Authorize direct ChatGPT execution for dependency-satisfied Phase 0 work.
 - [x] Confirm mutually exclusive ChatGPT / Forge / Hermes / human-operator ownership.
 - [x] Define the local MVP release-candidate scope and acceptance matrix in `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`.
-- [ ] Complete release-candidate QA and evidence review.
-- [ ] Lift the temporary major-feature freeze only after all Phase 0 exit conditions pass.
+- [x] Complete release-candidate QA and evidence review on candidate `b89e91a2a362914a0c71f60be95725acb8363aff`.
+- [x] Lift the temporary major-feature freeze after all Phase 0 exit conditions passed on 2026-08-20.
 
 ### Execution rules
 
@@ -42,9 +42,9 @@ Create one accepted program state, one exclusive execution model, and one depend
 
 ## Work after the exit gate
 
-1. Run the local MVP release-candidate validation program.
-2. Resolve only defects and gaps required by that baseline.
-3. Produce a release decision with tests, build results, smoke evidence, limitations, and rollback notes.
+1. Preserve the local MVP release-candidate validation program as a required regression gate.
+2. Resolve future defects with focused tests and evidence.
+3. Keep local-MVP acceptance distinct from enterprise production readiness.
 4. Resume the five tracks in dependency order; do not collapse them back into one phase number.
 
 ---

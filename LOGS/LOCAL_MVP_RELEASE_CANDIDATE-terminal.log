@@ -1,37 +1,44 @@
 EverythingAI local MVP RC validation
 Date: 2026-08-20
-Candidate: b92ec3492d759936bb996daf9f18eb4673a1578e
+Candidate: b89e91a2a362914a0c71f60be95725acb8363aff
 
 LOCAL ROOT
-- node scripts/framework-doctor.mjs: exit 0, WARN only for unavailable local gh auth
+- node scripts/framework-doctor.mjs: exit 0; WARN only for unavailable local gh auth
 - node --test tests/*.test.mjs: 190 passed, 0 failed, 0 skipped
-- git diff --check: pass before evidence edits
+- node --check changed JavaScript: pass
+- git diff --check: pass before evidence publication
 
-GITHUB ACTIONS RUN 32306414605
-- backend-tests: success
-  tests 173; pass 172; fail 0; skipped 1
-- frontend-build: success
-  TypeScript typecheck passed
-  Vite production build passed in 1.81s
+TDD DEFECT EVIDENCE
+- CI Smoke #436: disposable-folder acceptance failed because /api/files omitted persisted extraction state
+- CI Smoke #437: focused file-listing regression test failed with expected undefined extraction_status
+- Minimal repair: listIndexedFiles joins file_extractions and returns extraction status/metadata
+
+GITHUB ACTIONS RUN 32309409263 / CI SMOKE #438
+- backend-tests: success; tests 177; pass 176; fail 0; skipped 1
+- frontend-build: success; TypeScript typecheck and production build passed
 - playwright-smoke: success
-  5 passed, 0 failed
+- Client/Admin smoke: 5 passed, 0 failed
+- disposable-folder RC acceptance: passed
 
-ISSUE RECONCILIATION
-- #6-#13: independently PM-accepted and closed completed
-- #5: accepted and closed completed
-- #4 and #19: closed not planned/superseded
-- #105: remains truthfully closed not planned
-- #69: unchanged
+DISPOSABLE ACCEPTANCE
+- intake/index: PASS
+- supported and failing extraction states: PASS
+- search and document context: PASS
+- source-backed knowledge: PASS
+- Ask safe degradation: PASS
+- non-mutating planning: PASS
+- preview, denial, explicit approval, and move: PASS
+- audit actor/request identity: PASS
+- undo, trash, purge denial, and restore: PASS
+- out-of-root path rejection: PASS
+- Client/Admin separation: PASS
+- disposable cleanup: PASS
+
+GOVERNANCE
+- exact validated candidate fast-forwarded to main
+- #69 unchanged
+- #78 remains separately scoped and unreleased
+- local MVP is accepted; enterprise production readiness is not claimed
 
 FINAL DECISION
-RC_PARTIAL
-
-BLOCKERS
-1. Required disposable-folder product run not executed.
-
-AUDIT ACTOR REMEDIATION
-- additive audit actor/request schema migration: PASS
-- action, undo, recovery, purge-denial, and batch request-context propagation: PASS
-- truthful system/internal defaults: PASS
-- regression coverage: PASS
-- GitHub Actions run 32307967933 (CI Smoke #432): all three jobs PASS
+RC_PASS

@@ -12,13 +12,13 @@ EverythingAI is in **Reconciliation and Release Control**. Progress is tracked a
 4. Engineering Operations
 5. Governance and Autonomous Delivery
 
-The next product milestone is a **local MVP release candidate**. A temporary major-feature freeze remains active until:
+The **local MVP release candidate passed** on 2026-08-20. The temporary major-feature freeze was lifted after:
 
 1. open issue state is reconciled;
 2. execution ownership is explicit;
 3. canonical state and roadmaps are synchronized;
 4. the local MVP release-candidate baseline is defined; and
-5. the complete release-candidate acceptance matrix passes on one unchanged commit.
+5. the complete release-candidate acceptance matrix passed on one unchanged commit.
 
 ## Verified governance state
 
@@ -26,7 +26,7 @@ The next product milestone is a **local MVP release candidate**. A temporary maj
 - Issue #105 is closed as `not planned` after the CEO removed Forge as a prerequisite on 2026-08-19. Its missing scheduler evidence did not pass and must not be cited as accepted soak proof.
 - Issue #69 is protected and must not be modified or released without explicit CEO authorization.
 - Issues #6–#13 were independently PM-reviewed and closed as completed on 2026-08-19 after the candidate backend suite passed. Issue #5 was also accepted and closed as completed. Issues #4 and #19 were closed as superseded/not planned because they target obsolete or umbrella UI scope.
-- Issue #3 remains open pending the final local MVP release-candidate decision.
+- Issue #3 is PM-accepted for closure after the final local MVP release-candidate decision passed.
 - Issue #78 remains future/unreleased Atlas work.
 - Linux systemd issues #68/#76 belong to the Engineering Operations / infrastructure track. They do not silently block unrelated product work unless required by the selected milestone.
 
@@ -43,11 +43,11 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 
 ## Immediate priority order
 
-1. Complete the remaining issue #106 release gate: disposable-folder product validation.
-2. Re-run the complete matrix against the unchanged candidate and record `RC_PASS`, `RC_PARTIAL`, or `RC_FAIL` truthfully.
-3. Maintain the five-track canonical state across this file and both roadmaps.
-4. Create narrowly scoped remediation issues for confirmed release-candidate failures.
-5. Resume dependency-ordered execution without broad feature expansion.
+1. Preserve the accepted local MVP candidate and its reproducible CI acceptance sequence.
+2. Close completed issues #106 and #3 with the exact release evidence.
+3. Resume the five tracks in dependency order while keeping production-only capabilities behind their own gates.
+4. Keep #69 protected and #78 explicitly scoped before any autonomous-delivery work begins.
+5. Maintain canonical state, evidence, rollback paths, and truthful blockers as the program advances.
 
 ## Evidence baseline
 
@@ -55,9 +55,9 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 - Latest accepted issue audit: #103 and commit `1816018e38639a2f59a6af478d13abf8bf73bda8`
 - Historical Forge blocker, superseded without a pass claim: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
 - Defined release-candidate scope: `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`
-- Active validation task: issue #106 (open; current decision `RC_PARTIAL`)
-- Candidate validated by CI: `b92ec3492d759936bb996daf9f18eb4673a1578e`
-- CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32307967933`
+- Completed validation task: issue #106 (`RC_PASS`; PM-accepted for closure)
+- Candidate validated by CI: `b89e91a2a362914a0c71f60be95725acb8363aff`
+- CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32309409263`
 - Current evidence: `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md`
 
 ---

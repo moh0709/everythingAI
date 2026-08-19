@@ -6,11 +6,11 @@
 
 | Track | Verified position | Current exit gate |
 |---|---|---|
-| Product and UX | Local Client Workspace and Admin Dashboard foundations implemented | Define and validate the local MVP release-candidate scope |
-| Knowledge and Safe Action | Source-backed knowledge, planning, preview, approval, execution, undo, and audit foundations exist | Validate end-to-end release-candidate workflows and evidence UX |
+| Product and UX | Local MVP release candidate passed on one CI-validated commit | Prioritize bounded product improvements from reconciled issues |
+| Knowledge and Safe Action | End-to-end intake, extraction, search, knowledge, planning, approval, action, audit, undo, and recovery acceptance passed | Preserve safety boundaries while improving evidence UX |
 | Enterprise Platform | Target architecture documented; production platform incomplete | Keep future until CEO selects the production-platform milestone |
 | Engineering Operations | Repository reliability foundation exists; Linux systemd work remains explicit infrastructure backlog | Resolve or formally supersede #68/#76 when required by the chosen milestone |
-| Governance and Autonomous Delivery | Issue #103 accepted; #105 closed not planned by CEO direction; ChatGPT direct execution authorized | Maintain explicit ownership, evidence separation, and protected queues |
+| Governance and Autonomous Delivery | Phase 0 exit gate and local MVP RC passed; ChatGPT direct execution authorized | Scope #78 independently; maintain explicit ownership, evidence separation, and protected queues |
 
 ## Active sequence
 
@@ -19,13 +19,13 @@
 3. Use direct ChatGPT execution for dependency-satisfied Phase 0 work; Forge remains optional and explicitly released only.
 4. Keep Hermes isolated to explicitly assigned infrastructure/operational work.
 5. Synchronize canonical documents with this five-track model.
-6. Establish and validate the local MVP release-candidate baseline.
-7. Lift the temporary major-feature freeze only after the Phase 0 exit gate is met.
+6. Preserve the passed local MVP release-candidate baseline and reproducible acceptance workflow.
+7. Resume dependency-ordered work; the temporary major-feature freeze is lifted, while production and protected-work gates remain.
 
 ## Protected and unreleased work
 
 - #69 remains protected and unchanged unless the CEO explicitly changes that rule.
-- #3–#13 and #19 remain open and unreleased; implementation evidence does not equal PM acceptance.
+- #3 and #106 are accepted for closure; #4–#13 and #19 are reconciled and closed.
 - #78 remains future/unreleased Atlas work.
 - No bare phase number may be treated as the complete program status.
 
