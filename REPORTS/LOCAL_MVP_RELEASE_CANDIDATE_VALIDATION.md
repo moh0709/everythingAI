@@ -41,3 +41,4 @@ The required manual product sequence has not been executed against a disposable 
 Execute the disposable-folder acceptance sequence and re-run the remaining partial gates against the unchanged candidate SHA.
 
 Validation note: pull request #107 was used only to obtain independent CI evidence, then closed without merging; candidate `b92ec3492d759936bb996daf9f18eb4673a1578e` was fast-forwarded to `main` after CI passed.
+\nValidation trigger: this branch exists only to obtain independent CI evidence for the disposable-folder acceptance candidate.\n
