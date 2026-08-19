@@ -1,0 +1,27 @@
+{
+  "task": "Issue #106 - Local MVP release-candidate validation",
+  "date": "2026-08-20",
+  "candidateSha": "24998f04424b78ba531780523ef373c4c9981994",
+  "decision": "RC_PARTIAL",
+  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32306414605",
+  "passed": {
+    "rootTests": "190 passed, 0 failed",
+    "backendTests": "172 passed, 1 skipped, 0 failed",
+    "frontendTypecheck": "PASS",
+    "frontendBuild": "PASS",
+    "playwrightSmoke": "5 passed, 0 failed"
+  },
+  "blockers": [
+    "Required disposable-folder product acceptance sequence has not been executed in this validation environment.",
+    "Audit events do not persist explicit actor identity."
+  ],
+  "issueReconciliation": {
+    "completed": [5, 6, 7, 8, 9, 10, 11, 12, 13],
+    "superseded": [4, 19],
+    "stillOpen": [3, 78, 106],
+    "protectedUnchanged": 69
+  },
+  "freeze": "ACTIVE",
+  "nextSafeAction": "Implement narrow audit-actor propagation with regression coverage, then execute the disposable-folder acceptance matrix on one new unchanged candidate SHA.",
+  "rollback": "Revert the evidence synchronization commit only; no product behavior changed in this evidence pass."
+}

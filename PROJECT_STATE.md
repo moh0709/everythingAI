@@ -25,7 +25,8 @@ The next product milestone is a **local MVP release candidate**. A temporary maj
 - Issue #103 is PM-accepted and closed.
 - Issue #105 is closed as `not planned` after the CEO removed Forge as a prerequisite on 2026-08-19. Its missing scheduler evidence did not pass and must not be cited as accepted soak proof.
 - Issue #69 is protected and must not be modified or released without explicit CEO authorization.
-- Issues #3–#13 and #19 are open and intentionally unreleased after PM rejected unauthorized Forge maintenance claims; their repository commits remain evidence only, not acceptance.
+- Issues #6–#13 were independently PM-reviewed and closed as completed on 2026-08-19 after the candidate backend suite passed. Issue #5 was also accepted and closed as completed. Issues #4 and #19 were closed as superseded/not planned because they target obsolete or umbrella UI scope.
+- Issue #3 remains open pending the final local MVP release-candidate decision.
 - Issue #78 remains future/unreleased Atlas work.
 - Linux systemd issues #68/#76 belong to the Engineering Operations / infrastructure track. They do not silently block unrelated product work unless required by the selected milestone.
 
@@ -42,8 +43,8 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 
 ## Immediate priority order
 
-1. Execute issue #106 against one unchanged release-candidate commit.
-2. Keep the open-issue closure/review queue evidence-based.
+1. Complete the two remaining issue #106 release gates: disposable-folder product validation and explicit audit-actor context.
+2. Re-run the complete matrix against the remediated unchanged candidate and record `RC_PASS`, `RC_PARTIAL`, or `RC_FAIL` truthfully.
 3. Maintain the five-track canonical state across this file and both roadmaps.
 4. Create narrowly scoped remediation issues for confirmed release-candidate failures.
 5. Resume dependency-ordered execution without broad feature expansion.
@@ -54,8 +55,10 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 - Latest accepted issue audit: #103 and commit `1816018e38639a2f59a6af478d13abf8bf73bda8`
 - Historical Forge blocker, superseded without a pass claim: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
 - Defined release-candidate scope: `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`
-- Active validation task: issue #106 (open; direct ChatGPT execution authorized by the CEO)
-- Last verified repository head before this synchronization: `1816018e38639a2f59a6af478d13abf8bf73bda8`
+- Active validation task: issue #106 (open; current decision `RC_PARTIAL`)
+- Candidate validated by CI: `24998f04424b78ba531780523ef373c4c9981994`
+- CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32306414605`
+- Current evidence: `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md`
 
 ---
 
