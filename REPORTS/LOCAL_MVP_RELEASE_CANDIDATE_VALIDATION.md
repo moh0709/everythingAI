@@ -44,3 +44,4 @@ Remediation checkpoint: commit `a671c7c3a913e102b3dca31581c4c2a2ff52bf70` adds a
 ## Next safe action
 
 Implement a narrow audit-actor propagation contract with regression coverage, then execute the disposable-folder acceptance sequence and re-run the full matrix on one new unchanged candidate SHA.
+\nValidation trigger: this branch exists only to obtain independent pull-request CI evidence for the audit-actor candidate.\n
