@@ -32,9 +32,9 @@ No worker may invent a maintenance queue, claim unreleased work, self-accept, or
 - #69: protected; no modification or release without explicit CEO authorization.
 - #6–#13 and #5: independently PM-accepted and closed as completed on 2026-08-19.
 - #4 and #19: closed as superseded/not planned; their obsolete umbrella UI scope is not an active implementation queue.
-- #3: local MVP finalization is PM-accepted for closure after the release-candidate matrix passed.
+- #3: local MVP finalization is PM-accepted and closed completed after the release-candidate matrix passed.
 - #78: future/unreleased Atlas work.
-- #106: complete with `RC_PASS` on candidate `b89e91a2a362914a0c71f60be95725acb8363aff`; disposable-folder acceptance, audit identity, safety, recovery, backend, frontend, and browser gates passed in CI Smoke #438.
+- #106: PM-accepted and closed completed with `RC_PASS` on candidate `b89e91a2a362914a0c71f60be95725acb8363aff`; disposable-folder acceptance, audit identity, safety, recovery, backend, frontend, and browser gates passed in CI Smoke #438.
 - #68/#76: explicit Engineering Operations / infrastructure track, not a silent global product blocker.
 
 ## Temporary release control

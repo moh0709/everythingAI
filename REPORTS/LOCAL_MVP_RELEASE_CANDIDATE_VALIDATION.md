@@ -64,6 +64,6 @@ The acceptance work also preserves defense-in-depth path validation: previews an
 
 ## Release decision
 
-`RC_PASS` is accepted for the local MVP. Issues #106 and #3 may be closed as completed. The temporary major-feature freeze is lifted; future enterprise-platform, privileged-host, production-security, and protected-issue work remains subject to its own gates.
+`RC_PASS` is accepted for the local MVP. Issues #106 and #3 were closed as completed with exact candidate and CI evidence. The temporary major-feature freeze is lifted; future enterprise-platform, privileged-host, production-security, and protected-issue work remains subject to its own gates.
 
 Validation PR #108 was used to obtain independent CI evidence. Advancing `main` to the exact validated head caused GitHub to mark the PR merged without creating a separate merge commit.

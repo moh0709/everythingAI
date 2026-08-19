@@ -25,7 +25,7 @@
 ## Protected and unreleased work
 
 - #69 remains protected and unchanged unless the CEO explicitly changes that rule.
-- #3 and #106 are accepted for closure; #4–#13 and #19 are reconciled and closed.
+- #3 and #106 are accepted and closed completed; #4–#13 and #19 are reconciled and closed.
 - #78 remains future/unreleased Atlas work.
 - No bare phase number may be treated as the complete program status.
 
