@@ -217,34 +217,39 @@ export function listIndexedFiles(db, { limit = 100, status, query } = {}) {
   const params = { limit };
 
   if (status) {
-    clauses.push('index_status = @status');
+    clauses.push('f.index_status = @status');
     params.status = status;
   }
 
   if (query) {
-    clauses.push('(filename LIKE @query OR absolute_path LIKE @query OR extension LIKE @query)');
+    clauses.push('(f.filename LIKE @query OR f.absolute_path LIKE @query OR f.extension LIKE @query)');
     params.query = `%${query}%`;
   }
 
   const where = clauses.length > 0 ? `WHERE ${clauses.join(' AND ')}` : '';
   const stmt = db.prepare(`
     SELECT
-      id,
-      filename,
-      absolute_path,
-      relative_path,
-      extension,
-      mime_type,
-      size_bytes,
-      created_at,
-      modified_at,
-      content_hash,
-      index_status,
-      last_indexed_at,
-      error_message
-    FROM indexed_files
+      f.id,
+      f.filename,
+      f.absolute_path,
+      f.relative_path,
+      f.extension,
+      f.mime_type,
+      f.size_bytes,
+      f.created_at,
+      f.modified_at,
+      f.content_hash,
+      f.index_status,
+      f.last_indexed_at,
+      f.error_message,
+      e.extraction_status,
+      e.extracted_at,
+      e.extractor_name,
+      e.error_message AS extraction_error_message
+    FROM indexed_files f
+    LEFT JOIN file_extractions e ON e.file_id = f.id
     ${where}
-    ORDER BY last_indexed_at DESC
+    ORDER BY f.last_indexed_at DESC
     LIMIT @limit
   `);
 
