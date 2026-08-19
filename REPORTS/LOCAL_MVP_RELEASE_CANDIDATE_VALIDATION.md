@@ -1,7 +1,7 @@
 # Local MVP Release-Candidate Validation
 
 **Decision:** `RC_PARTIAL`  
-**Candidate:** `24998f04424b78ba531780523ef373c4c9981994`  
+**Candidate:** `b92ec3492d759936bb996daf9f18eb4673a1578e`
 **Branch:** `main`  
 **Validation date:** 2026-08-20  
 **Issue:** #106
@@ -20,18 +20,13 @@ The automated candidate is healthy, but the release-candidate gate is not comple
 - Playwright Client/Admin smoke: 5 passed, 0 failed.
 - CI workflow: all three jobs passed in [EverythingAI CI Smoke #428](https://github.com/moh0709/everythingAI/actions/runs/32306414605).
 - Issue reconciliation: #6–#13 and #5 independently accepted and closed; #4 and #19 closed as superseded/not planned; #105 truthfully closed not planned; #69 unchanged.
+- Audit actor identity: implemented with non-destructive schema migration, API request-context propagation, explicit system/internal defaults, and two regression tests. CI Smoke #432 passed all jobs on the candidate SHA.
 
 ## Remaining blockers
 
 ### 1. Disposable-folder acceptance evidence is absent
 
 The required manual product sequence has not been executed against a disposable runtime folder in this validation environment. Existing unit/integration tests cover indexing, extraction, search, knowledge, safe previews, approval, execution, undo, recovery, purge rejection, and path safety, but the baseline explicitly requires one end-to-end disposable-folder run.
-
-### 2. Audit actor identity is not explicit
-
-The local `audit_log` table stores event type, entity type, entity ID, payload, and timestamp, but no explicit actor identity. Request-context scaffolding exists, yet action, batch, undo, trash, restore, and purge audit writers do not persist that actor context. This leaves RC-AUD-01 incomplete.
-
-Remediation checkpoint: commit `a671c7c3a913e102b3dca31581c4c2a2ff52bf70` adds actor/request columns, non-destructive legacy migration, request-context propagation, truthful system defaults, and regression coverage. RC-AUD-01 remains incomplete until that candidate passes the full CI gate.
 
 ## Safety disposition
 
@@ -43,5 +38,6 @@ Remediation checkpoint: commit `a671c7c3a913e102b3dca31581c4c2a2ff52bf70` adds a
 
 ## Next safe action
 
-Implement a narrow audit-actor propagation contract with regression coverage, then execute the disposable-folder acceptance sequence and re-run the full matrix on one new unchanged candidate SHA.
-\nValidation trigger: this branch exists only to obtain independent pull-request CI evidence for the audit-actor candidate.\n
+Execute the disposable-folder acceptance sequence and re-run the remaining partial gates against the unchanged candidate SHA.
+
+Validation note: pull request #107 was used only to obtain independent CI evidence, then closed without merging; candidate `b92ec3492d759936bb996daf9f18eb4673a1578e` was fast-forwarded to `main` after CI passed.

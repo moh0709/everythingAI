@@ -3,7 +3,7 @@
 **Defined:** 2026-08-16  
 **Repository:** `moh0709/everythingAI`  
 **Branch:** `main`  
-**Status:** `RC_PARTIAL` (2026-08-20; candidate `24998f04424b78ba531780523ef373c4c9981994`)
+**Status:** `RC_PARTIAL` (2026-08-20; candidate `b92ec3492d759936bb996daf9f18eb4673a1578e`)
 **Authority:** `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`
 
 ## 1. Purpose
@@ -170,13 +170,12 @@ The freeze may be lifted only after:
 
 ## 10. Immediate next work
 
-1. Add explicit actor identity to local audit events without weakening the local-only safety model.
-2. Execute the disposable-folder intake, extraction, search, knowledge, Ask, preview, approval, execution, undo/restore, purge rejection, and path-boundary checks.
-3. Re-run all automated gates on the remediated unchanged candidate SHA.
-4. Promote to `RC_PASS` only when every required gate has evidence.
+1. Execute the disposable-folder intake, extraction, search, knowledge, Ask, preview, approval, execution, undo/restore, purge rejection, and path-boundary checks.
+2. Re-run the remaining partial gates on the unchanged candidate SHA.
+3. Promote to `RC_PASS` only when every required gate has evidence.
 
 ## 11. Current validation result
 
-The candidate passed root reliability tests (190/190), backend CI tests (172 passed, 1 skipped, 0 failed), frontend typecheck, frontend production build, and five Playwright Client/Admin smoke tests. GitHub Actions run #428 completed successfully.
+The candidate passed root reliability tests (190/190), the backend CI job including explicit audit-actor regression coverage, frontend typecheck, frontend production build, and five Playwright Client/Admin smoke tests. GitHub Actions run #432 completed successfully.
 
-The result remains `RC_PARTIAL` because the required disposable-folder product run has not been executed in this validation environment and the current `audit_log` contract does not store an explicit actor identity. Full evidence is in `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md` and `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_ACCEPTANCE_MATRIX.json`.
+The result remains `RC_PARTIAL` only because the required disposable-folder product run has not been executed in this validation environment. Explicit audit actor/request identity is now persisted and CI-verified. Full evidence is in `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md` and `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_ACCEPTANCE_MATRIX.json`.

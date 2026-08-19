@@ -1,19 +1,18 @@
 {
   "task": "Issue #106 - Local MVP release-candidate validation",
   "date": "2026-08-20",
-  "candidateSha": "24998f04424b78ba531780523ef373c4c9981994",
+  "candidateSha": "b92ec3492d759936bb996daf9f18eb4673a1578e",
   "decision": "RC_PARTIAL",
-  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32306414605",
+  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32307967933",
   "passed": {
     "rootTests": "190 passed, 0 failed",
-    "backendTests": "172 passed, 1 skipped, 0 failed",
+    "backendTests": "PASS, including audit actor identity regression coverage",
     "frontendTypecheck": "PASS",
     "frontendBuild": "PASS",
     "playwrightSmoke": "5 passed, 0 failed"
   },
   "blockers": [
-    "Required disposable-folder product acceptance sequence has not been executed in this validation environment.",
-    "Audit events do not persist explicit actor identity."
+    "Required disposable-folder product acceptance sequence has not been executed in this validation environment."
   ],
   "issueReconciliation": {
     "completed": [5, 6, 7, 8, 9, 10, 11, 12, 13],
@@ -22,6 +21,6 @@
     "protectedUnchanged": 69
   },
   "freeze": "ACTIVE",
-  "nextSafeAction": "Implement narrow audit-actor propagation with regression coverage, then execute the disposable-folder acceptance matrix on one new unchanged candidate SHA.",
-  "rollback": "Revert the evidence synchronization commit only; no product behavior changed in this evidence pass."
+  "nextSafeAction": "Execute the disposable-folder acceptance matrix against the unchanged candidate SHA.",
+  "rollback": "Revert the audit actor identity commit and the subsequent evidence-only commits; the database migration is additive and existing rows retain explicit system/internal defaults."
 }

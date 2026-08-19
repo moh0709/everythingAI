@@ -43,8 +43,8 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 
 ## Immediate priority order
 
-1. Complete the two remaining issue #106 release gates: disposable-folder product validation and explicit audit-actor context.
-2. Re-run the complete matrix against the remediated unchanged candidate and record `RC_PASS`, `RC_PARTIAL`, or `RC_FAIL` truthfully.
+1. Complete the remaining issue #106 release gate: disposable-folder product validation.
+2. Re-run the complete matrix against the unchanged candidate and record `RC_PASS`, `RC_PARTIAL`, or `RC_FAIL` truthfully.
 3. Maintain the five-track canonical state across this file and both roadmaps.
 4. Create narrowly scoped remediation issues for confirmed release-candidate failures.
 5. Resume dependency-ordered execution without broad feature expansion.
@@ -56,8 +56,8 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 - Historical Forge blocker, superseded without a pass claim: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
 - Defined release-candidate scope: `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`
 - Active validation task: issue #106 (open; current decision `RC_PARTIAL`)
-- Candidate validated by CI: `24998f04424b78ba531780523ef373c4c9981994`
-- CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32306414605`
+- Candidate validated by CI: `b92ec3492d759936bb996daf9f18eb4673a1578e`
+- CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32307967933`
 - Current evidence: `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md`
 
 ---

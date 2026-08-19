@@ -34,7 +34,7 @@ No worker may invent a maintenance queue, claim unreleased work, self-accept, or
 - #4 and #19: closed as superseded/not planned; their obsolete umbrella UI scope is not an active implementation queue.
 - #3: remains open pending the final local MVP release-candidate decision.
 - #78: future/unreleased Atlas work.
-- #106: active local MVP release-candidate validation task under direct ChatGPT execution authority; current decision is `RC_PARTIAL` pending disposable-folder validation and explicit audit-actor context.
+- #106: active local MVP release-candidate validation task under direct ChatGPT execution authority; current decision is `RC_PARTIAL` pending disposable-folder validation. Explicit audit-actor context is implemented and CI-verified.
 - #68/#76: explicit Engineering Operations / infrastructure track, not a silent global product blocker.
 
 ## Temporary release control

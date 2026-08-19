@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "candidateSha": "24998f04424b78ba531780523ef373c4c9981994",
+  "candidateSha": "b92ec3492d759936bb996daf9f18eb4673a1578e",
   "branch": "main",
   "validatedAt": "2026-08-20",
   "decision": "RC_PARTIAL",
-  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32306414605",
+  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32307967933",
   "summary": {
-    "pass": 16,
+    "pass": 17,
     "partial": 11,
-    "fail": 1
+    "fail": 0
   },
   "gates": [
     { "id": "RC-GOV-01", "status": "PASS", "evidence": "Candidate SHA recorded and pushed to main." },
@@ -17,10 +17,10 @@
     { "id": "RC-GOV-04", "status": "PASS", "evidence": "Protected issue #69 unchanged." },
     { "id": "RC-BLD-01", "status": "PASS", "evidence": "Framework doctor exit 0; local gh-auth warning recorded." },
     { "id": "RC-BLD-02", "status": "PASS", "evidence": "Root suite: 190 passed, 0 failed." },
-    { "id": "RC-BLD-03", "status": "PASS", "evidence": "Backend CI: 172 passed, 1 skipped, 0 failed." },
+    { "id": "RC-BLD-03", "status": "PASS", "evidence": "Backend CI job passed, including audit actor identity regression coverage." },
     { "id": "RC-BLD-04", "status": "PASS", "evidence": "Frontend TypeScript typecheck passed in CI." },
     { "id": "RC-BLD-05", "status": "PASS", "evidence": "Frontend Vite production build passed in CI." },
-    { "id": "RC-CI-01", "status": "PASS", "evidence": "CI Smoke #428: backend, frontend, and Playwright jobs passed." },
+    { "id": "RC-CI-01", "status": "PASS", "evidence": "CI Smoke #432: backend, frontend, and Playwright jobs passed on the candidate SHA." },
     { "id": "RC-UI-01", "status": "PASS", "evidence": "Five Playwright Client/Admin smoke tests passed." },
     { "id": "RC-INT-01", "status": "PARTIAL", "evidence": "Automated backend coverage passes; disposable-folder product run not executed." },
     { "id": "RC-EXT-01", "status": "PARTIAL", "evidence": "Supported extraction tests pass; manual fixture evidence missing." },
@@ -36,7 +36,7 @@
     { "id": "RC-SAFE-02", "status": "PASS", "evidence": "Path-boundary regression tests pass." },
     { "id": "RC-SAFE-03", "status": "PASS", "evidence": "Client/Admin separation smoke passed; provider controls remain Admin/backend-only." },
     { "id": "RC-SAFE-04", "status": "PASS", "evidence": "Connector UI remains Admin-only; agent bridge defaults disabled." },
-    { "id": "RC-AUD-01", "status": "FAIL", "evidence": "Audit events lack explicit persisted actor identity." },
+    { "id": "RC-AUD-01", "status": "PASS", "evidence": "Actor type/ID/email and request ID/source persist for action, undo, recovery, purge-denial, and execution-batch audit events; system/internal defaults remain explicit." },
     { "id": "RC-DOC-01", "status": "PASS", "evidence": "Canonical baseline and validation report now match RC_PARTIAL behavior." },
     { "id": "RC-ROLL-01", "status": "PARTIAL", "evidence": "Rollback paths are documented; disposable cleanup has not been executed in this run." }
   ]

@@ -1,6 +1,6 @@
 EverythingAI local MVP RC validation
 Date: 2026-08-20
-Candidate: 24998f04424b78ba531780523ef373c4c9981994
+Candidate: b92ec3492d759936bb996daf9f18eb4673a1578e
 
 LOCAL ROOT
 - node scripts/framework-doctor.mjs: exit 0, WARN only for unavailable local gh auth
@@ -28,4 +28,10 @@ RC_PARTIAL
 
 BLOCKERS
 1. Required disposable-folder product run not executed.
-2. Audit event contract lacks explicit persisted actor identity.
+
+AUDIT ACTOR REMEDIATION
+- additive audit actor/request schema migration: PASS
+- action, undo, recovery, purge-denial, and batch request-context propagation: PASS
+- truthful system/internal defaults: PASS
+- regression coverage: PASS
+- GitHub Actions run 32307967933 (CI Smoke #432): all three jobs PASS
