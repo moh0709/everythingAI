@@ -44,6 +44,14 @@ function ensureLegacyColumnsBeforeSchema(db) {
   );
 }
 
+function ensureAuditIdentityColumns(db) {
+  addColumnIfMissing(db, 'audit_log', 'actor_type', "TEXT NOT NULL DEFAULT 'system'");
+  addColumnIfMissing(db, 'audit_log', 'actor_id', 'TEXT');
+  addColumnIfMissing(db, 'audit_log', 'actor_email', 'TEXT');
+  addColumnIfMissing(db, 'audit_log', 'request_id', 'TEXT');
+  addColumnIfMissing(db, 'audit_log', 'request_source', "TEXT NOT NULL DEFAULT 'internal'");
+}
+
 export function openDatabase(dbPath = process.env.EVERYTHINGAI_DB_PATH || DEFAULT_DB_PATH) {
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   const db = new Database(dbPath);
@@ -51,6 +59,7 @@ export function openDatabase(dbPath = process.env.EVERYTHINGAI_DB_PATH || DEFAUL
   db.pragma('foreign_keys = ON');
   ensureLegacyColumnsBeforeSchema(db);
   db.exec(fs.readFileSync(SCHEMA_PATH, 'utf8'));
+  ensureAuditIdentityColumns(db);
   return db;
 }
 
@@ -726,6 +735,16 @@ export function markActionExecutionUndone(db, executionId) {
 }
 
 export function insertAuditLog(db, event) {
+  const auditContext = event.audit_context ?? {};
+  const record = {
+    ...event,
+    actor_type: auditContext.actor?.type || 'system',
+    actor_id: auditContext.actor?.id || null,
+    actor_email: auditContext.actor?.email || null,
+    request_id: auditContext.request?.id || null,
+    request_source: auditContext.request?.source || 'internal',
+  };
+
   db.prepare(`
     INSERT INTO audit_log (
       id,
@@ -733,6 +752,11 @@ export function insertAuditLog(db, event) {
       entity_type,
       entity_id,
       payload_json,
+      actor_type,
+      actor_id,
+      actor_email,
+      request_id,
+      request_source,
       created_at
     )
     VALUES (
@@ -741,9 +765,14 @@ export function insertAuditLog(db, event) {
       @entity_type,
       @entity_id,
       @payload_json,
+      @actor_type,
+      @actor_id,
+      @actor_email,
+      @request_id,
+      @request_source,
       @created_at
     )
-  `).run(event);
+  `).run(record);
 }
 
 export function listAuditLog(db, { entityType, entityId, limit = 100 } = {}) {

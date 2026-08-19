@@ -29,13 +29,14 @@ function createId(prefix) {
     .digest('hex');
 }
 
-function audit(db, { eventType, entityId, payload }) {
+function audit(db, { eventType, entityId, payload, auditContext = null }) {
   insertAuditLog(db, {
     id: createId('audit'),
     event_type: eventType,
     entity_type: 'execution_batch',
     entity_id: entityId,
     payload_json: JSON.stringify(payload),
+    audit_context: auditContext,
     created_at: new Date().toISOString(),
   });
 }
@@ -71,6 +72,7 @@ function assertExecutionBatchIntegrity(batch) {
 export async function executeExecutionBatch(db, {
   batchId,
   approve = false,
+  auditContext = null,
 } = {}) {
   if (!approve) {
     throw new Error('Explicit approval is required to execute an execution batch.');
@@ -101,6 +103,7 @@ export async function executeExecutionBatch(db, {
       batch_id: batch.id,
       execution_count: batch.executions.length,
     },
+    auditContext,
   });
 
   const results = [];
@@ -134,6 +137,7 @@ export async function executeExecutionBatch(db, {
       const executed = await executeActionPreview(db, {
         previewId: execution.preview_id,
         approve: true,
+        auditContext,
       });
 
       results.push({
@@ -175,6 +179,7 @@ export async function executeExecutionBatch(db, {
       : 'execution_batch.completed',
     entityId: batch.id,
     payload: summary,
+    auditContext,
   });
 
   return summary;
@@ -183,6 +188,7 @@ export async function executeExecutionBatch(db, {
 export async function rollbackExecutionBatch(db, {
   batchId,
   approve = false,
+  auditContext = null,
 } = {}) {
   if (!approve) {
     throw new Error('Explicit approval is required to rollback an execution batch.');
@@ -203,6 +209,7 @@ export async function rollbackExecutionBatch(db, {
       batch_id: batch.id,
       execution_count: batch.executions.length,
     },
+    auditContext,
   });
 
   const rollbackResults = [];
@@ -222,6 +229,7 @@ export async function rollbackExecutionBatch(db, {
       const undone = await undoActionExecution(db, {
         executionId: execution.id,
         approve: true,
+        auditContext,
       });
 
       rollbackResults.push({
@@ -263,6 +271,7 @@ export async function rollbackExecutionBatch(db, {
       : 'execution_batch.rollback_completed',
     entityId: batch.id,
     payload: summary,
+    auditContext,
   });
 
   return summary;

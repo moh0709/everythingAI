@@ -21,13 +21,14 @@ function addDays(date, days) {
   return next;
 }
 
-function audit(db, { eventType, entityType, entityId, payload }) {
+function audit(db, { eventType, entityType, entityId, payload, auditContext = null }) {
   insertAuditLog(db, {
     id: createId('audit'),
     event_type: eventType,
     entity_type: entityType,
     entity_id: entityId,
     payload_json: JSON.stringify(payload),
+    audit_context: auditContext,
     created_at: new Date().toISOString(),
   });
 }
@@ -125,7 +126,11 @@ export function listTrashRecords(db, { status = 'trashed', limit = 100 } = {}) {
   `).all(params);
 }
 
-export function moveFileToTrash(db, { fileId, retentionDays = DEFAULT_TRASH_RETENTION_DAYS } = {}) {
+export function moveFileToTrash(db, {
+  fileId,
+  retentionDays = DEFAULT_TRASH_RETENTION_DAYS,
+  auditContext = null,
+} = {}) {
   if (!fileId) {
     throw new Error('fileId is required');
   }
@@ -193,12 +198,13 @@ export function moveFileToTrash(db, { fileId, retentionDays = DEFAULT_TRASH_RETE
       retention_days: normalizedRetentionDays,
       note: 'Local MVP trash is recovery metadata only; file content is not permanently deleted.',
     },
+    auditContext,
   });
 
   return trashRecord;
 }
 
-export function restoreTrashRecord(db, { trashId, reason = null } = {}) {
+export function restoreTrashRecord(db, { trashId, reason = null, auditContext = null } = {}) {
   if (!trashId) {
     throw new Error('trashId is required');
   }
@@ -235,12 +241,17 @@ export function restoreTrashRecord(db, { trashId, reason = null } = {}) {
     entityType: 'trash_record',
     entityId: restoredRecord.id,
     payload: restoredRecord,
+    auditContext,
   });
 
   return restoredRecord;
 }
 
-export function blockPermanentPurge(db, { trashId = null, requestedBy = 'local-mvp' } = {}) {
+export function blockPermanentPurge(db, {
+  trashId = null,
+  requestedBy = 'local-mvp',
+  auditContext = null,
+} = {}) {
   const entityId = trashId || 'permanent-purge';
   const payload = {
     trash_id: trashId,
@@ -255,6 +266,7 @@ export function blockPermanentPurge(db, { trashId = null, requestedBy = 'local-m
     entityType: 'trash_record',
     entityId,
     payload,
+    auditContext,
   });
 
   throw createServiceError(PURGE_BLOCKED_MESSAGE, 403, {

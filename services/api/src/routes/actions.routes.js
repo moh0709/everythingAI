@@ -72,6 +72,7 @@ export function createActionsRouter() {
         execution = await executeActionPreview(db, {
           previewId,
           approve: req.body?.approve === true,
+          auditContext: req.requestContext,
         });
       } catch (execError) {
         db.close();
@@ -94,6 +95,7 @@ export function createActionsRouter() {
       const execution = await undoActionExecution(db, {
         executionId: req.params.executionId,
         approve: req.body?.approve === true,
+        auditContext: req.requestContext,
       });
       db.close();
 

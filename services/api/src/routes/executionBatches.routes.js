@@ -18,6 +18,7 @@ export function createExecutionBatchesRouter() {
       const batch = createExecutionBatch(db, {
         previewIds: req.body?.previewIds,
         planningSessionId: req.body?.planningSessionId || null,
+        auditContext: req.requestContext,
       });
       db.close();
 
@@ -65,6 +66,7 @@ export function createExecutionBatchesRouter() {
       const batch = approveExecutionBatch(db, {
         batchId: req.params.batchId,
         approve: req.body?.approve === true,
+        auditContext: req.requestContext,
       });
       db.close();
 
@@ -80,6 +82,7 @@ export function createExecutionBatchesRouter() {
       const batch = await runExecutionBatch(db, {
         batchId: req.params.batchId,
         approve: req.body?.approve === true,
+        auditContext: req.requestContext,
       });
       db.close();
 

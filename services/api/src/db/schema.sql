@@ -227,6 +227,11 @@ CREATE TABLE IF NOT EXISTS audit_log (
   entity_type TEXT NOT NULL,
   entity_id TEXT NOT NULL,
   payload_json TEXT NOT NULL,
+  actor_type TEXT NOT NULL DEFAULT 'system',
+  actor_id TEXT,
+  actor_email TEXT,
+  request_id TEXT,
+  request_source TEXT NOT NULL DEFAULT 'internal',
   created_at TEXT NOT NULL
 );
 

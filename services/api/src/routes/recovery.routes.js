@@ -54,6 +54,7 @@ export function createRecoveryRouter() {
         const trashRecord = moveFileToTrash(db, {
           fileId,
           retentionDays: req.body?.retentionDays,
+          auditContext: req.requestContext,
         });
         db.close();
         return res.status(201).json({ trashRecord });
@@ -78,6 +79,7 @@ export function createRecoveryRouter() {
         const trashRecord = restoreTrashRecord(db, {
           trashId: req.params.trashId,
           reason: req.body?.reason?.toString() || null,
+          auditContext: req.requestContext,
         });
         db.close();
         return res.json({ trashRecord });
@@ -98,6 +100,7 @@ export function createRecoveryRouter() {
         blockPermanentPurge(db, {
           trashId: req.params.trashId,
           requestedBy: req.body?.requestedBy?.toString() || 'api',
+          auditContext: req.requestContext,
         });
       } catch (error) {
         db.close();

@@ -34,18 +34,19 @@ function now() {
   return new Date().toISOString();
 }
 
-function audit(db, { eventType, entityType, entityId, payload }) {
+function audit(db, { eventType, entityType, entityId, payload, auditContext = null }) {
   insertAuditLog(db, {
     id: createId('audit'),
     event_type: eventType,
     entity_type: entityType,
     entity_id: entityId,
     payload_json: JSON.stringify(payload),
+    audit_context: auditContext,
     created_at: now(),
   });
 }
 
-function auditBatch(db, { eventType, batch }) {
+function auditBatch(db, { eventType, batch, auditContext = null }) {
   audit(db, {
     eventType,
     entityType: 'execution_batch',
@@ -60,6 +61,7 @@ function auditBatch(db, { eventType, batch }) {
       started_at: batch.started_at,
       completed_at: batch.completed_at,
     },
+    auditContext,
   });
 }
 
@@ -134,7 +136,11 @@ function persistBatch(db, batch, overrides = {}) {
   return getExecutionBatchById(db, batch.id);
 }
 
-export function createExecutionBatch(db, { previewIds, planningSessionId = null } = {}) {
+export function createExecutionBatch(db, {
+  previewIds,
+  planningSessionId = null,
+  auditContext = null,
+} = {}) {
   const normalizedPreviewIds = normalizePreviewIds(previewIds);
 
   if (normalizedPreviewIds.length === 0) {
@@ -167,12 +173,12 @@ export function createExecutionBatch(db, { previewIds, planningSessionId = null 
   insertExecutionBatch(db, batch);
 
   const createdBatch = getExecutionBatchById(db, batch.id);
-  auditBatch(db, { eventType: 'execution_batch.created', batch: createdBatch });
+  auditBatch(db, { eventType: 'execution_batch.created', batch: createdBatch, auditContext });
 
   return createdBatch;
 }
 
-export function approveExecutionBatch(db, { batchId, approve = false } = {}) {
+export function approveExecutionBatch(db, { batchId, approve = false, auditContext = null } = {}) {
   if (!approve) {
     throw new Error('Explicit approval is required to approve an execution batch.');
   }
@@ -202,12 +208,12 @@ export function approveExecutionBatch(db, { batchId, approve = false } = {}) {
     updated_at: approvedAt,
   });
 
-  auditBatch(db, { eventType: 'execution_batch.approved', batch: approvedBatch });
+  auditBatch(db, { eventType: 'execution_batch.approved', batch: approvedBatch, auditContext });
 
   return approvedBatch;
 }
 
-export async function runExecutionBatch(db, { batchId, approve = false } = {}) {
+export async function runExecutionBatch(db, { batchId, approve = false, auditContext = null } = {}) {
   if (!approve) {
     throw new Error('Explicit approval is required to run an execution batch.');
   }
@@ -228,7 +234,7 @@ export async function runExecutionBatch(db, { batchId, approve = false } = {}) {
     started_at: startedAt,
     updated_at: startedAt,
   });
-  auditBatch(db, { eventType: 'execution_batch.started', batch: runningBatch });
+  auditBatch(db, { eventType: 'execution_batch.started', batch: runningBatch, auditContext });
 
   const summary = {
     ...runningBatch.summary,
@@ -247,6 +253,7 @@ export async function runExecutionBatch(db, { batchId, approve = false } = {}) {
         previewId,
         approve: true,
         executionBatchId: runningBatch.id,
+        auditContext,
       });
 
       summary.executed += 1;
@@ -284,7 +291,7 @@ export async function runExecutionBatch(db, { batchId, approve = false } = {}) {
       ? 'execution_batch.completed_with_errors'
       : 'execution_batch.failed';
 
-  auditBatch(db, { eventType: finalEventType, batch: finalBatch });
+  auditBatch(db, { eventType: finalEventType, batch: finalBatch, auditContext });
 
   return finalBatch;
 }

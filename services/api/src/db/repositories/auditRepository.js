@@ -1,4 +1,14 @@
 export function insertAuditLog(db, event) {
+  const auditContext = event.audit_context ?? {};
+  const record = {
+    ...event,
+    actor_type: auditContext.actor?.type || 'system',
+    actor_id: auditContext.actor?.id || null,
+    actor_email: auditContext.actor?.email || null,
+    request_id: auditContext.request?.id || null,
+    request_source: auditContext.request?.source || 'internal',
+  };
+
   db.prepare(`
     INSERT INTO audit_log (
       id,
@@ -6,6 +16,11 @@ export function insertAuditLog(db, event) {
       entity_type,
       entity_id,
       payload_json,
+      actor_type,
+      actor_id,
+      actor_email,
+      request_id,
+      request_source,
       created_at
     )
     VALUES (
@@ -14,9 +29,14 @@ export function insertAuditLog(db, event) {
       @entity_type,
       @entity_id,
       @payload_json,
+      @actor_type,
+      @actor_id,
+      @actor_email,
+      @request_id,
+      @request_source,
       @created_at
     )
-  `).run(event);
+  `).run(record);
 }
 
 export function listAuditLog(db, { entityType, entityId, limit = 100 } = {}) {

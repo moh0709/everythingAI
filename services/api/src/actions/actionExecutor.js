@@ -79,13 +79,14 @@ function deriveOriginalRelativePath(currentFile, restoredAbsolutePath) {
   return restoredRelativePath;
 }
 
-function audit(db, { eventType, entityType, entityId, payload }) {
+function audit(db, { eventType, entityType, entityId, payload, auditContext = null }) {
   insertAuditLog(db, {
     id: createId('audit'),
     event_type: eventType,
     entity_type: entityType,
     entity_id: entityId,
     payload_json: JSON.stringify(payload),
+    audit_context: auditContext,
     created_at: new Date().toISOString(),
   });
 }
@@ -95,6 +96,7 @@ function failExecution(db, {
   error,
   executionId = createId('execution'),
   executionBatchId = null,
+  auditContext = null,
 }) {
   const failedExecution = {
     id: executionId,
@@ -121,12 +123,13 @@ function failExecution(db, {
     entityType: 'action_execution',
     entityId: failedExecution.id,
     payload: failedExecution,
+    auditContext,
   });
 
   return failedExecution;
 }
 
-function auditUndoFailure(db, { execution, error }) {
+function auditUndoFailure(db, { execution, error, auditContext = null }) {
   audit(db, {
     eventType: 'action.undo_failed',
     entityType: 'action_execution',
@@ -143,6 +146,7 @@ function auditUndoFailure(db, { execution, error }) {
       undo_target_path: execution.undo_target_path,
       error_message: error.message,
     },
+    auditContext,
   });
 }
 
@@ -288,6 +292,7 @@ export async function executeActionPreview(db, {
   previewId,
   approve = false,
   executionBatchId = null,
+  auditContext = null,
 } = {}) {
   const preview = getActionPreviewById(db, previewId);
 
@@ -365,6 +370,7 @@ export async function executeActionPreview(db, {
         ...execution,
         recovery_snapshot_id: recoverySnapshot?.id || null,
       },
+      auditContext,
     });
 
     return execution;
@@ -374,12 +380,13 @@ export async function executeActionPreview(db, {
       error,
       executionId,
       executionBatchId,
+      auditContext,
     });
     throw Object.assign(error, { execution: failedExecution });
   }
 }
 
-export async function undoActionExecution(db, { executionId, approve = false } = {}) {
+export async function undoActionExecution(db, { executionId, approve = false, auditContext = null } = {}) {
   if (!approve) {
     throw new Error('Explicit approval is required to undo an action execution.');
   }
@@ -432,11 +439,12 @@ export async function undoActionExecution(db, { executionId, approve = false } =
         ...execution,
         recovery_snapshot_id: recoverySnapshot?.id || null,
       },
+      auditContext,
     });
 
     return getActionExecutionById(db, execution.id);
   } catch (error) {
-    auditUndoFailure(db, { execution, error });
+    auditUndoFailure(db, { execution, error, auditContext });
     throw error;
   }
 }
