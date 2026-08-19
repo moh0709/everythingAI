@@ -15,10 +15,9 @@ Create one accepted program state, one exclusive execution model, and one depend
 - [x] Correct unauthorized queue-state changes and preserve issue #69 protection.
 - [x] Add the approved reconciliation baseline to repository documentation.
 - [x] Add current-authority overlays to canonical state and roadmap documents.
-- [ ] Obtain #105 clean post-exit scheduler result 0.
-- [ ] Prove no duplicate #105 claim during an unchanged second cycle.
-- [ ] Independently accept or correct #105.
-- [ ] Confirm mutually exclusive ChatGPT / Forge / Hermes / human-operator ownership.
+- [x] Truthfully close #105 as not planned after the CEO removed the Forge prerequisite; do not claim the missing scheduler evidence passed.
+- [x] Authorize direct ChatGPT execution for dependency-satisfied Phase 0 work.
+- [x] Confirm mutually exclusive ChatGPT / Forge / Hermes / human-operator ownership.
 - [x] Define the local MVP release-candidate scope and acceptance matrix in `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`.
 - [ ] Complete release-candidate QA and evidence review.
 - [ ] Lift the temporary major-feature freeze only after all Phase 0 exit conditions pass.
@@ -26,7 +25,7 @@ Create one accepted program state, one exclusive execution model, and one depend
 ### Execution rules
 
 - ChatGPT is the sole PM and release authority.
-- Forge becomes the primary code executor only after #105 acceptance.
+- ChatGPT directly executes dependency-satisfied Phase 0 work under the 2026-08-19 CEO decision; Forge is optional and requires explicit future release.
 - Hermes receives only explicitly assigned, non-overlapping infrastructure or operational work.
 - Privileged host work remains human-controlled.
 - Exactly one dependency-satisfied task is released at a time.
@@ -36,10 +35,10 @@ Create one accepted program state, one exclusive execution model, and one depend
 ### Exit gate
 
 1. Open issues are reconciled.
-2. Forge passes the clean operational soak gate.
-3. Execution ownership is explicit and non-overlapping.
-4. Canonical state and roadmaps agree.
-5. A local MVP release-candidate baseline is defined.
+2. Execution ownership is explicit and non-overlapping.
+3. Canonical state and roadmaps agree.
+4. A local MVP release-candidate baseline is defined.
+5. The complete release-candidate acceptance matrix passes on one unchanged commit.
 
 ## Work after the exit gate
 

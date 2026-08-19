@@ -67,7 +67,7 @@ The following are outside this release-candidate scope:
 |---|---|---|---|---|
 | RC-GOV-01 | Exact candidate SHA recorded | `git rev-parse HEAD` and remote comparison | Commit SHA and branch | Required |
 | RC-GOV-02 | Canonical state agrees | Review `PROJECT_STATE.md`, `AI_BOOTSTRAP.md`, both roadmaps, and Phase 0 baseline | No unresolved authority conflict | Required |
-| RC-GOV-03 | Forge operational ownership is accepted | Independent PM review of #105 | Clean scheduler result 0, unchanged second cycle, no duplicate claim | Required before autonomous release work |
+| RC-GOV-03 | Execution ownership is explicit | Review CEO decision, #105 disposition, #106 scope, and queue labels | ChatGPT direct execution recorded; #105 truthfully closed not planned; no competing worker claim | Required |
 | RC-GOV-04 | Protected work remains protected | Inspect #69 and unreleased queues | #69 unchanged; no unauthorized queue labels | Required |
 | RC-BLD-01 | Framework integrity passes | `npm run framework:doctor` | Exit 0 | Required |
 | RC-BLD-02 | Root reliability tests pass | `npm test` from repository root | Exit 0 and exact pass/fail counts | Required |
@@ -162,7 +162,7 @@ Defining this baseline does not lift the temporary major-feature freeze.
 
 The freeze may be lifted only after:
 
-1. #105 is independently resolved;
+1. #105 is truthfully dispositioned without claiming the missing Forge soak passed;
 2. execution ownership remains explicit and non-overlapping;
 3. this matrix is executed against one candidate SHA;
 4. the result is `RC_PASS`; and
@@ -170,8 +170,7 @@ The freeze may be lifted only after:
 
 ## 10. Immediate next work
 
-1. Finish #105 operational soak evidence.
-2. Prepare a narrowly scoped validation task using this matrix.
-3. Execute automated and disposable-folder checks against one candidate SHA.
-4. Record defects as focused issues; do not reopen broad umbrella execution.
-5. Produce the release-candidate decision.
+1. Execute issue #106 using this matrix under direct ChatGPT authority.
+2. Execute automated and disposable-folder checks against one candidate SHA.
+3. Record defects as focused issues; do not reopen broad umbrella execution.
+4. Produce the release-candidate decision.

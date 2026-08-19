@@ -15,15 +15,15 @@ EverythingAI is in **Reconciliation and Release Control**. Progress is tracked a
 The next product milestone is a **local MVP release candidate**. A temporary major-feature freeze remains active until:
 
 1. open issue state is reconciled;
-2. Forge completes the clean operational soak gate;
-3. execution ownership is explicit;
-4. canonical state and roadmaps are synchronized; and
-5. the local MVP release-candidate baseline is defined.
+2. execution ownership is explicit;
+3. canonical state and roadmaps are synchronized;
+4. the local MVP release-candidate baseline is defined; and
+5. the complete release-candidate acceptance matrix passes on one unchanged commit.
 
 ## Verified governance state
 
 - Issue #103 is PM-accepted and closed.
-- Issue #105 remains truthfully blocked at `forge:blocked + pm:review` pending one unchanged post-exit Windows scheduler cycle with result 0 and no duplicate claim.
+- Issue #105 is closed as `not planned` after the CEO removed Forge as a prerequisite on 2026-08-19. Its missing scheduler evidence did not pass and must not be cited as accepted soak proof.
 - Issue #69 is protected and must not be modified or released without explicit CEO authorization.
 - Issues #3–#13 and #19 are open and intentionally unreleased after PM rejected unauthorized Forge maintenance claims; their repository commits remain evidence only, not acceptance.
 - Issue #78 remains future/unreleased Atlas work.
@@ -33,7 +33,8 @@ The next product milestone is a **local MVP release candidate**. A temporary maj
 
 - Product Owner / CEO: Mohammad Ismail.
 - Sole PM and release authority: ChatGPT.
-- Primary code executor: Forge, only after #105 passes independent PM review.
+- Direct execution authority: ChatGPT may implement and validate dependency-satisfied work under the CEO decision of 2026-08-19; evidence and final review remain distinguishable.
+- Optional code executor: Forge may be used only when explicitly released for a future task; it is not a Phase 0 dependency.
 - Hermes: explicitly assigned, non-overlapping infrastructure or operational work only.
 - Human operator: privileged host, SSH, root, sudo, secret, and other actions outside safe automation boundaries.
 
@@ -41,19 +42,19 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 
 ## Immediate priority order
 
-1. Obtain and independently verify #105 clean scheduler soak evidence.
+1. Execute issue #106 against one unchanged release-candidate commit.
 2. Keep the open-issue closure/review queue evidence-based.
 3. Maintain the five-track canonical state across this file and both roadmaps.
-4. Keep issue #106 unreleased until #105 is accepted, then use it to validate the defined local MVP release-candidate baseline.
+4. Create narrowly scoped remediation issues for confirmed release-candidate failures.
 5. Resume dependency-ordered execution without broad feature expansion.
 
 ## Evidence baseline
 
 - CEO-approved reconciliation: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`
 - Latest accepted issue audit: #103 and commit `1816018e38639a2f59a6af478d13abf8bf73bda8`
-- Current Forge blocker: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
+- Historical Forge blocker, superseded without a pass claim: `docs/HANDOVER_2026-08-06_ISSUE_105_FORGE_AUTONOMOUS_CYCLE.json`
 - Defined release-candidate scope: `docs/LOCAL_MVP_RELEASE_CANDIDATE_BASELINE_2026-08-16.md`
-- Prepared next validation task: issue #106 (open, unreleased, dependent on #105)
+- Active validation task: issue #106 (open; direct ChatGPT execution authorized by the CEO)
 - Last verified repository head before this synchronization: `1816018e38639a2f59a6af478d13abf8bf73bda8`
 
 ---

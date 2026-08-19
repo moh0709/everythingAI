@@ -18,7 +18,8 @@ Do not use an unqualified phase number as the sole project-status statement. Alw
 
 - CEO: final business, strategic, commercial, and materially scope-changing decisions.
 - ChatGPT: sole PM and release authority; architecture, dependency order, issue reconciliation, acceptance decisions, and milestone reporting.
-- Forge: primary code executor only after issue #105 is independently accepted.
+- ChatGPT: authorized by the CEO on 2026-08-19 to directly execute dependency-satisfied implementation and validation work while preserving evidence and review separation.
+- Forge: optional executor only when explicitly released for a future task; no longer a Phase 0 dependency.
 - Hermes: only explicitly assigned, non-overlapping operational or infrastructure work.
 - Human operator: privileged host operations, SSH/root/sudo, secret provisioning, and actions that safe automation cannot perform.
 
@@ -27,16 +28,16 @@ No worker may invent a maintenance queue, claim unreleased work, self-accept, or
 ## Current gates
 
 - #103: accepted and closed.
-- #105: blocked pending a clean unchanged post-exit scheduler cycle, scheduler result 0, label integrity, and no duplicate claim.
+- #105: closed as `not planned` after the CEO removed the Forge prerequisite. The missing scheduler proof did not pass and is retained only as historical evidence.
 - #69: protected; no modification or release without explicit CEO authorization.
 - #3–#13 and #19: open, unreleased backlog after PM queue correction.
 - #78: future/unreleased Atlas work.
-- #106: prepared local MVP release-candidate validation task; open and unreleased until #105 is independently accepted.
+- #106: active local MVP release-candidate validation task under direct ChatGPT execution authority.
 - #68/#76: explicit Engineering Operations / infrastructure track, not a silent global product blocker.
 
 ## Temporary release control
 
-No new major feature may be released until open-issue reconciliation, Forge soak proof, explicit execution ownership, canonical-document synchronization, and a defined local MVP release-candidate baseline are complete.
+No new major feature may be released until open-issue reconciliation, explicit execution ownership, canonical-document synchronization, a defined local MVP release-candidate baseline, and a complete `RC_PASS` acceptance matrix are achieved.
 
 Small, reversible, evidence-backed documentation, governance, issue-triage, QA, and engineering actions may proceed autonomously within existing authority. Escalate only strategic, architectural, commercial, security, legal, irreversible, privileged, or materially scope-changing decisions.
 

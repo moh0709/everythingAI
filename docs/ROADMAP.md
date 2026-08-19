@@ -10,13 +10,13 @@
 | Knowledge and Safe Action | Source-backed knowledge, planning, preview, approval, execution, undo, and audit foundations exist | Validate end-to-end release-candidate workflows and evidence UX |
 | Enterprise Platform | Target architecture documented; production platform incomplete | Keep future until CEO selects the production-platform milestone |
 | Engineering Operations | Repository reliability foundation exists; Linux systemd work remains explicit infrastructure backlog | Resolve or formally supersede #68/#76 when required by the chosen milestone |
-| Governance and Autonomous Delivery | Issue #103 accepted; Forge foundations implemented; #105 soak still blocked | Accept one clean autonomous Forge cycle and maintain exclusive execution ownership |
+| Governance and Autonomous Delivery | Issue #103 accepted; #105 closed not planned by CEO direction; ChatGPT direct execution authorized | Maintain explicit ownership, evidence separation, and protected queues |
 
 ## Active sequence
 
 1. Reconcile live issue state and preserve corrected queue ownership.
-2. Complete #105 with clean unchanged scheduler evidence, result 0, and no duplicate claim.
-3. Keep ChatGPT as sole PM/release authority; activate Forge as primary code executor only after #105 acceptance.
+2. Preserve #105 as a truthful not-planned Forge result; never reinterpret it as passed soak evidence.
+3. Use direct ChatGPT execution for dependency-satisfied Phase 0 work; Forge remains optional and explicitly released only.
 4. Keep Hermes isolated to explicitly assigned infrastructure/operational work.
 5. Synchronize canonical documents with this five-track model.
 6. Establish and validate the local MVP release-candidate baseline.
