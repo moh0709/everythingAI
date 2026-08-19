@@ -27,7 +27,7 @@ The **local MVP release candidate passed** on 2026-08-20. The temporary major-fe
 - Issue #69 is protected and must not be modified or released without explicit CEO authorization.
 - Issues #6–#13 were independently PM-reviewed and closed as completed on 2026-08-19 after the candidate backend suite passed. Issue #5 was also accepted and closed as completed. Issues #4 and #19 were closed as superseded/not planned because they target obsolete or umbrella UI scope.
 - Issues #3 and #106 are PM-accepted and closed as completed after the final local MVP release-candidate decision passed.
-- Issue #78 remains future/unreleased Atlas work.
+- Issue #78 is PM-accepted for closure after its atomic/idempotent claim transition passed local and CI validation on commit `74b5335b67c01d44b64321dae4a374b599586a05`.
 - Linux systemd issues #68/#76 belong to the Engineering Operations / infrastructure track. They do not silently block unrelated product work unless required by the selected milestone.
 
 ## Execution authority
@@ -46,7 +46,7 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 1. Preserve the accepted local MVP candidate and its reproducible CI acceptance sequence.
 2. Preserve the exact closure evidence for completed issues #106 and #3.
 3. Resume the five tracks in dependency order while keeping production-only capabilities behind their own gates.
-4. Keep #69 protected and #78 explicitly scoped before any autonomous-delivery work begins.
+4. Preserve the accepted Atlas claim boundary and keep #69 protected from modification or release.
 5. Maintain canonical state, evidence, rollback paths, and truthful blockers as the program advances.
 
 ## Evidence baseline
@@ -59,6 +59,9 @@ Exactly one dependency-satisfied task may be released at a time for each authori
 - Candidate validated by CI: `b89e91a2a362914a0c71f60be95725acb8363aff`
 - CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32309409263`
 - Current evidence: `REPORTS/LOCAL_MVP_RELEASE_CANDIDATE_VALIDATION.md`
+- Atlas atomic-claim implementation: `74b5335b67c01d44b64321dae4a374b599586a05`
+- Atlas CI evidence: `https://github.com/moh0709/everythingAI/actions/runs/32315159757`
+- Atlas acceptance report: `REPORTS/ATLAS_ATOMIC_CLAIM_ISSUE_78.md`
 
 ---
 

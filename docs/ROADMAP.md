@@ -10,7 +10,7 @@
 | Knowledge and Safe Action | End-to-end intake, extraction, search, knowledge, planning, approval, action, audit, undo, and recovery acceptance passed | Preserve safety boundaries while improving evidence UX |
 | Enterprise Platform | Target architecture documented; production platform incomplete | Keep future until CEO selects the production-platform milestone |
 | Engineering Operations | Repository reliability foundation exists; Linux systemd work remains explicit infrastructure backlog | Resolve or formally supersede #68/#76 when required by the chosen milestone |
-| Governance and Autonomous Delivery | Phase 0 exit gate and local MVP RC passed; ChatGPT direct execution authorized | Scope #78 independently; maintain explicit ownership, evidence separation, and protected queues |
+| Governance and Autonomous Delivery | Phase 0 exit gate and local MVP RC passed; Atlas atomic claim accepted for closure | Preserve explicit ownership, evidence separation, and protected queues |
 
 ## Active sequence
 
@@ -26,7 +26,7 @@
 
 - #69 remains protected and unchanged unless the CEO explicitly changes that rule.
 - #3 and #106 are accepted and closed completed; #4–#13 and #19 are reconciled and closed.
-- #78 remains future/unreleased Atlas work.
+- #78 is PM-accepted for closure with exact implementation and CI evidence.
 - No bare phase number may be treated as the complete program status.
 
 ---

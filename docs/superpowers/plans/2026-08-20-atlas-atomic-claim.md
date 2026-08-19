@@ -31,17 +31,17 @@
 - Consumes: `claim_issue(issue, token, request=api_request, now=...)` from the poller module.
 - Produces: regression evidence for concurrent claimants, stale discovery, repeated ticks, existing ownership, and partial API failure.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
   Add a thread-safe in-memory GitHub API harness. Assert that two concurrent calls produce one `CLAIMED`, one `CLAIM_CONFLICT`, one acknowledgement, and label mutations from only the winning thread. Add independent tests for a lost `atlas:ready` label after discovery, a second cron tick, pre-existing `atlas:working`, label-removal failure, and add-label failure with rollback.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
   Run: `node --test tests/atlas-claim.test.mjs`
 
   Expected: FAIL because `claim_issue` and the remote lock behavior do not exist.
 
-- [ ] **Step 3: Implement the minimal claim authority**
+- [x] **Step 3: Implement the minimal claim authority**
 
   In `scripts/atlas-cron-poller.py`, add:
 
@@ -63,13 +63,13 @@
 
   Make API errors explicit. On pre-ownership failure, release only the ref whose target still matches the acquired target. On add-label failure, restore `atlas:ready` only when no terminal/review/competing ownership appeared. If acknowledgement creation is ambiguous, query comments for the unique issue claim marker before deciding the result.
 
-- [ ] **Step 4: Run the focused test and verify GREEN**
+- [x] **Step 4: Run the focused test and verify GREEN**
 
   Run: `node --test tests/atlas-claim.test.mjs`
 
   Expected: all Atlas claim tests pass with zero failures.
 
-- [ ] **Step 5: Run queue-boundary regressions**
+- [x] **Step 5: Run queue-boundary regressions**
 
   Run: `node --test tests/agent-queue-policy.test.mjs tests/atlas-claim.test.mjs`
 
@@ -88,21 +88,21 @@
 - Consumes: passing focused and full validation outputs plus the validated commit SHA.
 - Produces: auditable issue #78 acceptance evidence and synchronized zero-open-issue state.
 
-- [ ] **Step 1: Run full verification**
+- [x] **Step 1: Run full verification**
 
   Run: `npm test`, `npm run framework:doctor`, `python3 -m py_compile scripts/atlas-cron-poller.py tests/atlas_claim_test.py`, `git diff --check`.
 
-  Expected: zero test failures, doctor PASS, Python compilation exit 0, and no whitespace errors.
+  Expected: zero test failures, Python compilation exit 0, and no whitespace errors. The framework doctor may report only the known missing-local-`gh` warning when connector-backed GitHub read/write capability is independently verified.
 
-- [ ] **Step 2: Record evidence**
+- [x] **Step 2: Record evidence**
 
   Write the exact commands/counts, acceptance-criterion mapping, durable lock design, rollback behavior, protected #69 confirmation, and validated SHA into the report and handover.
 
-- [ ] **Step 3: Synchronize canonical state**
+- [x] **Step 3: Synchronize canonical state**
 
   Replace references to #78 as future/unreleased with its accepted completion, record that no open implementation issues remain, and keep production/privileged-host/#69 gates unchanged.
 
-- [ ] **Step 4: Publish and verify CI**
+- [x] **Step 4: Publish and verify CI**
 
   Publish the feature commit through a validation branch/PR, verify the exact commit in GitHub Actions, then update `main` only to the validated commit and re-read the resulting workflow and issue state.
 

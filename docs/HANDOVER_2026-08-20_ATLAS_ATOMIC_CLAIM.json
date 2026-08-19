@@ -1,0 +1,30 @@
+{
+  "task": "Issue #78 - Atlas atomic and idempotent claim transition",
+  "date": "2026-08-20",
+  "decision": "ACCEPTED_FOR_CLOSURE",
+  "implementationSha": "74b5335b67c01d44b64321dae4a374b599586a05",
+  "validationPullRequest": "https://github.com/moh0709/everythingAI/pull/109",
+  "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32315159757",
+  "validation": {
+    "atlasPythonCases": "7 passed, 0 failed",
+    "queueBoundaryTests": "6 passed, 0 failed",
+    "rootTests": "191 passed, 0 failed, 0 skipped",
+    "pythonCompilation": "PASS",
+    "diffCheck": "PASS",
+    "ciSmoke": "PASS",
+    "frameworkDoctor": "WARN: local gh executable absent; connector-backed GitHub read/write verified"
+  },
+  "acceptedControls": [
+    "Issue-scoped Git ref is the atomic cross-machine lock.",
+    "Only the remote-ref creator may mutate issue state.",
+    "Live issue labels and delegation body are re-read before mutation.",
+    "Ready removal and working addition are independently verified.",
+    "Partial failures roll back only when live ownership remains clean.",
+    "Stable acknowledgement marker prevents duplicate comments after ambiguous responses.",
+    "Forge and Hermes queue ownership remains excluded."
+  ],
+  "protectedIssue69": "UNCHANGED",
+  "atlasActivation": "NOT_PERFORMED",
+  "rollback": "Revert implementation commit; retain successful claim refs unless live issue state proves cleanup is safe.",
+  "nextAction": "Publish this acceptance evidence, close issue #78 as completed, synchronize closure wording, and verify that no open issues remain."
+}
