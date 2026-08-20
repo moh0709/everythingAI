@@ -27,7 +27,7 @@ The **local MVP release candidate passed** on 2026-08-20. The temporary major-fe
 - Issue #69 is protected and must not be modified or released without explicit CEO authorization.
 - Issues #6–#13 were independently PM-reviewed and closed as completed on 2026-08-19 after the candidate backend suite passed. Issue #5 was also accepted and closed as completed. Issues #4 and #19 were closed as superseded/not planned because they target obsolete or umbrella UI scope.
 - Issues #3 and #106 are PM-accepted and closed as completed after the final local MVP release-candidate decision passed.
-- Issue #78 is PM-accepted for closure after its atomic/idempotent claim transition passed local and CI validation on commit `74b5335b67c01d44b64321dae4a374b599586a05`.
+- Issue #78 is PM-accepted and closed as completed after its atomic/idempotent claim transition passed local and CI validation on commit `74b5335b67c01d44b64321dae4a374b599586a05`.
 - Linux systemd issues #68/#76 belong to the Engineering Operations / infrastructure track. They do not silently block unrelated product work unless required by the selected milestone.
 
 ## Execution authority

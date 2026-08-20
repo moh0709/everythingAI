@@ -106,6 +106,6 @@
 
   Publish the feature commit through a validation branch/PR, verify the exact commit in GitHub Actions, then update `main` only to the validated commit and re-read the resulting workflow and issue state.
 
-- [ ] **Step 5: PM acceptance**
+- [x] **Step 5: PM acceptance**
 
   Post concise evidence to #78 and close it as completed only after all acceptance criteria are verified. Re-query open issues and confirm #69 was not modified.

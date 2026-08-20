@@ -2,9 +2,9 @@
 
 ## Decision
 
-`ACCEPTED_FOR_CLOSURE`
+`ACCEPTED_CLOSED_COMPLETED`
 
-Issue #78 satisfies its repository acceptance criteria on implementation commit `74b5335b67c01d44b64321dae4a374b599586a05`. This decision does not activate Atlas, release any delegation, grant production access, or modify protected issue #69.
+Issue #78 satisfies its repository acceptance criteria on implementation commit `74b5335b67c01d44b64321dae4a374b599586a05` and is closed as completed. This decision does not activate Atlas, release any delegation, grant production access, or modify protected issue #69.
 
 ## Root cause
 

@@ -1,7 +1,7 @@
 {
   "task": "Issue #78 - Atlas atomic and idempotent claim transition",
   "date": "2026-08-20",
-  "decision": "ACCEPTED_FOR_CLOSURE",
+  "decision": "ACCEPTED_CLOSED_COMPLETED",
   "implementationSha": "74b5335b67c01d44b64321dae4a374b599586a05",
   "validationPullRequest": "https://github.com/moh0709/everythingAI/pull/109",
   "ciRun": "https://github.com/moh0709/everythingAI/actions/runs/32315159757",
@@ -26,5 +26,5 @@
   "protectedIssue69": "UNCHANGED",
   "atlasActivation": "NOT_PERFORMED",
   "rollback": "Revert implementation commit; retain successful claim refs unless live issue state proves cleanup is safe.",
-  "nextAction": "Publish this acceptance evidence, close issue #78 as completed, synchronize closure wording, and verify that no open issues remain."
+  "nextAction": "Preserve the accepted local MVP and Atlas claim baselines; no open implementation issue remains, and production, privileged-host, and protected issue #69 gates remain unchanged."
 }
