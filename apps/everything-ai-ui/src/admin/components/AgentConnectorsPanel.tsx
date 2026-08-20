@@ -362,7 +362,7 @@ export function AgentConnectorsPanel({
       <AlertTriangle size={14} /> Agent chat is enabled in the local environment. Controlled connector diagnostics should keep chat disabled unless explicitly approved.
     </div>}
 
-    <div className="provider-grid">
+    <div className="provider-grid agent-connector-grid">
       {agentCatalog.map((agent) => {
         const config = agentIntegrations[agent.id] || {
           enabled: false,
