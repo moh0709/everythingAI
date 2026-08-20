@@ -26,6 +26,12 @@ function connectorCard(page: Page, connectorName: string) {
     .locator('xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " source-card ")][1]');
 }
 
+async function openAgentConnectors(page: Page) {
+  await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Agent Connectors', exact: true }).click();
+  await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
+}
+
 test.describe('EverythingAI Client/Admin UX smoke agent', () => {
   test('client workspace clearly separates sources, files, knowledge base, and ask AI', async ({ page }) => {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
@@ -158,8 +164,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
 
   test('Agent Connector settings remain readable at desktop and narrow widths', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(`${BASE_URL}/admin.html#agent-connectors`, { waitUntil: 'networkidle' });
-    await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
+    await openAgentConnectors(page);
 
     const codexCard = connectorCard(page, 'OpenAI Codex app / CLI connector');
     await expect(codexCard).toBeVisible();
@@ -182,8 +187,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
   });
 
   test('Agent Connector settings use capability language instead of completed phase labels', async ({ page }) => {
-    await page.goto(`${BASE_URL}/admin.html#agent-connectors`, { waitUntil: 'networkidle' });
-    await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
+    await openAgentConnectors(page);
     await expect(page.getByText(/Phase 8\.3/)).toHaveCount(0);
   });
 
