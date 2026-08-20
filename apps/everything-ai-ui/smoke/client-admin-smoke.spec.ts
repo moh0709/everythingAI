@@ -119,7 +119,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Enable remote providers through server policy')).toBeVisible();
     await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
     await expect(page.getByText('Connector Health Summary')).toBeVisible();
-    await expect(page.getByText('Phase 8.3A scope')).toBeVisible();
+    await expect(page.getByText('Primary connector scope')).toBeVisible();
     await expect(page.getByText('Primary connector progress snapshot')).toBeVisible();
     await expect(page.getByText('Codex readiness')).toBeVisible();
     await expect(page.getByText('Claude Code readiness')).toBeVisible();
