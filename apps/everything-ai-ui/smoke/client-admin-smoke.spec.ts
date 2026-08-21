@@ -81,8 +81,11 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await page.route('**/api/intelligence/document-context/phase1-failed-source', async (route) => {
       await route.fulfill({ json: {
         document: {
-          file: failedFile,
-          index_error_message: 'Deterministic Phase 1 context index failure.',
+          file: {
+            ...failedFile,
+            error_message: undefined,
+            index_error_message: 'Deterministic Phase 1 context index failure.',
+          },
           previewText: 'Extracted text retained despite the conflicting failed index record.',
           source_reference: { relative_path: failedFile.relative_path },
         },
