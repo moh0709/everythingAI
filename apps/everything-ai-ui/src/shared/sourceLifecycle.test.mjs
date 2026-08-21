@@ -48,9 +48,35 @@ test('failure and terminal-state precedence is deterministic for conflicting rec
 });
 
 test('per-file retry is not offered because the backend only supports source-root re-scan', () => {
-  assert.equal(lifecycle.deriveSourceLifecycle({ index_status: 'failed' }).recoveryAction, null);
-  assert.equal(lifecycle.deriveSourceLifecycle({
+  const indexFailure = lifecycle.deriveSourceLifecycle({ index_status: 'failed' });
+  const extractionFailure = lifecycle.deriveSourceLifecycle({
     index_status: 'indexed',
     extraction_status: 'failed',
-  }).recoveryAction, null);
+  });
+
+  assert.equal(indexFailure.recoveryAction, null);
+  assert.equal(extractionFailure.recoveryAction, null);
+  assert.equal(indexFailure.recoveryTarget, 'source_root');
+  assert.equal(extractionFailure.recoveryTarget, 'source_root');
+  assert.equal(lifecycle.deriveSourceLifecycle({
+    index_status: 'indexed',
+    extraction_status: 'extracted',
+  }).recoveryTarget, null);
+});
+
+test('Client and Admin explorers use the unified lifecycle and source-root recovery navigation', async () => {
+  const client = await readFile(new URL('../user/ExploreView.tsx', import.meta.url), 'utf8');
+  const admin = await readFile(new URL('../admin/components/ExplorerView.tsx', import.meta.url), 'utf8');
+  const styles = await readFile(new URL('./sourceLifecycle.css', import.meta.url), 'utf8');
+
+  for (const source of [client, admin]) {
+    assert.match(source, /deriveSourceLifecycle/);
+    assert.match(source, /Open source recovery/);
+    assert.match(source, /aria-describedby="source-recovery-explanation"/);
+    assert.doesNotMatch(source, /Index: \{file\.index_status/);
+    assert.doesNotMatch(source, /Extract: \{file\.extraction_status/);
+  }
+
+  assert.match(styles, /\.source-lifecycle\s*\{/);
+  assert.match(styles, /\.source-lifecycle-(?:index_failed|extraction_failed)/);
 });

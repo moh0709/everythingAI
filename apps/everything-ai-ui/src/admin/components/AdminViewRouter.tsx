@@ -156,6 +156,7 @@ export function AdminViewRouter(props: AdminViewRouterProps) {
         filterStatus={props.filterStatus}
         setFilterStatus={props.setFilterStatus}
         extensionOptions={props.extensionOptions}
+        openSourceRecovery={() => props.setSection('dashboard')}
       />;
 
     case 'planning':

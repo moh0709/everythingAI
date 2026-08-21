@@ -53,6 +53,62 @@ async function openAgentConnectors(page: Page) {
 }
 
 test.describe('EverythingAI Client/Admin UX smoke agent', () => {
+  test('failed source recovery is keyboard-accessible and routes to source-root controls', async ({ page }) => {
+    const failedFile = {
+      id: 'phase1-failed-source',
+      filename: 'phase1-failed-source.txt',
+      absolute_path: '/tmp/phase1-failed-source.txt',
+      relative_path: 'phase1-failed-source.txt',
+      extension: '.txt',
+      size_bytes: 42,
+      index_status: 'failed',
+      extraction_status: 'extracted',
+      error_message: 'Deterministic Phase 1 index failure.',
+    };
+
+    await page.route('**/api/files?limit=250', async (route) => {
+      await route.fulfill({ json: { files: [failedFile] } });
+    });
+    await page.route('**/api/intelligence/document-context/phase1-failed-source', async (route) => {
+      await route.fulfill({ json: {
+        document: {
+          file: failedFile,
+          previewText: 'Extracted text retained despite the conflicting failed index record.',
+          source_reference: { relative_path: failedFile.relative_path },
+        },
+      } });
+    });
+
+    for (const viewport of PRODUCT_REVIEW_VIEWPORTS) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+      await expect(page.getByText('Index failed').first()).toBeVisible();
+      await page.getByText(failedFile.filename, { exact: true }).click();
+
+      const clientRecovery = page.getByRole('button', { name: 'Open source recovery' });
+      await expect(clientRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
+      await clientRecovery.focus();
+      await expect(clientRecovery).toBeFocused();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-client-source-recovery`);
+      await clientRecovery.press('Enter');
+      await expect(page.getByRole('heading', { name: 'Connect your local knowledge' })).toBeVisible();
+
+      await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
+      await page.getByRole('button', { name: 'Files & Content' }).click();
+      await expect(page.getByText('Index failed').first()).toBeVisible();
+
+      const adminRecovery = page.getByRole('button', { name: 'Open source recovery' });
+      await expect(adminRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
+      await adminRecovery.focus();
+      await expect(adminRecovery).toBeFocused();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-admin-source-recovery`);
+      await adminRecovery.press('Enter');
+      await expect(page.getByRole('heading', { name: 'Operator Control Center' })).toBeVisible();
+    }
+  });
+
   test('Phase 1 product-review journey remains usable at desktop and narrow widths', async ({ page }) => {
     for (const viewport of PRODUCT_REVIEW_VIEWPORTS) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });

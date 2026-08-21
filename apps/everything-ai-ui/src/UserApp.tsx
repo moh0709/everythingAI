@@ -214,6 +214,7 @@ export function UserApp() {
         handleAskFromHero={handleAskFromHero}
         loadDocumentContext={(fileId) => loadDocumentContextWorkflow(fileId)}
         saveConnection={saveConnection}
+        openSourceRecovery={() => setView('onboarding')}
       />}
 
       {view === 'wiki' && <WikiView

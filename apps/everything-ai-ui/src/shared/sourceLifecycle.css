@@ -1,0 +1,40 @@
+.source-lifecycle {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 13rem;
+  max-width: 24rem;
+}
+
+.source-lifecycle strong {
+  color: #1e40af;
+}
+
+.source-lifecycle small {
+  color: #475569;
+  line-height: 1.35;
+}
+
+.source-lifecycle-technical {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.source-lifecycle-index_failed strong,
+.source-lifecycle-extraction_failed strong {
+  color: #b91c1c;
+}
+
+.source-lifecycle-ready strong {
+  color: #15803d;
+}
+
+.source-lifecycle-unsupported strong {
+  color: #9a3412;
+}
+
+@media (max-width: 640px) {
+  .source-lifecycle {
+    min-width: 10rem;
+    max-width: 16rem;
+  }
+}

@@ -21,6 +21,7 @@ export type SourceLifecycleView = {
   label: string;
   detail: string;
   recoveryAction: SourceRecoveryAction;
+  recoveryTarget: 'source_root' | null;
 };
 
 export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecycleView {
@@ -30,6 +31,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
       label: 'Index failed',
       detail: file.error_message || 'The source could not be indexed. Fix the source and re-scan its root.',
       recoveryAction: null,
+      recoveryTarget: 'source_root',
     };
   }
 
@@ -39,6 +41,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
       label: 'Extraction failed',
       detail: file.extraction_error_message || 'Text extraction failed. Fix the source and re-scan its root.',
       recoveryAction: null,
+      recoveryTarget: 'source_root',
     };
   }
 
@@ -48,6 +51,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
       label: 'Ready without text',
       detail: 'Metadata is indexed, but this file type is unsupported for text extraction.',
       recoveryAction: null,
+      recoveryTarget: null,
     };
   }
 
@@ -57,6 +61,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
       label: 'Ready',
       detail: 'Indexing and text extraction are complete.',
       recoveryAction: null,
+      recoveryTarget: null,
     };
   }
 
@@ -66,6 +71,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
       label: 'Extracting text',
       detail: 'Indexing is complete and text extraction is pending.',
       recoveryAction: null,
+      recoveryTarget: null,
     };
   }
 
@@ -75,6 +81,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
       label: 'Indexing',
       detail: 'The source is queued or currently being indexed.',
       recoveryAction: null,
+      recoveryTarget: null,
     };
   }
 
@@ -83,5 +90,6 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
     label: 'Waiting for intake',
     detail: 'No indexing or extraction record exists yet.',
     recoveryAction: null,
+    recoveryTarget: null,
   };
 }
