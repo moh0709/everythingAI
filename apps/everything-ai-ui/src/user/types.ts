@@ -16,6 +16,8 @@ export type DocumentContext = {
     relative_path?: string;
     recovery_status?: string;
     source_reference?: string;
+    index_error_message?: string | null;
+    extraction_error_message?: string | null;
   };
   previewText?: string;
   insight?: {

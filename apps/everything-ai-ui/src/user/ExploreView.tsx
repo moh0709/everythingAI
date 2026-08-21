@@ -5,11 +5,12 @@ import type { DocumentContext } from './types';
 import type { IndexedFile } from '../api';
 import { ExtractedTextPreview } from '../shared/ExtractedTextPreview';
 import {
-  describeFileProgress,
   summarizeFileProgress,
   withInFlightSummary,
   type FileProgressRecord,
 } from '../shared/fileProgress';
+import { deriveSourceLifecycle } from '../shared/sourceLifecycle';
+import '../shared/sourceLifecycle.css';
 import './localSettingsHelp.css';
 
 type ExploreViewProps = {
@@ -30,6 +31,7 @@ type ExploreViewProps = {
   handleAskFromHero: () => void;
   loadDocumentContext: (fileId: string) => void;
   saveConnection: () => void;
+  openSourceRecovery: () => void;
 };
 
 function summarizeFiles(files: IndexedFile[]) {
@@ -57,12 +59,12 @@ function summarizeFiles(files: IndexedFile[]) {
 export function ExploreView({
   error, busy, status, baseUrl, setBaseUrl, token, setToken,
   query, setQuery, files, selectedFile, documentContext,
-  refreshFiles, searchEverything, handleAskFromHero, loadDocumentContext, saveConnection,
+  refreshFiles, searchEverything, handleAskFromHero, loadDocumentContext, saveConnection, openSourceRecovery,
 }: ExploreViewProps) {
   const summary = summarizeFiles(files);
   const progressSummary = withInFlightSummary(summarizeFileProgress(files));
   const selectedRecord = (documentContext?.file || selectedFile) as FileProgressRecord | undefined;
-  const selectedProgress = describeFileProgress(selectedRecord);
+  const selectedLifecycle = deriveSourceLifecycle(selectedRecord || {});
 
   return <>
     <section className="hero-row">
@@ -168,24 +170,23 @@ export function ExploreView({
         <div className="panel-title">
           <div>
             <h2><FileText /> Indexed File List</h2>
-            <p>{files.length} visible file(s). Click a file to inspect extracted file content and source metadata.</p>
+            <p>{files.length} visible file(s). Open a file to inspect extracted file content and source metadata.</p>
           </div>
           <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
         </div>
         <table>
           <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
           <tbody>{files.map((file) => {
-            const progress = describeFileProgress(file as FileProgressRecord);
-            return <tr key={file.id} onClick={() => loadDocumentContext(file.id)} className={selectedFile?.id === file.id ? 'selected' : ''}>
-              <td>{file.filename}</td>
+            const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
+            return <tr key={file.id} className={selectedFile?.id === file.id ? 'selected' : ''}>
+              <td><button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => loadDocumentContext(file.id)}>{file.filename}</button></td>
               <td><span className="chip blue">{file.extension || 'file'}</span></td>
               <td>{formatSize(file.size_bytes)}</td>
               <td>
-                <div className="chips">
-                  <span className={`chip ${progress.tone}`}>{progress.label}</span>
-                  <span className="chip dark">Stage: {progress.stage}</span>
-                  <span className="chip dark">Index: {file.index_status || 'pending'}</span>
-                  <span className="chip dark">Extract: {file.extraction_status || 'pending'}</span>
+                <div className={`source-lifecycle source-lifecycle-${lifecycle.state}`}>
+                  <strong>{lifecycle.label}</strong>
+                  <small>{lifecycle.detail}</small>
+                  <small className="source-lifecycle-technical">Index {file.index_status || 'pending'} · Extract {file.extraction_status || 'pending'}</small>
                 </div>
               </td>
             </tr>;
@@ -199,13 +200,15 @@ export function ExploreView({
           <p><strong>View type:</strong> File content / source context</p>
           <p><strong>Path:</strong> {documentContext.file?.absolute_path}</p>
           <p><strong>Recovery:</strong> {selectedRecord?.recovery_status || 'active'}</p>
-          <p><strong>Progress:</strong> {selectedProgress.label} — {selectedProgress.detail}</p>
-          <p><strong>Current stage:</strong> {selectedProgress.stage}</p>
-          <p><strong>Progress state:</strong> {selectedProgress.state}</p>
-          <p><strong>Next step:</strong> {selectedProgress.nextStep}</p>
+          <p><strong>Lifecycle:</strong> {selectedLifecycle.label} — {selectedLifecycle.detail}</p>
+          <p><strong>Lifecycle state:</strong> {selectedLifecycle.state}</p>
+          {selectedLifecycle.recoveryTarget === 'source_root' && <>
+            <p id="source-recovery-explanation">Recovery reuses the safe source-root controls; no unsupported per-file retry is attempted.</p>
+            <button className="outline" aria-describedby="source-recovery-explanation" onClick={openSourceRecovery}>Open source recovery</button>
+          </>}
           <p><strong>Index status:</strong> {documentContext.file?.index_status || 'unknown'}</p>
           <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'pending'}</p>
-          {(selectedRecord?.error_message || selectedRecord?.extraction_error_message) ? <p><strong>Reported issue:</strong> {selectedRecord?.error_message || selectedRecord?.extraction_error_message}</p> : null}
+          {(selectedRecord?.index_error_message || selectedRecord?.error_message || selectedRecord?.extraction_error_message) ? <p><strong>Reported issue:</strong> {selectedRecord?.index_error_message || selectedRecord?.error_message || selectedRecord?.extraction_error_message}</p> : null}
           <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
           {documentContext.insight?.summary && <><h3>File Insight</h3><p>{documentContext.insight.summary}</p></>}
           <h3>Extracted File Text</h3>

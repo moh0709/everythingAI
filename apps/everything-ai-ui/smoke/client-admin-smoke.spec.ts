@@ -40,6 +40,15 @@ async function assertNoHorizontalOverflow(page: Page) {
   ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 }
 
+async function focusByTab(page: Page, target: ReturnType<Page['getByRole']>, maxPresses = 40) {
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  for (let presses = 0; presses < maxPresses; presses += 1) {
+    await page.keyboard.press('Tab');
+    if (await target.evaluate((element) => element === document.activeElement)) return;
+  }
+  throw new Error(`Could not reach ${await target.getAttribute('aria-label') || await target.textContent()} by Tab`);
+}
+
 function connectorCard(page: Page, connectorName: string) {
   return page
     .getByText(connectorName, { exact: true })
@@ -53,6 +62,73 @@ async function openAgentConnectors(page: Page) {
 }
 
 test.describe('EverythingAI Client/Admin UX smoke agent', () => {
+  test('failed source recovery is keyboard-accessible and routes to source-root controls', async ({ page }) => {
+    const failedFile = {
+      id: 'phase1-failed-source',
+      filename: 'phase1-failed-source.txt',
+      absolute_path: '/tmp/phase1-failed-source.txt',
+      relative_path: 'phase1-failed-source.txt',
+      extension: '.txt',
+      size_bytes: 42,
+      index_status: 'failed',
+      extraction_status: 'extracted',
+      error_message: 'Deterministic Phase 1 index failure.',
+    };
+
+    await page.route('**/api/files?limit=250', async (route) => {
+      await route.fulfill({ json: { files: [failedFile] } });
+    });
+    await page.route('**/api/intelligence/document-context/phase1-failed-source', async (route) => {
+      await route.fulfill({ json: {
+        document: {
+          file: {
+            ...failedFile,
+            error_message: undefined,
+            index_error_message: 'Deterministic Phase 1 context index failure.',
+          },
+          previewText: 'Extracted text retained despite the conflicting failed index record.',
+          source_reference: { relative_path: failedFile.relative_path },
+        },
+      } });
+    });
+
+    for (const viewport of PRODUCT_REVIEW_VIEWPORTS) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+      await expect(page.getByText('Index failed').first()).toBeVisible();
+      const clientFile = page.getByRole('button', { name: `Inspect ${failedFile.filename}` });
+      await focusByTab(page, clientFile);
+      await clientFile.press('Enter');
+      await expect(page.getByText('Reported issue:', { exact: true }).locator('..'))
+        .toContainText('Deterministic Phase 1 context index failure.');
+
+      const clientRecovery = page.getByRole('button', { name: 'Open source recovery' });
+      await expect(clientRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
+      await focusByTab(page, clientRecovery);
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-client-source-recovery`);
+      await clientRecovery.press('Enter');
+      const clientDestination = page.getByRole('heading', { name: 'Connect your local knowledge' });
+      await expect(clientDestination).toBeFocused();
+
+      await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
+      await page.getByRole('button', { name: 'Files & Content' }).click();
+      await expect(page.getByText('Index failed').first()).toBeVisible();
+      const adminFile = page.getByRole('button', { name: `Inspect ${failedFile.filename}` });
+      await focusByTab(page, adminFile);
+      await adminFile.press('Enter');
+
+      const adminRecovery = page.getByRole('button', { name: 'Open source recovery' });
+      await expect(adminRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
+      await focusByTab(page, adminRecovery);
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-admin-source-recovery`);
+      await adminRecovery.press('Enter');
+      const adminDestination = page.getByRole('heading', { name: 'Operator Control Center' });
+      await expect(adminDestination).toBeFocused();
+    }
+  });
+
   test('Phase 1 product-review journey remains usable at desktop and narrow widths', async ({ page }) => {
     for (const viewport of PRODUCT_REVIEW_VIEWPORTS) {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });

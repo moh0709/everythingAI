@@ -1,0 +1,72 @@
+.source-lifecycle {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 13rem;
+  max-width: 24rem;
+}
+
+.source-lifecycle strong {
+  color: #1e40af;
+}
+
+.source-lifecycle small {
+  color: #475569;
+  line-height: 1.35;
+}
+
+.source-lifecycle-technical {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.source-lifecycle-index_failed strong,
+.source-lifecycle-extraction_failed strong {
+  color: #b91c1c;
+}
+
+.source-lifecycle-ready strong {
+  color: #15803d;
+}
+
+.source-lifecycle-unsupported strong {
+  color: #9a3412;
+}
+
+.explorer-table-scroll {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.file-select-button {
+  display: inline;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.file-select-button:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .explorer-search {
+    flex-wrap: wrap;
+  }
+
+  .explorer-search input {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .source-lifecycle {
+    min-width: 10rem;
+    max-width: 16rem;
+  }
+}

@@ -4,11 +4,12 @@ import { FILE_STATUS_FILTER_OPTIONS } from '../../shared/fileStatusOptions';
 import { formatDate } from '../../shared/formatDate';
 import type { ExtractedPreviewSource } from '../../shared/selectExtractedPreviewText';
 import {
-  describeFileProgress,
   summarizeFileProgress,
   withInFlightSummary,
   type FileProgressRecord,
 } from '../../shared/fileProgress';
+import { deriveSourceLifecycle } from '../../shared/sourceLifecycle';
+import '../../shared/sourceLifecycle.css';
 import { formatSize } from '../utils/format';
 import '../../user/localSettingsHelp.css';
 
@@ -32,6 +33,7 @@ type ExplorerViewProps = {
   filterStatus: string;
   setFilterStatus: (status: string) => void;
   extensionOptions: string[];
+  openSourceRecovery: () => void;
 };
 
 function dynamicTags(file?: IndexedFile, preview?: FilePreview | null) {
@@ -85,11 +87,12 @@ export function ExplorerView({
   filterStatus,
   setFilterStatus,
   extensionOptions,
+  openSourceRecovery,
 }: ExplorerViewProps) {
   const summary = summarizeFiles(allFiles);
   const visibleSummary = summarizeFiles(files);
   const progressSummary = withInFlightSummary(summarizeFileProgress(allFiles));
-  const selectedProgress = describeFileProgress((selectedFile || selectedPreview?.file) as FileProgressRecord | undefined);
+  const selectedLifecycle = deriveSourceLifecycle((selectedFile || selectedPreview?.file || {}) as FileProgressRecord);
 
   return <section>
     <div className="panel" style={{ marginBottom: '1rem' }}>
@@ -176,34 +179,34 @@ export function ExplorerView({
     </div>
 
     <div className="explorer-grid">
-      <table>
+      <div className="explorer-table-scroll">
+        <table>
         <thead>
-          <tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Last Modified</th></tr>
+          <tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Lifecycle</th></tr>
         </thead>
         <tbody>
           {files.map((file) => {
-            const progress = describeFileProgress(file as FileProgressRecord);
+            const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
             return <tr
               key={file.id}
-              onClick={() => setSelectedFileId(file.id)}
               className={selectedFile?.id === file.id ? 'selected' : ''}
             >
-              <td>{file.filename}</td>
+              <td><button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => setSelectedFileId(file.id)}>{file.filename}</button></td>
               <td>{file.absolute_path}</td>
               <td><span className="chip blue">{file.extension || 'file'}</span></td>
               <td>{formatSize(file.size_bytes)}</td>
               <td>
-                <div className="chips">
-                  <span className={`chip ${progress.tone}`}>{progress.label}</span>
-                  <span className="chip dark">Stage: {progress.stage}</span>
-                  <span className="chip dark">Index: {file.index_status || 'pending'}</span>
-                  <span className="chip dark">Extract: {file.extraction_status || 'pending'}</span>
+                <div className={`source-lifecycle source-lifecycle-${lifecycle.state}`}>
+                  <strong>{lifecycle.label}</strong>
+                  <small>{lifecycle.detail}</small>
+                  <small className="source-lifecycle-technical">Index {file.index_status || 'pending'} · Extract {file.extraction_status || 'pending'}</small>
                 </div>
               </td>
             </tr>;
           })}
         </tbody>
-      </table>
+        </table>
+      </div>
 
       <aside className="details">
         <h2>{selectedFile?.filename || 'Select a file'}</h2>
@@ -211,10 +214,12 @@ export function ExplorerView({
           <p><strong>Path:</strong> {selectedFile.absolute_path}</p>
           <p><strong>Type:</strong> {selectedFile.extension}</p>
           <p><strong>Size:</strong> {formatSize(selectedFile.size_bytes)}</p>
-          <p><strong>Progress:</strong> {selectedProgress.label} — {selectedProgress.detail}</p>
-          <p><strong>Current stage:</strong> {selectedProgress.stage}</p>
-          <p><strong>Progress state:</strong> {selectedProgress.state}</p>
-          <p><strong>Next step:</strong> {selectedProgress.nextStep}</p>
+          <p><strong>Lifecycle:</strong> {selectedLifecycle.label} — {selectedLifecycle.detail}</p>
+          <p><strong>Lifecycle state:</strong> {selectedLifecycle.state}</p>
+          {selectedLifecycle.recoveryTarget === 'source_root' && <>
+            <p id="source-recovery-explanation">Recovery reuses the safe source-root controls; no unsupported per-file retry is attempted.</p>
+            <button className="outline" aria-describedby="source-recovery-explanation" onClick={openSourceRecovery}>Open source recovery</button>
+          </>}
           <h3>Tags</h3>
           <div className="chips">
             {dynamicTags(selectedFile, selectedPreview).map((tag) => <span className="chip blue" key={tag}>{tag}</span>)}

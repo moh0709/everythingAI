@@ -3,6 +3,7 @@ import type { IndexedFile } from '../api';
 export type FileProgressRecord = IndexedFile & {
   recovery_status?: string;
   error_message?: string | null;
+  index_error_message?: string | null;
   extraction_error_message?: string | null;
 };
 
@@ -66,7 +67,7 @@ export function describeFileProgress(file?: FileProgressRecord | null): FileProg
     return {
       label: 'Index failed',
       tone: 'dark',
-      detail: file.error_message || 'The indexer reported a failure for this file.',
+      detail: file.index_error_message || file.error_message || 'The indexer reported a failure for this file.',
       state: 'failed',
       stage: 'Indexing failed',
       nextStep: 'Fix the source issue and re-scan the file before retrying extraction.',

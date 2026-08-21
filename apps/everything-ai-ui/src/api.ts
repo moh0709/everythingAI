@@ -162,7 +162,10 @@ export type IndexedFile = {
   size_bytes?: number;
   modified_at?: string;
   index_status?: string;
+  error_message?: string | null;
+  index_error_message?: string | null;
   extraction_status?: string;
+  extraction_error_message?: string | null;
 };
 
 export type Suggestion = {
