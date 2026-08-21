@@ -6,6 +6,7 @@ import path from 'node:path';
 const BASE_URL = process.env.EVERYTHINGAI_UI_URL || 'http://localhost:5151';
 const API_URL = process.env.EVERYTHINGAI_API_URL || 'http://localhost:4100';
 const API_TOKEN = process.env.EVERYTHINGAI_DEV_TOKEN || 'replace-with-your-local-development-token';
+const ARTIFACT_DIR = process.env.EVERYTHINGAI_SMOKE_ARTIFACT_DIR || 'test-results/everythingai-smoke';
 const UNICODE_FIXTURE_PATH = path.resolve('smoke/fixtures/phase1-unicode-source.txt');
 const MOJIBAKE_MARKERS = ['\uFFFD', 'Ã', 'Â', 'â€'];
 const ACTOR_HEADERS = {
@@ -112,6 +113,27 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
     ));
     expect(unicodePage).toBeTruthy();
     expectUnicodeIntegrity(JSON.stringify(unicodePage));
+
+    await page.getByRole('button', { name: 'Refresh Knowledge Base' }).click();
+    await page.getByPlaceholder('Search titles, topics, document content, source files...')
+      .fill('phase1-unicode-source.txt');
+    const unicodeSearchResult = page.locator('.wiki-search-result').filter({ hasText: unicodePage.title });
+    await expect(unicodeSearchResult).toHaveCount(1);
+    await unicodeSearchResult.click();
+
+    await expect(page.getByRole('heading', { name: unicodePage.title, exact: true })).toBeVisible();
+    await expect(page.getByText('Rødgrød med fløde', { exact: false })).toBeVisible();
+    await expect(page.getByText('información, acción, Málaga', { exact: false })).toBeVisible();
+    await expect(page.getByText('Größe, Straße, Überprüfung', { exact: false })).toBeVisible();
+    await expect(page.getByText('المعرفة الموثقة بالمصادر', { exact: false })).toBeVisible();
+    await expect(page.getByText('€ — “quoted text” …', { exact: false })).toBeVisible();
+    await expect(page.locator('.wiki-source-card').filter({ hasText: 'phase1-unicode-source.txt' })).toBeVisible();
+
+    await fs.mkdir(ARTIFACT_DIR, { recursive: true });
+    await page.screenshot({
+      path: path.join(ARTIFACT_DIR, 'phase1-unicode-knowledge-base.png'),
+      fullPage: true,
+    });
 
     const chat = await postJson(request, '/api/chat', {
       question: 'What are the payment terms for Supplier Alpha?',
