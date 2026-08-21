@@ -133,6 +133,7 @@ jobs:
         env:
           EVERYTHINGAI_API_URL: http://127.0.0.1:4100
           EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
         run: npx playwright test smoke/client-admin-smoke.spec.ts
 
       - name: Run disposable-folder RC acceptance
@@ -171,5 +172,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-test-results
-          path: apps/everything-ai-ui/test-results
+          path: |
+            apps/everything-ai-ui/test-results
+            apps/everything-ai-ui/smoke-artifacts
           if-no-files-found: ignore

@@ -11,6 +11,27 @@ async function saveScreenshot(page: Page, name: string) {
   });
 }
 
+async function assertNoHorizontalOverflow(page: Page) {
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+}
+
+function connectorCard(page: Page, connectorName: string) {
+  return page
+    .getByText(connectorName, { exact: true })
+    .locator('xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " source-card ")][1]');
+}
+
+async function openAgentConnectors(page: Page) {
+  await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Agent Connectors', exact: true }).click();
+  await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
+}
+
 test.describe('EverythingAI Client/Admin UX smoke agent', () => {
   test('client workspace clearly separates sources, files, knowledge base, and ask AI', async ({ page }) => {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
@@ -98,7 +119,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('Enable remote providers through server policy')).toBeVisible();
     await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
     await expect(page.getByText('Connector Health Summary')).toBeVisible();
-    await expect(page.getByText('Phase 8.3A scope')).toBeVisible();
+    await expect(page.getByText('Primary connector scope')).toBeVisible();
     await expect(page.getByText('Primary connector progress snapshot')).toBeVisible();
     await expect(page.getByText('Codex readiness')).toBeVisible();
     await expect(page.getByText('Claude Code readiness')).toBeVisible();
@@ -139,6 +160,35 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
     await expect(page.getByText('New key staged', { exact: true })).toBeVisible();
 
     await saveScreenshot(page, '09-admin-settings-providers-agents');
+  });
+
+  test('Agent Connector settings remain readable at desktop and narrow widths', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await openAgentConnectors(page);
+
+    const codexCard = connectorCard(page, 'OpenAI Codex app / CLI connector');
+    await expect(codexCard).toBeVisible();
+    await expect(codexCard.getByText('Controlled setup checklist')).toBeVisible();
+    await saveScreenshot(page, '10-admin-agent-connectors-desktop');
+
+    const desktopBox = await codexCard.boundingBox();
+    expect(desktopBox).not.toBeNull();
+    expect(desktopBox!.width).toBeGreaterThanOrEqual(600);
+    await assertNoHorizontalOverflow(page);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(codexCard).toBeVisible();
+    await saveScreenshot(page, '11-admin-agent-connectors-narrow');
+
+    const narrowBox = await codexCard.boundingBox();
+    expect(narrowBox).not.toBeNull();
+    expect(narrowBox!.width).toBeGreaterThanOrEqual(300);
+    await assertNoHorizontalOverflow(page);
+  });
+
+  test('Agent Connector settings use capability language instead of completed phase labels', async ({ page }) => {
+    await openAgentConnectors(page);
+    await expect(page.getByText(/Phase 8\.3/)).toHaveCount(0);
   });
 
   test('backend API is reachable for real smoke testing', async ({ request }) => {

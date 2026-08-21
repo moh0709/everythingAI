@@ -129,10 +129,10 @@ function connectorHealth({
   }
 
   return {
-    label: PHASE_83A_TARGETS.has(agentId) ? 'Phase 8.3A target pending detection' : 'Pending detection',
+    label: PHASE_83A_TARGETS.has(agentId) ? 'Primary connector pending detection' : 'Pending detection',
     tone: 'working',
     detail: status?.commandSafe ? 'Command format is safe, but live PATH detection has not been run in this session.' : 'Command safety is unknown until status refresh completes.',
-    nextAction: PHASE_83A_TARGETS.has(agentId) ? 'Run Detect for this Phase 8.3A connector.' : 'Run Detect All when reviewing optional connectors.',
+    nextAction: PHASE_83A_TARGETS.has(agentId) ? 'Run Detect for this primary connector.' : 'Run Detect All when reviewing optional connectors.',
   };
 }
 
@@ -179,7 +179,7 @@ function checklistItems({
     {
       label: 'Connector chat remains disabled',
       done: !bridgeStatus?.chatEnabled && !config.chatEnabled,
-      detail: !bridgeStatus?.chatEnabled && !config.chatEnabled ? 'Chat execution remains off as required for Phase 8.3A.' : 'Disable connector chat and local chat execution unless explicitly approved.',
+      detail: !bridgeStatus?.chatEnabled && !config.chatEnabled ? 'Chat execution remains off as required for controlled connector diagnostics.' : 'Disable connector chat and local chat execution unless explicitly approved.',
     },
   ];
 }
@@ -248,7 +248,7 @@ function phase83CloseoutSummary(primaryProgress: Array<{ ready: boolean; done: n
   return {
     allReady,
     tone: allReady ? 'ready' : 'working',
-    label: allReady ? 'Phase 8.3 connector closeout gates passed' : 'Phase 8.3 connector closeout gates pending',
+    label: allReady ? 'Connector readiness gates passed' : 'Connector readiness gates pending',
     detail: `${readyCount}/${primaryProgress.length} primary connector(s) ready · ${doneChecks}/${totalChecks} total setup checks complete`,
   };
 }
@@ -305,7 +305,7 @@ export function AgentConnectorsPanel({
         <p>{detectedCount} detected · {missingCount} missing after detection · {probePassCount} version probe(s) passed.</p>
       </div>
       <div>
-        <strong><ShieldCheck size={16} /> Phase 8.3A scope</strong>
+        <strong><ShieldCheck size={16} /> Primary connector scope</strong>
         <p>Primary setup targets are Codex and Claude Code. OpenCode, Kilo Code, Cline, Aider, and Continue stay documented as not installed until explicitly installed.</p>
       </div>
     </div>
@@ -359,10 +359,10 @@ export function AgentConnectorsPanel({
     </div>}
 
     {bridgeStatus?.chatEnabled && <div className="status-strip working">
-      <AlertTriangle size={14} /> Agent chat is enabled in the local environment. Phase 8.3A diagnostics should keep chat disabled unless explicitly approved.
+      <AlertTriangle size={14} /> Agent chat is enabled in the local environment. Controlled connector diagnostics should keep chat disabled unless explicitly approved.
     </div>}
 
-    <div className="provider-grid">
+    <div className="provider-grid agent-connector-grid">
       {agentCatalog.map((agent) => {
         const config = agentIntegrations[agent.id] || {
           enabled: false,
@@ -386,13 +386,13 @@ export function AgentConnectorsPanel({
         const isPrimaryTarget = PHASE_83A_TARGETS.has(agent.id);
         const isDocumentedMissing = DOCUMENTED_NOT_INSTALLED.has(agent.id);
 
-        return <div key={agent.id} className="source-card">
+        return <div key={agent.id} className={`source-card agent-connector-card${isExpanded ? ' expanded' : ''}`}>
           <div className="panel-title">
             <div>
               <strong><Terminal size={16} /> {agent.label}</strong>
               <p>{agent.description}</p>
               <div className="wiki-evidence-badges">
-                {isPrimaryTarget ? <span>Phase 8.3A target</span> : null}
+                {isPrimaryTarget ? <span>Primary connector target</span> : null}
                 {isDocumentedMissing ? <span>not installed until configured</span> : null}
                 <span>{config.enabled ? 'enabled' : 'disabled'}</span>
                 <span>{config.command || 'no command'}</span>
@@ -416,7 +416,7 @@ export function AgentConnectorsPanel({
           {isExpanded && <div className="settings-grid">
             {isPrimaryTarget && <div className="panel" style={{ gridColumn: '1 / -1' }}>
               <h3><ClipboardCheck size={16} /> Controlled setup checklist</h3>
-              <p className="muted">Phase 8.3A allows controlled detection and version probing for Codex and Claude Code only. Chat remains disabled unless explicitly approved later.</p>
+              <p className="muted">Controlled diagnostics allow detection and version probing for Codex and Claude Code only. Chat remains disabled unless explicitly approved later.</p>
               <div className="settings-help-grid">
                 {setupChecklist.map((item) => <div key={item.label}>
                   <strong>{item.done ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />} {item.label}</strong>
