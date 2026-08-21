@@ -3,6 +3,10 @@ import { test, expect, Page } from '@playwright/test';
 const BASE_URL = process.env.EVERYTHINGAI_UI_URL || 'http://localhost:5151';
 const API_URL = process.env.EVERYTHINGAI_API_URL || 'http://localhost:4100';
 const ARTIFACT_DIR = process.env.EVERYTHINGAI_SMOKE_ARTIFACT_DIR || 'test-results/everythingai-smoke';
+const PRODUCT_REVIEW_VIEWPORTS = [
+  { name: 'desktop', width: 1280, height: 900 },
+  { name: 'narrow', width: 390, height: 844 },
+];
 
 async function saveScreenshot(page: Page, name: string) {
   await page.screenshot({
@@ -33,6 +37,44 @@ async function openAgentConnectors(page: Page) {
 }
 
 test.describe('EverythingAI Client/Admin UX smoke agent', () => {
+  test('Phase 1 product-review journey remains usable at desktop and narrow widths', async ({ page }) => {
+    for (const viewport of PRODUCT_REVIEW_VIEWPORTS) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+
+      await page.getByRole('button', { name: 'Sources & Files' }).click();
+      await expect(page.getByRole('heading', { name: 'Sources & Files' })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-client-sources-files`);
+
+      await page.getByRole('button', { name: 'Knowledge Base' }).click();
+      await expect(page.getByRole('heading', { name: 'Knowledge Base' })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-client-knowledge-base`);
+
+      await page.getByRole('navigation').getByRole('button', { name: 'Ask AI' }).click();
+      await expect(page.getByRole('heading', { name: 'Ask AI about the Knowledge Base' })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-client-ask-ai`);
+
+      await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
+      await page.getByRole('button', { name: 'Planning', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'AI Planning Center' })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-admin-planning`);
+
+      await page.getByRole('button', { name: 'Analytics', exact: true }).click();
+      await expect(page.getByRole('heading', { name: 'Logging & Analytics Dashboard' })).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-admin-analytics-audit`);
+
+      await page.getByRole('button', { name: 'Agent Connectors', exact: true }).click();
+      await expect(page.getByText('Admin Agent Connectors')).toBeVisible();
+      await assertNoHorizontalOverflow(page);
+      await saveScreenshot(page, `phase1-${viewport.name}-admin-agent-connectors`);
+    }
+  });
+
   test('client workspace clearly separates sources, files, knowledge base, and ask AI', async ({ page }) => {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
     await expect(page.locator('span.chip:has-text("CLIENT WORKSPACE")')).toBeVisible();
