@@ -38,12 +38,12 @@ async function pathExists(filePath: string) {
   }
 }
 
-function expectUnicodeIntegrity(value: string) {
-  expect(value).toContain('Rødgrød med fløde');
-  expect(value).toContain('información, acción, Málaga');
-  expect(value).toContain('Größe, Straße, Überprüfung');
-  expect(value).toContain('المعرفة الموثقة بالمصادر');
-  expect(value).toContain('€ — “quoted text” …');
+function normalizedFixture(value: string) {
+  return value.replace(/\r\n/g, '\n').trim();
+}
+
+function expectUnicodeIntegrity(value: string, expectedFixture: string) {
+  expect(normalizedFixture(value)).toBe(normalizedFixture(expectedFixture));
 
   for (const marker of MOJIBAKE_MARKERS) {
     expect(value).not.toContain(marker);
@@ -99,7 +99,7 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
 
     const unicodeContext = await getJson(request, `/api/intelligence/document-context/${unicodeSource.id}`);
     expect(unicodeContext.document.file.filename).toBe('phase1-unicode-source.txt');
-    expectUnicodeIntegrity(unicodeContext.document.previewText);
+    expectUnicodeIntegrity(unicodeContext.document.previewText, unicodeFixture);
 
     const wikiBuild = await postJson(request, '/api/wiki/build', { limit: 100, filePageLimit: 20 });
     expect(wikiBuild.response.ok()).toBeTruthy();
@@ -113,7 +113,10 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
       && wikiPage.sources?.some((source: any) => source.file_id === unicodeSource.id)
     ));
     expect(unicodePage).toBeTruthy();
-    expectUnicodeIntegrity(JSON.stringify(unicodePage));
+    const persistedUnicodeText = unicodePage.sources[0].chunks
+      .map((chunk: any) => chunk.text)
+      .join('\n');
+    expectUnicodeIntegrity(persistedUnicodeText, unicodeFixture);
 
     await page.getByRole('button', { name: 'Refresh Knowledge Base' }).click();
     await page.getByPlaceholder('Search titles, topics, document content, source files...')
@@ -125,11 +128,15 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
     await unicodeSearchResult.click();
 
     await expect(page.getByRole('heading', { name: unicodePage.title, exact: true })).toBeVisible();
-    await expect(page.getByText('Rødgrød med fløde', { exact: false })).toBeVisible();
-    await expect(page.getByText('información, acción, Málaga', { exact: false })).toBeVisible();
-    await expect(page.getByText('Größe, Straße, Überprüfung', { exact: false })).toBeVisible();
-    await expect(page.getByText('المعرفة الموثقة بالمصادر', { exact: false })).toBeVisible();
-    await expect(page.getByText('€ — “quoted text” …', { exact: false })).toBeVisible();
+    const unicodeArticle = page.locator('.wiki-article');
+    await expect(unicodeArticle).toBeVisible();
+    const renderedArticleText = await unicodeArticle.innerText();
+    for (const exactLine of normalizedFixture(unicodeFixture).split('\n')) {
+      expect(renderedArticleText).toContain(exactLine);
+    }
+    for (const marker of MOJIBAKE_MARKERS) {
+      expect(renderedArticleText).not.toContain(marker);
+    }
     await expect(page.locator('.wiki-source-card').filter({ hasText: 'phase1-unicode-source.txt' })).toBeVisible();
 
     await fs.mkdir(ARTIFACT_DIR, { recursive: true });
