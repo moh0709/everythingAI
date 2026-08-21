@@ -1,3 +1,20 @@
+# 2026-08-21 Phase 1 Operating Addendum
+
+> This addendum supersedes conflicting immediate-priority statements below. Load `docs/PHASE1_LOCAL_MVP_PRODUCT_REVIEW_AND_RELEASE_HARDENING_2026-08-21.md` and `docs/superpowers/plans/2026-08-21-phase1-local-mvp-hardening.md` before Phase 1 implementation.
+
+## Current execution contract
+
+- Phase 1 name: **Local MVP Product Review and Release Hardening**.
+- Accepted baseline: `5a09c45d685eaa84576115469d2fe082957efcc5`.
+- #111 is completed; #110 is the only currently released implementation/discovery gate.
+- #112 and #113 remain blocked until #110 records current-commit classification evidence.
+- #114 remains blocked until #110 and #113 are accepted.
+- Use one dependency-satisfied issue at a time, focused red/green tests, full release gates, exact evidence, and per-merge rollback.
+- Do not broaden Phase 1 into authentication, tenancy, cloud deployment, database migration, or other Enterprise Platform implementation.
+- Do not modify or release protected issue #69 without explicit CEO authorization.
+
+---
+
 # 2026-08-16 CEO-Approved Operating Addendum
 
 > This addendum supersedes conflicting role, queue, phase, and immediate-priority statements later in this document. Existing detailed controls remain binding where they do not conflict with this addendum. Source decision: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`.

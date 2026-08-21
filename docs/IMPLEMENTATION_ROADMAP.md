@@ -1,3 +1,33 @@
+# 2026-08-21 Phase 1 Implementation Overlay
+
+> This is the active implementation sequence. Detailed plan: `docs/superpowers/plans/2026-08-21-phase1-local-mvp-hardening.md`.
+
+## Phase 1 — Local MVP Product Review and Release Hardening
+
+### Completed
+
+- [x] #111 Agent Connector responsive layout and stale presentation copy.
+- [x] Successful smoke screenshots preserved outside Playwright's cleaned result directory.
+- [x] PR #115 merged at `5a09c45d685eaa84576115469d2fe082957efcc5` after green CI #450 and explicit CEO authorization.
+
+### Active sequence
+
+- [ ] #110 complete deterministic desktop/narrow walkthrough and observation classification.
+- [ ] #112 prove/repair UTF-8 integrity after #110 classification.
+- [ ] #113 implement one source-processing/recovery lifecycle after #110 classification.
+- [ ] #114 prove UI-driven planning → preview → approval → execution → audit → undo after #113.
+- [ ] Run Phase 1 release matrix on one unchanged SHA and synchronize evidence.
+
+### Release rules
+
+- Exactly one dependency-satisfied implementation issue is active at a time.
+- Every product fix starts with a current-commit failing focused test.
+- Every milestone passes root tests, backend tests, frontend typecheck/build, both Playwright suites, and CI.
+- Every milestone records screenshots/logs, exact SHA, issue disposition, and rollback.
+- Enterprise production-platform work and protected #69 are outside this sequence.
+
+---
+
 # 2026-08-16 Implementation Control Overlay
 
 > This is the active implementation sequence. It supersedes conflicting immediate-priority and “next phase” statements later in this historical roadmap. Decision source: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`.
