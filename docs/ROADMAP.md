@@ -1,3 +1,22 @@
+# 2026-08-21 Phase 1 Roadmap Overlay
+
+> Current product-hardening authority: `docs/PHASE1_LOCAL_MVP_PRODUCT_REVIEW_AND_RELEASE_HARDENING_2026-08-21.md`. This overlay supersedes conflicting “next phase” statements below while preserving historical roadmap detail.
+
+## Phase 1 — Local MVP Product Review and Release Hardening
+
+| Order | Issue | Deliverable | State |
+|---:|---|---|---|
+| 1 | #111 | Agent Connector responsive layout, capability copy, durable screenshot artifact | Complete — merged as `5a09c45d685eaa84576115469d2fe082957efcc5` |
+| 2 | #110 | Complete current-commit Client/Admin walkthrough and classify Unicode, processing-state, and action-flow observations | Active |
+| 3 | #112 | Prove and repair Knowledge Base UTF-8 integrity | Blocked by #110 |
+| 4 | #113 | Unify source-processing and recovery lifecycle | Blocked by #110 |
+| 5 | #114 | UI-driven preview, approval, action, audit, and undo acceptance | Blocked by #110 and #113 |
+| 6 | Phase exit | One unchanged release candidate, synchronized canonical state, exact rollback/evidence | Blocked by #110–#114 |
+
+Enterprise Platform implementation remains future decision work. Issue #69 remains protected.
+
+---
+
 # 2026-08-16 Roadmap Reconciliation
 
 > Current roadmap authority: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`. This overlay supersedes conflicting “next phase” statements below while preserving historical roadmap detail.

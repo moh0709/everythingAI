@@ -1,3 +1,33 @@
+# 2026-08-21 Phase 1 Product Review and Release Hardening Overlay
+
+> This overlay supersedes conflicting immediate-priority and phase-status statements below. Phase 1 specification: `docs/PHASE1_LOCAL_MVP_PRODUCT_REVIEW_AND_RELEASE_HARDENING_2026-08-21.md`.
+
+## Current program stage
+
+EverythingAI is executing **Phase 1 — Local MVP Product Review and Release Hardening** across the accepted five tracks. Phase 0 is complete. The local MVP remains accepted; Phase 1 strengthens product evidence and does not claim enterprise production readiness.
+
+## Accepted Phase 1 baseline
+
+- PR #115 was CEO-authorized and squash-merged as `5a09c45d685eaa84576115469d2fe082957efcc5`.
+- Issue #111 is completed: Agent Connector responsiveness and stale Phase 8.3 presentation copy were repaired without runtime expansion.
+- CI #450 passed backend tests, frontend typecheck/build, Client/Admin Playwright smoke, and disposable-folder RC acceptance.
+- The successful run preserved 12 current-commit screenshots; root regression remained 191/191.
+- GitHub cannot submit an approval review from the PR author's own account; the merge was executed under explicit CEO authorization without misrepresenting a GitHub self-approval.
+
+## Active dependency sequence
+
+1. Complete #110 current-commit walkthrough and observation classification.
+2. Release #112 only after #110 classifies Unicode behavior.
+3. Release #113 only after #110 classifies source-processing/recovery ambiguity.
+4. Release #114 after #113 is accepted.
+5. Run the unchanged Phase 1 release matrix and synchronize closure evidence.
+
+Implementation plan: `docs/superpowers/plans/2026-08-21-phase1-local-mvp-hardening.md`.
+
+Issue #69 remains protected and unchanged without explicit CEO authorization. Enterprise Platform implementation remains outside Phase 1.
+
+---
+
 # 2026-08-16 CEO-Approved Reconciliation Overlay
 
 > This section is the current operating state and supersedes conflicting phase labels, role assignments, dependency conclusions, and “immediate next action” statements later in this historical document. The detailed legacy sections remain for evidence and traceability. Full decision record: `docs/PHASE0_RECONCILIATION_BASELINE_2026-08-14.md`.
