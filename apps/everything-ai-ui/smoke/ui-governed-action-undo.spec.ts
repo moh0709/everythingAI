@@ -62,6 +62,7 @@ test('Admin UI governs preview, approval, execution, audit, and undo on a dispos
 
   try {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+    await page.getByRole('button', { name: 'Home', exact: true }).click();
     await page.getByPlaceholder('Local folder path').fill(root);
     await page.getByRole('button', { name: 'Build Knowledge' }).click();
     await expect(page.getByText(/Workspace ready with \d+ indexed file\(s\)/)).toBeVisible({ timeout: 60_000 });
