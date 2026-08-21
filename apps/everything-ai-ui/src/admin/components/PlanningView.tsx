@@ -7,6 +7,7 @@ export type PreviewRecord = {
   suggestion_id?: string;
   file_id?: string;
   action_type: string;
+  source_path?: string;
   target_path?: string;
   suggested_value: string;
   preview_status: string;
@@ -62,6 +63,7 @@ export function PlanningView({
       .filter(isFilesystemAction)
       .map((suggestion) => suggestion.file_id),
   );
+  const filesById = new Map(files.map((file) => [file.id, file]));
 
   function toggleSuggestion(id: string) {
     const suggestion = suggestions.find((item) => item.id === id);
@@ -156,7 +158,14 @@ export function PlanningView({
         {suggestions.slice(0, 60).map((suggestion) => {
           const isSelected = selectedSuggestionIds.has(suggestion.id);
           const disabledByMutationGuard = !isSelected && isFilesystemAction(suggestion) && selectedFilesystemKeys.has(suggestion.file_id);
-          return <div className="suggestion-line selectable" key={suggestion.id}>
+          const sourceFile = filesById.get(suggestion.file_id);
+          return <div
+            className="suggestion-line selectable"
+            key={suggestion.id}
+            data-testid={`suggestion-${suggestion.id}`}
+            data-file-id={suggestion.file_id}
+            data-action-type={suggestion.action_type}
+          >
             <label title={disabledByMutationGuard ? 'Another move/rename action is already selected for this file.' : undefined}>
               <input
                 type="checkbox"
@@ -164,7 +173,10 @@ export function PlanningView({
                 disabled={disabledByMutationGuard}
                 onChange={() => toggleSuggestion(suggestion.id)}
               />
-              <b>{suggestion.action_type}</b> → {suggestion.suggested_value}
+              <span>
+                <b>{suggestion.action_type}</b> → {suggestion.suggested_value}
+                {sourceFile?.filename && <small className="muted" style={{ display: 'block' }}>Source: {sourceFile.filename}</small>}
+              </span>
             </label>
             <span className="chip blue">{Math.round(Number(suggestion.confidence || 0) * 100)}%</span>
             {disabledByMutationGuard && <span className="chip orange">file mutation already selected</span>}
@@ -176,9 +188,16 @@ export function PlanningView({
       <div className="panel wide">
         <h3>Dry Run / Execution Queue</h3>
         {!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}
-        {previews.map((preview) => <div className="suggestion-line" key={preview.id}>
+        {previews.map((preview) => <div
+          className="suggestion-line"
+          key={preview.id}
+          data-testid={`preview-${preview.id}`}
+          data-preview-status={preview.preview_status}
+        >
           <div>
-            <b>{preview.action_type}</b> → {preview.target_path || preview.suggested_value}
+            <b>{preview.action_type}</b>
+            {preview.source_path && <p className="muted">Source: {preview.source_path}</p>}
+            <p className="muted">Target: {preview.target_path || preview.suggested_value}</p>
             <p className="muted">
               {preview.preview_status === 'ready' ? 'Ready to execute' : `Blocked: ${preview.blocked_reason}`}
             </p>
