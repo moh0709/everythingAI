@@ -62,6 +62,10 @@ test('per-file retry is not offered because the backend only supports source-roo
     index_status: 'indexed',
     extraction_status: 'extracted',
   }).recoveryTarget, null);
+  assert.equal(lifecycle.deriveSourceLifecycle({
+    index_status: 'failed',
+    index_error_message: 'Context API index failure.',
+  }).detail, 'Context API index failure.');
 });
 
 test('Client and Admin explorers use the unified lifecycle and source-root recovery navigation', async () => {
@@ -73,6 +77,7 @@ test('Client and Admin explorers use the unified lifecycle and source-root recov
     assert.match(source, /deriveSourceLifecycle/);
     assert.match(source, /Open source recovery/);
     assert.match(source, /aria-describedby="source-recovery-explanation"/);
+    assert.match(source, /className="file-select-button"/);
     assert.doesNotMatch(source, /Index: \{file\.index_status/);
     assert.doesNotMatch(source, /Extract: \{file\.extraction_status/);
   }
@@ -82,4 +87,5 @@ test('Client and Admin explorers use the unified lifecycle and source-root recov
   assert.match(admin, /className="explorer-table-scroll"/);
   assert.match(styles, /\.explorer-table-scroll\s*\{/);
   assert.match(styles, /\.explorer-search\s*\{[^}]*flex-wrap:\s*wrap/s);
+  assert.match(styles, /\.file-select-button\s*\{/);
 });

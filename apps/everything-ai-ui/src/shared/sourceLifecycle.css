@@ -37,6 +37,24 @@
   overflow-x: auto;
 }
 
+.file-select-button {
+  display: inline;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: #1d4ed8;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.file-select-button:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
 @media (max-width: 640px) {
   .explorer-search {
     flex-wrap: wrap;

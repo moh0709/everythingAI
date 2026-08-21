@@ -46,7 +46,7 @@ export function OnboardingView({
   return <>
     <section className="hero-row">
       <div>
-        <h1><FolderOpen /> Connect your local knowledge</h1>
+        <h1 id="client-source-root-heading" tabIndex={-1}><FolderOpen /> Connect your local knowledge</h1>
         <p>Select a folder and EverythingAI will index, extract, analyze, and prepare it for search, wiki pages, and chat. This user UI remains read-only and safe.</p>
       </div>
       <div className="hero-actions">

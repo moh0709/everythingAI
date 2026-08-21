@@ -17,7 +17,7 @@ export function AdminHero({ query, setQuery, searchEverything, setSection, loadA
   return <div className="hero-row">
     <div>
       <span className="chip orange">ADMIN DASHBOARD</span>
-      <h1><Brain /> Operator Control Center</h1>
+      <h1 id="admin-source-root-heading" tabIndex={-1}><Brain /> Operator Control Center</h1>
       <p>Manage source paths, file indexing, extracted file content, AI providers, planning rules, execution safety, analytics, and knowledge operations. Normal users should use the Client Workspace.</p>
     </div>
     <div className="hero-actions">

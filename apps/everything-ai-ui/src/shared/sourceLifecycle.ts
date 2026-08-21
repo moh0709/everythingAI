@@ -13,6 +13,7 @@ export type SourceLifecycleRecord = {
   index_status?: string | null;
   extraction_status?: string | null;
   error_message?: string | null;
+  index_error_message?: string | null;
   extraction_error_message?: string | null;
 };
 
@@ -29,7 +30,7 @@ export function deriveSourceLifecycle(file: SourceLifecycleRecord): SourceLifecy
     return {
       state: 'index_failed',
       label: 'Index failed',
-      detail: file.error_message || 'The source could not be indexed. Fix the source and re-scan its root.',
+      detail: file.index_error_message || file.error_message || 'The source could not be indexed. Fix the source and re-scan its root.',
       recoveryAction: null,
       recoveryTarget: 'source_root',
     };

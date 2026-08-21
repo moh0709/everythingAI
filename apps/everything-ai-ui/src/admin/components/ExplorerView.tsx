@@ -182,17 +182,16 @@ export function ExplorerView({
       <div className="explorer-table-scroll">
         <table>
         <thead>
-          <tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Last Modified</th></tr>
+          <tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Lifecycle</th></tr>
         </thead>
         <tbody>
           {files.map((file) => {
             const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
             return <tr
               key={file.id}
-              onClick={() => setSelectedFileId(file.id)}
               className={selectedFile?.id === file.id ? 'selected' : ''}
             >
-              <td>{file.filename}</td>
+              <td><button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => setSelectedFileId(file.id)}>{file.filename}</button></td>
               <td>{file.absolute_path}</td>
               <td><span className="chip blue">{file.extension || 'file'}</span></td>
               <td>{formatSize(file.size_bytes)}</td>

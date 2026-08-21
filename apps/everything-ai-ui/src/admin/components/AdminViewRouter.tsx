@@ -156,7 +156,10 @@ export function AdminViewRouter(props: AdminViewRouterProps) {
         filterStatus={props.filterStatus}
         setFilterStatus={props.setFilterStatus}
         extensionOptions={props.extensionOptions}
-        openSourceRecovery={() => props.setSection('dashboard')}
+        openSourceRecovery={() => {
+          props.setSection('dashboard');
+          window.requestAnimationFrame(() => document.getElementById('admin-source-root-heading')?.focus());
+        }}
       />;
 
     case 'planning':

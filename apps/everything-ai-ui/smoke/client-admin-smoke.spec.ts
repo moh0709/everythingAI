@@ -40,6 +40,15 @@ async function assertNoHorizontalOverflow(page: Page) {
   ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 }
 
+async function focusByTab(page: Page, target: ReturnType<Page['getByRole']>, maxPresses = 40) {
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  for (let presses = 0; presses < maxPresses; presses += 1) {
+    await page.keyboard.press('Tab');
+    if (await target.evaluate((element) => element === document.activeElement)) return;
+  }
+  throw new Error(`Could not reach ${await target.getAttribute('aria-label') || await target.textContent()} by Tab`);
+}
+
 function connectorCard(page: Page, connectorName: string) {
   return page
     .getByText(connectorName, { exact: true })
@@ -73,6 +82,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
       await route.fulfill({ json: {
         document: {
           file: failedFile,
+          index_error_message: 'Deterministic Phase 1 context index failure.',
           previewText: 'Extracted text retained despite the conflicting failed index record.',
           source_reference: { relative_path: failedFile.relative_path },
         },
@@ -83,29 +93,35 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto(BASE_URL, { waitUntil: 'networkidle' });
       await expect(page.getByText('Index failed').first()).toBeVisible();
-      await page.getByRole('cell', { name: failedFile.filename, exact: true }).click();
+      const clientFile = page.getByRole('button', { name: `Inspect ${failedFile.filename}` });
+      await focusByTab(page, clientFile);
+      await clientFile.press('Enter');
+      await expect(page.getByText('Deterministic Phase 1 context index failure.')).toBeVisible();
 
       const clientRecovery = page.getByRole('button', { name: 'Open source recovery' });
       await expect(clientRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
-      await clientRecovery.focus();
-      await expect(clientRecovery).toBeFocused();
+      await focusByTab(page, clientRecovery);
       await assertNoHorizontalOverflow(page);
       await saveScreenshot(page, `phase1-${viewport.name}-client-source-recovery`);
       await clientRecovery.press('Enter');
-      await expect(page.getByRole('heading', { name: 'Connect your local knowledge' })).toBeVisible();
+      const clientDestination = page.getByRole('heading', { name: 'Connect your local knowledge' });
+      await expect(clientDestination).toBeFocused();
 
       await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
       await page.getByRole('button', { name: 'Files & Content' }).click();
       await expect(page.getByText('Index failed').first()).toBeVisible();
+      const adminFile = page.getByRole('button', { name: `Inspect ${failedFile.filename}` });
+      await focusByTab(page, adminFile);
+      await adminFile.press('Enter');
 
       const adminRecovery = page.getByRole('button', { name: 'Open source recovery' });
       await expect(adminRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
-      await adminRecovery.focus();
-      await expect(adminRecovery).toBeFocused();
+      await focusByTab(page, adminRecovery);
       await assertNoHorizontalOverflow(page);
       await saveScreenshot(page, `phase1-${viewport.name}-admin-source-recovery`);
       await adminRecovery.press('Enter');
-      await expect(page.getByRole('heading', { name: 'Operator Control Center' })).toBeVisible();
+      const adminDestination = page.getByRole('heading', { name: 'Operator Control Center' });
+      await expect(adminDestination).toBeFocused();
     }
   });
 

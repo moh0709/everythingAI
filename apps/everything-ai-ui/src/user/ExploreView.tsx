@@ -170,7 +170,7 @@ export function ExploreView({
         <div className="panel-title">
           <div>
             <h2><FileText /> Indexed File List</h2>
-            <p>{files.length} visible file(s). Click a file to inspect extracted file content and source metadata.</p>
+            <p>{files.length} visible file(s). Open a file to inspect extracted file content and source metadata.</p>
           </div>
           <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
         </div>
@@ -178,8 +178,8 @@ export function ExploreView({
           <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
           <tbody>{files.map((file) => {
             const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
-            return <tr key={file.id} onClick={() => loadDocumentContext(file.id)} className={selectedFile?.id === file.id ? 'selected' : ''}>
-              <td>{file.filename}</td>
+            return <tr key={file.id} className={selectedFile?.id === file.id ? 'selected' : ''}>
+              <td><button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => loadDocumentContext(file.id)}>{file.filename}</button></td>
               <td><span className="chip blue">{file.extension || 'file'}</span></td>
               <td>{formatSize(file.size_bytes)}</td>
               <td>
@@ -208,7 +208,7 @@ export function ExploreView({
           </>}
           <p><strong>Index status:</strong> {documentContext.file?.index_status || 'unknown'}</p>
           <p><strong>Extraction:</strong> {documentContext.file?.extraction_status || 'pending'}</p>
-          {(selectedRecord?.error_message || selectedRecord?.extraction_error_message) ? <p><strong>Reported issue:</strong> {selectedRecord?.error_message || selectedRecord?.extraction_error_message}</p> : null}
+          {(selectedRecord?.index_error_message || selectedRecord?.error_message || selectedRecord?.extraction_error_message) ? <p><strong>Reported issue:</strong> {selectedRecord?.index_error_message || selectedRecord?.error_message || selectedRecord?.extraction_error_message}</p> : null}
           <p><strong>Source:</strong> {documentContext.source_reference?.source_label || documentContext.source_reference?.relative_path || 'local file'}</p>
           {documentContext.insight?.summary && <><h3>File Insight</h3><p>{documentContext.insight.summary}</p></>}
           <h3>Extracted File Text</h3>
