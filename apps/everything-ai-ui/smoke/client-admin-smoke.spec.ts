@@ -83,7 +83,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await page.goto(BASE_URL, { waitUntil: 'networkidle' });
       await expect(page.getByText('Index failed').first()).toBeVisible();
-      await page.getByText(failedFile.filename, { exact: true }).click();
+      await page.getByRole('cell', { name: failedFile.filename, exact: true }).click();
 
       const clientRecovery = page.getByRole('button', { name: 'Open source recovery' });
       await expect(clientRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
