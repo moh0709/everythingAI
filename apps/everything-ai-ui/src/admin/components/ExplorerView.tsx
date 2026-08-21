@@ -179,7 +179,8 @@ export function ExplorerView({
     </div>
 
     <div className="explorer-grid">
-      <table>
+      <div className="explorer-table-scroll">
+        <table>
         <thead>
           <tr><th>Name</th><th>Path</th><th>Type</th><th>Size</th><th>Last Modified</th></tr>
         </thead>
@@ -205,7 +206,8 @@ export function ExplorerView({
             </tr>;
           })}
         </tbody>
-      </table>
+        </table>
+      </div>
 
       <aside className="details">
         <h2>{selectedFile?.filename || 'Select a file'}</h2>

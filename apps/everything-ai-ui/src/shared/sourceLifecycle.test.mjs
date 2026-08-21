@@ -79,4 +79,7 @@ test('Client and Admin explorers use the unified lifecycle and source-root recov
 
   assert.match(styles, /\.source-lifecycle\s*\{/);
   assert.match(styles, /\.source-lifecycle-(?:index_failed|extraction_failed)/);
+  assert.match(admin, /className="explorer-table-scroll"/);
+  assert.match(styles, /\.explorer-table-scroll\s*\{/);
+  assert.match(styles, /\.explorer-search\s*\{[^}]*flex-wrap:\s*wrap/s);
 });
