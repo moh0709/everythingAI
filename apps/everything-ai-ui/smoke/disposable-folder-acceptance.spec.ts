@@ -118,7 +118,9 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
     await page.getByRole('button', { name: 'Refresh Knowledge Base' }).click();
     await page.getByPlaceholder('Search titles, topics, document content, source files...')
       .fill('phase1-unicode-source.txt');
-    const unicodeSearchResult = page.locator('.wiki-search-result').filter({ hasText: unicodePage.title });
+    const unicodeSearchResult = page.locator('.wiki-search-result')
+      .filter({ hasText: unicodePage.title })
+      .filter({ has: page.locator('.wiki-search-result-type').filter({ hasText: /^file ·/ }) });
     await expect(unicodeSearchResult).toHaveCount(1);
     await unicodeSearchResult.click();
 
