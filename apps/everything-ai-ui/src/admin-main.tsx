@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { AdminApp } from './admin';
 import './styles.css';
+import './admin-responsive.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
