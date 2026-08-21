@@ -79,7 +79,7 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
       await assertNoHorizontalOverflow(page);
       await saveScreenshot(page, `phase1-${viewport.name}-admin-planning`);
 
-      await page.getByRole('button', { name: 'Analytics', exact: true }).click();
+      await page.getByRole('navigation').getByRole('button', { name: 'Analytics', exact: true }).click();
       await expect(page.getByRole('heading', { name: 'Logging & Analytics Dashboard' })).toBeVisible();
       await assertNoHorizontalOverflow(page);
       await saveScreenshot(page, `phase1-${viewport.name}-admin-analytics-audit`);
