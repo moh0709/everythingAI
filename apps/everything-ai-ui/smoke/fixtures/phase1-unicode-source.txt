@@ -1,0 +1,6 @@
+Phase 1 Unicode integrity
+Dansk: Rødgrød med fløde — ÆØÅ æøå
+Español: información, acción, Málaga
+Deutsch: Größe, Straße, Überprüfung
+Arabic: المعرفة الموثقة بالمصادر
+Symbols: € — “quoted text” …

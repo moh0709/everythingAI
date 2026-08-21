@@ -6,6 +6,8 @@ import path from 'node:path';
 const BASE_URL = process.env.EVERYTHINGAI_UI_URL || 'http://localhost:5151';
 const API_URL = process.env.EVERYTHINGAI_API_URL || 'http://localhost:4100';
 const API_TOKEN = process.env.EVERYTHINGAI_DEV_TOKEN || 'replace-with-your-local-development-token';
+const UNICODE_FIXTURE_PATH = path.resolve('smoke/fixtures/phase1-unicode-source.txt');
+const MOJIBAKE_MARKERS = ['\uFFFD', 'Ã', 'Â', 'â€'];
 const ACTOR_HEADERS = {
   Authorization: `Bearer ${API_TOKEN}`,
   'x-actor-type': 'service_principal',
@@ -35,12 +37,26 @@ async function pathExists(filePath: string) {
   }
 }
 
+function expectUnicodeIntegrity(value: string) {
+  expect(value).toContain('Rødgrød med fløde');
+  expect(value).toContain('información, acción, Málaga');
+  expect(value).toContain('Größe, Straße, Überprüfung');
+  expect(value).toContain('المعرفة الموثقة بالمصادر');
+  expect(value).toContain('€ — “quoted text” …');
+
+  for (const marker of MOJIBAKE_MARKERS) {
+    expect(value).not.toContain(marker);
+  }
+}
+
 test('local MVP completes the disposable-folder safe-action and recovery sequence', async ({ page, request }) => {
   test.setTimeout(120_000);
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'everythingai-rc-'));
   const outsideRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'everythingai-rc-outside-'));
   const invoicePath = path.join(root, 'invoice-test.txt');
   const invoiceContent = 'Invoice 123 from Supplier Alpha for project Gamma. Payment terms are 30 days.';
+  const unicodeFixture = await fs.readFile(UNICODE_FIXTURE_PATH, 'utf8');
+  const unicodePath = path.join(root, 'phase1-unicode-source.txt');
 
   await fs.writeFile(invoicePath, invoiceContent);
   await fs.writeFile(
@@ -49,6 +65,7 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
   );
   await fs.writeFile(path.join(root, 'project-data.csv'), 'project,owner\nGamma,Supplier Alpha\n');
   await fs.writeFile(path.join(root, 'intentionally-broken.pdf'), 'not a valid PDF fixture');
+  await fs.writeFile(unicodePath, unicodeFixture, 'utf8');
 
   try {
     await page.goto(BASE_URL, { waitUntil: 'networkidle' });
@@ -63,12 +80,14 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
     const contract = fixtureFiles.find((file: any) => file.filename === 'contract-test.md');
     const csv = fixtureFiles.find((file: any) => file.filename === 'project-data.csv');
     const brokenPdf = fixtureFiles.find((file: any) => file.filename === 'intentionally-broken.pdf');
+    const unicodeSource = fixtureFiles.find((file: any) => file.filename === 'phase1-unicode-source.txt');
 
-    expect(fixtureFiles).toHaveLength(4);
+    expect(fixtureFiles).toHaveLength(5);
     expect(invoice.extraction_status).toBe('extracted');
     expect(contract.extraction_status).toBe('extracted');
     expect(csv.extraction_status).toBe('extracted');
     expect(['failed', 'unsupported']).toContain(brokenPdf.extraction_status);
+    expect(unicodeSource.extraction_status).toBe('extracted');
 
     const searchPayload = await getJson(request, '/api/search?q=Supplier%20Alpha&limit=20');
     expect(searchPayload.results.some((result: any) => result.id === invoice.id)).toBeTruthy();
@@ -77,12 +96,22 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
     expect(contextPayload.document.file.filename).toBe('invoice-test.txt');
     expect(contextPayload.document.previewText).toContain('Payment terms are 30 days');
 
+    const unicodeContext = await getJson(request, `/api/intelligence/document-context/${unicodeSource.id}`);
+    expect(unicodeContext.document.file.filename).toBe('phase1-unicode-source.txt');
+    expectUnicodeIntegrity(unicodeContext.document.previewText);
+
     const wikiBuild = await postJson(request, '/api/wiki/build', { limit: 100, filePageLimit: 20 });
     expect(wikiBuild.response.ok()).toBeTruthy();
     const sourceBackedPage = wikiBuild.body.wiki.pages.find((wikiPage: any) => (
       wikiPage.sources?.some((source: any) => source.file_id === invoice.id && source.chunks?.length > 0)
     ));
     expect(sourceBackedPage).toBeTruthy();
+
+    const unicodePage = wikiBuild.body.wiki.pages.find((wikiPage: any) => (
+      wikiPage.sources?.some((source: any) => source.file_id === unicodeSource.id)
+    ));
+    expect(unicodePage).toBeTruthy();
+    expectUnicodeIntegrity(JSON.stringify(unicodePage));
 
     const chat = await postJson(request, '/api/chat', {
       question: 'What are the payment terms for Supplier Alpha?',
