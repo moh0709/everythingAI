@@ -45,7 +45,11 @@ type AuditEvent = {
   id: string;
   created_at: string;
   entity_type?: string;
+  entity_id?: string;
   event_type?: string;
+  actor_type?: string;
+  actor_id?: string;
+  actor_email?: string;
 };
 
 type AdminViewRouterProps = {
@@ -181,7 +185,7 @@ export function AdminViewRouter(props: AdminViewRouterProps) {
       />;
 
     case 'analytics':
-      return <AnalyticsView status={props.status} audit={props.audit} />;
+      return <AnalyticsView options={props.options} status={props.status} audit={props.audit} />;
 
     case 'settings':
       return <SettingsView
