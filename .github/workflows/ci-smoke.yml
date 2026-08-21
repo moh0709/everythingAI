@@ -141,7 +141,16 @@ jobs:
         env:
           EVERYTHINGAI_API_URL: http://127.0.0.1:4100
           EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
         run: npx playwright test smoke/disposable-folder-acceptance.spec.ts
+
+      - name: Run UI-governed action and undo acceptance
+        working-directory: apps/everything-ai-ui
+        env:
+          EVERYTHINGAI_API_URL: http://127.0.0.1:4100
+          EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
+        run: npx playwright test smoke/ui-governed-action-undo.spec.ts
 
       - name: Upload backend log
         if: always()
