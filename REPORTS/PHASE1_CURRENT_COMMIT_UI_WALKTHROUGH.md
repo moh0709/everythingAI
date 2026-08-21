@@ -53,4 +53,4 @@ For each viewport, `apps/everything-ai-ui/smoke/client-admin-smoke.spec.ts` capt
 - Browser mutation remains confined to Playwright-created temporary directories.
 - The test restores the moved source before cleanup and blocks targets outside the indexed root.
 - No provider, connector runtime, credential, or protected #69 behavior changed.
-- Roll back this discovery gate by reverting the eventual PR #117 merge commit; production code is unchanged.
+- Roll back this discovery gate by reverting the eventual PR #117 merge commit; the only production-code change is the one-line Knowledge Base responsive breakpoint repair.
