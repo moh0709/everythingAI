@@ -99,7 +99,8 @@ test.describe('EverythingAI Client/Admin UX smoke agent', () => {
       const clientFile = page.getByRole('button', { name: `Inspect ${failedFile.filename}` });
       await focusByTab(page, clientFile);
       await clientFile.press('Enter');
-      await expect(page.getByText('Deterministic Phase 1 context index failure.')).toBeVisible();
+      await expect(page.getByText('Reported issue:', { exact: true }).locator('..'))
+        .toContainText('Deterministic Phase 1 context index failure.');
 
       const clientRecovery = page.getByRole('button', { name: 'Open source recovery' });
       await expect(clientRecovery).toHaveAttribute('aria-describedby', 'source-recovery-explanation');
