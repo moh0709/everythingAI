@@ -109,7 +109,8 @@ test('local MVP completes the disposable-folder safe-action and recovery sequenc
     expect(sourceBackedPage).toBeTruthy();
 
     const unicodePage = wikiBuild.body.wiki.pages.find((wikiPage: any) => (
-      wikiPage.sources?.some((source: any) => source.file_id === unicodeSource.id)
+      wikiPage.page_type === 'file'
+      && wikiPage.sources?.some((source: any) => source.file_id === unicodeSource.id)
     ));
     expect(unicodePage).toBeTruthy();
     expectUnicodeIntegrity(JSON.stringify(unicodePage));
