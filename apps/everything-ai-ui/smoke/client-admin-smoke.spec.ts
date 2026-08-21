@@ -19,9 +19,25 @@ async function assertNoHorizontalOverflow(page: Page) {
   const dimensions = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,
     scrollWidth: document.documentElement.scrollWidth,
+    overflowElements: Array.from(document.querySelectorAll<HTMLElement>('body *'))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          className: element.className,
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        };
+      })
+      .filter((element) => element.left < -1 || element.right > document.documentElement.clientWidth + 1)
+      .slice(0, 12),
   }));
 
-  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
+  expect(
+    dimensions.scrollWidth,
+    `Horizontal overflow elements: ${JSON.stringify(dimensions.overflowElements)}`,
+  ).toBeLessThanOrEqual(dimensions.clientWidth + 1);
 }
 
 function connectorCard(page: Page, connectorName: string) {
