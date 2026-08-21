@@ -73,7 +73,7 @@ test('Admin UI governs preview, approval, execution, audit, and undo on a dispos
 
     await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
     await expect(page.getByText('ADMIN DASHBOARD').first()).toBeVisible();
-    await page.getByRole('button', { name: 'Planning', exact: true }).click();
+    await page.getByRole('navigation').getByRole('button', { name: 'Planning', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'AI Planning Center' })).toBeVisible();
 
     await page.getByRole('button', { name: /AI Analyze/ }).click();
@@ -110,7 +110,7 @@ test('Admin UI governs preview, approval, execution, audit, and undo on a dispos
     await expect(page.getByText('EverythingAI admin is ready')).toBeVisible({ timeout: 60_000 });
     expect(await manifest(root)).not.toEqual(initialManifest);
 
-    await page.getByRole('button', { name: 'Analytics', exact: true }).click();
+    await page.getByRole('navigation').getByRole('button', { name: 'Analytics', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Logging & Analytics Dashboard' })).toBeVisible();
 
     const executionRow = page.locator('[data-testid^="execution-"][data-execution-status="executed"]')
