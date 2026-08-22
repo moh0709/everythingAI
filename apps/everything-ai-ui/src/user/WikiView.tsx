@@ -100,7 +100,9 @@ export function WikiView({
     return map;
   }, [selectedWikiPage]);
 
-  const activeCitationRef = activeChunkRef || activeSourceRef;
+  const activeCitationRef = previewSource && activeChunkRef
+    ? `${previewSource.ref}:${activeChunkRef}`
+    : activeSourceRef;
   const citationCoverageLabel = formatCitationCoverage(selectedWikiPage?.citation_coverage_score);
   const sourceFingerprint = shortHash(selectedWikiPage?.source_fingerprint);
   const pageSearchMatchCount = selectedWikiPage ? countMarkdownMatches(selectedWikiPage.markdown, pageSearchTerm) : 0;
