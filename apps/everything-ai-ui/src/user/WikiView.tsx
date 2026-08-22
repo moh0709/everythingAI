@@ -56,7 +56,9 @@ function normalizeSourceRef(ref: string) {
 }
 
 function normalizeChunkRef(ref: string) {
-  return ref.replace(/^\[/, '').replace(/\]$/, '');
+  const normalized = ref.replace(/^\[/, '').replace(/\]$/, '');
+  const [, chunkRef] = normalized.split(':', 2);
+  return chunkRef || normalized;
 }
 
 function formatCitationCoverage(score?: number | null) {
