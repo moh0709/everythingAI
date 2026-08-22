@@ -77,7 +77,9 @@ test('rich citation keeps article, source, and chunk evidence visibly connected'
   await expect(citation).toBeVisible();
   await citation.click();
 
-  await expect(citation).toHaveAttribute('aria-current', 'location');
+  const activeCitation = page.locator('.wiki-source-ref-btn.active').filter({ hasText: '[S1:C1]' });
+  await expect(activeCitation).toHaveAttribute('aria-current', 'location');
+  await expect(activeCitation).toHaveAttribute('aria-label', 'Inspect active citation [S1:C1]');
   await expect(page.getByLabel('Focused citation details')).toContainText('phase2-citation-evidence.txt');
   await expect(page.getByLabel('Focused citation details')).toContainText('S1:C1');
 
