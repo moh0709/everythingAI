@@ -99,23 +99,23 @@ function buildSuggestionGroups(suggestions: Suggestion[], filesById: Map<string,
   return Array.from(groups.values());
 }
 
-function safeSelectionForSuggestions(suggestions: Suggestion[], seed: Set<string>) {
+function safeSelectionForSuggestions(candidates: Suggestion[], allSuggestions: Suggestion[], seed: Set<string>) {
   const next = new Set(seed);
-  const filesWithMutation = new Set<string>();
+  const selectedMutationFiles = new Set(
+    allSuggestions
+      .filter((suggestion) => next.has(suggestion.id) && isFilesystemAction(suggestion))
+      .map((suggestion) => suggestion.file_id),
+  );
 
-  for (const suggestion of suggestions) {
+  for (const suggestion of candidates) {
     if (!isFilesystemAction(suggestion)) {
       next.add(suggestion.id);
       continue;
     }
 
-    const alreadySelectedMutation = suggestions.some(
-      (candidate) => candidate.id !== suggestion.id && next.has(candidate.id) && isSameFileMutation(candidate, suggestion),
-    );
-
-    if (!filesWithMutation.has(suggestion.file_id) && !alreadySelectedMutation) {
+    if (!selectedMutationFiles.has(suggestion.file_id)) {
       next.add(suggestion.id);
-      filesWithMutation.add(suggestion.file_id);
+      selectedMutationFiles.add(suggestion.file_id);
     }
   }
 
@@ -177,7 +177,7 @@ export function PlanningView({
     if (allSelected) {
       visible.forEach((suggestion) => next.delete(suggestion.id));
     } else {
-      setSelectedSuggestionIds(safeSelectionForSuggestions(visible, next));
+      setSelectedSuggestionIds(safeSelectionForSuggestions(visible, suggestions, next));
       return;
     }
 
@@ -194,7 +194,7 @@ export function PlanningView({
       return;
     }
 
-    setSelectedSuggestionIds(safeSelectionForSuggestions(group.suggestions, next));
+    setSelectedSuggestionIds(safeSelectionForSuggestions(group.suggestions, suggestions, next));
   }
 
   function clearSelection() {
