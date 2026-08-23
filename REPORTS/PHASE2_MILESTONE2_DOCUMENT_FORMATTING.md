@@ -2,7 +2,7 @@
 
 Issue: #124
 Baseline: `15ec8b842e73981008ccb180b8777ea723f8ebc7`
-Status: IMPLEMENTED — CI/review pending
+Status: ACCEPTED — CI #494 green; diff review clear
 
 ## Scope
 
@@ -27,9 +27,21 @@ Improve extracted-document presentation without changing source content or prove
 - 390px viewport keeps wide tables contained in their local scroll region;
 - source attribution and the #122 citation inspector remain intact.
 
-## Regression gate
+## Regression evidence
 
-CI must pass root regression, backend tests, frontend typecheck/build, Client/Admin smoke, #122 rich-citation acceptance, this milestone acceptance, disposable-folder RC acceptance, and UI-governed action/undo acceptance.
+GitHub Actions run #494 passed:
+
+- root regression;
+- backend tests;
+- frontend typecheck and production build;
+- Client/Admin smoke tests;
+- Phase 2 rich-citation acceptance from #122;
+- Phase 2 long-form/table formatting acceptance;
+- disposable-folder RC acceptance;
+- UI-governed action and undo acceptance;
+- durable backend/frontend/Playwright artifacts.
+
+Independent pre-merge patch review found no unresolved Critical or Important findings. The change is presentation/semantic markup plus deterministic acceptance coverage; it does not modify extracted source values, citation identity, backend contracts, or provider/runtime behavior.
 
 ## Rollback
 
