@@ -22,7 +22,8 @@ function highlightLiteralTerms(text: string, query: string) {
   const terms = literalQueryTerms(query);
   if (!terms.length) return text;
 
-  const expression = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'gi');
+  const termPattern = terms.map(escapeRegExp).join('|');
+  const expression = new RegExp(`(?<![\\p{L}\\p{N}_])(${termPattern})(?![\\p{L}\\p{N}_])`, 'giu');
   const normalizedTerms = new Set(terms.map((term) => term.toLocaleLowerCase()));
 
   return text.split(expression).filter(Boolean).map((part, index) => (
