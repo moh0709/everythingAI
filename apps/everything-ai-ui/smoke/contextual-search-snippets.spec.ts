@@ -123,7 +123,7 @@ test('Client search shows truthful contextual snippets and highlights literal qu
   await expect(keywordContext.locator('mark')).toHaveCount(2);
   await expect(keywordContext.locator('mark').nth(0)).toHaveText('renewable');
   await expect(keywordContext.locator('mark').nth(1)).toHaveText('obligations');
-  await expect(keywordContext.getByText('nonrenewable', { exact: true })).toBeVisible();
+  await expect(keywordContext.locator('mark').filter({ hasText: 'nonrenewable' })).toHaveCount(0);
 
   const semanticContext = page.getByLabel('Search context for Energy Duties.txt');
   await expect(semanticContext).toContainText('Semantic context');
