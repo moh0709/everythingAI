@@ -5,6 +5,24 @@ import type { DocumentContext, UserView } from './types';
 
 type ActionRunner = (label: string, task: () => Promise<void>) => Promise<void>;
 
+type SearchMatch = {
+  basis: 'keyword' | 'semantic' | 'keyword + semantic';
+  keyword_rank: number | null;
+  semantic_rank: number | null;
+  semantic_score: number | null;
+  explanation: string;
+};
+
+type RankedIndexedFile = IndexedFile & {
+  search_match?: SearchMatch;
+  snippet?: string | null;
+};
+
+type UnifiedSearchPayload = {
+  files?: IndexedFile[];
+  ranked_files?: RankedIndexedFile[];
+};
+
 type UseFileDocumentWorkflowsArgs = {
   options: ApiOptions;
   query: string;
@@ -43,10 +61,11 @@ export function useFileDocumentWorkflows({
         await refreshFiles();
         return;
       }
-      const payload = await apiRequest<{ files: IndexedFile[] }>(options, `/api/unified-search?q=${encodeURIComponent(normalized)}&limit=50`);
-      loadFiles(payload.files || []);
-      if (payload.files?.[0]) await loadDocumentContext(payload.files[0].id, false);
-      setStatus(`Search complete: ${payload.files?.length || 0} file match(es).`);
+      const payload = await apiRequest<UnifiedSearchPayload>(options, `/api/unified-search?q=${encodeURIComponent(normalized)}&limit=50`);
+      const rankedFiles = payload.ranked_files || payload.files || [];
+      loadFiles(rankedFiles);
+      if (rankedFiles[0]) await loadDocumentContext(rankedFiles[0].id, false);
+      setStatus(`Search complete: ${rankedFiles.length} ranked file match(es).`);
     });
   }
 
