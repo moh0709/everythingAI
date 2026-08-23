@@ -16,7 +16,7 @@ The bounded **Product Depth — Trustworthy Search Experience** milestone chain 
 - #138 — contextual search snippets and result inspection — merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`;
 - #140 — trustworthy Knowledge Base search navigation — merge `680763ca86e35d748ce37b115f1be7601d011422`, accepted after CI #529.
 
-Issue #142 is the release-control gate for the combined Product Depth search experience. The combined status is a **`PRODUCT_DEPTH_PASS` candidate** until the final unchanged #142 PR head passes the inherited regression matrix, independent diff review is clean, and that release-control PR merges.
+Issue #142 records the combined release decision **`PRODUCT_DEPTH_PASS`**. Pre-decision CI #531 passed the complete inherited matrix on head `cd47fcb286f893ac8cdf170da7f3da228fe238f6`. This release-control decision is accepted into canonical `main` only if its exact final PR head independently passes the same matrix, final diff review has no unresolved Critical or Important findings, and the PR merges.
 
 Authoritative release evidence:
 
@@ -44,7 +44,7 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth search milestones #136/#138/#140 individually accepted | Complete #142 combined release-control gate, then select next bounded product outcome |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth search milestones #136/#138/#140 individually accepted | Merge #142 only after final unchanged-head CI/review, then select next bounded product outcome |
 | Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, grouped planning, approval/action/audit/undo accepted | Preserve evidence provenance and mutation safety |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
@@ -110,7 +110,7 @@ Issue #142 is the sole active Product Depth release-control gate. Its scope is v
 
 ## Current next action
 
-Complete #142 on one unchanged pull-request head: run the inherited Phase 1 + Phase 2 + Product Depth matrix, independently review the combined release-control diff, merge only if green and clean, close #142, and then select the next bounded product decision gate. Do not silently begin Enterprise Platform or privileged-host implementation.
+Run the complete inherited matrix on the exact final #142 pull-request head, independently review the final diff, merge only if green and clean, close #142, and then select the next bounded product decision gate. Do not silently begin Enterprise Platform or privileged-host implementation.
 
 ## Historical archive
 
