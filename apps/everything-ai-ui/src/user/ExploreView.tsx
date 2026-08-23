@@ -4,6 +4,7 @@ import { formatSize } from './userUtils';
 import type { DocumentContext } from './types';
 import type { IndexedFile } from '../api';
 import { ExtractedTextPreview } from '../shared/ExtractedTextPreview';
+import { SearchResultContext } from './SearchResultContext';
 import {
   summarizeFileProgress,
   withInFlightSummary,
@@ -71,6 +72,10 @@ function summarizeFiles(files: IndexedFile[]) {
 
 function searchMatchFor(file: IndexedFile) {
   return (file as SearchAwareIndexedFile).search_match;
+}
+
+function searchSnippetFor(file: IndexedFile) {
+  return (file as SearchAwareIndexedFile).snippet;
 }
 
 function formatSemanticSignal(score: number | null | undefined) {
@@ -201,16 +206,20 @@ export function ExploreView({
           <tbody>{files.map((file) => {
             const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
             const searchMatch = searchMatchFor(file);
+            const searchSnippet = searchSnippetFor(file);
             const semanticSignal = formatSemanticSignal(searchMatch?.semantic_score);
             const hasLifecycleData = Boolean(file.index_status || file.extraction_status);
             return <tr key={file.id} className={selectedFile?.id === file.id ? 'selected' : ''}>
               <td>
                 <button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => loadDocumentContext(file.id)}>{file.filename}</button>
-                {searchMatch ? <div className="search-match-details" aria-label={`Search match for ${file.filename}`}>
-                  <span className="chip blue">{searchMatch.basis}</span>
-                  <small>{searchMatch.explanation}</small>
-                  {semanticSignal ? <small>Semantic similarity signal: {semanticSignal} (ranking signal, not confidence).</small> : null}
-                </div> : null}
+                {searchMatch ? <>
+                  <div className="search-match-details" aria-label={`Search match for ${file.filename}`}>
+                    <span className="chip blue">{searchMatch.basis}</span>
+                    <small>{searchMatch.explanation}</small>
+                    {semanticSignal ? <small>Semantic similarity signal: {semanticSignal} (ranking signal, not confidence).</small> : null}
+                  </div>
+                  <SearchResultContext filename={file.filename} snippet={searchSnippet} query={query} basis={searchMatch.basis} />
+                </> : null}
               </td>
               <td><span className="chip blue">{file.extension || 'file'}</span></td>
               <td>{file.size_bytes == null ? '—' : formatSize(file.size_bytes)}</td>
