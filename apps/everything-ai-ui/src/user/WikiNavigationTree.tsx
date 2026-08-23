@@ -92,17 +92,31 @@ function queryTerms(query: string) {
   return normalizeText(query).split(' ').filter((term) => term.length >= 2);
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function literalTermPattern(terms: string[], capture = false) {
+  const alternatives = terms.map(escapeRegExp).join('|');
+  return new RegExp(`(?<![\\p{L}\\p{N}])${capture ? `(${alternatives})` : `(?:${alternatives})`}(?![\\p{L}\\p{N}])`, 'giu');
+}
+
 function containsLiteralTerm(text: string, term: string) {
-  return text.toLocaleLowerCase().includes(term.toLocaleLowerCase());
+  return literalTermPattern([term]).test(text);
+}
+
+function findFirstLiteralTermIndex(text: string, terms: string[]) {
+  if (!terms.length) return -1;
+  const match = literalTermPattern(terms).exec(text);
+  return match?.index ?? -1;
 }
 
 function makeSnippet(text = '', terms: string[]) {
   const compact = text.replace(/\s+/g, ' ').trim();
   if (!compact) return 'No preview text available.';
-  const lower = compact.toLocaleLowerCase();
-  const firstTerm = terms.find((term) => lower.includes(term.toLocaleLowerCase()));
-  if (!firstTerm) return compact.slice(0, 180);
-  const index = Math.max(0, lower.indexOf(firstTerm.toLocaleLowerCase()) - 70);
+  const literalIndex = findFirstLiteralTermIndex(compact, terms);
+  if (literalIndex < 0) return compact.slice(0, 180);
+  const index = Math.max(0, literalIndex - 70);
   return `${index > 0 ? '…' : ''}${compact.slice(index, index + 220)}${index + 220 < compact.length ? '…' : ''}`;
 }
 
@@ -171,14 +185,10 @@ function searchPages(pages: WikiPage[], query: string) {
     .slice(0, 12) as RankedWikiResult[];
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function highlightLiteralTerms(text: string, query: string): ReactNode {
   const terms = queryTerms(query).sort((a, b) => b.length - a.length);
   if (!terms.length) return text;
-  const expression = new RegExp(`(${terms.map(escapeRegExp).join('|')})`, 'giu');
+  const expression = literalTermPattern(terms, true);
   const parts = text.split(expression);
   return parts.map((part, index) => (
     terms.some((term) => part.toLocaleLowerCase() === term.toLocaleLowerCase())
