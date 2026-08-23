@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Server } from 'lucide-react';
 import type { ProviderModels, ProviderName, ProviderSettings } from '../../providerSettingsApi';
 import { providerLabel } from '../../providerCatalog';
@@ -67,6 +68,12 @@ function RemoteProviderConfiguration({ active, draft, providerSettings, provider
   const isClearPending = hasSavedApiKey && activeBlock.apiKey === '';
   const isReplacementStaged = hasSavedApiKey && activeBlock.apiKey !== '' && activeBlock.apiKey !== '__saved__';
   const isNewKeyStaged = !hasSavedApiKey && activeBlock.apiKey !== '';
+  const [editingSavedKey, setEditingSavedKey] = useState(false);
+
+  useEffect(() => {
+    setEditingSavedKey(false);
+  }, [active, hasSavedApiKey]);
+
   const apiKeyValue = isPreservedSavedKey ? '' : activeBlock.apiKey;
   const keyStatus = isClearPending
     ? 'Clear pending'
@@ -82,10 +89,33 @@ function RemoteProviderConfiguration({ active, draft, providerSettings, provider
     : isReplacementStaged
       ? 'A new key is staged in this draft and will replace the saved secret when you save AI settings.'
       : isPreservedSavedKey
-        ? 'The saved secret stays masked. Type a new value to replace it, or clear the field to stage removal.'
+        ? editingSavedKey
+          ? 'Replacement mode is active. Enter a new key, or cancel replacement to keep the saved secret unchanged.'
+          : 'The saved secret stays masked. Choose Replace saved key before entering a replacement, or Clear key to stage removal.'
         : isNewKeyStaged
           ? 'This provider has a new key staged in the draft and it will be stored after Save AI Settings.'
           : 'Paste a key to save one for this provider, or leave it blank to keep it unconfigured.';
+
+  function keepSavedKey() {
+    update(`${active}.apiKey`, '__saved__');
+    setEditingSavedKey(false);
+  }
+
+  function beginReplacement() {
+    if (!hasSavedApiKey) return;
+    update(`${active}.apiKey`, '__saved__');
+    setEditingSavedKey(true);
+  }
+
+  function stageClear() {
+    if (!hasSavedApiKey) return;
+    const confirmed = window.confirm(`Clear the saved ${providerLabel(active)} API key? The key will be removed only after you click Save AI Settings.`);
+    if (!confirmed) return;
+    update(`${active}.apiKey`, '');
+    setEditingSavedKey(false);
+  }
+
+  const keyInputDisabled = hasSavedApiKey && isPreservedSavedKey && !editingSavedKey;
 
   return <div className="settings-grid">
     <label>
@@ -93,15 +123,20 @@ function RemoteProviderConfiguration({ active, draft, providerSettings, provider
       <input
         type="password"
         value={apiKeyValue}
+        disabled={keyInputDisabled}
         onChange={(event) => update(`${active}.apiKey`, event.target.value)}
-        placeholder={isPreservedSavedKey ? 'Type to replace the masked saved key' : 'Paste API key to save or replace'}
+        placeholder={hasSavedApiKey ? (editingSavedKey ? 'Enter replacement API key' : 'Saved key is masked') : 'Paste API key to save'}
         aria-label={`${providerLabel(active)} API key`}
+        autoComplete="new-password"
       />
       <span className="muted">API key lifecycle: {keyStatus}. {keyGuidance}</span>
       <div className="button-row">
-        {hasSavedApiKey && !isPreservedSavedKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '__saved__')}>Keep saved key</button>}
-        {hasSavedApiKey && <button className="outline" type="button" onClick={() => update(`${active}.apiKey`, '')}>Clear key</button>}
-        {hasSavedApiKey && isPreservedSavedKey && <span className="scope-pill">Saved key</span>}
+        {hasSavedApiKey && isPreservedSavedKey && !editingSavedKey && <button className="outline" type="button" onClick={beginReplacement}>Replace saved key</button>}
+        {hasSavedApiKey && editingSavedKey && <button className="outline" type="button" onClick={keepSavedKey}>Cancel replacement</button>}
+        {hasSavedApiKey && !isPreservedSavedKey && <button className="outline" type="button" onClick={keepSavedKey}>Keep saved key</button>}
+        {hasSavedApiKey && <button className="outline" type="button" onClick={stageClear}>Clear key</button>}
+        {hasSavedApiKey && isPreservedSavedKey && !editingSavedKey && <span className="scope-pill">Saved key</span>}
+        {hasSavedApiKey && isPreservedSavedKey && editingSavedKey && <span className="scope-pill">Replacement mode</span>}
         {isReplacementStaged && <span className="scope-pill">Replace key</span>}
         {isClearPending && <span className="scope-pill">Clear pending</span>}
         {isNewKeyStaged && <span className="scope-pill">New key staged</span>}
