@@ -4,8 +4,14 @@
   "release": "Product Depth — Trustworthy Search Experience",
   "date": "2026-08-24",
   "issue": 142,
-  "decision_candidate": "PRODUCT_DEPTH_PASS",
+  "status": "PRODUCT_DEPTH_PASS",
+  "acceptance_state": "merge-gated by final unchanged-head CI and independent diff review",
   "accepted_baseline_before_release_control": "680763ca86e35d748ce37b115f1be7601d011422",
+  "pre_decision_validation": {
+    "ci_run": 531,
+    "head": "cd47fcb286f893ac8cdf170da7f3da228fe238f6",
+    "result": "PASS"
+  },
   "milestones": [
     {
       "issue": 136,
@@ -60,6 +66,6 @@
     "issue_140": "680763ca86e35d748ce37b115f1be7601d011422",
     "release_control": "independently reversible documentation/canonical update"
   },
-  "finalization_rule": "Set final status to PRODUCT_DEPTH_PASS only after the unchanged final PR head passes the complete inherited matrix and independent review, then merge and close issue #142.",
+  "finalization_rule": "Merge only after the exact final PR head passes the complete inherited matrix and independent review. Successful merge is final acceptance of PRODUCT_DEPTH_PASS.",
   "next_state": "Select the next bounded product decision gate while preserving the inherited Phase 1 + Phase 2 + Product Depth regression matrix."
 }
