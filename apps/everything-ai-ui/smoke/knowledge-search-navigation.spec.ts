@@ -95,28 +95,29 @@ test('Knowledge Base search explains match fields without exposing heuristic sco
 
   const results = page.getByLabel('Knowledge Base search results');
   await expect(results).toBeVisible();
-  await expect(results.getByText('Matched: Title', { exact: false })).toBeVisible();
-  await expect(results.getByText('Matched: Content', { exact: false })).toBeVisible();
-  await expect(results.getByText('Matched: Source', { exact: false })).toBeVisible();
   await expect(results).not.toContainText('score ');
   await expect(results).not.toContainText('confidence');
   await expect(results).not.toContainText('relevance');
 
   const titleResult = results.getByRole('button', { name: 'Open Renewable Supplier Guide' });
+  await expect(titleResult).toContainText('Matched: Title');
   await expect(titleResult.locator('mark')).toHaveCount(2);
   await expect(titleResult.locator('mark').first()).toHaveText('Renewable');
 
   const contentResult = results.getByRole('button', { name: 'Open Contract Operations' });
+  await expect(contentResult).toContainText('Matched: Content');
   await expect(contentResult).toContainText('renewable obligations apply to supplier onboarding');
   await expect(contentResult.locator('mark')).toHaveCount(1);
   await expect(contentResult.locator('mark')).toHaveText('renewable');
 
   const sourceResult = results.getByRole('button', { name: 'Open Evidence Register' });
+  await expect(sourceResult).toContainText('Matched: Source');
   await expect(sourceResult).toContainText('renewable-audit-record.txt');
   await expect(sourceResult.locator('mark')).toHaveCount(3);
   await expect(sourceResult.locator('mark').first()).toHaveText('renewable');
 
   const substringResult = results.getByRole('button', { name: 'Open Legacy Energy Classification' });
+  await expect(substringResult).toContainText('Matched: Content');
   await expect(substringResult).toContainText('nonrenewable classification remains in the historical archive');
   await expect(substringResult.locator('mark')).toHaveCount(0);
 
