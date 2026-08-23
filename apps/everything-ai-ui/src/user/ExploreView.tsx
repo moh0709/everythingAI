@@ -202,6 +202,7 @@ export function ExploreView({
             const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
             const searchMatch = searchMatchFor(file);
             const semanticSignal = formatSemanticSignal(searchMatch?.semantic_score);
+            const hasLifecycleData = Boolean(file.index_status || file.extraction_status);
             return <tr key={file.id} className={selectedFile?.id === file.id ? 'selected' : ''}>
               <td>
                 <button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => loadDocumentContext(file.id)}>{file.filename}</button>
@@ -212,13 +213,16 @@ export function ExploreView({
                 </div> : null}
               </td>
               <td><span className="chip blue">{file.extension || 'file'}</span></td>
-              <td>{formatSize(file.size_bytes)}</td>
+              <td>{file.size_bytes == null ? '—' : formatSize(file.size_bytes)}</td>
               <td>
-                <div className={`source-lifecycle source-lifecycle-${lifecycle.state}`}>
+                {hasLifecycleData || !searchMatch ? <div className={`source-lifecycle source-lifecycle-${lifecycle.state}`}>
                   <strong>{lifecycle.label}</strong>
                   <small>{lifecycle.detail}</small>
                   <small className="source-lifecycle-technical">Index {file.index_status || 'pending'} · Extract {file.extraction_status || 'pending'}</small>
-                </div>
+                </div> : <div className="source-lifecycle">
+                  <strong>Search result</strong>
+                  <small>Open the file to load its current indexing and extraction details.</small>
+                </div>}
               </td>
             </tr>;
           })}</tbody>
