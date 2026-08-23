@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-08-23  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`)  
-Current gate: issue #134 canonical reconciliation
+Date: 2026-08-24  
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth search milestones #136/#138/#140 individually accepted  
+Current gate: issue #142 final Product Depth release-control CI/review
 
 ## Mandatory startup sequence
 
@@ -27,7 +27,7 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Do not infer the active program state from an old phase label. The accepted current product state is Phase 2 complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
+Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth search sequence is implemented and individually accepted through #140 merge `680763ca86e35d748ce37b115f1be7601d011422`. Issue #142 records the combined `PRODUCT_DEPTH_PASS` release decision after pre-decision CI #531 passed on `cd47fcb286f893ac8cdf170da7f3da228fe238f6`; the decision reaches accepted canonical `main` only when the exact final PR head passes the same inherited matrix, independent review is clean, and the PR merges.
 
 ## Roles
 
@@ -58,7 +58,7 @@ Rules:
 
 ## Mandatory inherited product regression baseline
 
-For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 gates:
+For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates:
 
 - root regression;
 - backend tests;
@@ -69,6 +69,9 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - long-form/table rendering acceptance;
 - grouped-planning/bulk-selection acceptance;
 - API-key lifecycle acceptance;
+- Product Depth explainable unified-search acceptance;
+- Product Depth contextual-snippet acceptance;
+- Product Depth Knowledge Base search-navigation acceptance;
 - disposable-folder release-candidate acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -76,9 +79,21 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 
 Tests passing on an older commit do not prove a new candidate.
 
+## Product Depth trust constraints
+
+The accepted Product Depth search sequence must preserve these properties:
+
+- Client search remains read-only;
+- keyword/semantic match basis is explained truthfully;
+- semantic similarity is a ranking signal, not calibrated confidence;
+- the local Knowledge Base heuristic score is not shown as user-facing relevance/confidence;
+- snippets use real indexed/saved content and do not invent evidence;
+- literal highlighting respects Unicode letter/number term boundaries;
+- exact saved-page navigation and source provenance remain intact.
+
 ## Current scope gates
 
-No new major implementation phase is authorized by Phase 2 completion alone.
+No new major implementation phase is authorized by Phase 2 or Product Depth completion alone.
 
 The following require explicit CEO approval before implementation release because they materially expand scope or operational authority:
 
@@ -99,7 +114,7 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #134 is the sole active reconciliation task. It is documentation-only and must not change product/runtime behavior. Finish it with a clean diff review, merge, close, then prepare the next-phase decision gate without silently starting the next major implementation phase.
+Issue #142 is the sole active Product Depth release-control task. Run the complete inherited matrix on the exact final PR head and independently review the final diff. Merge only if both are clean, close #142, and then select the next bounded product decision gate without silently beginning Enterprise Platform or privileged-host implementation.
 
 ## Evidence authority
 
@@ -108,6 +123,15 @@ Current Phase 2 release evidence:
 - `docs/PHASE2_RELEASE_DECISION_2026-08-23.md`
 - `docs/HANDOVER_2026-08-23_PHASE2_RELEASE_DECISION.json`
 - merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`
+
+Current Product Depth release-control evidence:
+
+- `docs/PRODUCT_DEPTH_SEARCH_RELEASE_DECISION_2026-08-24.md`
+- `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_SEARCH_RELEASE.json`
+- pre-decision CI #531 on `cd47fcb286f893ac8cdf170da7f3da228fe238f6`
+- #136 merge `10eb14b5501499e90e5281390f9cfed99edc8315`
+- #138 merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`
+- #140 merge `680763ca86e35d748ce37b115f1be7601d011422`
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 

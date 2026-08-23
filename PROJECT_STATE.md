@@ -1,22 +1,32 @@
 # EverythingAI — Canonical Project State
 
-Date: 2026-08-23  
-Authority: current accepted repository state after Phase 2 dispatch  
-Reconciliation issue: #134
+Date: 2026-08-24  
+Authority: current accepted repository state after Phase 2 dispatch and Product Depth milestones  
+Current release-control issue: #142
 
 ## Current program stage
 
-**Phase 2 — Product Intelligence & Knowledge Experience is COMPLETE AND DISPATCHED (`PHASE2_PASS`).**
+**Phase 2 — Product Intelligence & Knowledge Experience remains COMPLETE AND DISPATCHED (`PHASE2_PASS`).**
 
-Accepted release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
+Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
 
-Authoritative evidence:
+The bounded **Product Depth — Trustworthy Search Experience** milestone chain is implemented and individually accepted:
+
+- #136 — explainable unified Sources & Files ranking — merge `10eb14b5501499e90e5281390f9cfed99edc8315`;
+- #138 — contextual search snippets and result inspection — merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`;
+- #140 — trustworthy Knowledge Base search navigation — merge `680763ca86e35d748ce37b115f1be7601d011422`, accepted after CI #529.
+
+Issue #142 records the combined release decision **`PRODUCT_DEPTH_PASS`**. Pre-decision CI #531 passed the complete inherited matrix on head `cd47fcb286f893ac8cdf170da7f3da228fe238f6`. This release-control decision is accepted into canonical `main` only if its exact final PR head independently passes the same matrix, final diff review has no unresolved Critical or Important findings, and the PR merges.
+
+Authoritative release evidence:
 
 - `docs/PHASE2_RELEASE_DECISION_2026-08-23.md`
 - `docs/HANDOVER_2026-08-23_PHASE2_RELEASE_DECISION.json`
 - `docs/PHASE2_EXIT_CANONICAL_RECONCILIATION_2026-08-23.md`
+- `docs/PRODUCT_DEPTH_SEARCH_RELEASE_DECISION_2026-08-24.md`
+- `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_SEARCH_RELEASE.json`
 
-No subsequent major implementation phase is currently authorized. Issue #134 is a documentation-only reconciliation gate before the next phase is selected.
+No Enterprise Platform or privileged-host implementation is authorized by Product Depth work.
 
 ## Authority order
 
@@ -34,8 +44,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 UX improvements dispatched | Select next bounded product outcome before implementation |
-| Knowledge and Safe Action | Source provenance, document rendering, grouped planning, approval/action/audit/undo accepted | Preserve evidence provenance and mutation safety |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth search milestones #136/#138/#140 individually accepted | Merge #142 only after final unchanged-head CI/review, then select next bounded product outcome |
+| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, grouped planning, approval/action/audit/undo accepted | Preserve evidence provenance and mutation safety |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve evidence, rollback, and truthful blocker handling |
@@ -48,6 +58,14 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 - #128 — secure API-key lifecycle UX — merge `f4de9b2c890ad28503756742e0989ac1bd2d01d2` — CI #502.
 - #130 — controlled frontend modularization — merge `ef54272e92bfc2774385be67fcf6ce311e241aa7` — CI #504.
 - #132 — Phase 2 release decision — final merge `266c2efa255ba11165ffaf5d0b6385affe0f261b` after unchanged-head CI #508 and independent diff review.
+
+## Accepted Product Depth milestone chain
+
+- #136 — explainable unified Sources & Files ranking — merge `10eb14b5501499e90e5281390f9cfed99edc8315`.
+- #138 — contextual search snippets and result inspection — merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`.
+- #140 — trustworthy Knowledge Base search navigation — merge `680763ca86e35d748ce37b115f1be7601d011422` after CI #529 and independent diff review.
+
+Product Depth preserves read-only Client search behavior, source provenance, truthful match-basis labeling, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence.
 
 ## Mandatory inherited regression baseline
 
@@ -62,10 +80,13 @@ Subsequent product work must preserve, where applicable:
 7. long-form/table rendering acceptance;
 8. grouped-planning/bulk-selection acceptance;
 9. API-key lifecycle acceptance;
-10. disposable-folder RC acceptance;
-11. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-12. independent diff review with no unresolved Critical or Important findings;
-13. milestone-scoped rollback evidence.
+10. Product Depth explainable unified-search acceptance;
+11. Product Depth contextual-snippet acceptance;
+12. Product Depth Knowledge Base search-navigation acceptance;
+13. disposable-folder RC acceptance;
+14. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+15. independent diff review with no unresolved Critical or Important findings;
+16. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for required validation of a new candidate.
 
@@ -85,15 +106,15 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-At reconciliation start, the Phase 2 release inspection found no open implementation issues or PRs. Issue #134 was then opened solely to reconcile stale canonical overlays and prepare the next-phase decision gate.
+Issue #142 is the sole active Product Depth release-control gate. Its scope is validation, evidence, handover, and canonical synchronization only; it does not authorize a new major platform phase.
 
 ## Current next action
 
-Complete #134 by synchronizing canonical state and roadmaps, independently review the documentation diff, merge if clean, and close #134. After that, prepare/select the next bounded phase objective. Do not silently begin Enterprise Platform or privileged-host implementation.
+Run the complete inherited matrix on the exact final #142 pull-request head, independently review the final diff, merge only if green and clean, close #142, and then select the next bounded product decision gate. Do not silently begin Enterprise Platform or privileged-host implementation.
 
 ## Historical archive
 
-The exact pre-reconciliation canonical file is preserved at:
+The exact pre-Phase-2-reconciliation canonical file is preserved at:
 
 `docs/archive/2026-08-23-pre-phase2-reconciliation/PROJECT_STATE.md`
 

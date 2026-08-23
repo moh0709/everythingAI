@@ -1,0 +1,71 @@
+{
+  "program": "EverythingAI",
+  "track": "Product and UX / Knowledge and Safe Action",
+  "release": "Product Depth — Trustworthy Search Experience",
+  "date": "2026-08-24",
+  "issue": 142,
+  "status": "PRODUCT_DEPTH_PASS",
+  "acceptance_state": "merge-gated by final unchanged-head CI and independent diff review",
+  "accepted_baseline_before_release_control": "680763ca86e35d748ce37b115f1be7601d011422",
+  "pre_decision_validation": {
+    "ci_run": 531,
+    "head": "cd47fcb286f893ac8cdf170da7f3da228fe238f6",
+    "result": "PASS"
+  },
+  "milestones": [
+    {
+      "issue": 136,
+      "merge": "10eb14b5501499e90e5281390f9cfed99edc8315",
+      "capability": "explainable unified Sources & Files ranking"
+    },
+    {
+      "issue": 138,
+      "merge": "e1ba126ea2f5017f21d7e551158bc80f9cf2328c",
+      "capability": "contextual search snippets and result inspection"
+    },
+    {
+      "issue": 140,
+      "merge": "680763ca86e35d748ce37b115f1be7601d011422",
+      "ci_run": 529,
+      "capability": "trustworthy Knowledge Base search navigation"
+    }
+  ],
+  "required_final_gate": [
+    "root regression",
+    "backend tests",
+    "frontend typecheck",
+    "frontend production build",
+    "Client/Admin Playwright smoke",
+    "Phase 2 rich citation acceptance",
+    "Phase 2 long-form/table acceptance",
+    "Phase 2 grouped planning acceptance",
+    "Phase 2 API-key lifecycle acceptance",
+    "Product Depth explainable unified-search acceptance",
+    "Product Depth contextual-snippet acceptance",
+    "Product Depth Knowledge Base search-navigation acceptance",
+    "disposable-folder RC acceptance",
+    "UI-governed action/undo acceptance",
+    "independent diff review with no unresolved Critical or Important findings"
+  ],
+  "trust_properties": [
+    "read-only Client search behavior",
+    "truthful match-basis labels",
+    "semantic similarity is not calibrated confidence",
+    "internal Knowledge Base heuristic score is not user-facing",
+    "literal highlighting respects Unicode letter/number boundaries",
+    "missing evidence is not invented",
+    "source provenance remains available"
+  ],
+  "scope_expansion": false,
+  "enterprise_platform_authorized": false,
+  "privileged_host_work_authorized": false,
+  "issue_69_modified": false,
+  "rollback": {
+    "issue_136": "10eb14b5501499e90e5281390f9cfed99edc8315",
+    "issue_138": "e1ba126ea2f5017f21d7e551158bc80f9cf2328c",
+    "issue_140": "680763ca86e35d748ce37b115f1be7601d011422",
+    "release_control": "independently reversible documentation/canonical update"
+  },
+  "finalization_rule": "Merge only after the exact final PR head passes the complete inherited matrix and independent review. Successful merge is final acceptance of PRODUCT_DEPTH_PASS.",
+  "next_state": "Select the next bounded product decision gate while preserving the inherited Phase 1 + Phase 2 + Product Depth regression matrix."
+}
