@@ -130,7 +130,7 @@ test('Admin explicitly preserves, replaces, and confirms clearing saved provider
     await dialog.accept();
   });
   await page.getByRole('button', { name: 'Clear key' }).click();
-  await expect(page.getByText('Clear pending', { exact: false })).toBeVisible();
+  await expect(page.getByText('Clear pending', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Save AI Settings' }).click();
   await expect.poll(() => putBodies.length).toBe(3);
   expect(putBodies[2].openai.apiKey).toBe('');
