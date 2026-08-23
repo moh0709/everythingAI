@@ -2,7 +2,7 @@
 
 Date: 2026-08-23  
 Issue: #132  
-Status: **RELEASE CANDIDATE — final unchanged-candidate CI and diff review required**
+Decision: **PHASE2_PASS — COMPLETE AND DISPATCHED**
 
 ## Phase
 
@@ -20,19 +20,19 @@ Status: **RELEASE CANDIDATE — final unchanged-candidate CI and diff review req
 
 ## Product result
 
-Phase 2 now provides:
+Phase 2 provides:
 
-- citation references that remain connected to genuine source evidence and focused source context;
+- citation references connected to genuine source evidence and focused source context;
 - clearer long-form document rendering, semantic lists, responsive tables, and interactive citations inside table cells;
-- grouped planning and bulk-selection UX with global one-filesystem-mutation-per-file safety preserved;
+- grouped planning and bulk-selection UX with the global one-filesystem-mutation-per-file safety guard preserved;
 - explicit provider API-key lifecycle states for saved, replace, cancel, clear, and staged-key behavior;
 - reduced frontend coupling by isolating the security-sensitive API-key lifecycle field from generic provider configuration.
 
 No Phase 2 milestone introduced authentication, tenancy, cloud deployment, database migration, object storage, new provider runtime behavior, connector runtime expansion, or other Enterprise Platform scope.
 
-## Mandatory final release gate
+## Release validation
 
-The release candidate is accepted only if one unchanged head SHA passes:
+Release-candidate CI #506 passed the complete inherited matrix on the documentation release branch before this final decision record was written:
 
 1. root regression;
 2. backend tests;
@@ -44,8 +44,11 @@ The release candidate is accepted only if one unchanged head SHA passes:
 8. Phase 2 grouped-planning acceptance;
 9. Phase 2 API-key lifecycle acceptance;
 10. disposable-folder RC acceptance;
-11. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-12. independent diff review with no unresolved Critical or Important findings.
+11. UI-governed planning → preview → approval → execution → audit → undo acceptance.
+
+This final decision commit remains merge-gated by the same CI workflow. It must not reach `main` unless its own unchanged PR head is green and independent diff review has no unresolved Critical or Important finding.
+
+Independent release-document diff review found no Critical or Important finding before the final decision commit.
 
 ## Rollback
 
@@ -53,8 +56,8 @@ Each milestone remains independently reversible by reverting its merge commit. T
 
 ## Protected scope
 
-Issue #69 remains protected and unchanged.
+Issue #69 remained protected and unchanged throughout Phase 2.
 
-## Decision rule
+## Final state
 
-If the final unchanged-candidate gate is green and independent review finds no unresolved Critical/Important issue, record **PHASE2_PASS — COMPLETE AND DISPATCHED** and close #132. Otherwise Phase 2 remains open until the failure is diagnosed, corrected, and revalidated.
+Phase 2 is complete once this decision record is merged after its unchanged-head CI gate. The accepted Phase 1 regression matrix plus the Phase 2 acceptance suite becomes the mandatory baseline for subsequent product work.
