@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { WikiSource, WikiSourceChunk } from './types';
 
 type WikiSourcePreviewDrawerProps = {
@@ -52,17 +52,41 @@ export function WikiSourcePreviewDrawer({
     return chunks.find((chunk) => chunkRefCandidates(chunk).includes(normalizedActiveChunkRef)) || null;
   }, [chunks, normalizedActiveChunkRef]);
   const activeChunkSnippet = activeChunk?.evidence || activeChunk?.text || source?.evidence || null;
+  const defaultInspectionRef = normalizedActiveChunkRef || (chunks[0] ? primaryChunkRef(chunks[0]) : null);
+  const [inspectionChunkRef, setInspectionChunkRef] = useState<string | null>(defaultInspectionRef);
 
   useEffect(() => {
-    if (!normalizedActiveChunkRef) return;
+    setInspectionChunkRef(defaultInspectionRef);
+  }, [defaultInspectionRef, source]);
 
-    const element = chunkRefs.current[normalizedActiveChunkRef];
+  const inspectionChunkIndex = useMemo(() => {
+    if (!inspectionChunkRef) return -1;
+    return chunks.findIndex((chunk) => chunkRefCandidates(chunk).includes(inspectionChunkRef));
+  }, [chunks, inspectionChunkRef]);
+
+  const inspectionChunk = inspectionChunkIndex >= 0 ? chunks[inspectionChunkIndex] : null;
+  const inspectionChunkSnippet = inspectionChunk?.evidence || inspectionChunk?.text || null;
+  const canInspectPrevious = inspectionChunkIndex > 0;
+  const canInspectNext = inspectionChunkIndex >= 0 && inspectionChunkIndex < chunks.length - 1;
+
+  useEffect(() => {
+    if (!inspectionChunkRef) return;
+
+    const element = chunkRefs.current[inspectionChunkRef];
     if (!element) return;
 
     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [normalizedActiveChunkRef, source]);
+  }, [inspectionChunkRef, source]);
 
   if (!source) return null;
+
+  function inspectChunkAt(index: number) {
+    const chunk = chunks[index];
+    if (!chunk) return;
+    const ref = primaryChunkRef(chunk);
+    if (!ref) return;
+    setInspectionChunkRef(ref);
+  }
 
   return (
     <aside className="wiki-source-preview-drawer" aria-label="Source preview drawer">
@@ -114,6 +138,58 @@ export function WikiSourcePreviewDrawer({
         ) : null}
       </section>
 
+      {chunks.length ? (
+        <section className="wiki-citation-focus" aria-label="Source chunk navigation">
+          <div className="wiki-citation-focus-top">
+            <span className="wiki-citation-focus-label">Browse source chunks</span>
+            {inspectionChunkIndex >= 0 ? (
+              <span className="wiki-source-preview-focus-pill">Chunk {inspectionChunkIndex + 1} of {chunks.length}</span>
+            ) : null}
+          </div>
+          <p className="wiki-citation-focus-copy">
+            Browse genuine stored chunks from this source. The pinned citation above does not change while you inspect neighboring evidence.
+          </p>
+          {inspectionChunk ? (
+            <dl className="wiki-citation-focus-meta">
+              <div>
+                <dt>Inspecting</dt>
+                <dd>{primaryChunkRef(inspectionChunk) || 'Stored chunk'}</dd>
+              </div>
+              <div>
+                <dt>Location</dt>
+                <dd>{inspectionChunk.location || `Chunk ${inspectionChunk.chunk_number || inspectionChunkIndex + 1}`}</dd>
+              </div>
+            </dl>
+          ) : null}
+          {inspectionChunkSnippet ? (
+            <div className="wiki-source-preview-snippet">
+              <span>Inspected chunk evidence</span>
+              <blockquote>{inspectionChunkSnippet}</blockquote>
+            </div>
+          ) : null}
+          <div className="wiki-source-preview-actions" style={{ marginTop: '0.85rem', marginBottom: 0 }}>
+            <button
+              type="button"
+              className="outline"
+              aria-label="Previous chunk"
+              disabled={!canInspectPrevious}
+              onClick={() => inspectChunkAt(inspectionChunkIndex - 1)}
+            >
+              Previous chunk
+            </button>
+            <button
+              type="button"
+              className="outline"
+              aria-label="Next chunk"
+              disabled={!canInspectNext}
+              onClick={() => inspectChunkAt(inspectionChunkIndex + 1)}
+            >
+              Next chunk
+            </button>
+          </div>
+        </section>
+      ) : null}
+
       {source.absolute_path ? (
         <div className="wiki-source-preview-path">
           <span>Path</span>
@@ -146,6 +222,7 @@ export function WikiSourcePreviewDrawer({
               const chunkRef = primaryChunkRef(chunk);
               const candidates = chunkRefCandidates(chunk);
               const isActive = Boolean(normalizedActiveChunkRef && candidates.includes(normalizedActiveChunkRef));
+              const isInspected = Boolean(inspectionChunkRef && candidates.includes(inspectionChunkRef));
               const meta = chunkMeta(chunk);
 
               return (
@@ -163,6 +240,7 @@ export function WikiSourcePreviewDrawer({
                     <strong>{chunkRef}</strong>
                     <span>{chunk.location || `Chunk ${chunk.chunk_number || ''}`}</span>
                     {isActive ? <span className="wiki-source-preview-active-badge">Active citation</span> : null}
+                    {isInspected && !isActive ? <span className="wiki-source-preview-active-badge">Inspecting</span> : null}
                   </div>
                   {meta.length ? <div className="wiki-source-preview-chunk-meta">{meta.map((label) => <span key={label}>{label}</span>)}</div> : null}
                   {chunk.id ? <code className="wiki-source-preview-chunk-id">{chunk.id}</code> : null}
