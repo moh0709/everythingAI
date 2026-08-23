@@ -12,7 +12,7 @@ const keywordFile = {
   index_status: 'indexed',
   extraction_status: 'extracted',
   recovery_status: 'active',
-  snippet: 'The renewable obligations apply to every supplier in the contract.',
+  snippet: 'The renewable obligations apply to every supplier; nonrenewable classifications remain separate.',
   search_match: {
     basis: 'keyword',
     keyword_rank: 1,
@@ -119,10 +119,11 @@ test('Client search shows truthful contextual snippets and highlights literal qu
 
   const keywordContext = page.getByLabel('Search context for Renewable Contract.txt');
   await expect(keywordContext).toContainText('Keyword context');
-  await expect(keywordContext).toContainText('The renewable obligations apply to every supplier in the contract.');
+  await expect(keywordContext).toContainText('The renewable obligations apply to every supplier; nonrenewable classifications remain separate.');
   await expect(keywordContext.locator('mark')).toHaveCount(2);
   await expect(keywordContext.locator('mark').nth(0)).toHaveText('renewable');
   await expect(keywordContext.locator('mark').nth(1)).toHaveText('obligations');
+  await expect(keywordContext.getByText('nonrenewable', { exact: true })).toBeVisible();
 
   const semanticContext = page.getByLabel('Search context for Energy Duties.txt');
   await expect(semanticContext).toContainText('Semantic context');
