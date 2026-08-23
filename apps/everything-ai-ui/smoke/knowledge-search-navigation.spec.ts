@@ -88,7 +88,8 @@ test('Knowledge Base search explains match fields without exposing heuristic sco
   await expect(results).not.toContainText('relevance');
 
   const titleResult = results.getByRole('button', { name: 'Open Renewable Supplier Guide' });
-  await expect(titleResult.locator('mark')).toContainText('Renewable');
+  await expect(titleResult.locator('mark')).toHaveCount(2);
+  await expect(titleResult.locator('mark').first()).toHaveText('Renewable');
 
   const contentResult = results.getByRole('button', { name: 'Open Contract Operations' });
   await expect(contentResult).toContainText('renewable obligations apply to supplier onboarding');
