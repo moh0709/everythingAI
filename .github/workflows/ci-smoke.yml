@@ -158,6 +158,14 @@ jobs:
           EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
         run: npx playwright test smoke/rich-citation-source-highlighting.spec.ts
 
+      - name: Run Phase 2 long-form and table formatting acceptance
+        working-directory: apps/everything-ai-ui
+        env:
+          EVERYTHINGAI_API_URL: http://127.0.0.1:4100
+          EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
+        run: npx playwright test smoke/long-form-table-formatting.spec.ts
+
       - name: Run disposable-folder RC acceptance
         working-directory: apps/everything-ai-ui
         env:

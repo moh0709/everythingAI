@@ -216,9 +216,9 @@ function renderMarkdownLines(lines: string[], options: MarkdownRenderOptions = {
 
     if (trimmed.startsWith('|')) {
       const table = parseTable(lines, index);
-      nodes.push(<div key={`table-wrap-${index}`} className="wiki-table-wrap">
+      nodes.push(<div key={`table-wrap-${index}`} className="wiki-table-wrap" tabIndex={0} role="region" aria-label="Scrollable source-backed table">
         <table className="wiki-table">
-          <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex}>{renderInlineMarkdown(header, options)}</th>)}</tr></thead>
+          <thead><tr>{table.headers.map((header, headerIndex) => <th key={headerIndex} scope="col">{renderInlineMarkdown(header, options)}</th>)}</tr></thead>
           <tbody>{table.body.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{renderInlineMarkdown(cell, options)}</td>)}</tr>)}</tbody>
         </table>
       </div>);
@@ -226,13 +226,25 @@ function renderMarkdownLines(lines: string[], options: MarkdownRenderOptions = {
       continue;
     }
 
+    if (line.startsWith('- ')) {
+      const listItems: string[] = [];
+      const listStart = index;
+      while (index < lines.length && lines[index].startsWith('- ')) {
+        listItems.push(lines[index].slice(2));
+        index += 1;
+      }
+      nodes.push(<ul key={`list-${listStart}`} className="wiki-reading-list">
+        {listItems.map((item, itemIndex) => <li key={itemIndex}>{renderInlineMarkdown(item, options)}</li>)}
+      </ul>);
+      continue;
+    }
+
     if (line.startsWith('# ')) nodes.push(<h1 key={index}>{renderInlineMarkdown(line.slice(2), options)}</h1>);
     else if (line.startsWith('## ')) nodes.push(<h2 key={index}>{renderInlineMarkdown(line.slice(3), options)}</h2>);
     else if (line.startsWith('### ')) nodes.push(<h3 key={index}>{renderInlineMarkdown(line.slice(4), options)}</h3>);
-    else if (line.startsWith('- ')) nodes.push(<li key={index}>{renderInlineMarkdown(line.slice(2), options)}</li>);
     else if (line.startsWith('> ')) nodes.push(<blockquote key={index}>{renderInlineMarkdown(line.slice(2), options)}</blockquote>);
     else if (!line.trim()) nodes.push(<br key={index} />);
-    else nodes.push(<p key={index}>{renderInlineMarkdown(line, options)}</p>);
+    else nodes.push(<p key={index} className="wiki-reading-paragraph">{renderInlineMarkdown(line, options)}</p>);
     index += 1;
   }
 
