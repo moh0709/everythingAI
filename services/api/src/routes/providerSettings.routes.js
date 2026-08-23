@@ -10,6 +10,7 @@ import {
 import { fetchProviderModels } from '../settings/providerModelFetchers.js';
 
 const SETTINGS_KEY = 'ai_provider_settings';
+const MASKED_API_KEY_PATTERN = /^(?:\*{4,}|[•●·]{4,})$/u;
 
 function publicSettings(settings) {
   const copy = JSON.parse(JSON.stringify(settings));
@@ -21,10 +22,19 @@ function publicSettings(settings) {
   return copy;
 }
 
-function preserveSavedKeys(existing, incoming) {
+export function isMaskedApiKeyPlaceholder(value) {
+  if (typeof value !== 'string') return false;
+  const normalized = value.trim();
+  return normalized === '__saved__' || MASKED_API_KEY_PATTERN.test(normalized);
+}
+
+export function preserveSavedKeys(existing, incoming) {
   const next = mergeAiProviderSettings(incoming);
   for (const provider of [...REMOTE_PROVIDERS, 'lmStudio', 'customOpenAI']) {
-    if (next[provider]?.apiKey === '__saved__') next[provider].apiKey = existing[provider]?.apiKey || '';
+    const incomingKey = next[provider]?.apiKey;
+    if (isMaskedApiKeyPlaceholder(incomingKey)) {
+      next[provider].apiKey = existing[provider]?.apiKey || '';
+    }
   }
   return next;
 }
