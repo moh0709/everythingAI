@@ -2,7 +2,7 @@
 
 Date: 2026-08-24  
 Issue: #142  
-Decision candidate: **PRODUCT_DEPTH_PASS**
+Decision: **PRODUCT_DEPTH_PASS — merge-gated by final unchanged-head CI**
 
 ## Bounded product outcome
 
@@ -12,8 +12,8 @@ Accepted milestone chain:
 
 | Milestone | Issue | Merge | Validation |
 |---|---:|---|---|
-| Explainable unified Sources & Files ranking | #136 | `10eb14b5501499e90e5281390f9cfed99edc8315` | accepted milestone CI |
-| Contextual search snippets and result inspection | #138 | `e1ba126ea2f5017f21d7e551158bc80f9cf2328c` | accepted milestone CI |
+| Explainable unified Sources & Files ranking | #136 | `10eb14b5501499e90e5281390f9cfed99edc8315` | accepted milestone validation |
+| Contextual search snippets and result inspection | #138 | `e1ba126ea2f5017f21d7e551158bc80f9cf2328c` | accepted milestone validation |
 | Trustworthy Knowledge Base search navigation | #140 | `680763ca86e35d748ce37b115f1be7601d011422` | CI #529 |
 
 ## Product result
@@ -28,9 +28,9 @@ The accepted sequence now provides:
 - exact saved-page navigation with category/topic context preserved;
 - read-only Client search behavior with source provenance and governed action boundaries unchanged.
 
-## Final validation gate
+## Release validation
 
-This decision is not accepted merely because the three milestones merged. The final #142 pull-request head must pass the complete inherited matrix on one unchanged candidate:
+Pre-decision PR CI **#531** passed on release-control head `cd47fcb286f893ac8cdf170da7f3da228fe238f6` across the complete inherited matrix:
 
 1. root regression;
 2. backend tests;
@@ -45,10 +45,9 @@ This decision is not accepted merely because the three milestones merged. The fi
 11. Product Depth contextual-snippet acceptance;
 12. Product Depth Knowledge Base search-navigation acceptance;
 13. disposable-folder RC acceptance;
-14. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-15. independent diff review with no unresolved Critical or Important findings.
+14. UI-governed planning → preview → approval → execution → audit → undo acceptance.
 
-`PRODUCT_DEPTH_PASS` becomes final only after that unchanged-head gate is green and the release-control PR merges.
+This final decision update creates a new release-control head. It must not merge unless that exact final head independently passes the same complete CI matrix and final diff review has no unresolved Critical or Important findings. A merge therefore constitutes the final acceptance of this `PRODUCT_DEPTH_PASS` decision.
 
 ## Risk review
 
@@ -67,6 +66,6 @@ Rollback remains milestone-scoped:
 
 ## Next gate
 
-After `PRODUCT_DEPTH_PASS`, the inherited Phase 1 + Phase 2 + Product Depth acceptance matrix becomes the mandatory baseline for the next bounded product decision. No Enterprise Platform or privileged-host implementation is authorized by this release decision.
+After this decision merges, the inherited Phase 1 + Phase 2 + Product Depth acceptance matrix becomes the mandatory baseline for the next bounded product decision. No Enterprise Platform or privileged-host implementation is authorized by this release decision.
 
 Issue #69 remains closed completed historical evidence and is not modified by this decision.
