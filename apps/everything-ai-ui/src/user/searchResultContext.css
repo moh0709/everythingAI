@@ -1,0 +1,46 @@
+.search-result-context {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #dbeafe;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  max-width: 42rem;
+}
+
+.search-result-context-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+}
+
+.search-result-context-header strong {
+  color: #1e3a8a;
+  font-size: 0.82rem;
+}
+
+.search-result-context-header small {
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.search-result-context p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.search-result-context mark {
+  padding: 0 0.12rem;
+  border-radius: 0.2rem;
+  background: #fef3c7;
+  color: inherit;
+  font-weight: 700;
+}
+
+.search-result-context-empty {
+  color: #64748b !important;
+  font-style: italic;
+}
