@@ -13,6 +13,19 @@ import { deriveSourceLifecycle } from '../shared/sourceLifecycle';
 import '../shared/sourceLifecycle.css';
 import './localSettingsHelp.css';
 
+type SearchMatchDetails = {
+  basis: 'keyword' | 'semantic' | 'keyword + semantic';
+  keyword_rank: number | null;
+  semantic_rank: number | null;
+  semantic_score: number | null;
+  explanation: string;
+};
+
+type SearchAwareIndexedFile = IndexedFile & {
+  search_match?: SearchMatchDetails;
+  snippet?: string | null;
+};
+
 type ExploreViewProps = {
   error: string;
   busy: boolean;
@@ -54,6 +67,15 @@ function summarizeFiles(files: IndexedFile[]) {
     awaitingExtraction,
     active: Math.max(total - extracted - extractionFailed - unsupported - indexFailed, 0),
   };
+}
+
+function searchMatchFor(file: IndexedFile) {
+  return (file as SearchAwareIndexedFile).search_match;
+}
+
+function formatSemanticSignal(score: number | null | undefined) {
+  if (score == null || !Number.isFinite(score)) return null;
+  return score.toFixed(3);
 }
 
 export function ExploreView({
@@ -170,7 +192,7 @@ export function ExploreView({
         <div className="panel-title">
           <div>
             <h2><FileText /> Indexed File List</h2>
-            <p>{files.length} visible file(s). Open a file to inspect extracted file content and source metadata.</p>
+            <p>{files.length} visible file(s). Search results explain whether they matched indexed text, semantic similarity, or both.</p>
           </div>
           <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
         </div>
@@ -178,16 +200,29 @@ export function ExploreView({
           <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
           <tbody>{files.map((file) => {
             const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
+            const searchMatch = searchMatchFor(file);
+            const semanticSignal = formatSemanticSignal(searchMatch?.semantic_score);
+            const hasLifecycleData = Boolean(file.index_status || file.extraction_status);
             return <tr key={file.id} className={selectedFile?.id === file.id ? 'selected' : ''}>
-              <td><button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => loadDocumentContext(file.id)}>{file.filename}</button></td>
-              <td><span className="chip blue">{file.extension || 'file'}</span></td>
-              <td>{formatSize(file.size_bytes)}</td>
               <td>
-                <div className={`source-lifecycle source-lifecycle-${lifecycle.state}`}>
+                <button className="file-select-button" aria-label={`Inspect ${file.filename}`} onClick={() => loadDocumentContext(file.id)}>{file.filename}</button>
+                {searchMatch ? <div className="search-match-details" aria-label={`Search match for ${file.filename}`}>
+                  <span className="chip blue">{searchMatch.basis}</span>
+                  <small>{searchMatch.explanation}</small>
+                  {semanticSignal ? <small>Semantic similarity signal: {semanticSignal} (ranking signal, not confidence).</small> : null}
+                </div> : null}
+              </td>
+              <td><span className="chip blue">{file.extension || 'file'}</span></td>
+              <td>{file.size_bytes == null ? '—' : formatSize(file.size_bytes)}</td>
+              <td>
+                {hasLifecycleData || !searchMatch ? <div className={`source-lifecycle source-lifecycle-${lifecycle.state}`}>
                   <strong>{lifecycle.label}</strong>
                   <small>{lifecycle.detail}</small>
                   <small className="source-lifecycle-technical">Index {file.index_status || 'pending'} · Extract {file.extraction_status || 'pending'}</small>
-                </div>
+                </div> : <div className="source-lifecycle">
+                  <strong>Search result</strong>
+                  <small>Open the file to load its current indexing and extraction details.</small>
+                </div>}
               </td>
             </tr>;
           })}</tbody>

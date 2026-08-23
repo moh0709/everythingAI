@@ -47,6 +47,7 @@ function hasFilename(rows, filename) {
 function assertNoTrashedLeak(result, trashedFilename) {
   assert.equal(hasFilename(result.files, trashedFilename), false);
   assert.equal(hasFilename(result.semantic, trashedFilename), false);
+  assert.equal(hasFilename(result.ranked_files, trashedFilename), false);
   assert.equal(hasFilename(result.insights, trashedFilename), false);
   assert.equal(hasFilename(result.labels, trashedFilename), false);
   assert.equal(hasFilename(result.suggestions, trashedFilename), false);
@@ -96,14 +97,17 @@ test('unified search does not leak trashed file-linked rows by default', async (
   assertNoTrashedLeak(normalResult, 'Trashed Unified Supplier.txt');
   assert.equal(hasFilename(normalResult.files, 'Active Unified Supplier.txt'), true);
   assert.equal(hasFilename(normalResult.semantic, 'Active Unified Supplier.txt'), true);
+  assert.equal(hasFilename(normalResult.ranked_files, 'Active Unified Supplier.txt'), true);
   assert.equal(hasFilename(normalResult.insights, 'Active Unified Supplier.txt'), true);
   assert.equal(hasFilename(normalResult.labels, 'Active Unified Supplier.txt'), true);
 
   assert.equal(hasFilename(recoveryResult.files, 'Trashed Unified Supplier.txt'), true);
   assert.equal(hasFilename(recoveryResult.semantic, 'Trashed Unified Supplier.txt'), true);
+  assert.equal(hasFilename(recoveryResult.ranked_files, 'Trashed Unified Supplier.txt'), true);
   assert.equal(hasFilename(recoveryResult.insights, 'Trashed Unified Supplier.txt'), true);
   assert.equal(hasFilename(recoveryResult.labels, 'Trashed Unified Supplier.txt'), true);
   assert.equal(recoveryResult.files.find((row) => row.filename === 'Trashed Unified Supplier.txt').recovery_status, 'trashed');
+  assert.equal(recoveryResult.ranked_files.find((row) => row.filename === 'Trashed Unified Supplier.txt').recovery_status, 'trashed');
   assert.equal(recoveryResult.insights.find((row) => row.filename === 'Trashed Unified Supplier.txt').recovery_status, 'trashed');
   assert.equal(recoveryResult.labels.find((row) => row.filename === 'Trashed Unified Supplier.txt').recovery_status, 'trashed');
 
