@@ -4,7 +4,7 @@ const BASE_URL = process.env.EVERYTHINGAI_UI_URL || 'http://localhost:5151';
 
 const fixtureWiki = {
   generated_at: '2026-08-24T00:00:00.000Z',
-  page_count: 3,
+  page_count: 4,
   pages: [
     {
       id: 'kb-title-page',
@@ -64,6 +64,21 @@ const fixtureWiki = {
         },
       ],
     },
+    {
+      id: 'kb-substring-page',
+      title: 'Legacy Energy Classification',
+      slug: 'legacy-energy-classification',
+      page_type: 'topic',
+      category: 'Archive',
+      subcategory: 'Classification',
+      summary: 'Legacy terminology retained for historical comparison.',
+      markdown: '# Legacy Energy Classification\n\nThe nonrenewable classification remains in the historical archive.',
+      sections: [],
+      sources: [],
+      related_topics: [],
+      citation_coverage_score: 1,
+      weak_source_warning: false,
+    },
   ],
 };
 
@@ -98,7 +113,12 @@ test('Knowledge Base search explains match fields without exposing heuristic sco
 
   const sourceResult = results.getByRole('button', { name: 'Open Evidence Register' });
   await expect(sourceResult).toContainText('renewable-audit-record.txt');
-  await expect(sourceResult.locator('mark')).toHaveText('renewable');
+  await expect(sourceResult.locator('mark')).toHaveCount(3);
+  await expect(sourceResult.locator('mark').first()).toHaveText('renewable');
+
+  const substringResult = results.getByRole('button', { name: 'Open Legacy Energy Classification' });
+  await expect(substringResult).toContainText('nonrenewable classification remains in the historical archive');
+  await expect(substringResult.locator('mark')).toHaveCount(0);
 
   await contentResult.click();
   await expect(page.getByRole('heading', { name: 'Contract Operations' })).toBeVisible();
