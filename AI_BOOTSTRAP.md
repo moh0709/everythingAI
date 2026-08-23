@@ -2,7 +2,7 @@
 
 Date: 2026-08-24  
 Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth search milestones #136/#138/#140 individually accepted  
-Current gate: issue #142 Product Depth combined release-control validation
+Current gate: issue #142 final Product Depth release-control CI/review
 
 ## Mandatory startup sequence
 
@@ -27,7 +27,7 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth search sequence is implemented and individually accepted through #140 merge `680763ca86e35d748ce37b115f1be7601d011422`; combined release status remains a `PRODUCT_DEPTH_PASS` candidate until #142's unchanged final PR head passes all inherited gates, independent review is clean, and the release-control PR merges.
+Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth search sequence is implemented and individually accepted through #140 merge `680763ca86e35d748ce37b115f1be7601d011422`. Issue #142 records the combined `PRODUCT_DEPTH_PASS` release decision after pre-decision CI #531 passed on `cd47fcb286f893ac8cdf170da7f3da228fe238f6`; the decision reaches accepted canonical `main` only when the exact final PR head passes the same inherited matrix, independent review is clean, and the PR merges.
 
 ## Roles
 
@@ -114,7 +114,7 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #142 is the sole active Product Depth release-control task. Finish it only after one unchanged final PR head passes the complete inherited matrix and independent diff review has no unresolved Critical or Important finding. If PASS, merge, close #142, and select the next bounded product decision gate without silently beginning Enterprise Platform or privileged-host implementation.
+Issue #142 is the sole active Product Depth release-control task. Run the complete inherited matrix on the exact final PR head and independently review the final diff. Merge only if both are clean, close #142, and then select the next bounded product decision gate without silently beginning Enterprise Platform or privileged-host implementation.
 
 ## Evidence authority
 
@@ -128,6 +128,7 @@ Current Product Depth release-control evidence:
 
 - `docs/PRODUCT_DEPTH_SEARCH_RELEASE_DECISION_2026-08-24.md`
 - `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_SEARCH_RELEASE.json`
+- pre-decision CI #531 on `cd47fcb286f893ac8cdf170da7f3da228fe238f6`
 - #136 merge `10eb14b5501499e90e5281390f9cfed99edc8315`
 - #138 merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`
 - #140 merge `680763ca86e35d748ce37b115f1be7601d011422`
