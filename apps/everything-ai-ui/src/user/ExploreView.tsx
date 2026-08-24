@@ -120,6 +120,16 @@ export function ExploreView({
     setBasisFilter('');
   }
 
+  function searchWithFreshRefinements() {
+    clearFilters();
+    searchEverything();
+  }
+
+  function refreshWithFreshRefinements() {
+    clearFilters();
+    refreshFiles();
+  }
+
   return <>
     <section className="hero-row">
       <div>
@@ -133,11 +143,11 @@ export function ExploreView({
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={(event) => { if (event.key === 'Enter') searchEverything(); }}
+            onKeyDown={(event) => { if (event.key === 'Enter') searchWithFreshRefinements(); }}
             placeholder="Search filenames, paths, or extracted file content..."
           />
         </div>
-        <button className="purple" onClick={searchEverything} disabled={busy}>Search Files</button>
+        <button className="purple" onClick={searchWithFreshRefinements} disabled={busy}>Search Files</button>
         <button className="outline" onClick={handleAskFromHero} disabled={busy}>Ask AI</button>
       </div>
     </section>
@@ -154,64 +164,26 @@ export function ExploreView({
         <span className="chip dark">{summary.total} file(s)</span>
       </div>
       <div className="settings-help-grid">
-        <div>
-          <strong>In flight</strong>
-          <p>{progressSummary.inFlight} file(s) are still moving through indexing or extraction.</p>
-        </div>
-        <div>
-          <strong>Running</strong>
-          <p>{progressSummary.running} file(s) are indexed and still waiting for extraction to finish.</p>
-        </div>
-        <div>
-          <strong>Waiting</strong>
-          <p>{progressSummary.waiting} file(s) have a progress record but are not yet in a clear active stage.</p>
-        </div>
-        <div>
-          <strong>Complete</strong>
-          <p>{progressSummary.complete} file(s) have finished indexing and extraction.</p>
-        </div>
-        <div>
-          <strong>Partial</strong>
-          <p>{progressSummary.partial} file(s) are indexed but unsupported for text extraction.</p>
-        </div>
-        <div>
-          <strong>Failures</strong>
-          <p>{progressSummary.failed} file(s) reported an index or extraction failure.</p>
-        </div>
-        <div>
-          <strong>No progress data</strong>
-          <p>{progressSummary.noProgressData} file(s) have not reported indexing or extraction status yet.</p>
-        </div>
-        <div>
-          <strong>Next step</strong>
-          <p>{progressSummary.running > 0
-            ? 'Refresh the file list after the scanner or extractor finishes to see the latest state.'
-            : 'If nothing is running, start a scan or open a file with missing progress data to inspect the next stage.'}</p>
-        </div>
+        <div><strong>In flight</strong><p>{progressSummary.inFlight} file(s) are still moving through indexing or extraction.</p></div>
+        <div><strong>Running</strong><p>{progressSummary.running} file(s) are indexed and still waiting for extraction to finish.</p></div>
+        <div><strong>Waiting</strong><p>{progressSummary.waiting} file(s) have a progress record but are not yet in a clear active stage.</p></div>
+        <div><strong>Complete</strong><p>{progressSummary.complete} file(s) have finished indexing and extraction.</p></div>
+        <div><strong>Partial</strong><p>{progressSummary.partial} file(s) are indexed but unsupported for text extraction.</p></div>
+        <div><strong>Failures</strong><p>{progressSummary.failed} file(s) reported an index or extraction failure.</p></div>
+        <div><strong>No progress data</strong><p>{progressSummary.noProgressData} file(s) have not reported indexing or extraction status yet.</p></div>
+        <div><strong>Next step</strong><p>{progressSummary.running > 0 ? 'Refresh the file list after the scanner or extractor finishes to see the latest state.' : 'If nothing is running, start a scan or open a file with missing progress data to inspect the next stage.'}</p></div>
       </div>
     </section>
 
     <section className="panel">
       <div className="panel-title">
-        <div>
-          <h2><Server /> Connection</h2>
-          <p>Official client workspace runs on port 5151. Backend API stays on port 4100.</p>
-        </div>
+        <div><h2><Server /> Connection</h2><p>Official client workspace runs on port 5151. Backend API stays on port 4100.</p></div>
         <button className="outline" onClick={saveConnection}>Save</button>
       </div>
       <div className="settings-help-grid">
-        <div>
-          <strong>Files vs Knowledge Base</strong>
-          <p>Sources & Files shows original indexed files and extracted content. Knowledge Base shows generated, saved knowledge pages built from those sources.</p>
-        </div>
-        <div>
-          <strong>Token field</strong>
-          <p>Only change the token if the backend token was changed. Saving stores it in this browser only.</p>
-        </div>
-        <div>
-          <strong>Progress cues</strong>
-          <p>Each file card now shows the current stage and next step so you can tell whether it is queued, running, complete, partial, or failed.</p>
-        </div>
+        <div><strong>Files vs Knowledge Base</strong><p>Sources & Files shows original indexed files and extracted content. Knowledge Base shows generated, saved knowledge pages built from those sources.</p></div>
+        <div><strong>Token field</strong><p>Only change the token if the backend token was changed. Saving stores it in this browser only.</p></div>
+        <div><strong>Progress cues</strong><p>Each file card now shows the current stage and next step so you can tell whether it is queued, running, complete, partial, or failed.</p></div>
       </div>
       <div className="settings-grid">
         <label>API Base URL<input value={baseUrl} onChange={(event) => setBaseUrl(event.target.value)} /></label>
@@ -226,7 +198,7 @@ export function ExploreView({
             <h2><FileText /> Indexed File List</h2>
             <p>{visibleFiles.length} visible file(s){hasActiveFilters ? ` from ${files.length} current-query result(s)` : ''}. Search results explain whether they matched indexed text, semantic similarity, or both.</p>
           </div>
-          <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
+          <button className="outline" onClick={refreshWithFreshRefinements} disabled={busy}>Refresh</button>
         </div>
 
         {hasSearchResults ? <section className="settings-help-grid" aria-label="Search result filters">
@@ -257,9 +229,7 @@ export function ExploreView({
           </div>
         </section> : null}
 
-        {hasSearchResults && hasActiveFilters && visibleFiles.length === 0 ? <div className="status-strip ready" role="status">
-          No current-query results match the active filters. Clear or adjust a filter to restore the underlying search results.
-        </div> : null}
+        {hasSearchResults && hasActiveFilters && visibleFiles.length === 0 ? <div className="status-strip ready" role="status">No current-query results match the active filters. Clear or adjust a filter to restore the underlying search results.</div> : null}
 
         <table>
           <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
@@ -288,10 +258,7 @@ export function ExploreView({
                   <strong>{lifecycle.label}</strong>
                   <small>{lifecycle.detail}</small>
                   <small className="source-lifecycle-technical">Index {file.index_status || 'pending'} · Extract {file.extraction_status || 'pending'}</small>
-                </div> : <div className="source-lifecycle">
-                  <strong>Search result</strong>
-                  <small>Open the file to load its current indexing and extraction details.</small>
-                </div>}
+                </div> : <div className="source-lifecycle"><strong>Search result</strong><small>Open the file to load its current indexing and extraction details.</small></div>}
               </td>
             </tr>;
           })}</tbody>
