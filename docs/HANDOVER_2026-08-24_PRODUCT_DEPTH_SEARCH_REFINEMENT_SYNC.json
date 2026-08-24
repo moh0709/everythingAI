@@ -1,0 +1,26 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-24",
+  "issue": 172,
+  "status": "CANDIDATE_NOT_ACCEPTED",
+  "accepted_predecessor": {
+    "issue": 170,
+    "pr": 171,
+    "merge": "7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce",
+    "candidate_head": "fce080ad6bca0ff0d9193419b52b04e1e8278dc9",
+    "ci_run": 579,
+    "ci_result": "PASS",
+    "independent_diff_review": "no unresolved Critical or Important findings"
+  },
+  "regression_baseline_change": "The inherited CI workflow now explicitly includes the accepted #166 knowledge-evidence/freshness acceptance and #170 search-refinement acceptance.",
+  "next_gate_candidate": "Product Depth — Search Refinement Lifecycle & Query-Context Clarity",
+  "next_gate_reason": "Accepted #170 filters are local UI state and can remain active across a new search or base-list refresh, which can unexpectedly narrow a different result context.",
+  "architecture_expansion_authorized": false,
+  "issue_69": "closed completed historical evidence; unchanged",
+  "rollback": "Revert only the #172 documentation merge; no runtime behavior changes are authorized by this handover.",
+  "acceptance_pending": [
+    "canonical current-state synchronization",
+    "documentation diff review",
+    "inherited CI validation on one unchanged candidate"
+  ]
+}
