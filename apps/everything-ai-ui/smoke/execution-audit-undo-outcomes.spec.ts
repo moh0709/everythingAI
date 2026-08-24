@@ -42,6 +42,19 @@ const executions = [
     executed_at: '2026-08-24T04:00:00.000Z',
     undone_at: null,
   },
+  {
+    id: 'execution-label-undone-1',
+    execution_batch_id: null,
+    preview_id: 'preview-4',
+    file_id: 'file-4',
+    action_type: 'category',
+    status: 'undone',
+    source_path: null,
+    target_path: null,
+    error_message: null,
+    executed_at: '2026-08-24T03:00:00.000Z',
+    undone_at: '2026-08-24T03:05:00.000Z',
+  },
 ];
 
 const auditEvents = [
@@ -82,8 +95,17 @@ const auditEvents = [
     actor_id: 'admin-1',
   },
   {
+    id: 'audit-label-undone-4',
+    created_at: '2026-08-24T03:05:01.000Z',
+    entity_type: 'action_execution',
+    entity_id: 'execution-label-undone-1',
+    event_type: 'action.undone',
+    actor_type: 'user',
+    actor_id: 'admin-1',
+  },
+  {
     id: 'audit-unrelated',
-    created_at: '2026-08-24T03:00:00.000Z',
+    created_at: '2026-08-24T02:00:00.000Z',
     entity_type: 'indexed_file',
     entity_id: 'file-other',
     event_type: 'file.indexed',
@@ -141,6 +163,12 @@ test('Analytics explains governed execution, audit, and undo outcomes from persi
   await expect(failed.getByTestId('execution-audit-execution-failed-1')).toContainText('action.failed');
   await expect(failed).toContainText('Undo unavailable');
   await expect(failed.getByRole('button', { name: /Undo/ })).toHaveCount(0);
+
+  const labelUndo = page.getByTestId('execution-execution-label-undone-1');
+  await expect(labelUndo).toContainText('Undo recorded');
+  await expect(labelUndo).toContainText('Persisted status: undone');
+  await expect(labelUndo).not.toContainText('Restored by undo');
+  await expect(labelUndo.getByTestId('execution-audit-execution-label-undone-1')).toContainText('action.undone');
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(executed).toBeVisible();
