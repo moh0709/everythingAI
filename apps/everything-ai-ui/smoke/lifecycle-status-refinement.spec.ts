@@ -157,7 +157,7 @@ test('lifecycle-status refinement uses existing lifecycle facts and resets with 
 
   await lifecycleFilter.selectOption('ready');
   await expect(rows).toHaveCount(0);
-  await expect(page.getByRole('status')).toContainText('No current-query results match the active filters');
+  await expect(page.getByText('No current-query results match the active filters. Clear or adjust a filter to restore the underlying search results.', { exact: true })).toBeVisible();
 
   await page.getByRole('button', { name: 'Clear all filters' }).click();
   await expect(rows).toHaveCount(3);
