@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-24  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth search milestones #136/#138/#140 individually accepted  
-Current gate: issue #142 final Product Depth release-control CI/review
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release plus #144/#146 accepted  
+Current gate: issue #148 canonical state synchronization
 
 ## Mandatory startup sequence
 
@@ -27,7 +27,7 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth search sequence is implemented and individually accepted through #140 merge `680763ca86e35d748ce37b115f1be7601d011422`. Issue #142 records the combined `PRODUCT_DEPTH_PASS` release decision after pre-decision CI #531 passed on `cd47fcb286f893ac8cdf170da7f3da228fe238f6`; the decision reaches accepted canonical `main` only when the exact final PR head passes the same inherited matrix, independent review is clean, and the PR merges.
+Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review. Product Depth continuation milestones #144 and #146 are also accepted at merges `9c707581c1c8d068724925854008309ab7cc251e` and `453b7d009060db44918f6c4d5346d197323cdf15` respectively; #146 final PR-head CI #541 passed the complete inherited matrix.
 
 ## Roles
 
@@ -72,6 +72,8 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth explainable unified-search acceptance;
 - Product Depth contextual-snippet acceptance;
 - Product Depth Knowledge Base search-navigation acceptance;
+- Product Depth source-inspection-navigation acceptance;
+- Product Depth trust-diagnostics-navigation acceptance;
 - disposable-folder release-candidate acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -81,15 +83,18 @@ Tests passing on an older commit do not prove a new candidate.
 
 ## Product Depth trust constraints
 
-The accepted Product Depth search sequence must preserve these properties:
+The accepted Product Depth sequence must preserve these properties:
 
-- Client search remains read-only;
+- Client search and diagnostics remain read-only;
 - keyword/semantic match basis is explained truthfully;
 - semantic similarity is a ranking signal, not calibrated confidence;
 - the local Knowledge Base heuristic score is not shown as user-facing relevance/confidence;
 - snippets use real indexed/saved content and do not invent evidence;
 - literal highlighting respects Unicode letter/number term boundaries;
-- exact saved-page navigation and source provenance remain intact.
+- exact saved-page navigation and source provenance remain intact;
+- source inspection moves only among genuine persisted chunks and does not alter the pinned citation identity;
+- trust diagnostics use exact persisted `page_id` navigation when available and do not recalculate backend trust values;
+- unresolved diagnostic targets remain visible and non-destructive.
 
 ## Current scope gates
 
@@ -104,9 +109,10 @@ The following require explicit CEO approval before implementation release becaus
 - object storage;
 - production infrastructure rollout;
 - privileged-host/systemd operations;
+- material connector/runtime expansion;
 - other material architecture or commercial-scope changes.
 
-Documentation reconciliation, issue triage, bounded QA, evidence synchronization, and similarly reversible governance work may proceed autonomously.
+Documentation reconciliation, issue triage, bounded QA, evidence synchronization, and bounded Product Depth work already within the approved direction may proceed autonomously.
 
 ## Issue #69
 
@@ -114,7 +120,7 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #142 is the sole active Product Depth release-control task. Run the complete inherited matrix on the exact final PR head and independently review the final diff. Merge only if both are clean, close #142, and then select the next bounded product decision gate without silently beginning Enterprise Platform or privileged-host implementation.
+Issue #148 is the sole active Product Depth governance task. Synchronize the canonical current state after #142/#144/#146 without changing runtime behavior. After #148 is accepted, release the next bounded Product Depth outcome: planning ergonomics focused on selection clarity, safety/conflict explanations, and reviewability. Do not change backend planning policy, approval requirements, execution rules, or mutation semantics as part of that product-depth milestone.
 
 ## Evidence authority
 
@@ -124,14 +130,20 @@ Current Phase 2 release evidence:
 - `docs/HANDOVER_2026-08-23_PHASE2_RELEASE_DECISION.json`
 - merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`
 
-Current Product Depth release-control evidence:
+Accepted Product Depth trustworthy-search release evidence:
 
 - `docs/PRODUCT_DEPTH_SEARCH_RELEASE_DECISION_2026-08-24.md`
 - `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_SEARCH_RELEASE.json`
-- pre-decision CI #531 on `cd47fcb286f893ac8cdf170da7f3da228fe238f6`
+- #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`
+- final unchanged-head CI #535
 - #136 merge `10eb14b5501499e90e5281390f9cfed99edc8315`
 - #138 merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`
 - #140 merge `680763ca86e35d748ce37b115f1be7601d011422`
+
+Accepted Product Depth continuation evidence:
+
+- #144 merge `9c707581c1c8d068724925854008309ab7cc251e` — CI #539
+- #146 merge `453b7d009060db44918f6c4d5346d197323cdf15` — final PR-head CI #541
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 
