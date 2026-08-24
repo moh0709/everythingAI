@@ -12,6 +12,8 @@ import {
 
 type WikiDiagnosticsPanelProps = {
   options: ApiOptions;
+  availablePageIds?: readonly string[];
+  onOpenWikiPage?: (pageId: string) => void;
 };
 
 type ExpandedDiagnosticType = 'dependency' | 'fingerprint' | 'rebuild' | 'quality';
@@ -111,12 +113,29 @@ function GovernanceBadges({ flags }: { flags?: WikiGovernanceFlags }) {
   );
 }
 
+function GovernanceSignalContent({ signal, unavailable = false }: { signal: WikiGovernancePageSignal; unavailable?: boolean }) {
+  return <>
+    <span>{signal.title}</span>
+    <strong className="wiki-quality-line">
+      <span className={`wiki-quality-grade ${qualityGradeClass(signal.quality_grade)}`}>Grade {signal.quality_grade}</span>
+      <span>{signal.quality_score}/100</span>
+      <span>{signal.human_validation}</span>
+      <GovernanceBadges flags={signal.flags} />
+      {unavailable ? <span className="muted">Saved page unavailable</span> : null}
+    </strong>
+  </>;
+}
+
 function GovernanceSignalList({
   signals,
   emptyLabel,
+  availablePageIds,
+  onOpenWikiPage,
 }: {
   signals?: WikiGovernancePageSignal[];
   emptyLabel: string;
+  availablePageIds: ReadonlySet<string>;
+  onOpenWikiPage?: (pageId: string) => void;
 }) {
   if (!signals?.length) {
     return <div className="wiki-diagnostics-empty">{emptyLabel}</div>;
@@ -124,26 +143,39 @@ function GovernanceSignalList({
 
   return (
     <div className="wiki-diagnostics-list">
-      {signals.map((signal) => (
-        <div key={signal.page_id} className="wiki-diagnostics-row">
-          <span>{signal.title}</span>
-          <strong className="wiki-quality-line">
-            <span className={`wiki-quality-grade ${qualityGradeClass(signal.quality_grade)}`}>Grade {signal.quality_grade}</span>
-            <span>{signal.quality_score}/100</span>
-            <span>{signal.human_validation}</span>
-            <GovernanceBadges flags={signal.flags} />
-          </strong>
-        </div>
-      ))}
+      {signals.map((signal) => {
+        const navigable = Boolean(onOpenWikiPage && availablePageIds.has(signal.page_id));
+
+        if (!navigable) {
+          return (
+            <div key={signal.page_id} className="wiki-diagnostics-row">
+              <GovernanceSignalContent signal={signal} unavailable />
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={signal.page_id}
+            type="button"
+            className="wiki-diagnostics-row wiki-diagnostics-row-button"
+            aria-label={`Open knowledge page ${signal.title} from governance diagnostics`}
+            onClick={() => onOpenWikiPage?.(signal.page_id)}
+          >
+            <GovernanceSignalContent signal={signal} />
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
+export function WikiDiagnosticsPanel({ options, availablePageIds = [], onOpenWikiPage }: WikiDiagnosticsPanelProps) {
   const [diagnostics, setDiagnostics] = useState<WikiDiagnostics | null>(null);
   const [expanded, setExpanded] = useState<ExpandedDiagnostic>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const availablePageIdSet = useMemo(() => new Set(availablePageIds), [availablePageIds]);
 
   async function loadDiagnostics() {
     try {
@@ -306,6 +338,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
               <GovernanceSignalList
                 signals={governanceConflicts}
                 emptyLabel="No governance conflicts detected."
+                availablePageIds={availablePageIdSet}
+                onOpenWikiPage={onOpenWikiPage}
               />
             </>
           ) : (
@@ -328,6 +362,8 @@ export function WikiDiagnosticsPanel({ options }: WikiDiagnosticsPanelProps) {
               <GovernanceSignalList
                 signals={reviewCandidates}
                 emptyLabel="No high-quality review candidates detected."
+                availablePageIds={availablePageIdSet}
+                onOpenWikiPage={onOpenWikiPage}
               />
             </>
           ) : (
