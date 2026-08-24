@@ -230,6 +230,14 @@ jobs:
           EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
         run: npx playwright test smoke/planning-preview-decision-clarity.spec.ts
 
+      - name: Run Product Depth execution, audit, and undo outcome clarity acceptance
+        working-directory: apps/everything-ai-ui
+        env:
+          EVERYTHINGAI_API_URL: http://127.0.0.1:4100
+          EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
+        run: npx playwright test smoke/execution-audit-undo-outcomes.spec.ts
+
       - name: Run disposable-folder RC acceptance
         working-directory: apps/everything-ai-ui
         env:
