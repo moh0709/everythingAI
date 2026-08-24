@@ -1,0 +1,30 @@
+{
+  "program": "EverythingAI",
+  "track": "Product Depth — Governed-Action Lifecycle",
+  "date": "2026-08-24",
+  "issue": 162,
+  "status": "PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS_FINAL_MERGE_GATED",
+  "accepted_dependencies": [
+    {"issue": 150, "merge": "6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5", "ci_run": 546},
+    {"issue": 154, "merge": "943aff2e9807894142581c4f6872b76188e26d5f", "ci_run": 555},
+    {"issue": 158, "merge": "b75e236960ec5f0e562bfbfb06f1954d47efafe2", "ci_run": 562},
+    {"issue": 160, "merge": "d62724bf649edf77e784e32df8a76366a10f1968", "ci_run": 564}
+  ],
+  "lifecycle": "planning selection -> conflict explanation -> dry-run preview -> approval boundary -> governed execution -> audit evidence -> undo/recovery outcome",
+  "pre_decision_release_candidate": {
+    "head": "e175ff1ef78349b2644a8211d658dde88721a2d0",
+    "ci_run": 566,
+    "result": "PASS"
+  },
+  "finalization": {
+    "required": "unchanged final PR head must pass the complete inherited CI matrix and independent final diff review before merge",
+    "final_head": null,
+    "final_ci_run": null,
+    "merge": null
+  },
+  "safety_invariants_changed": false,
+  "runtime_behavior_changed": false,
+  "enterprise_platform_scope_expanded": false,
+  "protected_issue_69_modified": false,
+  "rollback": "Release documentation is independently reversible; implementation rollback remains milestone-scoped at #150, #154, and #158."
+}
