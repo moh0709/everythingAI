@@ -74,8 +74,9 @@ test('source inspection browses genuine chunks without changing the pinned citat
   await page.getByRole('button', { name: 'Inspect citation [S1:C2]' }).click();
 
   const drawer = page.getByLabel('Source preview drawer');
+  const pinnedCitation = drawer.locator('.wiki-source-preview-focus-pill');
   await expect(drawer).toBeVisible();
-  await expect(drawer.getByText('[S1:C2]', { exact: true })).toBeVisible();
+  await expect(pinnedCitation).toHaveText('[S1:C2]');
 
   const navigator = drawer.getByLabel('Source chunk navigation');
   await expect(navigator).toContainText('Chunk 2 of 3');
@@ -90,7 +91,7 @@ test('source inspection browses genuine chunks without changing the pinned citat
   await expect(navigator).toContainText('Chunk 3 of 3');
   await expect(navigator).toContainText('Renewal requires written confirmation.');
   await expect(next).toBeDisabled();
-  await expect(drawer.getByText('[S1:C2]', { exact: true })).toBeVisible();
+  await expect(pinnedCitation).toHaveText('[S1:C2]');
   await expect(drawer.locator('.wiki-source-preview-chunk.active')).toContainText('C2');
   await expect(drawer.locator('.wiki-source-preview-chunk').filter({ hasText: 'C3' })).toContainText('Inspecting');
 
@@ -99,7 +100,7 @@ test('source inspection browses genuine chunks without changing the pinned citat
   await previous.click();
   await expect(navigator).toContainText('Chunk 1 of 3');
   await expect(previous).toBeDisabled();
-  await expect(drawer.getByText('[S1:C2]', { exact: true })).toBeVisible();
+  await expect(pinnedCitation).toHaveText('[S1:C2]');
 
   await assertNoHorizontalOverflow(page);
   await page.screenshot({
