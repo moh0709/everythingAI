@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-24  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release plus #144/#146 accepted  
-Current gate: issue #148 canonical state synchronization
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release plus #144/#146/#150 accepted  
+Current gate: issue #152 canonical synchronization
 
 ## Mandatory startup sequence
 
@@ -27,7 +27,7 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review. Product Depth continuation milestones #144 and #146 are also accepted at merges `9c707581c1c8d068724925854008309ab7cc251e` and `453b7d009060db44918f6c4d5346d197323cdf15` respectively; #146 final PR-head CI #541 passed the complete inherited matrix.
+Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review. Product Depth continuation milestones #144, #146, #148, and #150 are accepted at merges `9c707581c1c8d068724925854008309ab7cc251e`, `453b7d009060db44918f6c4d5346d197323cdf15`, `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, and `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5` respectively. #150 passed CI #546 and independent diff review with no unresolved Critical or Important findings.
 
 ## Roles
 
@@ -74,6 +74,7 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth Knowledge Base search-navigation acceptance;
 - Product Depth source-inspection-navigation acceptance;
 - Product Depth trust-diagnostics-navigation acceptance;
+- Product Depth planning-selection-clarity acceptance;
 - disposable-folder release-candidate acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -81,7 +82,7 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 
 Tests passing on an older commit do not prove a new candidate.
 
-## Product Depth trust constraints
+## Product Depth trust and planning constraints
 
 The accepted Product Depth sequence must preserve these properties:
 
@@ -94,7 +95,8 @@ The accepted Product Depth sequence must preserve these properties:
 - exact saved-page navigation and source provenance remain intact;
 - source inspection moves only among genuine persisted chunks and does not alter the pinned citation identity;
 - trust diagnostics use exact persisted `page_id` navigation when available and do not recalculate backend trust values;
-- unresolved diagnostic targets remain visible and non-destructive.
+- unresolved diagnostic targets remain visible and non-destructive;
+- planning-selection UI may explain included, unselected, blocked, and conflicting suggestions, but must not weaken backend policy, approval requirements, confidence enforcement, or the global one-filesystem-mutation-per-file guard.
 
 ## Current scope gates
 
@@ -120,7 +122,9 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #148 is the sole active Product Depth governance task. Synchronize the canonical current state after #142/#144/#146 without changing runtime behavior. After #148 is accepted, release the next bounded Product Depth outcome: planning ergonomics focused on selection clarity, safety/conflict explanations, and reviewability. Do not change backend planning policy, approval requirements, execution rules, or mutation semantics as part of that product-depth milestone.
+Issue #152 is the sole active Product Depth governance task. Synchronize the canonical current state after accepted #150 without changing runtime behavior. After #152 is accepted, release the next bounded Product Depth outcome: **planning dry-run/preview decision clarity**.
+
+That next milestone may improve how the UI presents preview readiness, blocked reasons, source/target impact, and the approval boundary using existing backend preview facts only. It must not change backend planning policy, confidence enforcement, execution permissions, approval semantics, audit, undo/recovery, authentication, tenancy, cloud/database/storage, privileged-host, or connector/runtime behavior.
 
 ## Evidence authority
 
@@ -144,6 +148,8 @@ Accepted Product Depth continuation evidence:
 
 - #144 merge `9c707581c1c8d068724925854008309ab7cc251e` — CI #539
 - #146 merge `453b7d009060db44918f6c4d5346d197323cdf15` — final PR-head CI #541
+- #148 merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b` — CI #543
+- #150 merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5` — CI #546
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 

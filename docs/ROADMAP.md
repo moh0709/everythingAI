@@ -47,40 +47,43 @@ Delivered:
 Product Depth continuation after that release:
 
 5. #144 richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e`, CI #539;
-6. #146 actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, final PR-head CI #541.
+6. #146 actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, final PR-head CI #541;
+7. #148 canonical synchronization — merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, CI #543;
+8. #150 planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, CI #546.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy search, source inspection, and trust-diagnostic navigation accepted | Complete #148 canonical synchronization, then deepen planning ergonomics as the next bounded Product Depth outcome |
-| Knowledge and Safe Action | Proven source-backed reading, explainable search, exact evidence navigation, diagnostics, and governed mutation lifecycle | Preserve provenance and safety while improving review clarity |
+| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy search, source inspection, trust-diagnostic navigation, and planning-selection clarity accepted | Complete #152 canonical synchronization, then deepen dry-run/preview decision clarity as the next bounded Product Depth outcome |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, exact evidence navigation, diagnostics, planning selection clarity, and governed mutation lifecycle | Preserve provenance and safety while improving preview reviewability |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before implementation expansion |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority + required privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency and rollback discipline |
 
-## Current gate — #148
+## Current gate — #152
 
-Synchronize the canonical current state after accepted #142/#144/#146. This is documentation/governance only and does not change runtime behavior.
+Synchronize the canonical current state after accepted #150. This is documentation/governance only and does not change runtime behavior.
 
 Exit criteria:
 
-- no canonical document presents #142 as active;
-- accepted Product Depth merge/CI evidence is exact;
-- #144/#146 are recorded as accepted;
-- inherited regression matrix includes source-inspection and trust-diagnostics acceptance;
-- next bounded Product Depth outcome is explicit;
-- documentation diff is independently reviewed and reversible.
+- no canonical document presents #148 or #150 as active;
+- #150 merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, CI #546, and rollback boundary are recorded exactly;
+- inherited regression matrix includes planning-selection-clarity acceptance;
+- next bounded Product Depth outcome is explicit but not implemented by this documentation task;
+- documentation diff is independently reviewed and reversible;
+- inherited regression matrix passes on the final candidate.
 
 ## Next bounded Product Depth outcome
 
-After #148 acceptance, prioritize **planning ergonomics focused on selection clarity, safety/conflict explanations, and reviewability**.
+After #152 acceptance, prioritize **planning dry-run/preview decision clarity**.
 
 Allowed scope:
 
-- make selected actions and exclusions easier to understand before preview/execution;
-- explain why a suggestion is blocked, conflicting, or excluded using existing backend facts;
-- improve reviewability of grouped planning without weakening existing one-filesystem-mutation-per-file protection;
+- make preview readiness and blocked states easier to distinguish before approval/execution;
+- explain blocked reasons using existing backend preview facts;
+- make source/target impact easier to review without inventing or recomputing backend state;
+- clarify where dry-run inspection ends and explicit approval/execution begins;
 - add focused acceptance coverage and inherit the full regression matrix.
 
 Non-goals:
@@ -105,7 +108,7 @@ Add carefully scoped external connectors/integrations where they produce clear p
 
 ## Mandatory regression baseline for future product work
 
-Preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates: root regression, backend tests, frontend typecheck/build, Client/Admin smoke, citation acceptance, long-form/table acceptance, grouped-planning acceptance, API-key lifecycle acceptance, explainable-search acceptance, contextual-snippet acceptance, Knowledge Base search-navigation acceptance, source-inspection-navigation acceptance, trust-diagnostics-navigation acceptance, disposable-folder RC acceptance, UI-governed action/undo acceptance, independent diff review, and rollback evidence.
+Preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates: root regression, backend tests, frontend typecheck/build, Client/Admin smoke, citation acceptance, long-form/table acceptance, grouped-planning acceptance, API-key lifecycle acceptance, explainable-search acceptance, contextual-snippet acceptance, Knowledge Base search-navigation acceptance, source-inspection-navigation acceptance, trust-diagnostics-navigation acceptance, planning-selection-clarity acceptance, disposable-folder RC acceptance, UI-governed action/undo acceptance, independent diff review, and rollback evidence.
 
 ## Historical roadmap
 
