@@ -14,6 +14,65 @@ async function buildFixtureWorkspace(page: import('@playwright/test').Page, root
   await expect(page.getByText(/Workspace ready with \d+ indexed file\(s\)/)).toBeVisible({ timeout: 60_000 });
 }
 
+async function installDeterministicPlanningSuggestions(page: import('@playwright/test').Page) {
+  const suggestions: Array<Record<string, unknown>> = [];
+
+  await page.route('**/api/suggestions**', async (route) => {
+    const request = route.request();
+
+    if (request.method() === 'POST') {
+      const payload = request.postDataJSON() as { fileId?: string };
+      const fileId = String(payload.fileId || 'fixture-file');
+      const generated = [
+        {
+          id: `${fileId}-move`,
+          file_id: fileId,
+          action_type: 'move',
+          current_value: 'fixture-source',
+          suggested_value: 'review-folder',
+          reason: 'Deterministic acceptance fixture move suggestion.',
+          confidence: 0.82,
+          risk_level: 'medium',
+        },
+        {
+          id: `${fileId}-rename`,
+          file_id: fileId,
+          action_type: 'rename',
+          current_value: 'Fixture File.txt',
+          suggested_value: 'fixture-file.txt',
+          reason: 'Deterministic acceptance fixture rename suggestion.',
+          confidence: 0.71,
+          risk_level: 'medium',
+        },
+        {
+          id: `${fileId}-category`,
+          file_id: fileId,
+          action_type: 'category',
+          current_value: null,
+          suggested_value: 'fixture-category',
+          reason: 'Deterministic acceptance fixture category suggestion.',
+          confidence: 0.91,
+          risk_level: 'low',
+        },
+      ];
+
+      suggestions.push(...generated);
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ suggestions: generated }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ suggestions }),
+    });
+  });
+}
+
 async function openPlanning(page: import('@playwright/test').Page) {
   await page.goto(`${BASE_URL}/admin.html`, { waitUntil: 'networkidle' });
   await page.getByRole('navigation').getByRole('button', { name: 'Planning', exact: true }).click();
@@ -22,17 +81,16 @@ async function openPlanning(page: import('@playwright/test').Page) {
   await expect(page.getByText(/AI analysis complete\. \d+ suggested action\(s\) ready\./)).toBeVisible({ timeout: 60_000 });
 }
 
-test('Planning groups genuine suggestions and explains safe review selection before preview', async ({ page }) => {
+test('Planning groups genuine file context and explains safe review selection before preview', async ({ page }) => {
   test.setTimeout(150_000);
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'everythingai-product-depth-planning-'));
 
   try {
-    // Mixed-case/spaced filenames deliberately create both move and rename suggestions,
-    // allowing the existing one-filesystem-mutation-per-file guard to be exercised.
     await fs.writeFile(path.join(root, 'Invoice Alpha 2026.txt'), 'Invoice Alpha. Supplier North. Finance payment terms 14 days.', 'utf8');
     await fs.writeFile(path.join(root, 'Project Notes.txt'), 'Project Orion notes. Customer delivery planning and milestone review.', 'utf8');
 
     await buildFixtureWorkspace(page, root);
+    await installDeterministicPlanningSuggestions(page);
     await openPlanning(page);
 
     const groups = page.getByTestId('planning-group');
@@ -49,6 +107,7 @@ test('Planning groups genuine suggestions and explains safe review selection bef
     await expect(firstSuggestion).toHaveAttribute('data-selection-state', 'not-selected');
     await expect(firstSuggestion.getByTestId('planning-selection-explanation')).toContainText('Not selected for the current review batch');
     await expect(firstSuggestion).toContainText('Why suggested:');
+    await expect(firstSuggestion).toContainText('Source:');
 
     const firstGroup = groups.first();
     await expect(firstGroup).toContainText(/selected/);
@@ -58,6 +117,14 @@ test('Planning groups genuine suggestions and explains safe review selection bef
     expect(await checkedInGroup.count()).toBeGreaterThan(0);
     await expect(firstGroup.locator('[data-selection-state="included"]').first()).toContainText('Included in the current review batch');
     await expect(page.locator('[data-testid^="preview-"]')).toHaveCount(0);
+
+    const groupConflictRows = page.locator('.planning-group-list [data-selection-state="conflict"]');
+    expect(await groupConflictRows.count()).toBeGreaterThan(0);
+    const firstGroupConflict = groupConflictRows.first();
+    await expect(firstGroupConflict).toContainText('safety conflict');
+    await expect(firstGroupConflict.getByTestId('planning-selection-explanation')).toContainText('Excluded by the filesystem safety guard');
+    await expect(firstGroupConflict.getByTestId('planning-selection-explanation')).toContainText('move → review-folder is already selected for this file');
+    await expect(firstGroupConflict.locator('input[type="checkbox"]')).toBeDisabled();
 
     await page.getByRole('button', { name: 'Clear Selection' }).click();
     await expect(firstGroup.locator('input[type="checkbox"]:checked')).toHaveCount(0);
