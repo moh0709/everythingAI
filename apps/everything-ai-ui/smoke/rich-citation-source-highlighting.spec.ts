@@ -71,7 +71,7 @@ test('rich citation keeps article, source, and chunk evidence visibly connected'
   await page.getByRole('button', { name: 'Knowledge Base' }).click();
 
   await expect(page.getByRole('heading', { name: 'Phase 2 Citation Evidence' })).toBeVisible();
-  await expect(page.getByText('100% citation coverage')).toBeVisible();
+  await expect(page.getByText('100% citation coverage', { exact: true })).toBeVisible();
 
   const citation = page.getByRole('button', { name: 'Inspect citation [S1:C1]' });
   await expect(citation).toBeVisible();

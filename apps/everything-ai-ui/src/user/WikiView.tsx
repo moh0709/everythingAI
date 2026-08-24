@@ -83,6 +83,19 @@ function citationInspectorCopy(sourceRef?: string | null, chunkRef?: string | nu
     : 'Click a citation in the article or source list to pin its source and snippet here.';
 }
 
+function evidenceCoverageExplanation(page: WikiPage) {
+  if (page.citation_coverage_score == null) {
+    return 'Citation coverage is not available for this saved page. Inspect the listed evidence directly before relying on unsupported statements.';
+  }
+
+  const percent = Math.round(page.citation_coverage_score * 100);
+  const supportCopy = page.weak_source_warning
+    ? 'The saved page is flagged for weak source coverage, so some statements may not be well supported by citations.'
+    : 'No weak-source warning is recorded for this saved page.';
+
+  return `${percent}% citation coverage means that the saved page reports this share of its knowledge content as citation-linked. ${supportCopy} Citation coverage is not a confidence score and does not prove that the source material is current.`;
+}
+
 export function WikiView({
   error, busy, status, options, wiki, selectedWikiPage, readingMode, activeSourceRef,
   sourceCardRefs, buildWiki, refreshWiki, setReadingMode, openWikiPage,
@@ -126,6 +139,13 @@ export function WikiView({
     const chunkRef = ref.includes(':') ? normalizeChunkRef(ref) : null;
     handleCitationClick(sourceRef);
     openSourcePreview(sourcesByRef.get(sourceRef), chunkRef);
+  }
+
+  function inspectFirstSource() {
+    const firstSource = selectedWikiPage?.sources?.[0];
+    if (!firstSource) return;
+    handleCitationClick(firstSource.ref);
+    openSourcePreview(firstSource);
   }
 
   return <>
@@ -193,6 +213,18 @@ export function WikiView({
                 {selectedWikiPage.weak_source_warning ? <span className="warning">Weak source coverage</span> : null}
                 {sourceFingerprint ? <span title={selectedWikiPage.source_fingerprint}>Fingerprint {sourceFingerprint}</span> : null}
               </div>
+              <section className="wiki-citation-rail-summary" aria-label="Knowledge evidence guidance">
+                <span className="wiki-citation-rail-label">Evidence guidance</span>
+                <p>{evidenceCoverageExplanation(selectedWikiPage)}</p>
+                <p><strong>Freshness: unknown.</strong> This saved page does not include a verified source-update timestamp, so the interface does not infer whether its evidence is current.</p>
+                {sourceFingerprint ? <p>The source fingerprint identifies the persisted source set used for this page. It is not a freshness timestamp.</p> : null}
+                <p><strong>Refresh</strong> reloads the currently saved Knowledge Base. <strong>Build Knowledge Base</strong> explicitly regenerates it from indexed files. Neither action is triggered automatically by this guidance.</p>
+                <div className="source-actions">
+                  <button className="outline" onClick={inspectFirstSource} disabled={!selectedWikiPage.sources.length}>Inspect source evidence</button>
+                  <button className="outline" onClick={refreshWiki} disabled={busy}>Refresh saved knowledge</button>
+                  <button className="outline" onClick={buildWiki} disabled={busy}><Sparkles size={14} /> Rebuild from indexed files</button>
+                </div>
+              </section>
               <p className="wiki-citation-hint">{pinnedCitationCopy}</p>
             </div>
             <div className="wiki-action-with-help">
