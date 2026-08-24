@@ -2,9 +2,9 @@
 
 Date: 2026-08-24  
 Issue: #162  
-Decision: **PENDING FINAL RELEASE VALIDATION**
+Decision: **PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS — FINAL MERGE-GATED**
 
-## Scope under review
+## Released scope
 
 This release gate evaluates the already accepted Product Depth action-lifecycle clarity milestones as one coherent governed flow:
 
@@ -17,26 +17,15 @@ Accepted implementation dependencies:
 - #158 execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI Smoke #562;
 - #160 canonical synchronization — merge `d62724bf649edf77e784e32df8a76366a10f1968`, CI Smoke #564.
 
-## Required final validation
+## Validation evidence
 
-A PASS decision requires one unchanged final PR head to pass the complete inherited matrix:
+Pre-decision release-candidate CI Smoke #566 passed the complete inherited matrix on unchanged head `e175ff1ef78349b2644a8211d658dde88721a2d0`, including the accepted planning-selection, planning-preview, execution/audit/undo, disposable-folder RC, and full UI-governed action/undo gates.
 
-1. root regression;
-2. backend tests;
-3. frontend TypeScript typecheck;
-4. frontend production build;
-5. Client/Admin Playwright smoke;
-6. all inherited Phase 2 and Product Depth acceptance suites;
-7. planning-selection-clarity acceptance;
-8. planning-preview-decision-clarity acceptance;
-9. execution/audit/undo outcome-clarity acceptance;
-10. disposable-folder RC acceptance;
-11. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-12. independent final diff review with no unresolved Critical or Important findings.
+This final PASS decision is **merge-gated**: the decision commit and handover must themselves remain on one unchanged final PR head, pass the same CI workflow, and receive independent final diff review with no unresolved Critical or Important findings before merge. A failure on the final head invalidates the merge until diagnosed and corrected.
 
-## Safety invariants
+## Safety invariants preserved
 
-The release must preserve unchanged:
+The release preserves unchanged:
 
 - backend planning policy and confidence enforcement;
 - one-filesystem-mutation-per-file guard;
@@ -48,15 +37,11 @@ The release must preserve unchanged:
 - source/target evidence labels and backend-provided block reasons;
 - truthful distinction between persisted `undone` state and actual filesystem restoration evidence.
 
-## Decision rule
+No new runtime behavior is introduced by this release decision.
 
-After final unchanged-head validation and review, replace the pending decision above with exactly one of:
+## Decision rationale
 
-- `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS`
-- `PRODUCT_DEPTH_ACTION_LIFECYCLE_BLOCKED`
-- `PRODUCT_DEPTH_ACTION_LIFECYCLE_REJECTED`
-
-No prior milestone CI may substitute for validation of the final release-decision candidate.
+The three accepted clarity milestones now form a coherent, evidence-backed governed-action lifecycle. The user can understand what is selected and conflicted before preview, what a dry run means and whether a preview is blocked or ready for approval, and what execution/audit/undo outcomes mean after governed action. Existing safety boundaries remain backend-enforced and unchanged.
 
 ## Non-goals
 
@@ -64,4 +49,8 @@ No authentication, tenancy, cloud/database/storage, privileged-host/systemd, con
 
 ## Rollback
 
-The release-decision documentation is independently reversible. The implementation milestones retain their existing rollback points at #150, #154, and #158 merge boundaries.
+The release-decision documentation is independently reversible. The implementation milestones retain their existing rollback points at #150, #154, and #158 merge boundaries. If a later regression is proven, revert only the affected milestone rather than the entire Product Depth history.
+
+## Finalization rule
+
+This decision becomes accepted repository state only after the unchanged final PR head passes CI and the PR is merged. Until then, `main` remains the previously accepted #160 baseline.
