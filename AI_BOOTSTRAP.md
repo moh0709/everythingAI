@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-24  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release plus #144/#146/#150/#154 accepted  
-Current gate: issue #156 canonical synchronization
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release plus #144/#146/#150/#154/#158 accepted  
+Current gate: issue #160 canonical synchronization
 
 ## Mandatory startup sequence
 
@@ -27,7 +27,7 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Do not infer the active program state from an old phase label. Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review. Product Depth continuation milestones #144, #146, #148, #150, #152, and #154 are accepted at merges `9c707581c1c8d068724925854008309ab7cc251e`, `453b7d009060db44918f6c4d5346d197323cdf15`, `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd`, and `943aff2e9807894142581c4f6872b76188e26d5f` respectively. #154 passed CI #555 and independent diff review with no unresolved Critical or Important findings.
+Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review. Product Depth continuation milestones #144, #146, #148, #150, #152, #154, #156, and #158 are accepted. #156 merged as `d8152d2307b63917e5580d01690119b24c88ccf0` after CI #557. #158 merged as `b75e236960ec5f0e562bfbfb06f1954d47efafe2` after CI Smoke #562 and independent final diff review with no unresolved Critical or Important findings.
 
 ## Roles
 
@@ -76,6 +76,7 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth trust-diagnostics-navigation acceptance;
 - Product Depth planning-selection-clarity acceptance;
 - Product Depth planning-preview-decision-clarity acceptance;
+- Product Depth execution/audit/undo outcome-clarity acceptance;
 - disposable-folder release-candidate acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -94,29 +95,19 @@ The accepted Product Depth sequence must preserve these properties:
 - snippets use real indexed/saved content and do not invent evidence;
 - literal highlighting respects Unicode letter/number term boundaries;
 - exact saved-page navigation and source provenance remain intact;
-- source inspection moves only among genuine persisted chunks and does not alter the pinned citation identity;
+- source inspection moves only among genuine persisted chunks and does not alter pinned citation identity;
 - trust diagnostics use exact persisted `page_id` navigation when available and do not recalculate backend trust values;
-- unresolved diagnostic targets remain visible and non-destructive;
 - planning-selection UI may explain included, unselected, blocked, and conflicting suggestions, but must not weaken backend policy, approval requirements, confidence enforcement, or the global one-filesystem-mutation-per-file guard;
-- planning-preview UI may explain ready and blocked previews, backend-provided reasons, source/target impact, and the dry-run/approval boundary, but must preserve existing preview and execution semantics.
+- planning-preview UI may explain ready and blocked previews, backend-provided reasons, source/target impact, and the dry-run/approval boundary, but must preserve existing preview and execution semantics;
+- execution/audit/undo UI may clarify existing persisted outcome facts, but must not imply filesystem restoration solely from an `undone` persisted state or change execution, audit, mutation, or undo semantics.
 
 ## Current scope gates
 
 No new major implementation phase is authorized by Phase 2 or Product Depth completion alone.
 
-The following require explicit CEO approval before implementation release because they materially expand scope or operational authority:
+Explicit CEO approval remains required before authentication/identity architecture, production tenancy/workspaces, cloud deployment, production database/storage, privileged-host/systemd work, material connector/runtime expansion, or other material architecture/commercial-scope expansion.
 
-- authentication/identity architecture;
-- tenancy/workspaces as production infrastructure;
-- cloud deployment;
-- database migration to a production platform;
-- object storage;
-- production infrastructure rollout;
-- privileged-host/systemd operations;
-- material connector/runtime expansion;
-- other material architecture or commercial-scope changes.
-
-Documentation reconciliation, issue triage, bounded QA, evidence synchronization, and bounded Product Depth work already within the approved direction may proceed autonomously.
+Bounded documentation reconciliation, QA, evidence synchronization, and Product Depth work already within the approved direction may proceed autonomously.
 
 ## Issue #69
 
@@ -124,9 +115,9 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #156 is the sole active Product Depth governance task. Synchronize the canonical current state after accepted #154 without changing runtime behavior. After #156 is accepted, release the next bounded Product Depth outcome: **execution/audit/undo outcome clarity**.
+Issue #160 is the sole active Product Depth governance task. Synchronize canonical state after accepted #156/#158 without changing runtime behavior.
 
-That next milestone may improve how the UI presents and navigates existing execution results, audit evidence, batch status, and undo/recovery outcomes using existing backend facts only. It must not change execution permissions, approval semantics, audit creation, filesystem mutation behavior, rollback semantics, backend planning policy/confidence enforcement, authentication, tenancy, cloud/database/storage, privileged-host, or connector/runtime behavior.
+After #160 acceptance, release the bounded **Product Depth governed-action lifecycle release decision**. That gate evaluates the already accepted planning-selection (#150), preview-decision (#154), and execution/audit/undo outcome-clarity (#158) milestones as one lifecycle. It is an evidence/release gate, not authorization for new runtime behavior.
 
 ## Evidence authority
 
@@ -142,9 +133,6 @@ Accepted Product Depth trustworthy-search release evidence:
 - `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_SEARCH_RELEASE.json`
 - #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`
 - final unchanged-head CI #535
-- #136 merge `10eb14b5501499e90e5281390f9cfed99edc8315`
-- #138 merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`
-- #140 merge `680763ca86e35d748ce37b115f1be7601d011422`
 
 Accepted Product Depth continuation evidence:
 
@@ -154,6 +142,8 @@ Accepted Product Depth continuation evidence:
 - #150 merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5` — CI #546
 - #152 merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd` — CI #548
 - #154 merge `943aff2e9807894142581c4f6872b76188e26d5f` — CI #555
+- #156 merge `d8152d2307b63917e5580d01690119b24c88ccf0` — CI #557
+- #158 merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2` — CI Smoke #562
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 

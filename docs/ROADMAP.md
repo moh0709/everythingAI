@@ -19,14 +19,7 @@ Complete. Hardened the local MVP, source-processing/recovery lifecycle, Unicode 
 
 Complete and dispatched.
 
-Delivered:
-
-1. rich citations and source highlighting;
-2. improved long-form and table rendering;
-3. grouped planning and bulk-selection UX;
-4. secure provider API-key lifecycle UX;
-5. controlled frontend modularization;
-6. final unchanged-head release validation and independent diff review.
+Delivered rich citations/source highlighting, improved long-form/table rendering, grouped planning/bulk selection, secure provider API-key lifecycle UX, controlled frontend modularization, and unchanged-head release validation.
 
 Release evidence:
 
@@ -50,49 +43,65 @@ Product Depth continuation after that release:
 6. #146 actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, final PR-head CI #541;
 7. #148 canonical synchronization — merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, CI #543;
 8. #150 planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, CI #546;
-9. #152 canonical synchronization after planning-selection clarity — merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd`, CI #548;
-10. #154 planning dry-run/preview decision clarity — merge `943aff2e9807894142581c4f6872b76188e26d5f`, CI #555.
+9. #152 canonical synchronization — merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd`, CI #548;
+10. #154 planning dry-run/preview decision clarity — merge `943aff2e9807894142581c4f6872b76188e26d5f`, CI #555;
+11. #156 canonical synchronization — merge `d8152d2307b63917e5580d01690119b24c88ccf0`, CI #557;
+12. #158 execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI Smoke #562, independent final diff review clean of unresolved Critical/Important findings.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy search, source inspection, trust-diagnostic navigation, planning-selection clarity, and planning-preview clarity accepted | Complete #156 canonical synchronization, then deepen execution/audit/undo outcome clarity as the next bounded Product Depth outcome |
-| Knowledge and Safe Action | Proven source-backed reading, explainable search, exact evidence navigation, diagnostics, planning selection/preview clarity, and governed mutation lifecycle | Preserve provenance and safety while improving execution/audit/undo reviewability |
+| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy search, source inspection, diagnostics, planning selection, preview clarity, and execution/audit/undo outcome clarity accepted | Complete #160, then run the bounded governed-action lifecycle release decision |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, exact evidence navigation, diagnostics, planning selection/preview clarity, governed execution, audit, and undo outcome clarity | Validate the combined governed-action lifecycle without changing backend semantics |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before implementation expansion |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority + required privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency and rollback discipline |
 
-## Current gate — #156
+## Current gate — #160
 
-Synchronize the canonical current state after accepted #154. This is documentation/governance only and does not change runtime behavior.
+Synchronize canonical current state after accepted #156 and #158. This is documentation/governance only and does not change runtime behavior.
 
 Exit criteria:
 
-- no canonical document presents #152 or #154 as current work;
-- #154 merge `943aff2e9807894142581c4f6872b76188e26d5f`, CI #555, and rollback boundary are recorded exactly;
-- inherited regression matrix includes planning-preview-decision-clarity acceptance;
-- next bounded Product Depth outcome is explicit but not implemented by this documentation task;
+- no canonical document presents #156 or #158 as pending/current work;
+- #158 merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI Smoke #562, independent review, and rollback boundary are recorded exactly;
+- inherited regression matrix includes execution/audit/undo outcome-clarity acceptance;
+- next governed-action lifecycle release gate is explicit but not executed by #160;
 - documentation diff is independently reviewed and reversible;
-- inherited regression matrix passes on the final candidate.
+- complete inherited regression matrix passes on the unchanged final candidate.
 
-## Next bounded Product Depth outcome
+## Next bounded Product Depth gate — governed-action lifecycle release decision
 
-After #156 acceptance, prioritize **execution/audit/undo outcome clarity**.
+After #160 acceptance, run a release-decision gate over the already accepted action-lifecycle clarity milestones:
 
-Allowed scope:
+- #150 planning selection clarity and conflict explanations;
+- #154 planning dry-run/preview decision clarity;
+- #158 execution, audit, and undo outcome clarity.
 
-- make existing execution results and batch status easier to inspect after governed execution;
-- connect existing audit evidence to the corresponding execution outcome without inventing or recomputing backend facts;
-- make undo/recovery availability and outcome easier to understand using existing backend state;
-- improve presentation/navigation only, preserving existing mutation and rollback behavior;
-- add focused acceptance coverage and inherit the full regression matrix.
+The release gate should verify the complete user-visible lifecycle:
+
+`planning selection → conflict explanation → dry-run preview → approval boundary → governed execution → audit evidence → undo/recovery outcome`
+
+The gate is evidence/release work only. It must not introduce new runtime/product behavior.
+
+Required release evidence:
+
+- one unchanged candidate;
+- complete inherited regression matrix;
+- explicit coverage of #150/#154/#158 acceptance behaviors;
+- disposable-folder RC acceptance;
+- full UI-governed planning → preview → approval → execution → audit → undo acceptance;
+- independent final diff review with no unresolved Critical or Important findings;
+- exact milestone-scoped rollback chain;
+- a truthful PASS/BLOCKED/REJECTED decision.
 
 Non-goals:
 
-- no change to backend planning policy or confidence enforcement;
-- no change to approval requirements or execution permissions;
-- no change to audit creation, filesystem mutation behavior, rollback semantics, or undo/recovery mechanics;
+- no backend planning policy/confidence changes;
+- no approval or execution permission changes;
+- no audit persistence changes;
+- no filesystem mutation or rollback/undo semantic changes;
 - no authentication, tenancy, cloud deployment, database migration, object storage, privileged-host work, or material connector/runtime expansion.
 
 ## Other future directions — decision required before material expansion
@@ -111,7 +120,7 @@ Add carefully scoped external connectors/integrations where they produce clear p
 
 ## Mandatory regression baseline for future product work
 
-Preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates: root regression, backend tests, frontend typecheck/build, Client/Admin smoke, citation acceptance, long-form/table acceptance, grouped-planning acceptance, API-key lifecycle acceptance, explainable-search acceptance, contextual-snippet acceptance, Knowledge Base search-navigation acceptance, source-inspection-navigation acceptance, trust-diagnostics-navigation acceptance, planning-selection-clarity acceptance, planning-preview-decision-clarity acceptance, disposable-folder RC acceptance, UI-governed action/undo acceptance, independent diff review, and rollback evidence.
+Preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates: root regression, backend tests, frontend typecheck/build, Client/Admin smoke, citation acceptance, long-form/table acceptance, grouped-planning acceptance, API-key lifecycle acceptance, explainable-search acceptance, contextual-snippet acceptance, Knowledge Base search-navigation acceptance, source-inspection-navigation acceptance, trust-diagnostics-navigation acceptance, planning-selection-clarity acceptance, planning-preview-decision-clarity acceptance, execution/audit/undo outcome-clarity acceptance, disposable-folder RC acceptance, UI-governed action/undo acceptance, independent diff review, and rollback evidence.
 
 ## Historical roadmap
 
