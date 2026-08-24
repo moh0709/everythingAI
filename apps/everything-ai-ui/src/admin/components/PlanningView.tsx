@@ -39,6 +39,7 @@ type SuggestionGroup = {
 };
 
 const FILESYSTEM_ACTIONS = new Set(['move', 'rename']);
+const MAX_VISIBLE_SUGGESTIONS = 60;
 
 function isFilesystemAction(suggestion: Pick<Suggestion, 'action_type'>) {
   return FILESYSTEM_ACTIONS.has(suggestion.action_type);
@@ -86,7 +87,7 @@ function groupDescriptor(suggestion: Suggestion, sourceFile?: IndexedFile): Omit
 function buildSuggestionGroups(suggestions: Suggestion[], filesById: Map<string, IndexedFile>) {
   const groups = new Map<string, SuggestionGroup>();
 
-  for (const suggestion of suggestions.slice(0, 60)) {
+  for (const suggestion of suggestions.slice(0, MAX_VISIBLE_SUGGESTIONS)) {
     const descriptor = groupDescriptor(suggestion, filesById.get(suggestion.file_id));
     const current = groups.get(descriptor.key);
     if (current) {
@@ -122,6 +123,17 @@ function safeSelectionForSuggestions(candidates: Suggestion[], allSuggestions: S
   return next;
 }
 
+function selectedMutationForFile(suggestion: Suggestion, selectedSuggestions: Suggestion[]) {
+  if (!isFilesystemAction(suggestion)) return undefined;
+  return selectedSuggestions.find((candidate) => (
+    candidate.id !== suggestion.id && isSameFileMutation(candidate, suggestion)
+  ));
+}
+
+function actionContext(suggestion: Suggestion) {
+  return `${suggestion.action_type} → ${suggestion.suggested_value}`;
+}
+
 export function PlanningView({
   files,
   suggestions,
@@ -138,12 +150,19 @@ export function PlanningView({
   destinationFolder,
   setDestinationFolder,
 }: PlanningViewProps) {
+  const visibleSuggestions = suggestions.slice(0, MAX_VISIBLE_SUGGESTIONS);
   const selectedSuggestions = suggestions.filter((suggestion) => selectedSuggestionIds.has(suggestion.id));
+  const selectedVisibleSuggestions = visibleSuggestions.filter((suggestion) => selectedSuggestionIds.has(suggestion.id));
   const selectedFilesystemKeys = new Set(
     selectedSuggestions
       .filter(isFilesystemAction)
       .map((suggestion) => suggestion.file_id),
   );
+  const mutationConflictCount = visibleSuggestions.filter((suggestion) => (
+    !selectedSuggestionIds.has(suggestion.id)
+    && isFilesystemAction(suggestion)
+    && selectedFilesystemKeys.has(suggestion.file_id)
+  )).length;
   const filesById = new Map(files.map((file) => [file.id, file]));
   const groups = buildSuggestionGroups(suggestions, filesById);
 
@@ -170,14 +189,13 @@ export function PlanningView({
   }
 
   function selectAllSuggestions() {
-    const visible = suggestions.slice(0, 60);
-    const allSelected = visible.length > 0 && visible.every((suggestion) => selectedSuggestionIds.has(suggestion.id));
+    const allSelected = visibleSuggestions.length > 0 && visibleSuggestions.every((suggestion) => selectedSuggestionIds.has(suggestion.id));
     const next = new Set(selectedSuggestionIds);
 
     if (allSelected) {
-      visible.forEach((suggestion) => next.delete(suggestion.id));
+      visibleSuggestions.forEach((suggestion) => next.delete(suggestion.id));
     } else {
-      setSelectedSuggestionIds(safeSelectionForSuggestions(visible, suggestions, next));
+      setSelectedSuggestionIds(safeSelectionForSuggestions(visibleSuggestions, suggestions, next));
       return;
     }
 
@@ -238,6 +256,14 @@ export function PlanningView({
         <p className="muted">Safety: group selection changes checkboxes only. It cannot execute or bypass backend policy. Only one move/rename action can be selected per file.</p>
       </div>
 
+      <div className="panel" data-testid="planning-selection-review">
+        <h3>Review Selection</h3>
+        <p><span className="chip green">Included</span> <b>{selectedVisibleSuggestions.length}</b> visible action(s) will be sent to the next dry run.</p>
+        <p><span className="chip blue">Not selected</span> <b>{Math.max(0, visibleSuggestions.length - selectedVisibleSuggestions.length - mutationConflictCount)}</b> visible action(s) remain outside the review batch.</p>
+        <p><span className="chip orange">Safety conflict</span> <b>{mutationConflictCount}</b> visible move/rename alternative(s) are excluded because another filesystem mutation is already selected for the same file.</p>
+        <p className="muted">Selection is review intent only. Dry run and backend policy still decide whether an action can proceed, and execution still requires the existing approval path.</p>
+      </div>
+
       <div className="panel wide planning-groups-panel">
         <div className="planning-section-header">
           <div>
@@ -246,7 +272,7 @@ export function PlanningView({
           </div>
           <div className="planning-bulk-actions">
             <button className="outline" onClick={selectAllSuggestions} disabled={!suggestions.length}>
-              {suggestions.slice(0, 60).length > 0 && suggestions.slice(0, 60).every((suggestion) => selectedSuggestionIds.has(suggestion.id)) ? 'Deselect All' : 'Select Safe Batch'}
+              {visibleSuggestions.length > 0 && visibleSuggestions.every((suggestion) => selectedSuggestionIds.has(suggestion.id)) ? 'Deselect All' : 'Select Safe Batch'}
             </button>
             <button className="outline" onClick={clearSelection} disabled={!selectedSuggestionIds.size}>Clear Selection</button>
           </div>
@@ -273,16 +299,25 @@ export function PlanningView({
               <div className="planning-group-items">
                 {group.suggestions.map((suggestion) => {
                   const isSelected = selectedSuggestionIds.has(suggestion.id);
-                  const disabledByMutationGuard = !isSelected && isFilesystemAction(suggestion) && selectedFilesystemKeys.has(suggestion.file_id);
+                  const conflictingSelection = selectedMutationForFile(suggestion, selectedSuggestions);
+                  const disabledByMutationGuard = !isSelected && Boolean(conflictingSelection);
                   const sourceFile = filesById.get(suggestion.file_id);
+                  const selectionState = isSelected ? 'included' : disabledByMutationGuard ? 'conflict' : 'not-selected';
+                  const selectionExplanation = isSelected
+                    ? 'Included in the current review batch. Dry Run Preview will validate this action before any execution.'
+                    : conflictingSelection
+                      ? `Excluded by the filesystem safety guard: ${actionContext(conflictingSelection)} is already selected for this file.`
+                      : 'Not selected for the current review batch. Select this action to include it in the next dry run.';
+
                   return <div
                     className="suggestion-line selectable"
                     key={suggestion.id}
                     data-testid={`suggestion-${suggestion.id}`}
                     data-file-id={suggestion.file_id}
                     data-action-type={suggestion.action_type}
+                    data-selection-state={selectionState}
                   >
-                    <label title={disabledByMutationGuard ? 'Another move/rename action is already selected for this file.' : undefined}>
+                    <label title={disabledByMutationGuard ? selectionExplanation : undefined}>
                       <input
                         type="checkbox"
                         checked={isSelected}
@@ -292,10 +327,14 @@ export function PlanningView({
                       <span>
                         <b>{suggestion.action_type}</b> → {suggestion.suggested_value}
                         {sourceFile?.filename && <small className="muted" style={{ display: 'block' }}>Source: {sourceFile.filename}</small>}
+                        <small className="muted" style={{ display: 'block' }}>Why suggested: {suggestion.reason}</small>
+                        <small data-testid="planning-selection-explanation" style={{ display: 'block' }}><b>Review status:</b> {selectionExplanation}</small>
                       </span>
                     </label>
                     <span className="chip blue">{Math.round(Number(suggestion.confidence || 0) * 100)}%</span>
-                    {disabledByMutationGuard && <span className="chip orange">file mutation already selected</span>}
+                    {isSelected && <span className="chip green">included</span>}
+                    {!isSelected && !disabledByMutationGuard && <span className="chip blue">not selected</span>}
+                    {disabledByMutationGuard && <span className="chip orange">safety conflict</span>}
                     <button onClick={() => createPreview(suggestion)}>Preview</button>
                   </div>;
                 })}
