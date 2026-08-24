@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-24  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release plus #144/#146/#150/#154/#158 accepted  
-Current gate: issue #160 canonical synchronization
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release and governed-action lifecycle release accepted  
+Current gate: issue #164 canonical synchronization and next bounded decision preparation
 
 ## Mandatory startup sequence
 
@@ -27,7 +27,13 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review. Product Depth continuation milestones #144, #146, #148, #150, #152, #154, #156, and #158 are accepted. #156 merged as `d8152d2307b63917e5580d01690119b24c88ccf0` after CI #557. #158 merged as `b75e236960ec5f0e562bfbfb06f1954d47efafe2` after CI Smoke #562 and independent final diff review with no unresolved Critical or Important findings.
+Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
+
+The bounded Product Depth governed-action lifecycle release was accepted through #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`. Pre-decision CI #566 passed on `e175ff1ef78349b2644a8211d658dde88721a2d0`; final unchanged-head CI #568 passed on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`; independent final diff review found no unresolved Critical or Important findings.
+
+The accepted governed-action lifecycle is:
+
+`planning selection → conflict explanation → dry-run preview → approval boundary → governed execution → audit evidence → undo/recovery outcome`
 
 ## Roles
 
@@ -107,7 +113,7 @@ No new major implementation phase is authorized by Phase 2 or Product Depth comp
 
 Explicit CEO approval remains required before authentication/identity architecture, production tenancy/workspaces, cloud deployment, production database/storage, privileged-host/systemd work, material connector/runtime expansion, or other material architecture/commercial-scope expansion.
 
-Bounded documentation reconciliation, QA, evidence synchronization, and Product Depth work already within the approved direction may proceed autonomously.
+Bounded documentation reconciliation, QA, evidence synchronization, and Product Depth work already within the approved local-first product direction may proceed autonomously.
 
 ## Issue #69
 
@@ -115,9 +121,9 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #160 is the sole active Product Depth governance task. Synchronize canonical state after accepted #156/#158 without changing runtime behavior.
+Issue #164 is the sole active Product Depth governance task. Synchronize canonical state after accepted #162, finalize its post-merge handover facts, and prepare the next bounded decision gate without changing runtime behavior.
 
-After #160 acceptance, release the bounded **Product Depth governed-action lifecycle release decision**. That gate evaluates the already accepted planning-selection (#150), preview-decision (#154), and execution/audit/undo outcome-clarity (#158) milestones as one lifecycle. It is an evidence/release gate, not authorization for new runtime behavior.
+After #164 acceptance, select only from bounded, reversible work inside the accepted local-first Product Depth direction unless the CEO explicitly authorizes a material expansion. The current bounded options are documented in `docs/PRODUCT_DEPTH_NEXT_DECISION_GATE_2026-08-24.md`.
 
 ## Evidence authority
 
@@ -134,16 +140,14 @@ Accepted Product Depth trustworthy-search release evidence:
 - #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`
 - final unchanged-head CI #535
 
-Accepted Product Depth continuation evidence:
+Accepted Product Depth governed-action lifecycle release evidence:
 
-- #144 merge `9c707581c1c8d068724925854008309ab7cc251e` — CI #539
-- #146 merge `453b7d009060db44918f6c4d5346d197323cdf15` — final PR-head CI #541
-- #148 merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b` — CI #543
-- #150 merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5` — CI #546
-- #152 merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd` — CI #548
-- #154 merge `943aff2e9807894142581c4f6872b76188e26d5f` — CI #555
-- #156 merge `d8152d2307b63917e5580d01690119b24c88ccf0` — CI #557
-- #158 merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2` — CI Smoke #562
+- `docs/PRODUCT_DEPTH_ACTION_LIFECYCLE_RELEASE_DECISION_2026-08-24.md`
+- `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_ACTION_LIFECYCLE_RELEASE.json`
+- #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`
+- pre-decision CI #566 on `e175ff1ef78349b2644a8211d658dde88721a2d0`
+- final unchanged-head CI #568 on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`
+- independent final diff review with no unresolved Critical or Important findings
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 
