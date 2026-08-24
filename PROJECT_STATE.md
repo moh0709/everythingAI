@@ -2,7 +2,7 @@
 
 Date: 2026-08-24  
 Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth releases  
-Current governance issue: #164
+Current governance issue: #168
 
 ## Current program stage
 
@@ -13,6 +13,8 @@ Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
 The bounded **Product Depth — Trustworthy Search Experience** release is accepted as **`PRODUCT_DEPTH_PASS`** through merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, after final unchanged-head CI #535 and independent diff review.
 
 The bounded **Product Depth — Governed-Action Lifecycle** release is accepted as **`PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS`** through PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`. Pre-decision CI #566 passed on `e175ff1ef78349b2644a8211d658dde88721a2d0`; final unchanged-head CI #568 passed on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`; independent final diff review found no unresolved Critical or Important findings.
+
+The bounded **Product Depth — Knowledge Evidence Quality & Safe Freshness Guidance** milestone is accepted through #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`. Final unchanged-head CI Smoke #574 passed on `76699c7e30bf741b12c880d096b770ee73de98ac`; final diff review found no unresolved Critical or Important findings. The accepted behavior explains persisted citation coverage and weak-source warnings, keeps freshness explicitly unknown when no verified source-update timestamp exists, identifies source fingerprint as source-set identity rather than freshness, and keeps refresh/rebuild user-controlled.
 
 Accepted Product Depth continuation milestones include:
 
@@ -25,7 +27,9 @@ Accepted Product Depth continuation milestones include:
 - #156 — canonical synchronization after preview-decision clarity — merge `d8152d2307b63917e5580d01690119b24c88ccf0`, CI #557;
 - #158 — execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI Smoke #562;
 - #160 — canonical synchronization before lifecycle release — merge `d62724bf649edf77e784e32df8a76366a10f1968`, CI #564;
-- #162 — governed-action lifecycle release decision — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final unchanged-head CI #568.
+- #162 — governed-action lifecycle release decision — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final unchanged-head CI #568;
+- #164 — canonical synchronization after governed-action lifecycle release — merge `5a88a7df42d15deb747baaf30974040c4a977cdd`, CI #570;
+- #166 — knowledge evidence quality and safe freshness guidance — merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`, final unchanged-head CI #574.
 
 No Enterprise Platform or privileged-host implementation is authorized by Product Depth work.
 
@@ -45,8 +49,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy-search and governed-action lifecycle Product Depth releases accepted | #164 canonical synchronization and next bounded decision selection |
-| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, diagnostics, planning selection/preview clarity, governed execution, audit, and undo lifecycle accepted | Preserve evidence provenance and mutation safety while selecting the next bounded product gate |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy-search, governed-action lifecycle, and evidence-quality Product Depth milestones accepted | #168 canonical synchronization and next bounded decision selection |
+| Knowledge and Safe Action | Source provenance, trustworthy search evidence, evidence-quality/freshness guidance, document rendering, diagnostics, planning selection/preview clarity, governed execution, audit, and undo lifecycle accepted | Preserve truthful evidence semantics and mutation safety while selecting the next bounded product gate |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve evidence, rollback, and truthful blocker handling |
@@ -76,8 +80,10 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 - #158 — execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2` after CI Smoke #562 and independent final diff review.
 - #160 — canonical synchronization — merge `d62724bf649edf77e784e32df8a76366a10f1968` after CI #564 and independent documentation diff review.
 - #162 — Product Depth governed-action lifecycle release decision — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` after pre-decision CI #566, final unchanged-head CI #568, and independent final diff review.
+- #164 — canonical synchronization — merge `5a88a7df42d15deb747baaf30974040c4a977cdd` after CI #570 and independent documentation diff review.
+- #166 — knowledge evidence quality and safe freshness guidance — merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb` after final unchanged-head CI Smoke #574 and independent final diff review.
 
-Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Trust diagnostics preserve backend-computed values rather than recalculating them in the client. Planning-selection and preview UX explain existing backend facts while preserving the global one-filesystem-mutation-per-file guard, approval boundary, planning policy, source/target evidence, and dry-run separation. Execution/audit/undo UX clarifies existing persisted outcomes without changing execution permissions, audit creation, filesystem mutation behavior, or undo semantics; actual filesystem restoration must not be inferred merely from an `undone` persisted state.
+Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Trust diagnostics preserve backend-computed values rather than recalculating them in the client. Planning-selection and preview UX explain existing backend facts while preserving the global one-filesystem-mutation-per-file guard, approval boundary, planning policy, source/target evidence, and dry-run separation. Execution/audit/undo UX clarifies existing persisted outcomes without changing execution permissions, audit creation, filesystem mutation behavior, or undo semantics; actual filesystem restoration must not be inferred merely from an `undone` persisted state. Knowledge evidence guidance explains persisted citation coverage and weak-source warnings without recalculation, keeps freshness unknown when unproven, and does not treat source fingerprints as timestamps or confidence.
 
 ## Mandatory inherited regression baseline
 
@@ -100,10 +106,11 @@ Subsequent product work must preserve, where applicable:
 15. Product Depth planning-selection-clarity acceptance;
 16. Product Depth planning-preview-decision-clarity acceptance;
 17. Product Depth execution/audit/undo outcome-clarity acceptance;
-18. disposable-folder RC acceptance;
-19. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-20. independent diff review with no unresolved Critical or Important findings;
-21. milestone-scoped rollback evidence.
+18. Product Depth knowledge-evidence/freshness-guidance acceptance;
+19. disposable-folder RC acceptance;
+20. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+21. independent diff review with no unresolved Critical or Important findings;
+22. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for required validation of a new candidate.
 
@@ -123,11 +130,13 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #164 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #162 and does not authorize runtime changes or new platform architecture.
+Issue #168 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #166 and prepares the next bounded decision gate without authorizing runtime changes or new platform architecture.
 
 ## Current next action
 
-Complete #164 with documentation diff review and the full inherited regression matrix on one unchanged candidate. Then select the next bounded Product Depth or governance gate from `docs/PRODUCT_DEPTH_NEXT_DECISION_GATE_2026-08-24.md`.
+Complete #168 with documentation diff review and the inherited regression matrix on one unchanged candidate. Then release the next bounded Product Depth milestone only from the accepted decision package.
+
+The candidate next direction is **Search refinement and filtering UX** using existing metadata and ranking outputs only. This direction must remain read-only, must not change semantic-model/provider architecture, and must not present ranking signals as calibrated confidence.
 
 Autonomously selectable work remains limited to bounded, reversible product-depth, QA, evidence, documentation, and governance improvements already inside the accepted local-first product direction. Enterprise Platform, privileged-host/systemd work, authentication/tenancy/cloud/database/storage, and material connector/runtime expansion remain CEO-gated.
 

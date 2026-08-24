@@ -1,0 +1,30 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-24",
+  "issue": 168,
+  "status": "CANDIDATE_PENDING_CI_AND_REVIEW",
+  "predecessor_issue": 166,
+  "accepted_predecessor_merge": "9b41167f41b89ff6ae5a8deb7064c817bfb205fb",
+  "accepted_predecessor_ci": {
+    "run_number": 574,
+    "unchanged_head": "76699c7e30bf741b12c880d096b770ee73de98ac",
+    "result": "PASS"
+  },
+  "canonical_sync": [
+    "PROJECT_STATE.md",
+    "AI_BOOTSTRAP.md"
+  ],
+  "next_decision_gate": "docs/PRODUCT_DEPTH_SEARCH_REFINEMENT_DECISION_GATE_2026-08-24.md",
+  "next_candidate_direction": "Search refinement and filtering UX using genuine existing result metadata only",
+  "scope_constraints": [
+    "read-only Client search behavior",
+    "no semantic-model/provider architecture change",
+    "no calibrated-confidence claim from ranking signals",
+    "no authentication/tenancy/cloud/database/storage expansion",
+    "no privileged-host/systemd work",
+    "no material connector/runtime expansion"
+  ],
+  "issue_69": "closed completed historical evidence; unchanged",
+  "rollback": "Revert only the #168 documentation synchronization merge.",
+  "acceptance_rule": "Do not mark #168 accepted until the unchanged PR head passes inherited CI and independent documentation diff review has no unresolved Critical or Important findings."
+}
