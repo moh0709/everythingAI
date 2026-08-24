@@ -45,6 +45,10 @@ function isFilesystemAction(suggestion: Pick<Suggestion, 'action_type'>) {
   return FILESYSTEM_ACTIONS.has(suggestion.action_type);
 }
 
+function isPreviewFilesystemAction(preview: PreviewRecord) {
+  return FILESYSTEM_ACTIONS.has(preview.action_type);
+}
+
 function isSameFileMutation(a: Suggestion, b: Suggestion) {
   return a.file_id === b.file_id && isFilesystemAction(a) && isFilesystemAction(b);
 }
@@ -132,10 +136,6 @@ function selectedMutationForFile(suggestion: Suggestion, selectedSuggestions: Su
 
 function actionContext(suggestion: Suggestion) {
   return `${suggestion.action_type} → ${suggestion.suggested_value}`;
-}
-
-function previewTarget(preview: PreviewRecord) {
-  return preview.target_path || preview.suggested_value || null;
 }
 
 function previewDecisionLabel(preview: PreviewRecord) {
@@ -364,12 +364,12 @@ export function PlanningView({
         {previews.length > 0 && <div className="planning-preview-summary" data-testid="planning-preview-summary">
           <p><span className="chip green">Ready for approval</span> <b>{readyPreviewCount}</b> preview(s) passed backend validation.</p>
           <p><span className="chip orange">Blocked</span> <b>{blockedPreviewCount}</b> preview(s) cannot execute in their current backend-validated state.</p>
-          <p className="muted">Review source → target impact and any backend block reason below before approving execution.</p>
+          <p className="muted">Review filesystem source → target impact, metadata proposed values, and any backend block reason below before approving execution.</p>
         </div>}
         {!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}
         {previews.map((preview) => {
           const isReady = preview.preview_status === 'ready';
-          const target = previewTarget(preview);
+          const filesystemAction = isPreviewFilesystemAction(preview);
           return <div
             className="suggestion-line planning-preview-row"
             key={preview.id}
@@ -380,10 +380,12 @@ export function PlanningView({
             <div>
               <p><span className={isReady ? 'chip green' : 'chip orange'}>{previewDecisionLabel(preview)}</span></p>
               <p><b>{preview.action_type}</b></p>
-              <p data-testid="preview-impact"><b>Impact:</b> {preview.source_path || 'Source not available'} → {target || 'Target not available'}</p>
+              {filesystemAction
+                ? <p data-testid="preview-impact"><b>Filesystem impact:</b> {preview.source_path || 'Source path not provided'} → {preview.target_path || 'Target path not provided'}</p>
+                : <p data-testid="preview-impact"><b>Proposed value:</b> {preview.suggested_value || 'Not provided'}</p>}
               {isReady
                 ? <p className="muted" data-testid="preview-decision-explanation">Dry run passed backend validation. Execution remains a separate explicit approval.</p>
-                : <p className="muted" data-testid="preview-decision-explanation"><b>Backend reason:</b> {preview.blocked_reason || 'No blocked reason was provided by the backend.'}</p>}
+                : <p className="muted" data-testid="preview-decision-explanation"><b>Backend reason:</b> {preview.blocked_reason || 'Backend did not provide a blocked reason.'}</p>}
             </div>
             <span className={isReady ? 'chip green' : 'chip orange'}>{preview.preview_status}</span>
             <button disabled={!isReady} onClick={() => executePreview(preview)}>Execute</button>
