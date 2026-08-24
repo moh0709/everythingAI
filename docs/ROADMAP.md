@@ -1,8 +1,9 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-08-23  
+Date: 2026-08-24  
 Current product state: **Phase 2 complete and dispatched (`PHASE2_PASS`)**  
-Accepted release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`
+Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`  
+Accepted Product Depth trustworthy-search release: `PRODUCT_DEPTH_PASS` / merge `d8fad2df21454aa7dce0101abe208fd24b91a883`
 
 ## Completed product sequence
 
@@ -32,52 +33,79 @@ Release evidence:
 - `docs/PHASE2_RELEASE_DECISION_2026-08-23.md`
 - `docs/HANDOVER_2026-08-23_PHASE2_RELEASE_DECISION.json`
 
+### Product Depth — Trustworthy Search Experience
+
+Accepted and dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
+
+Delivered:
+
+1. #136 explainable unified Sources & Files ranking — merge `10eb14b5501499e90e5281390f9cfed99edc8315`;
+2. #138 contextual search snippets and result inspection — merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`;
+3. #140 trustworthy Knowledge Base search navigation — merge `680763ca86e35d748ce37b115f1be7601d011422`;
+4. #142 combined `PRODUCT_DEPTH_PASS` release decision — merge `d8fad2df21454aa7dce0101abe208fd24b91a883`.
+
+Product Depth continuation after that release:
+
+5. #144 richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e`, CI #539;
+6. #146 actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, final PR-head CI #541.
+
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP with Phase 2 UX improvements accepted | Choose next bounded product outcome |
-| Knowledge and Safe Action | Proven source-backed reading and governed mutation lifecycle | Preserve provenance and safety; deepen capability only through bounded milestones |
+| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy search, source inspection, and trust-diagnostic navigation accepted | Complete #148 canonical synchronization, then deepen planning ergonomics as the next bounded Product Depth outcome |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, exact evidence navigation, diagnostics, and governed mutation lifecycle | Preserve provenance and safety while improving review clarity |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before implementation expansion |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority + required privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency and rollback discipline |
 
-## Current gate — #134
+## Current gate — #148
 
-Before starting another major phase, reconcile stale Phase 1 overlays in canonical state/roadmap documents. This is documentation-only.
+Synchronize the canonical current state after accepted #142/#144/#146. This is documentation/governance only and does not change runtime behavior.
 
 Exit criteria:
 
-- canonical docs state Phase 2 is complete;
-- accepted release merge/evidence are exact;
-- historical material remains preserved in repository archive/history;
-- inherited regression matrix is explicit;
-- next-phase options are separated from implementation authorization;
+- no canonical document presents #142 as active;
+- accepted Product Depth merge/CI evidence is exact;
+- #144/#146 are recorded as accepted;
+- inherited regression matrix includes source-inspection and trust-diagnostics acceptance;
+- next bounded Product Depth outcome is explicit;
 - documentation diff is independently reviewed and reversible.
 
-## Candidate next directions — decision required before implementation
+## Next bounded Product Depth outcome
 
-These are options, not authorization:
+After #148 acceptance, prioritize **planning ergonomics focused on selection clarity, safety/conflict explanations, and reviewability**.
 
-### A. Product Depth
+Allowed scope:
 
-Continue bounded local-first product improvements: search relevance/explainability, knowledge navigation, richer source inspection, planning ergonomics, onboarding, and trust/diagnostic UX.
+- make selected actions and exclusions easier to understand before preview/execution;
+- explain why a suggestion is blocked, conflicting, or excluded using existing backend facts;
+- improve reviewability of grouped planning without weakening existing one-filesystem-mutation-per-file protection;
+- add focused acceptance coverage and inherit the full regression matrix.
 
-### B. Enterprise Platform Foundation
+Non-goals:
+
+- no change to backend planning policy or confidence enforcement;
+- no change to approval requirements, execution permissions, audit semantics, or undo/recovery behavior;
+- no authentication, tenancy, cloud deployment, database migration, object storage, privileged-host work, or material connector/runtime expansion.
+
+## Other future directions — decision required before material expansion
+
+### Enterprise Platform Foundation
 
 Begin production architecture implementation such as authentication, tenancy/workspaces, production database/storage, deployment topology, and capability permissions. This is a material architecture expansion and requires CEO approval.
 
-### C. Engineering Operations Hardening
+### Engineering Operations Hardening
 
 Prioritize live host/runtime reliability and infrastructure operations. Privileged host/systemd work requires explicit selection and appropriate human/privileged execution authority.
 
-### D. Integration Expansion
+### Integration Expansion
 
 Add carefully scoped external connectors/integrations where they produce clear product value without weakening source provenance, user/admin separation, or safety boundaries. Material connector/runtime expansion requires an approved milestone.
 
 ## Mandatory regression baseline for future product work
 
-Preserve all applicable accepted Phase 1 + Phase 2 gates: root regression, backend tests, frontend typecheck/build, Client/Admin smoke, citation acceptance, long-form/table acceptance, grouped-planning acceptance, API-key lifecycle acceptance, disposable-folder RC acceptance, UI-governed action/undo acceptance, independent diff review, and rollback evidence.
+Preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates: root regression, backend tests, frontend typecheck/build, Client/Admin smoke, citation acceptance, long-form/table acceptance, grouped-planning acceptance, API-key lifecycle acceptance, explainable-search acceptance, contextual-snippet acceptance, Knowledge Base search-navigation acceptance, source-inspection-navigation acceptance, trust-diagnostics-navigation acceptance, disposable-folder RC acceptance, UI-governed action/undo acceptance, independent diff review, and rollback evidence.
 
 ## Historical roadmap
 
