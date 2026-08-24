@@ -3,7 +3,7 @@
   "track": "Product Depth — Governed-Action Lifecycle",
   "date": "2026-08-24",
   "issue": 162,
-  "status": "PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS_FINAL_MERGE_GATED",
+  "status": "PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS",
   "accepted_dependencies": [
     {"issue": 150, "merge": "6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5", "ci_run": 546},
     {"issue": 154, "merge": "943aff2e9807894142581c4f6872b76188e26d5f", "ci_run": 555},
@@ -18,9 +18,11 @@
   },
   "finalization": {
     "required": "unchanged final PR head must pass the complete inherited CI matrix and independent final diff review before merge",
-    "final_head": null,
-    "final_ci_run": null,
-    "merge": null
+    "final_head": "9fbc1502869c71f43a4b069cd5fb872f4dd382b1",
+    "final_ci_run": 568,
+    "final_ci_result": "PASS",
+    "independent_final_diff_review": "no unresolved Critical or Important findings",
+    "merge": "241b8c8cb723a43be1ede211fdfc55acf15d96e2"
   },
   "safety_invariants_changed": false,
   "runtime_behavior_changed": false,
