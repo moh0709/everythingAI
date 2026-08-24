@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-08-24  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search, governed-action lifecycle, and knowledge evidence/freshness guidance accepted  
-Current gate: issue #168 canonical synchronization and next bounded decision preparation
+Date: 2026-08-25  
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search, governed-action lifecycle, knowledge evidence/freshness guidance, search refinement/filtering, and search refinement lifecycle accepted  
+Current gate: issue #176 canonical synchronization and next bounded decision preparation
 
 ## Mandatory startup sequence
 
@@ -32,6 +32,10 @@ Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0
 The bounded Product Depth governed-action lifecycle release was accepted through #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`. Pre-decision CI #566 passed on `e175ff1ef78349b2644a8211d658dde88721a2d0`; final unchanged-head CI #568 passed on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`; independent final diff review found no unresolved Critical or Important findings.
 
 The bounded Product Depth knowledge evidence/freshness guidance milestone was accepted through #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`. Final unchanged-head CI Smoke #574 passed on `76699c7e30bf741b12c880d096b770ee73de98ac`; final diff review found no unresolved Critical or Important findings.
+
+The bounded Product Depth search refinement/filtering milestone was accepted through #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce` after final CI Smoke #579 and independent diff review. Canonical synchronization #172 / PR #173 was accepted and merged as `3b750a1467a0ba01bd30ef3dbd18b38f969099af` after CI Smoke #581.
+
+The bounded Product Depth search refinement lifecycle milestone was accepted through #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`. Final unchanged-head CI Smoke #584 passed on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`; PM diff review found no unresolved Critical or Important findings. The accepted behavior resets stale refinements before a new explicit search or base-file refresh, preserves the typed query, keeps clear-all scoped to the current result context, and leaves backend result facts and ordering unchanged.
 
 The accepted governed-action lifecycle is:
 
@@ -86,6 +90,8 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth planning-preview-decision-clarity acceptance;
 - Product Depth execution/audit/undo outcome-clarity acceptance;
 - Product Depth knowledge-evidence/freshness-guidance acceptance;
+- Product Depth search-refinement/filtering acceptance;
+- Product Depth search-refinement lifecycle/query-context acceptance;
 - disposable-folder release-candidate acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -110,6 +116,8 @@ The accepted Product Depth sequence must preserve these properties:
 - freshness remains explicitly unknown where no verified source-update timestamp exists;
 - source fingerprints identify persisted source sets and must not be presented as freshness timestamps or confidence;
 - refresh/rebuild guidance remains explicit and user-controlled, with no automatic rebuild triggered by explanatory UI;
+- search refinements remain read-only, preserve backend-returned ordering, and must not transform ranking signals into confidence claims;
+- search refinements belong to the current result context and stale refinements must reset before a new explicit search or base-file refresh changes that context;
 - planning-selection UI may explain included, unselected, blocked, and conflicting suggestions, but must not weaken backend policy, approval requirements, confidence enforcement, or the global one-filesystem-mutation-per-file guard;
 - planning-preview UI may explain ready and blocked previews, backend-provided reasons, source/target impact, and the dry-run/approval boundary, but must preserve existing preview and execution semantics;
 - execution/audit/undo UI may clarify existing persisted outcome facts, but must not imply filesystem restoration solely from an `undone` persisted state or change execution, audit, mutation, or undo semantics.
@@ -128,9 +136,9 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #168 is the sole active Product Depth governance task. Synchronize canonical state after accepted #166 / PR #167, preserve its validation and rollback evidence, and prepare the next bounded decision gate without changing runtime behavior.
+Issue #176 is the sole active Product Depth governance task. Synchronize canonical state after accepted #174 / PR #175, preserve its validation and rollback evidence, and prepare the next bounded decision gate without changing runtime behavior.
 
-After #168 acceptance, the candidate next bounded direction is **Search refinement and filtering UX** using existing metadata and ranking outputs only. It must remain read-only, must not change semantic-model/provider architecture, and must not present ranking signals as calibrated confidence.
+After #176 acceptance, the candidate next bounded direction is **Search lifecycle-status refinement and processing-state clarity** using existing persisted indexing/extraction/recovery facts only. It must remain read-only, preserve backend result order, reset with the accepted query-context lifecycle, and must not invent progress, confidence, freshness, completion, retry, or recovery facts.
 
 ## Evidence authority
 
@@ -162,6 +170,19 @@ Accepted Product Depth knowledge evidence/freshness milestone evidence:
 - final unchanged-head CI Smoke #574 on `76699c7e30bf741b12c880d096b770ee73de98ac`
 - final diff review with no unresolved Critical or Important findings
 - milestone-scoped rollback by reverting only the #166 merge
+
+Accepted Product Depth search refinement/filtering evidence:
+
+- #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`
+- final CI Smoke #579
+- #172 / PR #173 canonical synchronization merge `3b750a1467a0ba01bd30ef3dbd18b38f969099af`, CI Smoke #581
+
+Accepted Product Depth search refinement lifecycle evidence:
+
+- #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`
+- final unchanged-head CI Smoke #584 on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`
+- PM diff review with no unresolved Critical or Important findings
+- milestone-scoped rollback by reverting only the #174 merge
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 
