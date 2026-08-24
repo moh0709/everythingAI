@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { FileText, Search, Server } from 'lucide-react';
 import { formatSize } from './userUtils';
 import type { DocumentContext } from './types';
@@ -83,15 +83,42 @@ function formatSemanticSignal(score: number | null | undefined) {
   return score.toFixed(3);
 }
 
+function normalizedExtension(file: IndexedFile) {
+  return (file.extension || '').trim().toLowerCase();
+}
+
 export function ExploreView({
   error, busy, status, baseUrl, setBaseUrl, token, setToken,
   query, setQuery, files, selectedFile, documentContext,
   refreshFiles, searchEverything, handleAskFromHero, loadDocumentContext, saveConnection, openSourceRecovery,
 }: ExploreViewProps) {
+  const [extensionFilter, setExtensionFilter] = useState<string>('');
+  const [basisFilter, setBasisFilter] = useState<SearchMatchDetails['basis'] | ''>('');
   const summary = summarizeFiles(files);
   const progressSummary = withInFlightSummary(summarizeFileProgress(files));
   const selectedRecord = (documentContext?.file || selectedFile) as FileProgressRecord | undefined;
   const selectedLifecycle = deriveSourceLifecycle(selectedRecord || {});
+
+  const hasSearchResults = useMemo(() => files.some((file) => Boolean(searchMatchFor(file))), [files]);
+  const availableExtensions = useMemo(() => Array.from(new Set(
+    files.map(normalizedExtension).filter(Boolean),
+  )).sort(), [files]);
+  const availableBases = useMemo(() => Array.from(new Set(
+    files.map((file) => searchMatchFor(file)?.basis).filter((basis): basis is SearchMatchDetails['basis'] => Boolean(basis)),
+  )), [files]);
+
+  const visibleFiles = useMemo(() => files.filter((file) => {
+    if (extensionFilter && normalizedExtension(file) !== extensionFilter) return false;
+    if (basisFilter && searchMatchFor(file)?.basis !== basisFilter) return false;
+    return true;
+  }), [files, extensionFilter, basisFilter]);
+
+  const hasActiveFilters = Boolean(extensionFilter || basisFilter);
+
+  function clearFilters() {
+    setExtensionFilter('');
+    setBasisFilter('');
+  }
 
   return <>
     <section className="hero-row">
@@ -197,13 +224,46 @@ export function ExploreView({
         <div className="panel-title">
           <div>
             <h2><FileText /> Indexed File List</h2>
-            <p>{files.length} visible file(s). Search results explain whether they matched indexed text, semantic similarity, or both.</p>
+            <p>{visibleFiles.length} visible file(s){hasActiveFilters ? ` from ${files.length} current-query result(s)` : ''}. Search results explain whether they matched indexed text, semantic similarity, or both.</p>
           </div>
           <button className="outline" onClick={refreshFiles} disabled={busy}>Refresh</button>
         </div>
+
+        {hasSearchResults ? <section className="settings-help-grid" aria-label="Search result filters">
+          <div>
+            <strong>File type</strong>
+            <p>Filter only by the extension already returned with each result.</p>
+            <select aria-label="Filter search results by file type" value={extensionFilter} onChange={(event) => setExtensionFilter(event.target.value)}>
+              <option value="">All file types</option>
+              {availableExtensions.map((extension) => <option key={extension} value={extension}>.{extension}</option>)}
+            </select>
+          </div>
+          <div>
+            <strong>Match basis</strong>
+            <p>Filter by the existing keyword/semantic match explanation without changing ranking.</p>
+            <select aria-label="Filter search results by match basis" value={basisFilter} onChange={(event) => setBasisFilter(event.target.value as SearchMatchDetails['basis'] | '')}>
+              <option value="">All match bases</option>
+              {availableBases.map((basis) => <option key={basis} value={basis}>{basis}</option>)}
+            </select>
+          </div>
+          <div>
+            <strong>Active refinement</strong>
+            <p>{hasActiveFilters ? 'Filters narrow the current query only. Original result order and match explanations are unchanged.' : 'No filters are active. The full current-query result set is visible.'}</p>
+            <div className="source-actions" aria-label="Active search filters">
+              {extensionFilter ? <button className="outline" onClick={() => setExtensionFilter('')}>File type: .{extensionFilter} ×</button> : null}
+              {basisFilter ? <button className="outline" onClick={() => setBasisFilter('')}>Match basis: {basisFilter} ×</button> : null}
+              {hasActiveFilters ? <button className="outline" onClick={clearFilters}>Clear all filters</button> : null}
+            </div>
+          </div>
+        </section> : null}
+
+        {hasSearchResults && hasActiveFilters && visibleFiles.length === 0 ? <div className="status-strip ready" role="status">
+          No current-query results match the active filters. Clear or adjust a filter to restore the underlying search results.
+        </div> : null}
+
         <table>
           <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Status</th></tr></thead>
-          <tbody>{files.map((file) => {
+          <tbody>{visibleFiles.map((file) => {
             const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
             const searchMatch = searchMatchFor(file);
             const searchSnippet = searchSnippetFor(file);
