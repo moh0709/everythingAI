@@ -147,8 +147,9 @@ test('Planning preview queue explains ready and blocked decisions without changi
     const ready = page.locator('[data-preview-decision="ready-for-approval"]');
     await expect(ready).toHaveCount(1);
     await expect(ready).toContainText('Ready for approval');
-    await expect(ready.getByTestId('preview-impact')).toContainText('Filesystem impact:');
+    await expect(ready.getByTestId('preview-impact')).toContainText('Source:');
     await expect(ready.getByTestId('preview-impact')).toContainText('Invoice Alpha 2026.txt');
+    await expect(ready.getByTestId('preview-impact')).toContainText('Target:');
     await expect(ready.getByTestId('preview-impact')).toContainText('Reviewed');
     await expect(ready.getByTestId('preview-decision-explanation')).toContainText('Execution remains a separate explicit approval');
     await expect(ready.getByRole('button', { name: 'Execute', exact: true })).toBeEnabled();
