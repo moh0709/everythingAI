@@ -2,7 +2,7 @@
 
 Date: 2026-08-24  
 Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth milestones  
-Current governance issue: #152
+Current governance issue: #156
 
 ## Current program stage
 
@@ -17,7 +17,9 @@ Accepted Product Depth continuation milestones after that release:
 - #144 — richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e`, accepted after CI #539;
 - #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, accepted after final PR-head CI #541 and independent diff review;
 - #148 — canonical synchronization — merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, accepted after CI #543 and independent documentation diff review;
-- #150 — planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, accepted after CI #546 and independent diff review.
+- #150 — planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, accepted after CI #546 and independent diff review;
+- #152 — canonical synchronization after planning-selection clarity — merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd`, accepted after CI #548 and independent documentation diff review;
+- #154 — planning dry-run/preview decision clarity — merge `943aff2e9807894142581c4f6872b76188e26d5f`, accepted after CI #555 and independent diff review.
 
 Authoritative release evidence:
 
@@ -45,8 +47,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth trustworthy-search release plus #144/#146/#150 accepted | Complete #152 canonical synchronization, then release the bounded dry-run/preview decision-clarity milestone |
-| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, source inspection, actionable trust diagnostics, grouped planning, planning-selection clarity, approval/action/audit/undo accepted | Preserve evidence provenance, read-only diagnostics, and mutation safety while improving preview reviewability |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth trustworthy-search release plus #144/#146/#150/#154 accepted | Complete #156 canonical synchronization, then release the bounded execution/audit/undo outcome-clarity milestone |
+| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, source inspection, actionable trust diagnostics, grouped planning, planning-selection clarity, preview-decision clarity, approval/action/audit/undo accepted | Preserve evidence provenance and mutation safety while improving execution/audit/undo reviewability |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve evidence, rollback, and truthful blocker handling |
@@ -70,8 +72,10 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 - #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15` after final PR-head CI #541 and independent diff review.
 - #148 — canonical synchronization — merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b` after CI #543 and independent documentation diff review.
 - #150 — planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5` after CI #546 and independent diff review.
+- #152 — canonical synchronization after planning-selection clarity — merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd` after CI #548 and independent documentation diff review.
+- #154 — planning dry-run/preview decision clarity — merge `943aff2e9807894142581c4f6872b76188e26d5f` after CI #555 and independent diff review.
 
-Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence. Trust diagnostics preserve backend-computed grades, scores, validation state, and governance flags rather than recalculating them in the client. Planning-selection UX now distinguishes included, unselected, and safety-conflicting actions using existing backend facts while preserving the global one-filesystem-mutation-per-file guard and unchanged planning policy.
+Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence. Trust diagnostics preserve backend-computed grades, scores, validation state, and governance flags rather than recalculating them in the client. Planning-selection UX distinguishes included, unselected, and safety-conflicting actions using existing backend facts while preserving the global one-filesystem-mutation-per-file guard and unchanged planning policy. Planning-preview UX distinguishes ready-for-approval and backend-blocked previews, preserves the accepted `Source:` / `Target:` evidence labels, shows backend-provided block reasons, and keeps dry-run validation separate from explicit governed execution.
 
 ## Mandatory inherited regression baseline
 
@@ -92,10 +96,11 @@ Subsequent product work must preserve, where applicable:
 13. Product Depth source-inspection-navigation acceptance;
 14. Product Depth trust-diagnostics-navigation acceptance;
 15. Product Depth planning-selection-clarity acceptance;
-16. disposable-folder RC acceptance;
-17. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-18. independent diff review with no unresolved Critical or Important findings;
-19. milestone-scoped rollback evidence.
+16. Product Depth planning-preview-decision-clarity acceptance;
+17. disposable-folder RC acceptance;
+18. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+19. independent diff review with no unresolved Critical or Important findings;
+20. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for required validation of a new candidate.
 
@@ -115,13 +120,13 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #152 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #150 and does not authorize new platform architecture.
+Issue #156 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #154 and does not authorize new platform architecture.
 
 ## Current next action
 
-Complete #152 with documentation diff review, inherited regression validation, and merge. Then release the next bounded Product Depth outcome: **planning dry-run/preview decision clarity**, focused on making preview readiness, blocked reasons, source/target impact, and the approval boundary easier to review using existing backend preview facts only.
+Complete #156 with documentation diff review, inherited regression validation, and merge. Then release the next bounded Product Depth outcome: **execution/audit/undo outcome clarity**, focused on making existing execution results, audit evidence, batch status, and undo/recovery outcomes easier to inspect and understand using existing backend facts only.
 
-The next implementation must not change backend planning policy, confidence enforcement, execution permissions, approval semantics, audit, undo/recovery, authentication, tenancy, cloud/database/storage, privileged-host, or material connector/runtime behavior.
+The next implementation may improve presentation and navigation of existing execution result, audit, batch, and undo/recovery facts. It must not change execution permissions, approval semantics, audit creation, filesystem mutation behavior, rollback semantics, backend planning policy/confidence enforcement, authentication, tenancy, cloud/database/storage, privileged-host, or material connector/runtime behavior.
 
 Do not silently begin Enterprise Platform, privileged-host, or material connector/runtime implementation.
 
