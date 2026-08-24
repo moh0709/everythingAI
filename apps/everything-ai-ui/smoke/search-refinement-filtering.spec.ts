@@ -113,8 +113,9 @@ test('search refinement filters current-query results without changing match fac
 
   await page.getByLabel('Filter search results by match basis').selectOption('semantic');
   await expect(rows).toHaveCount(0);
-  await expect(page.getByRole('status')).toContainText('No current-query results match the active filters');
-  await expect(page.getByRole('status')).toContainText('restore the underlying search results');
+  const filteredEmptyStatus = page.locator('.status-strip[role="status"]');
+  await expect(filteredEmptyStatus).toContainText('No current-query results match the active filters');
+  await expect(filteredEmptyStatus).toContainText('restore the underlying search results');
 
   await page.getByRole('button', { name: 'File type: .pdf ×' }).click();
   await expect(rows).toHaveCount(1);
