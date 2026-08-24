@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-24  
-Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth milestones  
-Current governance issue: #160
+Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth releases  
+Current governance issue: #164
 
 ## Current program stage
 
@@ -12,7 +12,9 @@ Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
 
 The bounded **Product Depth — Trustworthy Search Experience** release is accepted as **`PRODUCT_DEPTH_PASS`** through merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, after final unchanged-head CI #535 and independent diff review.
 
-Accepted Product Depth continuation milestones after that release:
+The bounded **Product Depth — Governed-Action Lifecycle** release is accepted as **`PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS`** through PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`. Pre-decision CI #566 passed on `e175ff1ef78349b2644a8211d658dde88721a2d0`; final unchanged-head CI #568 passed on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`; independent final diff review found no unresolved Critical or Important findings.
+
+Accepted Product Depth continuation milestones include:
 
 - #144 — richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e`, CI #539;
 - #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, final PR-head CI #541;
@@ -21,7 +23,9 @@ Accepted Product Depth continuation milestones after that release:
 - #152 — canonical synchronization after planning-selection clarity — merge `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd`, CI #548;
 - #154 — planning dry-run/preview decision clarity — merge `943aff2e9807894142581c4f6872b76188e26d5f`, CI #555;
 - #156 — canonical synchronization after preview-decision clarity — merge `d8152d2307b63917e5580d01690119b24c88ccf0`, CI #557;
-- #158 — execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI Smoke #562, independent final diff review with no unresolved Critical or Important findings.
+- #158 — execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI Smoke #562;
+- #160 — canonical synchronization before lifecycle release — merge `d62724bf649edf77e784e32df8a76366a10f1968`, CI #564;
+- #162 — governed-action lifecycle release decision — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final unchanged-head CI #568.
 
 No Enterprise Platform or privileged-host implementation is authorized by Product Depth work.
 
@@ -41,8 +45,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth trustworthy-search release plus source inspection, trust diagnostics, planning selection, preview decision, and execution/audit/undo clarity accepted | Complete #160 canonical synchronization, then execute the bounded governed-action lifecycle release decision |
-| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, diagnostics, grouped planning, selection clarity, preview clarity, governed execution, audit, and undo outcome clarity accepted | Preserve evidence provenance and mutation safety while evaluating the combined governed-action lifecycle release gate |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy-search and governed-action lifecycle Product Depth releases accepted | #164 canonical synchronization and next bounded decision selection |
+| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, diagnostics, planning selection/preview clarity, governed execution, audit, and undo lifecycle accepted | Preserve evidence provenance and mutation safety while selecting the next bounded product gate |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve evidence, rollback, and truthful blocker handling |
@@ -70,6 +74,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 - #154 — planning dry-run/preview decision clarity — merge `943aff2e9807894142581c4f6872b76188e26d5f` after CI #555 and independent diff review.
 - #156 — canonical synchronization — merge `d8152d2307b63917e5580d01690119b24c88ccf0` after CI #557 and independent documentation diff review.
 - #158 — execution, audit, and undo outcome clarity — merge `b75e236960ec5f0e562bfbfb06f1954d47efafe2` after CI Smoke #562 and independent final diff review.
+- #160 — canonical synchronization — merge `d62724bf649edf77e784e32df8a76366a10f1968` after CI #564 and independent documentation diff review.
+- #162 — Product Depth governed-action lifecycle release decision — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` after pre-decision CI #566, final unchanged-head CI #568, and independent final diff review.
 
 Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Trust diagnostics preserve backend-computed values rather than recalculating them in the client. Planning-selection and preview UX explain existing backend facts while preserving the global one-filesystem-mutation-per-file guard, approval boundary, planning policy, source/target evidence, and dry-run separation. Execution/audit/undo UX clarifies existing persisted outcomes without changing execution permissions, audit creation, filesystem mutation behavior, or undo semantics; actual filesystem restoration must not be inferred merely from an `undone` persisted state.
 
@@ -117,13 +123,13 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #160 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #156 and #158 and does not authorize runtime changes or new platform architecture.
+Issue #164 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #162 and does not authorize runtime changes or new platform architecture.
 
 ## Current next action
 
-Complete #160 with documentation diff review and the full inherited regression matrix on one unchanged candidate. Then release a bounded **Product Depth governed-action lifecycle release decision** covering the already accepted #150 planning-selection clarity, #154 preview-decision clarity, and #158 execution/audit/undo outcome clarity.
+Complete #164 with documentation diff review and the full inherited regression matrix on one unchanged candidate. Then select the next bounded Product Depth or governance gate from `docs/PRODUCT_DEPTH_NEXT_DECISION_GATE_2026-08-24.md`.
 
-The release gate must evaluate the combined lifecycle as evidence; it must not change execution permissions, approval semantics, audit creation, filesystem mutation behavior, rollback/undo semantics, backend planning policy/confidence enforcement, authentication, tenancy, cloud/database/storage, privileged-host, or material connector/runtime behavior.
+Autonomously selectable work remains limited to bounded, reversible product-depth, QA, evidence, documentation, and governance improvements already inside the accepted local-first product direction. Enterprise Platform, privileged-host/systemd work, authentication/tenancy/cloud/database/storage, and material connector/runtime expansion remain CEO-gated.
 
 Do not silently begin Enterprise Platform, privileged-host, or material connector/runtime implementation.
 
