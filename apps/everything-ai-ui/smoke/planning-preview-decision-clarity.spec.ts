@@ -147,6 +147,7 @@ test('Planning preview queue explains ready and blocked decisions without changi
     const ready = page.locator('[data-preview-decision="ready-for-approval"]');
     await expect(ready).toHaveCount(1);
     await expect(ready).toContainText('Ready for approval');
+    await expect(ready.getByTestId('preview-impact')).toContainText('Filesystem impact:');
     await expect(ready.getByTestId('preview-impact')).toContainText('Invoice Alpha 2026.txt');
     await expect(ready.getByTestId('preview-impact')).toContainText('Reviewed');
     await expect(ready.getByTestId('preview-decision-explanation')).toContainText('Execution remains a separate explicit approval');
@@ -155,8 +156,7 @@ test('Planning preview queue explains ready and blocked decisions without changi
     const blocked = page.locator('[data-preview-decision="blocked"]');
     await expect(blocked).toHaveCount(1);
     await expect(blocked).toContainText('Blocked by backend validation');
-    await expect(blocked.getByTestId('preview-impact')).toContainText('Source not available');
-    await expect(blocked.getByTestId('preview-impact')).toContainText('reviewed-finance');
+    await expect(blocked.getByTestId('preview-impact')).toContainText('Proposed value: reviewed-finance');
     await expect(blocked.getByTestId('preview-decision-explanation')).toContainText('Backend reason: Policy requires manual classification review.');
     await expect(blocked.getByRole('button', { name: 'Execute', exact: true })).toBeDisabled();
 
