@@ -38,18 +38,34 @@ function formatEventTime(value?: string | null) {
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
 }
 
+function isFilesystemAction(execution: ActionExecution) {
+  return execution.action_type === 'move' || execution.action_type === 'rename';
+}
+
 function executionOutcome(execution: ActionExecution) {
   if (execution.status === 'executed') {
     return {
       label: 'Executed successfully',
-      recovery: 'Undo available · explicit approval required.',
+      recovery: isFilesystemAction(execution)
+        ? 'Undo available · explicit approval required.'
+        : 'Undo action available · explicit approval required; recovery effect follows existing action semantics.',
+      undoTimeLabel: 'Undo recorded',
     };
   }
 
   if (execution.status === 'undone') {
+    if (isFilesystemAction(execution)) {
+      return {
+        label: 'Restored by undo',
+        recovery: 'Restored',
+        undoTimeLabel: 'Restored',
+      };
+    }
+
     return {
-      label: 'Restored by undo',
-      recovery: 'Restored',
+      label: 'Undo recorded',
+      recovery: 'Undo completed; persisted status is undone.',
+      undoTimeLabel: 'Undo recorded',
     };
   }
 
@@ -57,12 +73,14 @@ function executionOutcome(execution: ActionExecution) {
     return {
       label: 'Execution failed',
       recovery: 'Undo unavailable after failed execution.',
+      undoTimeLabel: 'Undo recorded',
     };
   }
 
   return {
     label: 'Execution outcome recorded',
     recovery: 'Undo availability follows the persisted execution status.',
+    undoTimeLabel: 'Undo recorded',
   };
 }
 
@@ -164,7 +182,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
                   <strong>{outcome.label}</strong>
                   <small className="muted" style={{ display: 'block' }}>Persisted status: {execution.status}</small>
                   <small className="muted" style={{ display: 'block' }}>Executed: {formatEventTime(execution.executed_at)}</small>
-                  {execution.undone_at ? <small className="muted" style={{ display: 'block' }}>Restored: {formatEventTime(execution.undone_at)}</small> : null}
+                  {execution.undone_at ? <small className="muted" style={{ display: 'block' }}>{outcome.undoTimeLabel}: {formatEventTime(execution.undone_at)}</small> : null}
                   {execution.error_message ? <small className="error" style={{ display: 'block' }}>Failure: {execution.error_message}</small> : null}
                 </td>
                 <td>
