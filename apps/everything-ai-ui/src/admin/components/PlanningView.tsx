@@ -45,6 +45,10 @@ function isFilesystemAction(suggestion: Pick<Suggestion, 'action_type'>) {
   return FILESYSTEM_ACTIONS.has(suggestion.action_type);
 }
 
+function isPreviewFilesystemAction(preview: PreviewRecord) {
+  return FILESYSTEM_ACTIONS.has(preview.action_type);
+}
+
 function isSameFileMutation(a: Suggestion, b: Suggestion) {
   return a.file_id === b.file_id && isFilesystemAction(a) && isFilesystemAction(b);
 }
@@ -134,6 +138,10 @@ function actionContext(suggestion: Suggestion) {
   return `${suggestion.action_type} → ${suggestion.suggested_value}`;
 }
 
+function previewDecisionLabel(preview: PreviewRecord) {
+  return preview.preview_status === 'ready' ? 'Ready for approval' : 'Blocked by backend validation';
+}
+
 export function PlanningView({
   files,
   suggestions,
@@ -165,6 +173,8 @@ export function PlanningView({
   )).length;
   const filesById = new Map(files.map((file) => [file.id, file]));
   const groups = buildSuggestionGroups(suggestions, filesById);
+  const readyPreviewCount = previews.filter((preview) => preview.preview_status === 'ready').length;
+  const blockedPreviewCount = previews.length - readyPreviewCount;
 
   function toggleSuggestion(id: string) {
     const suggestion = suggestions.find((item) => item.id === id);
@@ -252,7 +262,7 @@ export function PlanningView({
         <p>Average confidence: <b>{averageConfidence(suggestions)}</b></p>
         <p>Selected actions: <b>{selectedSuggestionIds.size}</b></p>
         <p>Dry-run previews: <b>{previews.length}</b></p>
-        <p>Executable previews: <b>{previews.filter((preview) => preview.preview_status === 'ready').length}</b></p>
+        <p>Executable previews: <b>{readyPreviewCount}</b></p>
         <p className="muted">Safety: group selection changes checkboxes only. It cannot execute or bypass backend policy. Only one move/rename action can be selected per file.</p>
       </div>
 
@@ -344,26 +354,46 @@ export function PlanningView({
         </div>
       </div>
 
-      <div className="panel wide">
-        <h3>Dry Run / Execution Queue</h3>
-        {!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}
-        {previews.map((preview) => <div
-          className="suggestion-line"
-          key={preview.id}
-          data-testid={`preview-${preview.id}`}
-          data-preview-status={preview.preview_status}
-        >
+      <div className="panel wide" data-testid="planning-preview-queue">
+        <div className="planning-section-header">
           <div>
-            <b>{preview.action_type}</b>
-            {preview.source_path && <p className="muted">Source: {preview.source_path}</p>}
-            <p className="muted">Target: {preview.target_path || preview.suggested_value}</p>
-            <p className="muted">
-              {preview.preview_status === 'ready' ? 'Ready to execute' : `Blocked: ${preview.blocked_reason}`}
-            </p>
+            <h3>Dry Run / Execution Queue</h3>
+            <p className="muted">Dry run validates a proposal only. It never executes a file action. A ready preview still requires a separate explicit execution approval.</p>
           </div>
-          <span className={preview.preview_status === 'ready' ? 'chip green' : 'chip orange'}>{preview.preview_status}</span>
-          <button disabled={preview.preview_status !== 'ready'} onClick={() => executePreview(preview)}>Execute</button>
-        </div>)}
+        </div>
+        {previews.length > 0 && <div className="planning-preview-summary" data-testid="planning-preview-summary">
+          <p><span className="chip green">Ready for approval</span> <b>{readyPreviewCount}</b> preview(s) passed backend validation.</p>
+          <p><span className="chip orange">Blocked</span> <b>{blockedPreviewCount}</b> preview(s) cannot execute in their current backend-validated state.</p>
+          <p className="muted">Review filesystem source → target impact, metadata proposed values, and any backend block reason below before approving execution.</p>
+        </div>}
+        {!previews.length && <p className="muted">Run Dry Run Preview to validate selected actions before execution.</p>}
+        {previews.map((preview) => {
+          const isReady = preview.preview_status === 'ready';
+          const filesystemAction = isPreviewFilesystemAction(preview);
+          return <div
+            className="suggestion-line planning-preview-row"
+            key={preview.id}
+            data-testid={`preview-${preview.id}`}
+            data-preview-status={preview.preview_status}
+            data-preview-decision={isReady ? 'ready-for-approval' : 'blocked'}
+          >
+            <div>
+              <p><span className={isReady ? 'chip green' : 'chip orange'}>{previewDecisionLabel(preview)}</span></p>
+              <p><b>{preview.action_type}</b></p>
+              {filesystemAction
+                ? <div data-testid="preview-impact">
+                    <p><b>Source:</b> {preview.source_path || 'Source path not provided'}</p>
+                    <p><b>Target:</b> {preview.target_path || 'Target path not provided'}</p>
+                  </div>
+                : <p data-testid="preview-impact"><b>Proposed value:</b> {preview.suggested_value || 'Not provided'}</p>}
+              {isReady
+                ? <p className="muted" data-testid="preview-decision-explanation">Dry run passed backend validation. Execution remains a separate explicit approval.</p>
+                : <p className="muted" data-testid="preview-decision-explanation"><b>Backend reason:</b> {preview.blocked_reason || 'Backend did not provide a blocked reason.'}</p>}
+            </div>
+            <span className={isReady ? 'chip green' : 'chip orange'}>{preview.preview_status}</span>
+            <button disabled={!isReady} onClick={() => executePreview(preview)}>Execute</button>
+          </div>;
+        })}
       </div>
     </div>
   </section>;
