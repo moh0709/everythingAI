@@ -100,6 +100,7 @@ export function WikiView({
     return map;
   }, [selectedWikiPage]);
 
+  const availablePageIds = useMemo(() => (wiki?.pages || []).map((page) => page.id), [wiki]);
   const activeCitationRef = previewSource && activeChunkRef
     ? `${previewSource.ref}:${activeChunkRef}`
     : activeSourceRef;
@@ -160,7 +161,11 @@ export function WikiView({
       </div>
     </section>
 
-    <WikiRebuildPanel options={options} />
+    <WikiRebuildPanel
+      options={options}
+      availablePageIds={availablePageIds}
+      onOpenWikiPage={openWikiPage}
+    />
 
     <section className="wiki-layout">
       <aside className="wiki-sidebar panel">

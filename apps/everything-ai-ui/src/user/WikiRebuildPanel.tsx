@@ -21,9 +21,11 @@ function formatTimestamp(value?: string) {
 
 type WikiRebuildPanelProps = {
   options: ApiOptions;
+  availablePageIds?: readonly string[];
+  onOpenWikiPage?: (pageId: string) => void;
 };
 
-export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
+export function WikiRebuildPanel({ options, availablePageIds = [], onOpenWikiPage }: WikiRebuildPanelProps) {
   const [jobs, setJobs] = useState<WikiJob[]>([]);
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
@@ -185,7 +187,11 @@ export function WikiRebuildPanel({ options }: WikiRebuildPanelProps) {
         </div>
       </div>
 
-      <WikiDiagnosticsPanel options={options} />
+      <WikiDiagnosticsPanel
+        options={options}
+        availablePageIds={availablePageIds}
+        onOpenWikiPage={onOpenWikiPage}
+      />
 
       {loading ? (
         <div className="wiki-rebuild-loading">Loading rebuild jobs…</div>
