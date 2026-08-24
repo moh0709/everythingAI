@@ -74,7 +74,8 @@ test('source inspection browses genuine chunks without changing the pinned citat
   await page.getByRole('button', { name: 'Inspect citation [S1:C2]' }).click();
 
   const drawer = page.getByLabel('Source preview drawer');
-  const pinnedCitation = drawer.locator('.wiki-source-preview-focus-pill');
+  const citationFocus = drawer.getByLabel('Source citation focus');
+  const pinnedCitation = citationFocus.locator('.wiki-source-preview-focus-pill');
   await expect(drawer).toBeVisible();
   await expect(pinnedCitation).toHaveText('[S1:C2]');
 
