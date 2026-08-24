@@ -85,7 +85,7 @@ function citationInspectorCopy(sourceRef?: string | null, chunkRef?: string | nu
 
 function evidenceCoverageExplanation(page: WikiPage) {
   if (page.citation_coverage_score == null) {
-    return 'Citation coverage is not available for this saved page. Inspect the listed file sources directly before relying on unsupported statements.';
+    return 'Citation coverage is not available for this saved page. Inspect the listed evidence directly before relying on unsupported statements.';
   }
 
   const percent = Math.round(page.citation_coverage_score * 100);
