@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-24  
-Authority: current accepted repository state after Phase 2 dispatch and Product Depth milestones  
-Current release-control issue: #142
+Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth milestones  
+Current governance issue: #148
 
 ## Current program stage
 
@@ -10,13 +10,12 @@ Current release-control issue: #142
 
 Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
 
-The bounded **Product Depth — Trustworthy Search Experience** milestone chain is implemented and individually accepted:
+The bounded **Product Depth — Trustworthy Search Experience** release is also accepted as **`PRODUCT_DEPTH_PASS`** through merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, after final unchanged-head CI #535 and independent diff review.
 
-- #136 — explainable unified Sources & Files ranking — merge `10eb14b5501499e90e5281390f9cfed99edc8315`;
-- #138 — contextual search snippets and result inspection — merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`;
-- #140 — trustworthy Knowledge Base search navigation — merge `680763ca86e35d748ce37b115f1be7601d011422`, accepted after CI #529.
+Accepted Product Depth continuation milestones after that release:
 
-Issue #142 records the combined release decision **`PRODUCT_DEPTH_PASS`**. Pre-decision CI #531 passed the complete inherited matrix on head `cd47fcb286f893ac8cdf170da7f3da228fe238f6`. This release-control decision is accepted into canonical `main` only if its exact final PR head independently passes the same matrix, final diff review has no unresolved Critical or Important findings, and the PR merges.
+- #144 — richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e`, accepted after CI #539;
+- #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, accepted after final PR-head CI #541 and independent diff review.
 
 Authoritative release evidence:
 
@@ -44,8 +43,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth search milestones #136/#138/#140 individually accepted | Merge #142 only after final unchanged-head CI/review, then select next bounded product outcome |
-| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, grouped planning, approval/action/audit/undo accepted | Preserve evidence provenance and mutation safety |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth trustworthy-search release plus #144/#146 accepted | Complete #148 canonical synchronization, then release the next bounded Product Depth outcome |
+| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, source inspection, actionable trust diagnostics, grouped planning, approval/action/audit/undo accepted | Preserve evidence provenance, read-only diagnostics, and mutation safety |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve evidence, rollback, and truthful blocker handling |
@@ -64,8 +63,11 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 - #136 — explainable unified Sources & Files ranking — merge `10eb14b5501499e90e5281390f9cfed99edc8315`.
 - #138 — contextual search snippets and result inspection — merge `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`.
 - #140 — trustworthy Knowledge Base search navigation — merge `680763ca86e35d748ce37b115f1be7601d011422` after CI #529 and independent diff review.
+- #142 — Product Depth trustworthy-search release decision — merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
+- #144 — richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e` after CI #539 and independent diff review.
+- #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15` after final PR-head CI #541 and independent diff review.
 
-Product Depth preserves read-only Client search behavior, source provenance, truthful match-basis labeling, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence.
+Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence. Trust diagnostics preserve backend-computed grades, scores, validation state, and governance flags rather than recalculating them in the client.
 
 ## Mandatory inherited regression baseline
 
@@ -83,10 +85,12 @@ Subsequent product work must preserve, where applicable:
 10. Product Depth explainable unified-search acceptance;
 11. Product Depth contextual-snippet acceptance;
 12. Product Depth Knowledge Base search-navigation acceptance;
-13. disposable-folder RC acceptance;
-14. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-15. independent diff review with no unresolved Critical or Important findings;
-16. milestone-scoped rollback evidence.
+13. Product Depth source-inspection-navigation acceptance;
+14. Product Depth trust-diagnostics-navigation acceptance;
+15. disposable-folder RC acceptance;
+16. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+17. independent diff review with no unresolved Critical or Important findings;
+18. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for required validation of a new candidate.
 
@@ -106,11 +110,13 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #142 is the sole active Product Depth release-control gate. Its scope is validation, evidence, handover, and canonical synchronization only; it does not authorize a new major platform phase.
+Issue #148 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #144/#146 and does not authorize a new major platform phase.
 
 ## Current next action
 
-Run the complete inherited matrix on the exact final #142 pull-request head, independently review the final diff, merge only if green and clean, close #142, and then select the next bounded product decision gate. Do not silently begin Enterprise Platform or privileged-host implementation.
+Complete #148 with documentation diff review and merge. Then release the next bounded Product Depth outcome: **planning ergonomics focused on selection clarity, safety/conflict explanations, and reviewability**, without changing backend planning policy, approval requirements, execution rules, or mutation behavior. Preserve the full inherited regression matrix.
+
+Do not silently begin Enterprise Platform, privileged-host, or material connector/runtime implementation.
 
 ## Historical archive
 
