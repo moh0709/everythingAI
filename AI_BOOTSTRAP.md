@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-24  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search release and governed-action lifecycle release accepted  
-Current gate: issue #164 canonical synchronization and next bounded decision preparation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search, governed-action lifecycle, and knowledge evidence/freshness guidance accepted  
+Current gate: issue #168 canonical synchronization and next bounded decision preparation
 
 ## Mandatory startup sequence
 
@@ -30,6 +30,8 @@ Maintain five separately named tracks:
 Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
 
 The bounded Product Depth governed-action lifecycle release was accepted through #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`. Pre-decision CI #566 passed on `e175ff1ef78349b2644a8211d658dde88721a2d0`; final unchanged-head CI #568 passed on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`; independent final diff review found no unresolved Critical or Important findings.
+
+The bounded Product Depth knowledge evidence/freshness guidance milestone was accepted through #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`. Final unchanged-head CI Smoke #574 passed on `76699c7e30bf741b12c880d096b770ee73de98ac`; final diff review found no unresolved Critical or Important findings.
 
 The accepted governed-action lifecycle is:
 
@@ -83,6 +85,7 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth planning-selection-clarity acceptance;
 - Product Depth planning-preview-decision-clarity acceptance;
 - Product Depth execution/audit/undo outcome-clarity acceptance;
+- Product Depth knowledge-evidence/freshness-guidance acceptance;
 - disposable-folder release-candidate acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -103,6 +106,10 @@ The accepted Product Depth sequence must preserve these properties:
 - exact saved-page navigation and source provenance remain intact;
 - source inspection moves only among genuine persisted chunks and does not alter pinned citation identity;
 - trust diagnostics use exact persisted `page_id` navigation when available and do not recalculate backend trust values;
+- citation coverage and weak-source warnings are explained from persisted values only and are not recalculated in the client;
+- freshness remains explicitly unknown where no verified source-update timestamp exists;
+- source fingerprints identify persisted source sets and must not be presented as freshness timestamps or confidence;
+- refresh/rebuild guidance remains explicit and user-controlled, with no automatic rebuild triggered by explanatory UI;
 - planning-selection UI may explain included, unselected, blocked, and conflicting suggestions, but must not weaken backend policy, approval requirements, confidence enforcement, or the global one-filesystem-mutation-per-file guard;
 - planning-preview UI may explain ready and blocked previews, backend-provided reasons, source/target impact, and the dry-run/approval boundary, but must preserve existing preview and execution semantics;
 - execution/audit/undo UI may clarify existing persisted outcome facts, but must not imply filesystem restoration solely from an `undone` persisted state or change execution, audit, mutation, or undo semantics.
@@ -121,9 +128,9 @@ Issue #69 is closed completed historical evidence. Read it when relevant, but do
 
 ## Current task
 
-Issue #164 is the sole active Product Depth governance task. Synchronize canonical state after accepted #162, finalize its post-merge handover facts, and prepare the next bounded decision gate without changing runtime behavior.
+Issue #168 is the sole active Product Depth governance task. Synchronize canonical state after accepted #166 / PR #167, preserve its validation and rollback evidence, and prepare the next bounded decision gate without changing runtime behavior.
 
-After #164 acceptance, select only from bounded, reversible work inside the accepted local-first Product Depth direction unless the CEO explicitly authorizes a material expansion. The current bounded options are documented in `docs/PRODUCT_DEPTH_NEXT_DECISION_GATE_2026-08-24.md`.
+After #168 acceptance, the candidate next bounded direction is **Search refinement and filtering UX** using existing metadata and ranking outputs only. It must remain read-only, must not change semantic-model/provider architecture, and must not present ranking signals as calibrated confidence.
 
 ## Evidence authority
 
@@ -148,6 +155,13 @@ Accepted Product Depth governed-action lifecycle release evidence:
 - pre-decision CI #566 on `e175ff1ef78349b2644a8211d658dde88721a2d0`
 - final unchanged-head CI #568 on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`
 - independent final diff review with no unresolved Critical or Important findings
+
+Accepted Product Depth knowledge evidence/freshness milestone evidence:
+
+- #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`
+- final unchanged-head CI Smoke #574 on `76699c7e30bf741b12c880d096b770ee73de98ac`
+- final diff review with no unresolved Critical or Important findings
+- milestone-scoped rollback by reverting only the #166 merge
 
 Historical pre-reconciliation bootstrap is preserved exactly at:
 
