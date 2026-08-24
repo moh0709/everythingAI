@@ -126,8 +126,18 @@ test('search refinements reset when query context or base file context changes',
   await expect(rows).toHaveCount(2);
 
   await page.getByLabel('Filter search results by file type').selectOption('pdf');
+  await page.getByLabel('Filter search results by match basis').selectOption('keyword + semantic');
   await expect(rows).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'File type: .pdf ×' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Match basis: keyword + semantic ×' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Clear all filters' }).click();
+  await expect(rows).toHaveCount(2);
+  await expect(page.getByRole('button', { name: 'File type: .pdf ×' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Match basis: keyword + semantic ×' })).toHaveCount(0);
+
+  await page.getByLabel('Filter search results by file type').selectOption('pdf');
+  await expect(rows).toHaveCount(1);
 
   await searchInput.fill('second context');
   await page.getByRole('button', { name: 'Search Files' }).click();
