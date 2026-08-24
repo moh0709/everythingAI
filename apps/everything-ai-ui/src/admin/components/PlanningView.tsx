@@ -381,7 +381,10 @@ export function PlanningView({
               <p><span className={isReady ? 'chip green' : 'chip orange'}>{previewDecisionLabel(preview)}</span></p>
               <p><b>{preview.action_type}</b></p>
               {filesystemAction
-                ? <p data-testid="preview-impact"><b>Filesystem impact:</b> {preview.source_path || 'Source path not provided'} → {preview.target_path || 'Target path not provided'}</p>
+                ? <div data-testid="preview-impact">
+                    <p><b>Source:</b> {preview.source_path || 'Source path not provided'}</p>
+                    <p><b>Target:</b> {preview.target_path || 'Target path not provided'}</p>
+                  </div>
                 : <p data-testid="preview-impact"><b>Proposed value:</b> {preview.suggested_value || 'Not provided'}</p>}
               {isReady
                 ? <p className="muted" data-testid="preview-decision-explanation">Dry run passed backend validation. Execution remains a separate explicit approval.</p>
