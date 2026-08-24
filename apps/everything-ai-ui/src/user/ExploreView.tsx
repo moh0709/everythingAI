@@ -27,6 +27,11 @@ type SearchAwareIndexedFile = IndexedFile & {
   snippet?: string | null;
 };
 
+type LifecycleRefinement = {
+  state: string;
+  label: string;
+};
+
 type ExploreViewProps = {
   error: string;
   busy: boolean;
@@ -87,6 +92,13 @@ function normalizedExtension(file: IndexedFile) {
   return (file.extension || '').trim().toLowerCase();
 }
 
+function lifecycleRefinementFor(file: IndexedFile): LifecycleRefinement | null {
+  const hasLifecycleData = Boolean(file.index_status || file.extraction_status);
+  if (!hasLifecycleData && searchMatchFor(file)) return null;
+  const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
+  return { state: lifecycle.state, label: lifecycle.label };
+}
+
 export function ExploreView({
   error, busy, status, baseUrl, setBaseUrl, token, setToken,
   query, setQuery, files, selectedFile, documentContext,
@@ -94,6 +106,7 @@ export function ExploreView({
 }: ExploreViewProps) {
   const [extensionFilter, setExtensionFilter] = useState<string>('');
   const [basisFilter, setBasisFilter] = useState<SearchMatchDetails['basis'] | ''>('');
+  const [lifecycleFilter, setLifecycleFilter] = useState<string>('');
   const summary = summarizeFiles(files);
   const progressSummary = withInFlightSummary(summarizeFileProgress(files));
   const selectedRecord = (documentContext?.file || selectedFile) as FileProgressRecord | undefined;
@@ -106,18 +119,29 @@ export function ExploreView({
   const availableBases = useMemo(() => Array.from(new Set(
     files.map((file) => searchMatchFor(file)?.basis).filter((basis): basis is SearchMatchDetails['basis'] => Boolean(basis)),
   )), [files]);
+  const availableLifecycles = useMemo(() => {
+    const lifecycleByState = new Map<string, string>();
+    for (const file of files) {
+      const lifecycle = lifecycleRefinementFor(file);
+      if (lifecycle) lifecycleByState.set(lifecycle.state, lifecycle.label);
+    }
+    return Array.from(lifecycleByState, ([state, label]) => ({ state, label }));
+  }, [files]);
 
   const visibleFiles = useMemo(() => files.filter((file) => {
     if (extensionFilter && normalizedExtension(file) !== extensionFilter) return false;
     if (basisFilter && searchMatchFor(file)?.basis !== basisFilter) return false;
+    if (lifecycleFilter && lifecycleRefinementFor(file)?.state !== lifecycleFilter) return false;
     return true;
-  }), [files, extensionFilter, basisFilter]);
+  }), [files, extensionFilter, basisFilter, lifecycleFilter]);
 
-  const hasActiveFilters = Boolean(extensionFilter || basisFilter);
+  const hasActiveFilters = Boolean(extensionFilter || basisFilter || lifecycleFilter);
+  const lifecycleFilterLabel = availableLifecycles.find((lifecycle) => lifecycle.state === lifecycleFilter)?.label || lifecycleFilter;
 
   function clearFilters() {
     setExtensionFilter('');
     setBasisFilter('');
+    setLifecycleFilter('');
   }
 
   function searchWithFreshRefinements() {
@@ -219,11 +243,20 @@ export function ExploreView({
             </select>
           </div>
           <div>
+            <strong>Lifecycle status</strong>
+            <p>Filter by the processing state already derived from each result's persisted indexing and extraction facts.</p>
+            <select aria-label="Filter search results by lifecycle status" value={lifecycleFilter} onChange={(event) => setLifecycleFilter(event.target.value)}>
+              <option value="">All lifecycle states</option>
+              {availableLifecycles.map((lifecycle) => <option key={lifecycle.state} value={lifecycle.state}>{lifecycle.label}</option>)}
+            </select>
+          </div>
+          <div>
             <strong>Active refinement</strong>
             <p>{hasActiveFilters ? 'Filters narrow the current query only. Original result order and match explanations are unchanged.' : 'No filters are active. The full current-query result set is visible.'}</p>
             <div className="source-actions" aria-label="Active search filters">
               {extensionFilter ? <button className="outline" onClick={() => setExtensionFilter('')}>File type: .{extensionFilter} ×</button> : null}
               {basisFilter ? <button className="outline" onClick={() => setBasisFilter('')}>Match basis: {basisFilter} ×</button> : null}
+              {lifecycleFilter ? <button className="outline" onClick={() => setLifecycleFilter('')}>Lifecycle: {lifecycleFilterLabel} ×</button> : null}
               {hasActiveFilters ? <button className="outline" onClick={clearFilters}>Clear all filters</button> : null}
             </div>
           </div>
