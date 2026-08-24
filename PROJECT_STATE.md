@@ -2,7 +2,7 @@
 
 Date: 2026-08-24  
 Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth milestones  
-Current governance issue: #148
+Current governance issue: #152
 
 ## Current program stage
 
@@ -10,12 +10,14 @@ Current governance issue: #148
 
 Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
 
-The bounded **Product Depth — Trustworthy Search Experience** release is also accepted as **`PRODUCT_DEPTH_PASS`** through merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, after final unchanged-head CI #535 and independent diff review.
+The bounded **Product Depth — Trustworthy Search Experience** release is accepted as **`PRODUCT_DEPTH_PASS`** through merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, after final unchanged-head CI #535 and independent diff review.
 
 Accepted Product Depth continuation milestones after that release:
 
 - #144 — richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e`, accepted after CI #539;
-- #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, accepted after final PR-head CI #541 and independent diff review.
+- #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15`, accepted after final PR-head CI #541 and independent diff review;
+- #148 — canonical synchronization — merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, accepted after CI #543 and independent documentation diff review;
+- #150 — planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, accepted after CI #546 and independent diff review.
 
 Authoritative release evidence:
 
@@ -43,8 +45,8 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth trustworthy-search release plus #144/#146 accepted | Complete #148 canonical synchronization, then release the next bounded Product Depth outcome |
-| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, source inspection, actionable trust diagnostics, grouped planning, approval/action/audit/undo accepted | Preserve evidence provenance, read-only diagnostics, and mutation safety |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth trustworthy-search release plus #144/#146/#150 accepted | Complete #152 canonical synchronization, then release the bounded dry-run/preview decision-clarity milestone |
+| Knowledge and Safe Action | Source provenance, trustworthy search evidence, document rendering, source inspection, actionable trust diagnostics, grouped planning, planning-selection clarity, approval/action/audit/undo accepted | Preserve evidence provenance, read-only diagnostics, and mutation safety while improving preview reviewability |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work is a separate operational track | Explicit selection and required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve evidence, rollback, and truthful blocker handling |
@@ -66,8 +68,10 @@ Conflicts are resolved conservatively. Implementation completion alone is never 
 - #142 — Product Depth trustworthy-search release decision — merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
 - #144 — richer source inspection navigation — merge `9c707581c1c8d068724925854008309ab7cc251e` after CI #539 and independent diff review.
 - #146 — actionable trust diagnostics navigation — merge `453b7d009060db44918f6c4d5346d197323cdf15` after final PR-head CI #541 and independent diff review.
+- #148 — canonical synchronization — merge `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b` after CI #543 and independent documentation diff review.
+- #150 — planning selection clarity and conflict explanations — merge `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5` after CI #546 and independent diff review.
 
-Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence. Trust diagnostics preserve backend-computed grades, scores, validation state, and governance flags rather than recalculating them in the client.
+Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Literal highlighting uses Unicode letter/number term boundaries so substring coincidences are not visually asserted as exact evidence. Trust diagnostics preserve backend-computed grades, scores, validation state, and governance flags rather than recalculating them in the client. Planning-selection UX now distinguishes included, unselected, and safety-conflicting actions using existing backend facts while preserving the global one-filesystem-mutation-per-file guard and unchanged planning policy.
 
 ## Mandatory inherited regression baseline
 
@@ -87,10 +91,11 @@ Subsequent product work must preserve, where applicable:
 12. Product Depth Knowledge Base search-navigation acceptance;
 13. Product Depth source-inspection-navigation acceptance;
 14. Product Depth trust-diagnostics-navigation acceptance;
-15. disposable-folder RC acceptance;
-16. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-17. independent diff review with no unresolved Critical or Important findings;
-18. milestone-scoped rollback evidence.
+15. Product Depth planning-selection-clarity acceptance;
+16. disposable-folder RC acceptance;
+17. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+18. independent diff review with no unresolved Critical or Important findings;
+19. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for required validation of a new candidate.
 
@@ -110,11 +115,13 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #148 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #144/#146 and does not authorize a new major platform phase.
+Issue #152 is the sole active Product Depth governance task. It synchronizes canonical current-state documents after accepted #150 and does not authorize new platform architecture.
 
 ## Current next action
 
-Complete #148 with documentation diff review and merge. Then release the next bounded Product Depth outcome: **planning ergonomics focused on selection clarity, safety/conflict explanations, and reviewability**, without changing backend planning policy, approval requirements, execution rules, or mutation behavior. Preserve the full inherited regression matrix.
+Complete #152 with documentation diff review, inherited regression validation, and merge. Then release the next bounded Product Depth outcome: **planning dry-run/preview decision clarity**, focused on making preview readiness, blocked reasons, source/target impact, and the approval boundary easier to review using existing backend preview facts only.
+
+The next implementation must not change backend planning policy, confidence enforcement, execution permissions, approval semantics, audit, undo/recovery, authentication, tenancy, cloud/database/storage, privileged-host, or material connector/runtime behavior.
 
 Do not silently begin Enterprise Platform, privileged-host, or material connector/runtime implementation.
 
