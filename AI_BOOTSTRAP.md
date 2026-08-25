@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); bounded Product Depth milestones accepted through #190 recovery outcome interpretation/safe next-step guidance  
-Current gate: issue #192 canonical synchronization and next bounded decision preparation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); bounded Product Depth milestones accepted through #194 recovery-evidence scope alignment/context clarity  
+Current gate: issue #196 canonical synchronization and comprehension-tranche release preparation
 
 ## Mandatory startup sequence
 
@@ -28,8 +28,8 @@ If a source lookup fails, exhaust repository/file fallbacks before declaring a b
 - Lifecycle-status refinement/processing-state clarity: #178 / PR #179 merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, CI #595.
 - Selected-source lifecycle next-step clarity: #182 / PR #183 merge `2c4b5596230b498a8fa20977bdf1790b13ff4955`, CI #600.
 - Source-root recovery context/safe guidance: #186 / PR #187 merge `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, CI #604.
-- Canonical synchronization: #188 / PR #189 merge `037a38f362b5619aa2706e16b22e7f91a7f59cd6`, CI #606.
-- Recovery outcome interpretation/safe next-step guidance: #190 / PR #191 merge `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, unchanged head `e8a6e705cde81bf804cdaa45e5572860ee784eaa`, CI Smoke #611, final PM diff review clean.
+- Recovery outcome interpretation/safe next-step guidance: #190 / PR #191 merge `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, CI #611.
+- Recovery evidence scope alignment/context clarity: #194 / PR #195 merge `a869b305457d8fc18bd3b9265990e9d0065d2c6b`, unchanged head `fd8c23d963fb0576ee047349da4e33052da89c95`, CI Smoke #618, final PM diff review clean.
 
 ## Program tracks
 
@@ -73,7 +73,7 @@ Rules:
 
 ## Mandatory inherited product regression baseline
 
-For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates:
+For subsequent product/release work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth gates:
 
 - root regression;
 - backend tests;
@@ -85,7 +85,7 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - grouped-planning/bulk-selection acceptance;
 - API-key lifecycle acceptance;
 - explainable unified-search acceptance;
-- contextual-snippet acceptance;
+- contextual-search-snippet acceptance;
 - Knowledge Base search-navigation acceptance;
 - source-inspection-navigation acceptance;
 - trust-diagnostics-navigation acceptance;
@@ -97,11 +97,11 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - search-refinement lifecycle/query-context acceptance;
 - lifecycle-status refinement/processing-state acceptance;
 - selected-source lifecycle guidance acceptance;
-- source-root recovery-context acceptance from #186;
-- recovery-outcome guidance acceptance from #190;
+- source-root recovery-context acceptance;
+- recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence scenarios;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
-- independent diff review with no unresolved Critical or Important findings;
+- independent final review with no unresolved Critical or Important findings;
 - milestone-scoped rollback evidence.
 
 Historical green evidence never substitutes for validating a new candidate. CI wiring for accepted focused gates is part of the baseline.
@@ -120,7 +120,10 @@ Current Product Depth work may improve existing local-first Client comprehension
 - recovery-context inspection as read-only until the user explicitly invokes an existing control;
 - persisted `indexed`, `skipped`, and `failed` scan outcomes remain semantically distinct;
 - watcher state is monitoring evidence only, never recovery/extraction/Knowledge Base success;
-- evidence must remain scoped to the root path it actually records;
+- configured recovery-root identity comes only from Folder Path;
+- scan/watcher root identities remain evidence-only and are applicable to the configured root only on exact match;
+- if no Folder Path is configured, configured-root identity remains unknown even when persisted evidence exists;
+- mismatched persisted evidence may remain visible only when explicitly scoped to its recorded root;
 - no per-file retry;
 - governed planning, approval, audit, undo, and filesystem safety boundaries.
 
@@ -132,12 +135,12 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Current gate
 
-Issue #192 is the sole active Product Depth governance task. It synchronizes accepted #190 evidence and must pass the full inherited matrix on one unchanged documentation candidate plus final documentation diff review before merge.
+Issue #196 is the sole active Product Depth governance task. It synchronizes accepted #194 evidence and prepares the bounded **Evidence, Search, Lifecycle & Recovery Comprehension** release/dispatch gate.
 
-If #192 is accepted, the recommended next bounded milestone is **Recovery Evidence Scope Alignment & Context Clarity**, defined in `docs/PRODUCT_DEPTH_RECOVERY_EVIDENCE_SCOPE_ALIGNMENT_DECISION_GATE_2026-08-25.md`.
+The release gate is defined in `docs/PRODUCT_DEPTH_EVIDENCE_LIFECYCLE_RECOVERY_RELEASE_GATE_2026-08-25.md`. After #196 is accepted, the next action is one unchanged-candidate release validation against the complete inherited matrix. No another product feature is authorized by synchronization alone.
 
-That recommendation is frontend/read-only and may compare only already available persisted root identities: configured recovery root, `scanReport.rootPath`, and watcher `rootPath`. When evidence is for a different root, the UI may explain the mismatch but must not reinterpret those counts/statuses as evidence for the active root. It must not infer freshness, health, progress, success, root cause, repair completion, or retry state; automatically scan/extract/rebuild/recover; redesign backend lifecycle/recovery; alter planning/mutation behavior; or expand Enterprise Platform/privileged-host scope.
+A release decision may state PASS only if the complete matrix is green on one unchanged candidate and final independent review has no unresolved Critical or Important findings. The allowed release outcomes are `PRODUCT_DEPTH_COMPREHENSION_PASS`, `PRODUCT_DEPTH_COMPREHENSION_BLOCKED`, or `PRODUCT_DEPTH_COMPREHENSION_REJECTED`.
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #192 is documentation-only and can be reverted independently from product/runtime code.
+Every accepted milestone remains independently reversible by its recorded merge. #196 is documentation-only and can be reverted independently from product/runtime code.

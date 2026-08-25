@@ -4,7 +4,8 @@ Date: 2026-08-25
 Current product state: **Phase 2 complete and dispatched (`PHASE2_PASS`)**  
 Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`  
 Accepted Product Depth trustworthy-search release: `PRODUCT_DEPTH_PASS` / merge `d8fad2df21454aa7dce0101abe208fd24b91a883`  
-Accepted Product Depth governed-action lifecycle release: `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS` / merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`
+Accepted Product Depth governed-action lifecycle release: `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS` / merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`  
+Latest accepted bounded Product Depth milestone: **#194 / PR #195** merge `a869b305457d8fc18bd3b9265990e9d0065d2c6b`, unchanged-head CI #618 on `fd8c23d963fb0576ee047349da4e33052da89c95`
 
 ## Completed product sequence
 
@@ -29,51 +30,33 @@ Release evidence:
 
 Accepted and dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
 
-1. #136 explainable unified Sources & Files ranking — `10eb14b5501499e90e5281390f9cfed99edc8315`.
-2. #138 contextual search snippets and result inspection — `e1ba126ea2f5017f21d7e551158bc80f9cf2328c`.
-3. #140 trustworthy Knowledge Base search navigation — `680763ca86e35d748ce37b115f1be7601d011422`.
-4. #142 `PRODUCT_DEPTH_PASS` release decision — `d8fad2df21454aa7dce0101abe208fd24b91a883`.
-
 ### Product Depth — Governed-Action Lifecycle
 
-Accepted as `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS` through #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`.
-
-5. #144 richer source inspection navigation — `9c707581c1c8d068724925854008309ab7cc251e`, CI #539.
-6. #146 actionable trust diagnostics navigation — `453b7d009060db44918f6c4d5346d197323cdf15`, CI #541.
-7. #148 canonical synchronization — `f496cf86e733501bc4bb0a5a90af4a1ec3e8678b`, CI #543.
-8. #150 planning selection clarity/conflict explanations — `6bdb96f08cab2f1597528223d2f19a2ee1d0f3f5`, CI #546.
-9. #152 canonical synchronization — `2f8d2bf0700d3d07e97e38e1f51bffb806886dbd`, CI #548.
-10. #154 planning dry-run/preview decision clarity — `943aff2e9807894142581c4f6872b76188e26d5f`, CI #555.
-11. #156 canonical synchronization — `d8152d2307b63917e5580d01690119b24c88ccf0`, CI #557.
-12. #158 execution/audit/undo outcome clarity — `b75e236960ec5f0e562bfbfb06f1954d47efafe2`, CI #562.
-13. #160 canonical synchronization — `d62724bf649edf77e784e32df8a76366a10f1968`, CI #564.
-14. #162 governed-action lifecycle release — `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final CI #568.
+Accepted as `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS` through #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` after final CI #568.
 
 ### Product Depth — Evidence, Search, Lifecycle & Recovery Comprehension
 
-15. #164 canonical synchronization — `5a88a7df42d15deb747baaf30974040c4a977cdd`, CI #570.
-16. #166 knowledge evidence quality/safe freshness guidance — `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`, CI #574.
-17. #168 canonical synchronization — `26fcc0fc68bcf7f784241b5c45d52835b5b0d0c4`, CI #576.
-18. #170 read-only search refinement/filtering UX — `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, CI #579.
-19. #172 canonical synchronization — `3b750a1467a0ba01bd30ef3dbd18b38f969099af`, CI #581.
-20. #174 search refinement lifecycle/query-context clarity — `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, CI #584.
-21. #176 canonical synchronization — `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e`, CI #590.
-22. #178 lifecycle-status refinement/processing-state clarity — `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, CI #595.
-23. #180 canonical synchronization — `ff85d2fe90eb5f2903ea8c986e759e2bfcc3101d`, CI #597.
-24. #182 selected-source lifecycle next-step clarity — `2c4b5596230b498a8fa20977bdf1790b13ff4955`, CI #600.
-25. #184 canonical synchronization — `980b47937dd6601533776ef12478b6904faf4e0f`, CI #602.
-26. #186 source-root recovery context/safe guidance — `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, CI #604.
-27. #188 canonical synchronization — `037a38f362b5619aa2706e16b22e7f91a7f59cd6`, CI #606.
-28. #190 recovery outcome interpretation/safe next-step guidance — `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, final unchanged head `e8a6e705cde81bf804cdaa45e5572860ee784eaa`, CI #611.
+Accepted implementation milestones in this bounded tranche:
 
-The accepted continuation remains read-only unless a user explicitly invokes an existing control. Search refinement preserves backend order and query-context boundaries. Lifecycle guidance derives only from persisted facts. Recovery context is source-root scoped; persisted `indexed`, `skipped`, and `failed` scan outcomes remain distinct; watcher state is monitoring evidence only; missing state remains unknown; and opening recovery guidance does not trigger scan, extraction, rebuild, watcher changes, retry, or file mutation.
+1. #166 knowledge evidence quality/safe freshness guidance — `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`, CI #574.
+2. #170 read-only search refinement/filtering UX — `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, CI #579.
+3. #174 search refinement lifecycle/query-context clarity — `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, CI #584.
+4. #178 lifecycle-status refinement/processing-state clarity — `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, CI #595.
+5. #182 selected-source lifecycle next-step clarity — `2c4b5596230b498a8fa20977bdf1790b13ff4955`, CI #600.
+6. #186 source-root recovery context/safe guidance — `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, CI #604.
+7. #190 recovery outcome interpretation/safe next-step guidance — `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, CI #611.
+8. #194 recovery evidence scope alignment/context clarity — `a869b305457d8fc18bd3b9265990e9d0065d2c6b`, unchanged-head CI #618 on `fd8c23d963fb0576ee047349da4e33052da89c95`.
+
+Canonical synchronization milestones between implementation milestones remain governance evidence and do not add product behavior.
+
+The accepted tranche remains read-only unless a user explicitly invokes an existing control. Search refinement preserves backend order and query-context boundaries. Lifecycle guidance derives only from persisted facts. Recovery context remains source-root scoped. Configured-root identity comes only from Folder Path; persisted scan/watcher roots are evidence identities only and apply to the configured root only on exact match. `indexed`, `skipped`, and `failed` remain distinct persisted outcomes. Watcher state is monitoring evidence only. Missing configured root or applicable evidence remains unknown. Opening recovery guidance does not trigger scan, extraction, rebuild, watcher changes, retry, recovery mutation, or file mutation.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 dispatched; bounded Product Depth accepted through recovery outcome interpretation | Complete #192; if accepted, release one recovery-evidence scope-alignment/context-clarity milestone |
-| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, recovery context/outcome interpretation, governed planning/execution/audit/undo | Clarify whether persisted scan/watcher evidence belongs to the currently configured source root without new recovery mechanics |
+| Product and UX | Strong local MVP; Phase 2 dispatched; Evidence/Search/Lifecycle/Recovery comprehension implementation accepted through #194 | Complete #196 synchronization, then run one unchanged-candidate tranche release validation |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo | Validate the completed tranche as one coherent release without inventing stronger trust/freshness/recovery claims |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before implementation expansion |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority plus privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency, inherited CI wiring, rollback, and truthful blocker discipline |
@@ -81,45 +64,47 @@ The accepted continuation remains read-only unless a user explicitly invokes an 
 ## Active dependency sequence
 
 ```text
-#190 accepted
-  -> #192 canonical synchronization + next decision package
-    -> recovery evidence scope alignment & context clarity (recommended bounded gate)
+#194 accepted
+  -> #196 canonical synchronization + comprehension-tranche release gate
+    -> one unchanged-candidate full release validation
+      -> PRODUCT_DEPTH_COMPREHENSION_PASS / BLOCKED / REJECTED
 ```
 
-Issue #192 does not itself authorize product/runtime implementation. Its decision package recommends one bounded next milestone only after #192 is accepted.
+Issue #196 does not itself authorize another product/runtime implementation milestone.
 
-## Recommended next bounded milestone
+## Current release gate
 
-**Recovery Evidence Scope Alignment & Context Clarity**
+**Evidence, Search, Lifecycle & Recovery Comprehension Release Gate**
 
-Decision package: `docs/PRODUCT_DEPTH_RECOVERY_EVIDENCE_SCOPE_ALIGNMENT_DECISION_GATE_2026-08-25.md`.
+Decision package: `docs/PRODUCT_DEPTH_EVIDENCE_LIFECYCLE_RECOVERY_RELEASE_GATE_2026-08-25.md`.
 
-Inspection of accepted `SourceRecoveryContext.tsx` shows that three genuine root identities already exist in the client: the configured recovery root, `scanReport.rootPath`, and watcher `rootPath`. The view currently renders scan evidence even when the persisted scan report belongs to a different root than the configured recovery root. That evidence is real, but its applicability can be ambiguous.
+A PASS decision requires one unchanged candidate to pass the complete inherited Phase 1 + Phase 2 + Product Depth matrix, including all accepted focused browser gates through #194, disposable-folder RC acceptance, UI-governed planning → preview → approval → execution → audit → undo acceptance, and independent final review with no unresolved Critical or Important findings.
 
-Allowed direction:
+Allowed release outcomes:
 
-- compare the configured recovery root with the persisted scan-report root and watcher root using only exact existing values;
-- clearly label evidence as aligned when it belongs to the active recovery root;
-- when the persisted scan report belongs to another root, keep it visible but explicitly say it does not describe the active recovery root;
-- keep unmatched watcher state absent/unknown rather than borrowing state from another root;
-- preserve the exact #190 semantics for indexed/skipped/failed outcomes and watcher monitoring evidence;
-- add focused browser acceptance for matching-root, mismatched-root, and missing-root/evidence scenarios;
-- preserve every inherited gate through #190.
+- `PRODUCT_DEPTH_COMPREHENSION_PASS`
+- `PRODUCT_DEPTH_COMPREHENSION_BLOCKED`
+- `PRODUCT_DEPTH_COMPREHENSION_REJECTED`
 
-Prohibited expansion:
+No PASS may be inferred from historical milestone CI alone.
 
-- path guessing, normalization rules that can change identity semantics, or cross-root merging;
-- freshness, health, progress, confidence, success, root-cause, repair-completion, or retry inference;
-- per-file retry or automatic recovery;
-- automatic scan/extraction/rebuild/watcher mutation;
-- backend lifecycle/recovery redesign;
-- search/ranking/provider changes;
-- planning/mutation/approval/audit/undo changes;
-- authentication, tenancy, cloud deployment, DB migration, object storage, privileged-host/systemd, or material connector/runtime expansion.
+## Prohibited expansion
+
+This synchronization/release gate does not authorize:
+
+- authentication or tenancy;
+- cloud deployment;
+- database migration or object storage;
+- privileged-host/systemd work;
+- material connector/runtime expansion;
+- new semantic/provider architecture;
+- automatic recovery, scan, extraction, Knowledge Base rebuild, watcher mutation, or filesystem mutation;
+- new retry semantics or per-file retry;
+- planning/mutation/approval/audit/undo redesign.
 
 ## Mandatory inherited release discipline
 
-Every new product candidate must pass the full applicable inherited matrix on one unchanged head, including accepted Product Depth browser gates through #190, disposable-folder RC acceptance, and UI-governed action/undo acceptance. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise.
+Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
 
 ## Issue #69
 
