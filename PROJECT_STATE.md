@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-25  
-Authority: current accepted repository state after Cross-Surface Context Continuity milestone #206  
-Current governance issue: #208
+Authority: current accepted repository state after Cross-Surface Context Continuity milestone #210  
+Current governance issue: #212
 
 ## Current program stage
 
@@ -10,10 +10,11 @@ Current governance issue: #208
 
 **Product Depth — Evidence, Search, Lifecycle & Recovery Comprehension is COMPLETE AND DISPATCHED (`PRODUCT_DEPTH_COMPREHENSION_PASS`).**
 
-**Cross-Surface Context Continuity milestones #202 and #206 are ACCEPTED.**
+**Cross-Surface Context Continuity milestones #202, #206, and #210 are ACCEPTED.**
 
 - #202 / PR #203 merged as `698d07aea66d00fbdf65c94eeacc1f15240fd4c2`; unchanged-head CI Smoke #629 passed on `d63cdb84c836e882d3734c6aeade98a5010043fc`; final PM review found no unresolved Critical or Important findings.
 - #206 / PR #207 merged as `21325da2ffb41899047b200d8e71877d022033b0`; focused workflow `EverythingAI Source Recovery Return Context` passed on unchanged head `deb06e7055d57cf6feeb49e97222750f838f1a10`; CI Smoke #634 passed the complete inherited matrix on the same unchanged head; final PM review found no unresolved Critical or Important findings.
+- #210 / PR #211 merged as `a4cc1fd89ea34a397d8537a8050ff68f56423d35`; unchanged PR head `968fab6f50c9a4b09262cb203fa0a2947809edd6` passed CI Smoke #641, `EverythingAI Source Recovery Return Context`, and `EverythingAI Multi-hop Return Context`; final independent diff review found no unresolved Critical or Important findings.
 
 Accepted comprehension release merge: `e32f3a1db5b1c5447031842cd59bda59afadce90`.
 
@@ -25,7 +26,7 @@ Release evidence:
 - release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`;
 - handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
 
-Issue #208 is documentation-only synchronization plus the next bounded context-continuity decision gate. It does not itself authorize backend architecture changes, new routing architecture, automatic actions, Enterprise Platform, privileged-host/systemd, or material connector/runtime expansion.
+Issue #212 is documentation-only synchronization plus the next bounded context-continuity decision gate. It does not itself authorize backend architecture changes, new routing architecture, automatic actions, Enterprise Platform, privileged-host/systemd, or material connector/runtime expansion.
 
 ## Authority order
 
@@ -43,7 +44,7 @@ Implementation completion alone is never acceptance.
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2, trustworthy search, governed-action lifecycle, comprehension tranche, and Cross-Surface Context Continuity through #206 accepted | #208 synchronization and one next bounded continuity decision gate |
+| Product and UX | Local MVP release-hardened; Phase 2, trustworthy search, governed-action lifecycle, comprehension tranche, and Cross-Surface Context Continuity through #210 accepted | #212 synchronization and one next bounded continuity decision gate |
 | Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo accepted | Preserve truthful evidence scope and explicit user control while improving movement between existing surfaces |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work remains separate | Explicit selection plus required privileged-host authority before live infrastructure work |
@@ -56,6 +57,7 @@ Implementation completion alone is never acceptance.
 - Evidence, Search, Lifecycle & Recovery Comprehension — #198/#199 — merge `e32f3a1db5b1c5447031842cd59bda59afadce90` — release candidate CI #624 and final decision CI #625.
 - Cross-Surface Context Continuity #202/#203 — merge `698d07aea66d00fbdf65c94eeacc1f15240fd4c2` — unchanged-head CI #629 on `d63cdb84c836e882d3734c6aeade98a5010043fc` — final PM review clean.
 - Source-to-Recovery Return Context #206/#207 — merge `21325da2ffb41899047b200d8e71877d022033b0` — focused workflow PASS and unchanged-head CI #634 on `deb06e7055d57cf6feeb49e97222750f838f1a10` — final PM review clean.
+- Multi-Hop Return Context #210/#211 — merge `a4cc1fd89ea34a397d8537a8050ff68f56423d35` — unchanged-head CI #641 plus both focused return-context workflows PASS on `968fab6f50c9a4b09262cb203fa0a2947809edd6` — final independent diff review clean.
 
 Accepted implementation milestones within the comprehension tranche:
 
@@ -99,7 +101,10 @@ Accepted context-continuity semantics remain exact:
 6. The selected file is navigation origin only, never recovery scope; recovery remains source-root scoped.
 7. Returning from Recovery restores the same source only when it still exists; a missing source must not cause another source to be inferred or selected.
 8. Direct Home/recovery navigation clears source-origin context rather than fabricating one.
-9. Context continuity uses existing Client Workspace state/identifiers only and does not change mutation semantics.
+9. Multi-hop continuity may carry only genuine recorded origins across Knowledge Base → Source Inspection → Recovery → Source Inspection → Knowledge Base.
+10. A stale selected-source identifier must never fall back to another file; stale document context must be cleared when refresh proves that source no longer exists.
+11. Missing/stale page or source context remains unavailable/unknown rather than inferred.
+12. Context continuity uses existing Client Workspace state/identifiers only and does not change mutation semantics.
 
 ## Mandatory inherited regression baseline
 
@@ -131,11 +136,12 @@ Any subsequent product/release candidate must preserve the complete applicable P
 24. recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence cases;
 25. cross-surface context-continuity acceptance;
 26. focused source-to-recovery return-context workflow acceptance;
-27. complete inherited CI matrix validation on the same unchanged candidate as that focused gate;
-28. disposable-folder RC acceptance;
-29. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-30. independent final review with no unresolved Critical or Important findings;
-31. milestone-scoped rollback evidence.
+27. focused multi-hop return-context workflow acceptance;
+28. complete inherited CI matrix validation on the same unchanged candidate as both focused gates;
+29. disposable-folder RC acceptance;
+30. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+31. independent final review with no unresolved Critical or Important findings;
+32. milestone-scoped rollback evidence.
 
 Historical green evidence is not a substitute for validating a new candidate. Previously accepted focused gates must remain wired into CI unless explicitly superseded by an accepted decision.
 
@@ -155,10 +161,10 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** historical Phase 3/Hermes rel
 
 ## Current next action
 
-Complete #208 canonical synchronization. After acceptance, release exactly one bounded implementation issue for **multi-hop return-context continuity** across the already-existing Knowledge Base → Source Inspection → Recovery → Source Inspection → Knowledge Base flow. It must preserve only genuine recorded origins, preserve the current query where applicable, clear stale/missing origins rather than infer replacements, and introduce no backend/routing/mutation architecture expansion.
+Complete #212 canonical synchronization. After acceptance, release exactly one bounded implementation issue for **return-context provenance visibility and explicit context clearing** across the existing Client Workspace surfaces. The UI may expose only genuinely recorded navigation origins, must clearly distinguish navigation context from recovery/action scope, must let the user explicitly clear remembered return context, and must never infer or reconstruct missing history. No backend/routing/mutation architecture expansion is authorized.
 
 Enterprise Platform and privileged-host work remain CEO/authority gated.
 
 ## Rollback
 
-#208 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.
+#212 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.
