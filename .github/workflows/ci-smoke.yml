@@ -294,6 +294,14 @@ jobs:
           EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
         run: npx playwright test smoke/recovery-outcome-guidance.spec.ts
 
+      - name: Run Product Depth cross-surface context continuity acceptance
+        working-directory: apps/everything-ai-ui
+        env:
+          EVERYTHINGAI_API_URL: http://127.0.0.1:4100
+          EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
+        run: npx playwright test smoke/cross-surface-context-continuity.spec.ts
+
       - name: Run disposable-folder RC acceptance
         working-directory: apps/everything-ai-ui
         env:
