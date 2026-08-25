@@ -220,6 +220,11 @@ export function UserApp() {
     if (fileId && fileStillExists) loadDocumentContextWorkflow(fileId);
   }
 
+  function clearReturnContext() {
+    setExploreReturnWikiPageId(null);
+    setRecoveryReturnFileId(null);
+  }
+
   function handleTopNavView(nextView: UserView) {
     if (nextView === 'explore') setExploreReturnWikiPageId(null);
     setRecoveryReturnFileId(null);
@@ -235,12 +240,18 @@ export function UserApp() {
           <div className="panel-title">
             <div>
               <h2>Source inspection context</h2>
+              <p aria-label="Remembered return provenance">Remembered return provenance: {recoveryReturnFile
+                ? `Sources & Files → “${recoveryReturnFile.filename}”${exploreReturnWikiPage ? ` → Knowledge Base → “${exploreReturnWikiPage.title}”` : ''}.`
+                : 'the recorded source origin is no longer available; no replacement origin is inferred.'}</p>
               <p>{recoveryReturnFile
                 ? `Recovery was opened while inspecting “${recoveryReturnFile.filename}”. The selected file is only the navigation origin; recovery remains scoped to the configured source root.`
                 : 'The source that opened recovery is no longer present in the current file list. Recovery remains scoped to the configured source root, and no replacement source is assumed.'}</p>
               <p>The current search query is preserved. Opening this context does not start recovery, scanning, extraction, rebuilding, watcher activity, or file mutation.</p>
             </div>
-            <button className="outline" onClick={returnToSourceOrigin}>Back to Sources & Files</button>
+            <div className="source-actions">
+              <button className="outline" onClick={clearReturnContext}>Clear return context</button>
+              <button className="outline" onClick={returnToSourceOrigin}>Back to Sources & Files</button>
+            </div>
           </div>
         </section> : null}
         <OnboardingView
@@ -265,11 +276,17 @@ export function UserApp() {
           <div className="panel-title">
             <div>
               <h2>Knowledge Base context</h2>
+              <p aria-label="Remembered return provenance">Remembered return provenance: {exploreReturnWikiPage
+                ? `Knowledge Base → “${exploreReturnWikiPage.title}”.`
+                : 'the recorded Knowledge Base origin is no longer available; no replacement origin is inferred.'}</p>
               <p>{exploreReturnWikiPage
                 ? `This source was opened from “${exploreReturnWikiPage.title}”. Return there without losing the current search query.`
                 : 'The Knowledge Base page that opened this source is no longer present. Return to the Knowledge Base without assuming a replacement page.'}</p>
             </div>
-            <button className="outline" onClick={returnToWikiOrigin}>Back to Knowledge Base</button>
+            <div className="source-actions">
+              <button className="outline" onClick={clearReturnContext}>Clear return context</button>
+              <button className="outline" onClick={returnToWikiOrigin}>Back to Knowledge Base</button>
+            </div>
           </div>
         </section> : null}
         <ExploreView
