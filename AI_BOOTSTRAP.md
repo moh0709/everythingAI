@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); bounded Product Depth trustworthy-search, governed-action lifecycle, knowledge evidence/freshness guidance, search refinement/filtering, search refinement lifecycle, and lifecycle-status refinement accepted  
-Current gate: issue #180 canonical synchronization and next bounded decision preparation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); bounded Product Depth trustworthy-search, governed-action lifecycle, knowledge evidence/freshness guidance, search refinement/filtering, search refinement lifecycle, lifecycle-status refinement, and selected-source lifecycle guidance accepted  
+Current gate: issue #184 canonical synchronization and next bounded decision preparation
 
 ## Mandatory startup sequence
 
@@ -27,6 +27,8 @@ If a source lookup fails, use available repository/file fallbacks before declari
 - Search refinement lifecycle/query-context clarity: #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, final unchanged-head CI #584 on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`.
 - Canonical synchronization #176 / PR #177 merge `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e`, final unchanged-head CI #590.
 - Lifecycle-status refinement/processing-state clarity: #178 / PR #179 merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, final unchanged head `0fd7b5638b142cddd1ce5f4f1795839d50eb583a`, final CI Smoke #595. The final candidate restored and passed the inherited #174 lifecycle browser gate before acceptance.
+- Canonical synchronization #180 / PR #181 merge `ff85d2fe90eb5f2903ea8c986e759e2bfcc3101d`, CI Smoke #597.
+- Selected-source lifecycle next-step clarity: #182 / PR #183 merge `2c4b5596230b498a8fa20977bdf1790b13ff4955`, final unchanged head `b973508701ac7be3e0f3f8108755976d12f4bd91`, final CI Smoke #600. Final PM diff review found no unresolved Critical or Important findings.
 
 ## Program tracks
 
@@ -93,6 +95,7 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth search-refinement/filtering acceptance;
 - Product Depth search-refinement lifecycle/query-context acceptance;
 - Product Depth lifecycle-status refinement/processing-state acceptance;
+- Product Depth selected-source lifecycle guidance acceptance;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
@@ -109,7 +112,8 @@ Current Product Depth work may improve existing local-first Client comprehension
 - no presentation of ranking signals as calibrated confidence;
 - no frontend invention of progress, completion, freshness, trust, retry, recovery, or mutation facts;
 - existing `deriveSourceLifecycle` semantics for indexing/extraction state;
-- source-root recovery as the only recovery path currently exposed when that derived lifecycle explicitly allows it;
+- selected-source guidance derived only from those accepted lifecycle facts;
+- source-root recovery as the only recovery path currently exposed when the derived lifecycle explicitly allows it;
 - governed planning, approval, audit, undo, and filesystem safety boundaries.
 
 No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, or material connector/runtime expansion is authorized.
@@ -120,11 +124,11 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Current gate
 
-Issue #180 is the sole active Product Depth governance task. It synchronizes the accepted #178 state and must pass the full inherited matrix on one unchanged documentation candidate plus final documentation diff review before merge.
+Issue #184 is the sole active Product Depth governance task. It synchronizes the accepted #182 state and must pass the full inherited matrix on one unchanged documentation candidate plus final documentation diff review before merge.
 
-If #180 is accepted, the recommended next bounded milestone is **Selected-Source Lifecycle Next-Step Clarity**, defined in `docs/PRODUCT_DEPTH_SELECTED_SOURCE_LIFECYCLE_DECISION_GATE_2026-08-25.md`.
+If #184 is accepted, the recommended next bounded milestone is **Source-Root Recovery Context & Safe Guidance**, defined in `docs/PRODUCT_DEPTH_SOURCE_RECOVERY_CONTEXT_DECISION_GATE_2026-08-25.md`.
 
-That recommendation is frontend/read-only except for reusing already accepted source-root recovery navigation. It does not authorize per-file retry, automatic scanning/extraction/recovery, backend lifecycle redesign, search-ranking changes, new confidence/freshness/provenance calculations, Enterprise Platform work, or privileged-host operations.
+That recommendation is frontend/read-only and reuses only already persisted recovery facts and the accepted source-root recovery navigation. It does not authorize automatic scan/extraction/recovery, per-file retry, backend lifecycle redesign, new health/progress/confidence/freshness calculations, search-ranking changes, Enterprise Platform work, or privileged-host operations.
 
 ## Rollback discipline
 
