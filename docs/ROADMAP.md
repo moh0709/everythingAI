@@ -3,7 +3,7 @@
 Date: 2026-08-25  
 Current product state: **Phase 2 complete and dispatched (`PHASE2_PASS`)**  
 Current Product Depth state: **Evidence, Search, Lifecycle & Recovery Comprehension complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
-Cross-Surface Context Continuity: **milestones #202, #206, and #210 accepted**  
+Cross-Surface Context Continuity: **milestones #202, #206, #210, and #214 accepted; release gate prepared by #216**  
 Accepted comprehension release merge: `e32f3a1db5b1c5447031842cd59bda59afadce90`
 
 ## Completed product sequence
@@ -91,17 +91,27 @@ Accepted #210 behavior:
 - direct navigation does not fabricate a multi-hop chain;
 - no backend intelligence, routing architecture, or mutation semantics were added.
 
+Milestone #214 is accepted. PR #215 merged as `a92803adaf5b15a3c5990efb01e4e469a5938311`; unchanged head `44a2df64e14f946aef3438194a80c64250c2d047` passed CI Smoke #645 and all three focused workflows `EverythingAI Return Context Provenance`, `EverythingAI Source Recovery Return Context`, and `EverythingAI Multi-hop Return Context`; final independent diff review found no unresolved Critical or Important findings.
+
+Accepted #214 behavior:
+
+- the UI exposes only genuinely recorded return-context provenance;
+- remembered navigation origin is visibly distinguished from recovery/action scope;
+- users can explicitly clear remembered return context;
+- clearing context changes client navigation memory only and causes no backend, file, recovery, Knowledge Base, or filesystem mutation;
+- cleared or missing context is not reconstructed or inferred from nearby files/pages.
+
 Canonical synchronization milestones remain governance evidence and do not add product behavior.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 and Product Depth comprehension dispatched; Cross-Surface Context Continuity accepted through #210 | #212 synchronization, then exactly one bounded provenance-visibility/context-clear issue may be released |
-| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo | Preserve truthful evidence scope while improving movement between existing surfaces |
+| Product and UX | Strong local MVP; Phase 2 and Product Depth comprehension dispatched; Cross-Surface Context Continuity accepted through #214 | #216 synchronization and fresh unchanged-candidate tranche release/dispatch decision |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo, and explicit return-context provenance visibility/clearing | Preserve truthful evidence and scope semantics during release validation |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority plus privileged authority before live host work |
-| Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency, inherited CI wiring, rollback, and truthful blocker discipline |
+| Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Require fresh unchanged-candidate release evidence; preserve exact dependency, inherited CI wiring, rollback, and truthful blocker discipline |
 
 ## Active dependency sequence
 
@@ -110,30 +120,29 @@ PRODUCT_DEPTH_COMPREHENSION_PASS accepted and dispatched
   -> #202 Cross-Surface Context Continuity accepted
     -> #206 Source-to-Recovery Return Context accepted
       -> #210 Multi-Hop Return Context accepted
-        -> #212 canonical synchronization + bounded continuity decision gate
-          -> accept/reject #212 after full CI, both focused workflows, and final documentation review
-            -> if accepted, release exactly one bounded implementation issue
+        -> #214 Return-Context Provenance Visibility & Explicit Context Clearing accepted
+          -> #216 canonical synchronization + tranche release-gate preparation
+            -> fresh unchanged-candidate full CI + all three focused return-context workflows
+              -> independent release review
+                -> PASS / HOLD / REJECT / BLOCKED decision
 ```
 
-Issue #212 does not itself authorize another product/runtime implementation milestone.
+Issue #216 does not itself authorize another product/runtime implementation milestone and does not itself declare a release PASS.
 
-## Recommended next bounded direction
+## Current release gate
 
-**Return-Context Provenance Visibility & Explicit Context Clearing**
+**Cross-Surface Context Continuity tranche release/dispatch decision**
 
-Goal: make remembered navigation history understandable and user-controllable without adding new backend intelligence, routing architecture, or mutation semantics.
+Scope is limited to accepted milestones #202, #206, #210, and #214. The release gate is defined in `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_GATE_2026-08-25.md`.
 
-A separately released implementation issue should require:
+Before any release PASS:
 
-- expose only genuinely recorded navigation origins already present in Client Workspace state;
-- show which remembered origin will be used by an available return action before the user invokes it;
-- clearly distinguish navigation provenance from recovery scope, action scope, confidence, freshness, or success state;
-- provide an explicit user control to clear remembered return context without mutating files, recovery state, Knowledge Base content, or backend data;
-- after clearing, no return path may be reconstructed or inferred from nearby files/pages;
-- stale/missing context remains unavailable/unknown rather than substituted;
-- existing Client Workspace state/identifiers only; no backend/routing architecture expansion.
+- one fresh unchanged candidate must pass the complete inherited CI matrix;
+- the same unchanged candidate must pass `EverythingAI Source Recovery Return Context`, `EverythingAI Multi-hop Return Context`, and `EverythingAI Return Context Provenance`;
+- final independent release review must find no unresolved Critical or Important findings;
+- tranche scope, provenance semantics, recovery-root scope, stale/missing-context behavior, explicit context clearing, and rollback evidence must remain unchanged.
 
-This is the next preferred bounded increment because #202/#206/#210 established correct continuity behavior; the next usability risk is opacity about what context is being remembered and how to discard it.
+Historical milestone greens are supporting evidence only and do not replace this fresh tranche-level validation.
 
 ## CEO-gated directions
 
@@ -149,7 +158,7 @@ The following remain material expansion and require explicit CEO selection/appro
 
 ## Mandatory inherited release discipline
 
-Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head. Both focused workflows — `EverythingAI Source Recovery Return Context` and `EverythingAI Multi-hop Return Context` — must pass on that same unchanged candidate. The accepted cross-surface context-continuity acceptance from #202 remains part of the full matrix. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
+Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head. All three focused return-context workflows — `EverythingAI Source Recovery Return Context`, `EverythingAI Multi-hop Return Context`, and `EverythingAI Return Context Provenance` — must pass on that same unchanged candidate. The accepted cross-surface context-continuity acceptance from #202 remains part of the full matrix. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
 
 ## Issue #69
 
