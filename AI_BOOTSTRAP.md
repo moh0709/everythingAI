@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity accepted through #214  
-Current gate: issue #216 canonical synchronization and Cross-Surface Context Continuity release/dispatch gate
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)  
+Current gate: issue #220 canonical synchronization and next five-track governance decision
 
 ## Mandatory startup sequence
 
@@ -17,21 +17,34 @@ Before any project-state decision or implementation:
 
 If a source lookup fails, exhaust repository/file fallbacks before declaring a blocker. Verify tool capabilities before claiming an action is unavailable.
 
-## Current accepted release evidence
+## Current accepted release authority
 
 - Phase 2 release: `266c2efa255ba11165ffaf5d0b6385affe0f261b` (`PHASE2_PASS`).
-- Trustworthy-search release: #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, final CI #535.
-- Governed-action lifecycle release: #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final CI #568.
+- Trustworthy Search release: #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, final CI #535.
+- Governed-Action Lifecycle release: #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final CI #568.
 - Evidence/Search/Lifecycle/Recovery Comprehension release: #198 / PR #199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, status `PRODUCT_DEPTH_COMPREHENSION_PASS`.
-- Comprehension post-sync release candidate: `de8302a281badff75d8408fdcba1fbc15f9916ca`, CI #624 PASS.
-- Comprehension release-decision head: `94d303c8e687f01f4f8f1e4216ac2357cea0beb7`, CI #625 PASS, final documentation review clean.
-- Cross-Surface Context Continuity #202 / PR #203: merge `698d07aea66d00fbdf65c94eeacc1f15240fd4c2`; unchanged head `d63cdb84c836e882d3734c6aeade98a5010043fc`; CI #629 PASS; final PM review clean.
-- Source-to-Recovery Return Context #206 / PR #207: merge `21325da2ffb41899047b200d8e71877d022033b0`; focused workflow `EverythingAI Source Recovery Return Context` PASS on unchanged head `deb06e7055d57cf6feeb49e97222750f838f1a10`; full CI #634 PASS on the same head; final PM review clean.
-- Multi-Hop Return Context #210 / PR #211: merge `a4cc1fd89ea34a397d8537a8050ff68f56423d35`; unchanged head `968fab6f50c9a4b09262cb203fa0a2947809edd6`; CI #641 PASS; `EverythingAI Source Recovery Return Context` and `EverythingAI Multi-hop Return Context` PASS; final independent diff review clean.
-- Return-Context Provenance Visibility & Explicit Context Clearing #214 / PR #215: merge `a92803adaf5b15a3c5990efb01e4e469a5938311`; unchanged head `44a2df64e14f946aef3438194a80c64250c2d047`; CI #645 PASS; `EverythingAI Return Context Provenance`, `EverythingAI Source Recovery Return Context`, and `EverythingAI Multi-hop Return Context` PASS; final independent diff review clean.
-- Release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`.
-- Handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
-- Current tranche gate: `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_GATE_2026-08-25.md`.
+- Cross-Surface Context Continuity release: #218 / PR #219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, status `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
+
+Cross-Surface release validation:
+
+- fresh unchanged candidate `aa735fca42a4c64411188c6b41b69efb44adcb12` — CI Smoke #652 PASS;
+- Source Recovery Return Context run #19 PASS;
+- Multi-hop Return Context run #12 PASS;
+- Return Context Provenance run #8 PASS;
+- final decision head `ad821eac4bf1b61aa932c2bed7e00ca018977398` — CI Smoke #654 PASS;
+- Source Recovery Return Context run #21 PASS;
+- Multi-hop Return Context run #14 PASS;
+- Return Context Provenance run #10 PASS;
+- final release review clean: no unresolved Critical or Important findings.
+
+Current release authority documents:
+
+- `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_DECISION_2026-08-25.md`
+- `docs/HANDOVER_2026-08-25_CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE.json`
+
+Current governance decision package:
+
+- `docs/NEXT_FIVE_TRACK_GOVERNANCE_OPTIONS_2026-08-25.md`
 
 ## Program tracks
 
@@ -71,7 +84,7 @@ Rules:
 - no PASS without independently reviewable evidence;
 - truthful BLOCKED outcomes are valid;
 - every accepted milestone records exact commit/merge, validation, risks, and rollback;
-- previously accepted focused browser gates must remain wired into CI unless explicitly superseded by an accepted decision.
+- previously accepted focused browser gates remain wired into CI unless explicitly superseded by an accepted decision.
 
 ## Mandatory inherited product regression baseline
 
@@ -105,7 +118,7 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 - focused `EverythingAI Source Recovery Return Context` acceptance;
 - focused `EverythingAI Multi-hop Return Context` acceptance;
 - focused `EverythingAI Return Context Provenance` acceptance;
-- complete inherited CI matrix validation on the same unchanged candidate as all three focused return-context gates;
+- complete inherited CI matrix validation on the required unchanged candidate together with the focused gates;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent final review with no unresolved Critical or Important findings;
@@ -113,65 +126,57 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 
 Historical green evidence never substitutes for validating a new candidate. CI wiring for accepted focused gates is part of the baseline.
 
-## Accepted Product Depth safety boundaries
+## Accepted safety boundaries
 
-Product Depth may improve existing local-first Client comprehension and inspection, but must preserve:
+Product Depth remains local-first and bounded:
 
-- backend-returned search order and existing match facts;
-- source provenance and citation evidence;
-- no presentation of ranking signals as calibrated confidence;
-- no frontend invention of progress, completion, freshness, trust, retry, recovery success, or mutation facts;
-- existing lifecycle semantics for indexing/extraction state;
-- selected-source guidance derived only from accepted persisted lifecycle facts;
-- source-root recovery as the only currently exposed recovery path for supported failure states;
-- recovery-context inspection as read-only until the user explicitly invokes an existing control;
-- persisted `indexed`, `skipped`, and `failed` scan outcomes remain semantically distinct;
-- watcher state is monitoring evidence only, never recovery/extraction/Knowledge Base success;
-- configured recovery-root identity comes only from Folder Path;
-- scan/watcher root identities remain evidence-only and are applicable to the configured root only on exact match;
-- if no Folder Path is configured, configured-root identity remains unknown even when persisted evidence exists;
-- mismatched persisted evidence may remain visible only when explicitly scoped to its recorded root;
-- no per-file retry;
-- governed planning, approval, audit, undo, and filesystem safety boundaries.
+- backend-returned search order and existing match facts are preserved;
+- source provenance and citation evidence remain authoritative;
+- ranking signals are not presented as calibrated confidence;
+- frontend does not invent progress, completion, freshness, trust, retry, recovery success, or mutation facts;
+- lifecycle semantics remain based on persisted indexing/extraction state;
+- recovery remains source-root scoped and uses only configured Folder Path plus persisted scan/watcher evidence under exact-root rules;
+- no per-file retry is introduced;
+- governed planning, approval, execution, audit, undo, and filesystem safety boundaries remain unchanged.
 
-Accepted Cross-Surface Context Continuity additionally preserves:
+Cross-Surface Context Continuity additionally preserves:
 
-- genuine Knowledge Base origin identity when opening source inspection;
-- the current search query where genuine source context is opened;
-- explicit return navigation only to recorded origin context;
-- no fabricated Knowledge Base return context from direct Sources & Files navigation;
-- source-to-recovery navigation may remember only the genuine selected source and current query;
-- that selected source is navigation origin only, never recovery scope;
+- only genuine Knowledge Base/source/recovery provenance is remembered;
+- current query is retained only where actually recorded;
+- direct navigation does not fabricate return history;
+- stale source IDs never select a substitute source;
+- missing/stale page/source/history remains unknown or unavailable;
+- selected source is navigation provenance only, never recovery scope;
 - recovery remains source-root scoped;
-- return restores the same source only if it still exists and never selects a substitute when missing;
-- direct Home/recovery navigation clears prior source-origin context;
-- multi-hop return context may carry only genuine recorded origins across Knowledge Base → Source Inspection → Recovery → Source Inspection → Knowledge Base;
-- stale selected-source IDs never fall back to another file, and stale document context is cleared when refresh proves the source no longer exists;
-- missing/stale page or source context remains unavailable/unknown rather than inferred;
-- the UI exposes only genuinely recorded return-context provenance and clearly distinguishes navigation context from recovery/action scope;
-- explicit clearing of remembered return context modifies client navigation memory only and triggers no backend, file, recovery, Knowledge Base, or filesystem mutation;
-- cleared or missing history remains unknown and is not reconstructed from nearby files/pages;
-- existing Client Workspace identifiers/state only unless a separately approved gate proves a minimal contract is required.
+- explicit context clearing changes client navigation memory only and triggers no backend, file, recovery, Knowledge Base, governed action, or filesystem mutation;
+- existing Client Workspace identifiers/state are used;
+- no new routing architecture or backend intelligence was introduced by the dispatched tranche.
 
-No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, new routing architecture, or material connector/runtime expansion is authorized.
+## Current governance gate
 
-## Current release gate
+Issue #220 is the sole active governance task. It synchronizes `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS` into canonical startup/roadmap state and prepares the next five-track decision without authorizing implementation merely by synchronization.
 
-Issue #216 is the sole active governance task. It synchronizes accepted #214 evidence and prepares a bounded Cross-Surface Context Continuity tranche release/dispatch decision covering #202, #206, #210, and #214.
+Preferred bounded local-first Product & UX option after #220 acceptance:
 
-No release PASS may be declared from milestone history alone. A fresh unchanged candidate must pass:
+**Workspace Context Summary & Safe Return Map** — a read-only summary of genuinely recorded current query, valid selected source, recorded originating Knowledge Base page, recovery-root identity, and available explicit return targets, using existing Client Workspace state only.
 
-- the complete inherited CI matrix;
-- `EverythingAI Source Recovery Return Context`;
-- `EverythingAI Multi-hop Return Context`;
-- `EverythingAI Return Context Provenance`;
-- final independent release review with no unresolved Critical or Important findings.
+This recommendation is not implementation authorization. A separate issue must define exact behavior, acceptance, unchanged-head validation, and rollback before code changes begin.
 
-The allowed release outcomes are `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`, `HOLD`, `REJECT`, or `BLOCKED`, as defined in `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_GATE_2026-08-25.md`.
+Knowledge & Safe Action alternative: evidence-to-action traceability review using existing provenance only, without changing policy, confidence, approval, execution, undo, or mutation semantics.
 
-Do not release another product feature merely because #216 synchronization completes.
+Governance alternative: release-evidence automation hardening that improves evidence collection/detection without weakening gates or changing runtime behavior.
 
-CEO-gated directions remain Enterprise Platform expansion, privileged-host/systemd work, auth/tenancy/cloud/database/object-storage work, or material connector/runtime expansion.
+CEO-gated directions remain:
+
+- authentication or tenancy;
+- cloud deployment;
+- database migration or object storage;
+- privileged-host/systemd work;
+- production-platform architecture execution;
+- new routing architecture;
+- automatic action/recovery/rebuild behavior;
+- material connector/runtime expansion;
+- new semantic/provider architecture with material runtime, cost, or trust implications.
 
 ## Issue #69
 
@@ -179,4 +184,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #216 is documentation-only and can be reverted independently from product/runtime code.
+Every accepted milestone remains independently reversible by its recorded merge. #220 is documentation-only and can be reverted independently from product/runtime code. All earlier milestone rollback evidence remains valid.
