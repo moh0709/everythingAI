@@ -1,0 +1,40 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-25",
+  "release": "Cross-Surface Context Continuity",
+  "issue": 218,
+  "status": "CROSS_SURFACE_CONTEXT_CONTINUITY_PASS",
+  "accepted_sync_baseline": {
+    "merge": "1af6d5be2198e7a6656ce401c451d5042452339d",
+    "issue": 216,
+    "pr": 217
+  },
+  "fresh_release_candidate": {
+    "sha": "aa735fca42a4c64411188c6b41b69efb44adcb12",
+    "ci_smoke_run": 652,
+    "source_recovery_return_context_run": 19,
+    "multi_hop_return_context_run": 12,
+    "return_context_provenance_run": 8,
+    "result": "PASS"
+  },
+  "accepted_milestones": [
+    {"issue": 202, "merge": "698d07aea66d00fbdf65c94eeacc1f15240fd4c2", "ci_run": 629},
+    {"issue": 206, "merge": "21325da2ffb41899047b200d8e71877d022033b0", "ci_run": 634},
+    {"issue": 210, "merge": "a4cc1fd89ea34a397d8537a8050ff68f56423d35", "ci_run": 641},
+    {"issue": 214, "merge": "a92803adaf5b15a3c5990efb01e4e469a5938311", "ci_run": 645},
+    {"issue": 216, "merge": "1af6d5be2198e7a6656ce401c451d5042452339d", "ci_run": 650}
+  ],
+  "safety_semantics": {
+    "navigation_provenance_is_scope": false,
+    "recovery_scope": "source-root",
+    "missing_context_inferred": false,
+    "stale_source_substitution": false,
+    "direct_navigation_fabricates_history": false,
+    "explicit_context_clear_mutates_backend_or_filesystem": false,
+    "existing_governed_action_controls_changed": false
+  },
+  "rollback": "Revert only the affected accepted milestone merge; #216 synchronization and release-decision documentation are independently reversible.",
+  "enterprise_platform_scope_expanded": false,
+  "protected_historical_issue_69_modified": false,
+  "next_state": "Merge the release decision only after the final decision head itself passes full CI plus all three focused return-context workflows; after dispatch, select any next implementation direction through a separate bounded governance gate."
+}
