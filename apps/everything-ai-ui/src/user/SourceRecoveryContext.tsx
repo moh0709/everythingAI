@@ -56,19 +56,27 @@ export function SourceRecoveryContext({ folderPath, scanReport, watcherStatus }:
       <div className="settings-help-grid">
         <div>
           <strong>Latest scan evidence</strong>
-          {scanReport?.rootPath
-            ? <p>Persisted scan report for <code>{scanReport.rootPath}</code>: {count(scanReport.indexed)} indexed, {count(scanReport.skipped)} skipped, {count(scanReport.failed)} failed.</p>
-            : <p>No persisted scan report is loaded in this view.</p>}
+          {scanReport?.rootPath ? <>
+            <p>Persisted scan report for <code>{scanReport.rootPath}</code>: {count(scanReport.indexed)} indexed, {count(scanReport.skipped)} skipped, {count(scanReport.failed)} failed.</p>
+            <p>{count(scanReport.indexed)} indexed: recorded as indexed by the latest persisted scan report.</p>
+            <p>{count(scanReport.skipped)} skipped: skipped by that scan; skipped does not mean failed or ready.</p>
+            <p>{count(scanReport.failed)} failed: recorded as failed by that scan; use the Scan Report below for persisted failure details rather than inferring a cause here.</p>
+          </> : <>
+            <p>No persisted scan report is loaded in this view.</p>
+            <p>No scan outcome can be concluded from this view until a persisted scan report is available.</p>
+          </>}
         </div>
         <div>
           <strong>Watcher evidence</strong>
           {matchingWatcher
             ? <p>Status: {matchingWatcher.status}. Running: {matchingWatcher.running ? 'Yes' : 'No'} · Pending: {matchingWatcher.pending ? 'Yes' : 'No'} · Scheduled: {matchingWatcher.scheduled ? 'Yes' : 'No'}.</p>
             : <p>No matching persisted watcher state is loaded for this source root.</p>}
+          <p>Watcher state is monitoring evidence only. It does not prove extraction, recovery, or Knowledge Base success.</p>
         </div>
         <div>
           <strong>Before choosing recovery</strong>
           <p>Inspect the configured Folder Path, latest Scan Report, and Watcher Status below. Use the existing Build Knowledge or watcher controls only when you intentionally want to re-scan or resume monitoring.</p>
+          <p>Next step: inspect the Scan Report and Folder Path first. Use Build Knowledge or watcher controls only when you intentionally choose to rerun the source-root flow or change monitoring.</p>
         </div>
       </div>
     </section>
