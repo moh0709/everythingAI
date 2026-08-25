@@ -59,15 +59,17 @@ Accepted as `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS` through #162 / PR #163 merge `
 20. #174 search refinement lifecycle/query-context clarity — `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, final unchanged-head CI #584.
 21. #176 canonical synchronization — `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e`, final unchanged-head CI #590.
 22. #178 lifecycle-status refinement and processing-state clarity — `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, final unchanged head `0fd7b5638b142cddd1ce5f4f1795839d50eb583a`, final CI #595. The final candidate restored and passed the inherited #174 search-refinement lifecycle browser gate before acceptance.
+23. #180 canonical synchronization — `ff85d2fe90eb5f2903ea8c986e759e2bfcc3101d`, CI #597.
+24. #182 selected-source lifecycle next-step clarity — `2c4b5596230b498a8fa20977bdf1790b13ff4955`, final unchanged head `b973508701ac7be3e0f3f8108755976d12f4bd91`, CI #600.
 
-The accepted refinement behavior is read-only. It preserves backend result ordering, scopes filters to the current result context, clears stale refinements on explicit search/base-file refresh, and derives lifecycle labels only from persisted indexing/extraction facts.
+The accepted refinement behavior is read-only. It preserves backend result ordering, scopes filters to the current result context, clears stale refinements on explicit search/base-file refresh, derives lifecycle labels only from persisted indexing/extraction facts, and explains selected-source next steps without inventing per-file retry or progress.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy-search, governed-action lifecycle, evidence-quality, search refinement/filtering, search-context lifecycle, and lifecycle-status Product Depth work accepted | Complete #180; if accepted, release selected-source lifecycle next-step clarity |
-| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, diagnostics, lifecycle-state filtering, governed planning/execution/audit/undo lifecycle | Improve selected-source lifecycle comprehension using existing derived facts only |
+| Product and UX | Strong local MVP; Phase 2 dispatched; trustworthy-search, governed-action lifecycle, evidence-quality, search refinement/filtering, search-context lifecycle, lifecycle-status, and selected-source lifecycle Product Depth work accepted | Complete #184; if accepted, release source-root recovery context/safe guidance |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, diagnostics, lifecycle-state filtering, selected-source lifecycle guidance, governed planning/execution/audit/undo lifecycle | Improve source-root recovery comprehension using existing persisted recovery facts only |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before implementation expansion |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority plus privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency, inherited CI wiring, rollback, and truthful blocker discipline |
@@ -75,42 +77,42 @@ The accepted refinement behavior is read-only. It preserves backend result order
 ## Active dependency sequence
 
 ```text
-#178 accepted
-  -> #180 canonical synchronization + decision package
-    -> selected-source lifecycle next-step clarity (recommended bounded gate)
+#182 accepted
+  -> #184 canonical synchronization + decision package
+    -> source-root recovery context & safe guidance (recommended bounded gate)
 ```
 
-Issue #180 does not itself authorize product/runtime implementation. Its decision package recommends one bounded next milestone only after #180 is accepted.
+Issue #184 does not itself authorize product/runtime implementation. Its decision package recommends one bounded next milestone only after #184 is accepted.
 
 ## Recommended next bounded milestone
 
-**Selected-Source Lifecycle Next-Step Clarity**
+**Source-Root Recovery Context & Safe Guidance**
 
-Decision package: `docs/PRODUCT_DEPTH_SELECTED_SOURCE_LIFECYCLE_DECISION_GATE_2026-08-25.md`.
+Decision package: `docs/PRODUCT_DEPTH_SOURCE_RECOVERY_CONTEXT_DECISION_GATE_2026-08-25.md`.
 
-The selected source panel already has persisted index/extraction status, the accepted `deriveSourceLifecycle` result, technical status values, and source-root recovery navigation for supported failure states. The next bounded improvement should explain the current state, why it is shown, and the safe next step without adding new lifecycle semantics.
+The selected-source panel now truthfully explains lifecycle state and safe next steps. The remaining bounded comprehension gap is what the existing source-root recovery navigation means after a supported failure state: users should understand the scope of that recovery context before navigating there, using only already persisted recovery facts and existing navigation.
 
 Allowed direction:
 
-- plain-language selected-source lifecycle explanation from existing derived facts;
-- safe next-step guidance;
-- reuse existing source-root recovery navigation only where already allowed;
-- keep technical status details visible;
+- explain that recovery operates at the configured source-root context rather than as a per-file retry;
+- surface already persisted recovery state where available;
+- clarify that navigation opens recovery/inspection context and does not itself guarantee or trigger repair;
+- reuse existing source-root recovery navigation only;
 - add focused browser acceptance and preserve the full inherited matrix.
 
 Prohibited expansion:
 
 - per-file retry;
 - automatic scan/extraction/recovery/rebuild;
-- progress percentages or inferred completion/freshness timestamps;
-- new trust/confidence/provenance/health calculations;
-- backend lifecycle/search-ranking redesign;
+- progress percentages, health scores, inferred recovery success, or freshness timestamps;
+- new trust/confidence/provenance calculations;
+- backend lifecycle/recovery redesign;
 - planning/mutation/approval/audit/undo changes;
 - authentication, tenancy, cloud deployment, DB migration, object storage, privileged-host/systemd, or material connector/runtime expansion.
 
 ## Mandatory inherited release discipline
 
-Every new product candidate must pass the full applicable inherited matrix on one unchanged head, including accepted Product Depth browser gates through #178, disposable-folder RC acceptance, and UI-governed action/undo acceptance. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise.
+Every new product candidate must pass the full applicable inherited matrix on one unchanged head, including accepted Product Depth browser gates through #182, disposable-folder RC acceptance, and UI-governed action/undo acceptance. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise.
 
 ## Issue #69
 
