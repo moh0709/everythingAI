@@ -7,7 +7,9 @@ export function useFileDocumentState() {
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [documentContext, setDocumentContext] = useState<DocumentContext | null>(null);
 
-  const selectedFile = files.find((file) => file.id === selectedFileId) || files[0];
+  const selectedFile = selectedFileId
+    ? files.find((file) => file.id === selectedFileId)
+    : files[0];
 
   function loadFiles(nextFiles: IndexedFile[]) {
     setFiles(nextFiles);
