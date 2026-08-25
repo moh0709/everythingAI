@@ -1,0 +1,43 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-25",
+  "governance_issue": 180,
+  "status": "CANDIDATE_PENDING_CI_AND_REVIEW",
+  "accepted_dependency": {
+    "issue": 178,
+    "pr": 179,
+    "merge": "48531f7d1ff843c6a23180b5331f3c05fd2df1da",
+    "final_head": "0fd7b5638b142cddd1ce5f4f1795839d50eb583a",
+    "final_ci": 595,
+    "review": "no unresolved Critical or Important findings",
+    "regression_baseline_restoration": "final candidate restored and passed the inherited #174 search-refinement lifecycle browser gate before #178 acceptance"
+  },
+  "canonical_updates": [
+    "PROJECT_STATE.md",
+    "AI_BOOTSTRAP.md",
+    "docs/ROADMAP.md"
+  ],
+  "next_decision_package": "docs/PRODUCT_DEPTH_SELECTED_SOURCE_LIFECYCLE_DECISION_GATE_2026-08-25.md",
+  "recommended_next_gate": "Selected-Source Lifecycle Next-Step Clarity",
+  "recommended_scope": "frontend/read-only comprehension using existing deriveSourceLifecycle and persisted indexing/extraction facts; reuse accepted source-root recovery navigation only where already supported",
+  "prohibited_scope": [
+    "per-file retry",
+    "automatic scan/extraction/recovery/rebuild",
+    "invented progress/completion/freshness/confidence/provenance/health facts",
+    "backend lifecycle or search-ranking redesign",
+    "planning/mutation/approval/audit/undo changes",
+    "authentication/tenancy/cloud/database/object-storage expansion",
+    "privileged-host/systemd work",
+    "material connector/runtime expansion"
+  ],
+  "issue_69": "closed completed historical evidence; unchanged",
+  "acceptance_required": [
+    "complete inherited regression matrix on one unchanged documentation candidate",
+    "accepted browser gates through #178 remain wired and green",
+    "disposable-folder RC acceptance",
+    "UI-governed action/undo acceptance",
+    "final documentation diff review with no unresolved Critical or Important findings"
+  ],
+  "rollback": "revert only the #180 documentation/governance synchronization merge",
+  "pass_claim": false
+}

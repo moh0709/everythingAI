@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth trustworthy-search, governed-action lifecycle, knowledge evidence/freshness guidance, search refinement/filtering, and search refinement lifecycle accepted  
-Current gate: issue #176 canonical synchronization and next bounded decision preparation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); bounded Product Depth trustworthy-search, governed-action lifecycle, knowledge evidence/freshness guidance, search refinement/filtering, search refinement lifecycle, and lifecycle-status refinement accepted  
+Current gate: issue #180 canonical synchronization and next bounded decision preparation
 
 ## Mandatory startup sequence
 
@@ -10,14 +10,25 @@ Before any project-state decision or implementation:
 
 1. Read `PROJECT_STATE.md`.
 2. Read this `AI_BOOTSTRAP.md`.
-3. Read the newest accepted release decision/handover.
+3. Read the newest accepted release decision/handover and current decision gate.
 4. Inspect recent commits, open issues, open PRs, and relevant CI state.
-5. Confirm the next work is dependency-satisfied and within already approved scope.
+5. Confirm the next work is dependency-satisfied and within approved scope.
 6. Define acceptance criteria, evidence, validation, and rollback before implementation.
 
 If a source lookup fails, use available repository/file fallbacks before declaring a blocker. Verify tool capabilities before claiming an action is unavailable.
 
-## Current program model
+## Current accepted evidence
+
+- Phase 2 release: `266c2efa255ba11165ffaf5d0b6385affe0f261b` (`PHASE2_PASS`).
+- Product Depth trustworthy-search release: #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, final CI #535.
+- Product Depth governed-action lifecycle release: #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final unchanged-head CI #568.
+- Knowledge evidence/freshness guidance: #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`, CI #574.
+- Search refinement/filtering: #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, CI #579.
+- Search refinement lifecycle/query-context clarity: #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, final unchanged-head CI #584 on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`.
+- Canonical synchronization #176 / PR #177 merge `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e`, final unchanged-head CI #590.
+- Lifecycle-status refinement/processing-state clarity: #178 / PR #179 merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, final unchanged head `0fd7b5638b142cddd1ce5f4f1795839d50eb583a`, final CI Smoke #595. The final candidate restored and passed the inherited #174 lifecycle browser gate before acceptance.
+
+## Program tracks
 
 Maintain five separately named tracks:
 
@@ -27,19 +38,7 @@ Maintain five separately named tracks:
 4. Engineering Operations.
 5. Governance and Autonomous Delivery.
 
-Phase 2 is complete and dispatched at merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`. The bounded Product Depth trustworthy-search sequence was dispatched through #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` after final unchanged-head CI #535 and independent diff review.
-
-The bounded Product Depth governed-action lifecycle release was accepted through #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`. Pre-decision CI #566 passed on `e175ff1ef78349b2644a8211d658dde88721a2d0`; final unchanged-head CI #568 passed on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`; independent final diff review found no unresolved Critical or Important findings.
-
-The bounded Product Depth knowledge evidence/freshness guidance milestone was accepted through #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`. Final unchanged-head CI Smoke #574 passed on `76699c7e30bf741b12c880d096b770ee73de98ac`; final diff review found no unresolved Critical or Important findings.
-
-The bounded Product Depth search refinement/filtering milestone was accepted through #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce` after final CI Smoke #579 and independent diff review. Canonical synchronization #172 / PR #173 was accepted and merged as `3b750a1467a0ba01bd30ef3dbd18b38f969099af` after CI Smoke #581.
-
-The bounded Product Depth search refinement lifecycle milestone was accepted through #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`. Final unchanged-head CI Smoke #584 passed on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`; PM diff review found no unresolved Critical or Important findings. The accepted behavior resets stale refinements before a new explicit search or base-file refresh, preserves the typed query, keeps clear-all scoped to the current result context, and leaves backend result facts and ordering unchanged.
-
-The accepted governed-action lifecycle is:
-
-`planning selection → conflict explanation → dry-run preview → approval boundary → governed execution → audit evidence → undo/recovery outcome`
+Do not silently treat Enterprise Platform or privileged-host work as authorized by Product Depth progress.
 
 ## Roles
 
@@ -66,7 +65,8 @@ Rules:
 - no broad refactor without approved scope;
 - no PASS without independently reviewable evidence;
 - truthful BLOCKED outcomes are valid;
-- every accepted milestone records exact commit/merge, validation, risks, and rollback.
+- every accepted milestone records exact commit/merge, validation, risks, and rollback;
+- previously accepted focused browser gates must remain wired into CI unless explicitly superseded by an accepted decision.
 
 ## Mandatory inherited product regression baseline
 
@@ -92,100 +92,40 @@ For subsequent product work, preserve all applicable accepted Phase 1 + Phase 2 
 - Product Depth knowledge-evidence/freshness-guidance acceptance;
 - Product Depth search-refinement/filtering acceptance;
 - Product Depth search-refinement lifecycle/query-context acceptance;
-- disposable-folder release-candidate acceptance;
+- Product Depth lifecycle-status refinement/processing-state acceptance;
+- disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent diff review with no unresolved Critical or Important findings;
 - milestone-scoped rollback evidence.
 
-Tests passing on an older commit do not prove a new candidate.
+Historical green evidence never substitutes for validating a new candidate.
 
-## Product Depth trust and planning constraints
+## Product Depth safety boundaries
 
-The accepted Product Depth sequence must preserve these properties:
+Current Product Depth work may improve existing local-first Client comprehension and inspection, but must preserve:
 
-- Client search and diagnostics remain read-only;
-- keyword/semantic match basis is explained truthfully;
-- semantic similarity is a ranking signal, not calibrated confidence;
-- the local Knowledge Base heuristic score is not shown as user-facing relevance/confidence;
-- snippets use real indexed/saved content and do not invent evidence;
-- literal highlighting respects Unicode letter/number term boundaries;
-- exact saved-page navigation and source provenance remain intact;
-- source inspection moves only among genuine persisted chunks and does not alter pinned citation identity;
-- trust diagnostics use exact persisted `page_id` navigation when available and do not recalculate backend trust values;
-- citation coverage and weak-source warnings are explained from persisted values only and are not recalculated in the client;
-- freshness remains explicitly unknown where no verified source-update timestamp exists;
-- source fingerprints identify persisted source sets and must not be presented as freshness timestamps or confidence;
-- refresh/rebuild guidance remains explicit and user-controlled, with no automatic rebuild triggered by explanatory UI;
-- search refinements remain read-only, preserve backend-returned ordering, and must not transform ranking signals into confidence claims;
-- search refinements belong to the current result context and stale refinements must reset before a new explicit search or base-file refresh changes that context;
-- planning-selection UI may explain included, unselected, blocked, and conflicting suggestions, but must not weaken backend policy, approval requirements, confidence enforcement, or the global one-filesystem-mutation-per-file guard;
-- planning-preview UI may explain ready and blocked previews, backend-provided reasons, source/target impact, and the dry-run/approval boundary, but must preserve existing preview and execution semantics;
-- execution/audit/undo UI may clarify existing persisted outcome facts, but must not imply filesystem restoration solely from an `undone` persisted state or change execution, audit, mutation, or undo semantics.
+- backend-returned search order and existing match facts;
+- source provenance and citation evidence;
+- no presentation of ranking signals as calibrated confidence;
+- no frontend invention of progress, completion, freshness, trust, retry, recovery, or mutation facts;
+- existing `deriveSourceLifecycle` semantics for indexing/extraction state;
+- source-root recovery as the only recovery path currently exposed when that derived lifecycle explicitly allows it;
+- governed planning, approval, audit, undo, and filesystem safety boundaries.
 
-## Current scope gates
-
-No new major implementation phase is authorized by Phase 2 or Product Depth completion alone.
-
-Explicit CEO approval remains required before authentication/identity architecture, production tenancy/workspaces, cloud deployment, production database/storage, privileged-host/systemd work, material connector/runtime expansion, or other material architecture/commercial-scope expansion.
-
-Bounded documentation reconciliation, QA, evidence synchronization, and Product Depth work already within the approved local-first product direction may proceed autonomously.
+No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, or material connector/runtime expansion is authorized.
 
 ## Issue #69
 
-Issue #69 is closed completed historical evidence. Read it when relevant, but do not rewrite its historical acceptance record unless a newly discovered factual inconsistency requires explicit CEO review.
+Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliability evidence. It is not an active dependency. Do not rewrite its historical acceptance record unless a newly discovered factual inconsistency is escalated for explicit CEO review.
 
-## Current task
+## Current gate
 
-Issue #176 is the sole active Product Depth governance task. Synchronize canonical state after accepted #174 / PR #175, preserve its validation and rollback evidence, and prepare the next bounded decision gate without changing runtime behavior.
+Issue #180 is the sole active Product Depth governance task. It synchronizes the accepted #178 state and must pass the full inherited matrix on one unchanged documentation candidate plus final documentation diff review before merge.
 
-After #176 acceptance, the candidate next bounded direction is **Search lifecycle-status refinement and processing-state clarity** using existing persisted indexing/extraction/recovery facts only. It must remain read-only, preserve backend result order, reset with the accepted query-context lifecycle, and must not invent progress, confidence, freshness, completion, retry, or recovery facts.
+If #180 is accepted, the recommended next bounded milestone is **Selected-Source Lifecycle Next-Step Clarity**, defined in `docs/PRODUCT_DEPTH_SELECTED_SOURCE_LIFECYCLE_DECISION_GATE_2026-08-25.md`.
 
-## Evidence authority
+That recommendation is frontend/read-only except for reusing already accepted source-root recovery navigation. It does not authorize per-file retry, automatic scanning/extraction/recovery, backend lifecycle redesign, search-ranking changes, new confidence/freshness/provenance calculations, Enterprise Platform work, or privileged-host operations.
 
-Current Phase 2 release evidence:
+## Rollback discipline
 
-- `docs/PHASE2_RELEASE_DECISION_2026-08-23.md`
-- `docs/HANDOVER_2026-08-23_PHASE2_RELEASE_DECISION.json`
-- merge `266c2efa255ba11165ffaf5d0b6385affe0f261b`
-
-Accepted Product Depth trustworthy-search release evidence:
-
-- `docs/PRODUCT_DEPTH_SEARCH_RELEASE_DECISION_2026-08-24.md`
-- `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_SEARCH_RELEASE.json`
-- #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`
-- final unchanged-head CI #535
-
-Accepted Product Depth governed-action lifecycle release evidence:
-
-- `docs/PRODUCT_DEPTH_ACTION_LIFECYCLE_RELEASE_DECISION_2026-08-24.md`
-- `docs/HANDOVER_2026-08-24_PRODUCT_DEPTH_ACTION_LIFECYCLE_RELEASE.json`
-- #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`
-- pre-decision CI #566 on `e175ff1ef78349b2644a8211d658dde88721a2d0`
-- final unchanged-head CI #568 on `9fbc1502869c71f43a4b069cd5fb872f4dd382b1`
-- independent final diff review with no unresolved Critical or Important findings
-
-Accepted Product Depth knowledge evidence/freshness milestone evidence:
-
-- #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`
-- final unchanged-head CI Smoke #574 on `76699c7e30bf741b12c880d096b770ee73de98ac`
-- final diff review with no unresolved Critical or Important findings
-- milestone-scoped rollback by reverting only the #166 merge
-
-Accepted Product Depth search refinement/filtering evidence:
-
-- #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`
-- final CI Smoke #579
-- #172 / PR #173 canonical synchronization merge `3b750a1467a0ba01bd30ef3dbd18b38f969099af`, CI Smoke #581
-
-Accepted Product Depth search refinement lifecycle evidence:
-
-- #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`
-- final unchanged-head CI Smoke #584 on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`
-- PM diff review with no unresolved Critical or Important findings
-- milestone-scoped rollback by reverting only the #174 merge
-
-Historical pre-reconciliation bootstrap is preserved exactly at:
-
-`docs/archive/2026-08-23-pre-phase2-reconciliation/AI_BOOTSTRAP.md`
-
-The archive remains evidence, not current operating authority.
+Every accepted milestone remains independently reversible by its recorded merge. Governance/documentation synchronization is reverted independently from product/runtime code. Preserve exact CI and final-head evidence before claiming acceptance.
