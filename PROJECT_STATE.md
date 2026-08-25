@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-26  
-Authority: current accepted repository state after Product & UX milestone #222  
-Current governance issue: #224
+Authority: current accepted repository state after Product & UX milestone #226  
+Current governance issue: #228
 
 ## Current program stage
 
@@ -13,6 +13,8 @@ Current governance issue: #224
 **Cross-Surface Context Continuity is COMPLETE AND DISPATCHED (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`).**
 
 **Product & UX milestone #222 — Workspace Context Summary & Safe Return Map is ACCEPTED.**
+
+**Product & UX milestone #226 — Workspace Context Provenance & Unknown-State Explanations is ACCEPTED.**
 
 Accepted #222 evidence:
 
@@ -25,7 +27,29 @@ Accepted #222 evidence:
 - EverythingAI Return Context Provenance run #14 — PASS;
 - final independent diff review — no unresolved Critical or Important findings.
 
-Issue #224 is documentation-only synchronization and preparation of exactly one next bounded governance option. It does not authorize another implementation merely by being accepted.
+Accepted #224 synchronization evidence:
+
+- PR #225 merged as `e5517027c922c0697441a22b4e946ffa0a44e13e`;
+- EverythingAI CI Smoke #660 — PASS;
+- EverythingAI Workspace Context Summary run #3 — PASS;
+- EverythingAI Source Recovery Return Context run #27 — PASS;
+- EverythingAI Multi-hop Return Context run #20 — PASS;
+- EverythingAI Return Context Provenance run #16 — PASS;
+- final documentation review — no unresolved Critical or Important findings.
+
+Accepted #226 evidence:
+
+- PR #227 merged as `d7a5002582f0b0fb13d95d4656dbaedba651fcb0`;
+- unchanged implementation head `28a853b3b01be6dfad7ce025b89e251b2bdb0106`;
+- EverythingAI CI Smoke #662 — PASS;
+- EverythingAI Workspace Context Provenance run #1 — PASS;
+- EverythingAI Workspace Context Summary run #5 — PASS;
+- EverythingAI Source Recovery Return Context run #29 — PASS;
+- EverythingAI Multi-hop Return Context run #22 — PASS;
+- EverythingAI Return Context Provenance run #18 — PASS;
+- final independent diff review — no unresolved Critical or Important findings.
+
+Issue #228 is documentation-only canonical synchronization and preparation of a bounded Workspace Context release/dispatch evaluation gate. It does not itself dispatch a release or authorize another product/runtime implementation.
 
 ## Authority order
 
@@ -48,6 +72,8 @@ Implementation completion alone is never acceptance.
 - Cross-Surface Context Continuity — #218/#219 — merge `6cbb3c15de8cb5e9624c5fb164a2781790336298` — fresh candidate CI #652 and final decision CI #654 plus all focused return-context workflows — `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
 - Canonical post-dispatch synchronization — #220/#221 — merge `dcffd7e9648e37784b91db9852f628e09bed3ee4` — CI #656 plus all three focused return-context workflows.
 - Workspace Context Summary & Safe Return Map — #222/#223 — merge `17195747cb4fed58202992a0907816696b3ca3e1` — unchanged-head CI #658 plus Workspace Context Summary #1 and all three prior focused return-context workflows.
+- Workspace Context canonical synchronization — #224/#225 — merge `e5517027c922c0697441a22b4e946ffa0a44e13e` — CI #660 plus Workspace Context Summary #3 and all three prior focused return-context workflows.
+- Workspace Context Provenance & Unknown-State Explanations — #226/#227 — merge `d7a5002582f0b0fb13d95d4656dbaedba651fcb0` — unchanged-head CI #662 plus Workspace Context Provenance #1, Workspace Context Summary #5, and all three return-context workflows.
 
 Cross-Surface Context Continuity milestone merges remain independently reversible:
 
@@ -61,11 +87,11 @@ Cross-Surface Context Continuity milestone merges remain independently reversibl
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2, Product Depth comprehension, Cross-Surface Context Continuity dispatched; Workspace Context Summary accepted | #224 synchronization; next recommended bounded option is Workspace Context Provenance & Unknown-State Explanations |
+| Product and UX | Local MVP release-hardened; Phase 2, Product Depth comprehension, Cross-Surface Context Continuity dispatched; Workspace Context Summary and provenance/unknown-state explanations accepted | #228 synchronization, then bounded Workspace Context release/dispatch evaluation |
 | Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed planning/execution/audit/undo, truthful navigation provenance | Preserve evidence/action-scope semantics; no policy or mutation expansion |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host history remains separate | Explicit business priority plus privileged authority before live infrastructure work |
-| Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve unchanged-head evidence, focused workflows, rollback, and truthful blocker handling |
+| Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve unchanged-head evidence, all focused workflows, rollback, and truthful blocker handling |
 
 ## Accepted safety contract
 
@@ -92,6 +118,15 @@ Accepted Workspace Context Summary semantics from #222:
 4. Missing context remains unknown/unavailable rather than inferred.
 5. Summary display does not trigger backend, recovery, Knowledge Base, governed action, or filesystem mutation.
 6. It uses existing Client Workspace state/identifiers only; no backend or routing architecture was added.
+
+Accepted Workspace Context Provenance semantics from #226:
+
+1. Each displayed Workspace Context fact identifies its genuine existing client-side origin.
+2. Unavailable fields explain only the absence/staleness fact supported by current client state; no unobserved root cause is invented.
+3. A stale selected-source identifier remains unavailable and never selects a substitute source.
+4. Missing Knowledge Base origin, configured Folder Path, query, or safe-return provenance remains explicitly unknown/unavailable.
+5. Provenance/explanation rendering is read-only and triggers no backend, file, recovery, Knowledge Base, governed-action, or filesystem mutation.
+6. Existing safe-return, explicit context clearing, recovery-scope, and governed-action semantics remain unchanged.
 
 ## Mandatory inherited regression baseline
 
@@ -126,19 +161,20 @@ Every subsequent product/release candidate must preserve the complete applicable
 27. focused `EverythingAI Multi-hop Return Context` acceptance;
 28. focused `EverythingAI Return Context Provenance` acceptance;
 29. focused `EverythingAI Workspace Context Summary` acceptance;
-30. complete inherited CI matrix validation on the required unchanged candidate together with all applicable focused gates;
-31. disposable-folder RC acceptance;
-32. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-33. independent final review with no unresolved Critical or Important findings;
-34. milestone-scoped rollback evidence.
+30. focused `EverythingAI Workspace Context Provenance` acceptance;
+31. complete inherited CI matrix validation on the required unchanged candidate together with all applicable focused gates;
+32. disposable-folder RC acceptance;
+33. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+34. independent final review with no unresolved Critical or Important findings;
+35. milestone-scoped rollback evidence.
 
 Historical green evidence is supporting evidence only and never substitutes for validating a changed candidate. Accepted focused workflows remain part of the baseline unless explicitly superseded by an accepted decision.
 
 ## Current next action
 
-Complete #224 documentation synchronization. Validate its unchanged documentation head with EverythingAI CI Smoke, Workspace Context Summary, Source Recovery Return Context, Multi-hop Return Context, and Return Context Provenance workflows, then perform final documentation review before merge.
+Complete #228 documentation synchronization. Validate its unchanged documentation head with EverythingAI CI Smoke, Workspace Context Provenance, Workspace Context Summary, Source Recovery Return Context, Multi-hop Return Context, and Return Context Provenance workflows, then perform final documentation review before merge.
 
-After #224 acceptance, the single recommended bounded option is **Workspace Context Provenance & Unknown-State Explanations**: a read-only enhancement to the accepted Workspace Context Summary that explains the genuine origin of each displayed context fact and why unavailable fields are unknown, using existing Client Workspace state only. A separate implementation issue is required before code changes.
+If #228 is accepted, prepare a separate **Workspace Context Trust & Provenance release/dispatch gate** covering the already accepted #222 and #226 behaviors. That gate must use a fresh unchanged release candidate, rerun the complete inherited CI matrix plus every focused context workflow, independently review the tranche, and write explicit PASS/FAIL release evidence before dispatch. It does not authorize another feature.
 
 ## CEO-gated material expansion
 
@@ -160,4 +196,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback
 
-#224 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. All earlier accepted milestone rollback evidence remains independently valid.
+#228 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. All earlier accepted milestone rollback evidence remains independently valid.

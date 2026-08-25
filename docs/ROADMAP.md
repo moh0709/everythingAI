@@ -4,7 +4,8 @@ Date: 2026-08-26
 Current product state: **Phase 2 complete and dispatched (`PHASE2_PASS`)**  
 Current Product Depth state: **Evidence, Search, Lifecycle & Recovery Comprehension complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
-Workspace Context Summary & Safe Return Map: **milestone #222 accepted**
+Workspace Context Summary & Safe Return Map: **milestone #222 accepted**  
+Workspace Context Provenance & Unknown-State Explanations: **milestone #226 accepted**
 
 ## Completed product sequence
 
@@ -60,9 +61,13 @@ Accepted continuity milestones:
 5. #216 / PR #217 — Synchronization/release-gate preparation — merge `1af6d5be2198e7a6656ce401c451d5042452339d`, CI #650 plus all three focused workflows.
 6. #220 / PR #221 — Post-dispatch synchronization and next-direction selection — merge `dcffd7e9648e37784b91db9852f628e09bed3ee4`, CI #656 plus all three focused workflows.
 
-### Product & UX — Workspace Context Summary & Safe Return Map
+### Product & UX — Workspace Context Trust & Provenance
 
-Milestone #222 is accepted. PR #223 merged as `17195747cb4fed58202992a0907816696b3ca3e1` after unchanged implementation head `598bbd007547644380c18b880513f695fd49f147` passed:
+The current bounded Product & UX increment contains two accepted implementation milestones plus one accepted synchronization milestone.
+
+#### #222 — Workspace Context Summary & Safe Return Map
+
+PR #223 merged as `17195747cb4fed58202992a0907816696b3ca3e1` after unchanged implementation head `598bbd007547644380c18b880513f695fd49f147` passed:
 
 - EverythingAI CI Smoke #658;
 - EverythingAI Workspace Context Summary run #1;
@@ -74,22 +79,48 @@ Final independent diff review found no unresolved Critical or Important findings
 
 Accepted behavior:
 
-- the summary is read-only;
-- it shows only genuinely known current query, valid selected source, recorded Knowledge Base origin, configured source root, and genuine safe-return target;
-- stale/invalid selected-source state is shown as unavailable and never substituted;
+- summary is read-only;
+- only genuinely known current query, valid selected source, recorded Knowledge Base origin, configured source root, and genuine safe-return target are shown;
+- stale/invalid selected-source state is unavailable and never substituted;
 - missing context stays unknown/unavailable rather than inferred;
-- rendering the summary triggers no backend, recovery, Knowledge Base, governed-action, or filesystem mutation;
-- it uses existing Client Workspace state/identifiers only and introduces no backend or routing architecture.
+- rendering triggers no backend, recovery, Knowledge Base, governed-action, or filesystem mutation;
+- existing Client Workspace state/identifiers only; no backend or routing architecture added.
+
+#### #224 — Canonical synchronization
+
+PR #225 merged as `e5517027c922c0697441a22b4e946ffa0a44e13e` after CI Smoke #660 plus Workspace Context Summary #3, Source Recovery Return Context #27, Multi-hop Return Context #20, and Return Context Provenance #16 all passed. Final documentation review was clean.
+
+#### #226 — Workspace Context Provenance & Unknown-State Explanations
+
+PR #227 merged as `d7a5002582f0b0fb13d95d4656dbaedba651fcb0` after unchanged implementation head `28a853b3b01be6dfad7ce025b89e251b2bdb0106` passed:
+
+- EverythingAI CI Smoke #662;
+- EverythingAI Workspace Context Provenance run #1;
+- EverythingAI Workspace Context Summary run #5;
+- EverythingAI Source Recovery Return Context run #29;
+- EverythingAI Multi-hop Return Context run #22;
+- EverythingAI Return Context Provenance run #18.
+
+Final independent diff review found no unresolved Critical or Important findings.
+
+Accepted behavior:
+
+- each displayed Workspace Context fact identifies its genuine existing client-side origin;
+- unavailable fields explain only supported absence/staleness conditions and never invent an unobserved cause;
+- stale selected-source identity remains unavailable and never selects another source;
+- missing query, Knowledge Base origin, configured Folder Path, or safe-return history remains explicitly unknown/unavailable;
+- provenance/explanation rendering is read-only and mutation-free;
+- safe-return, explicit context clearing, source-root recovery scope, and governed-action semantics remain unchanged.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 and Product Depth releases dispatched; Workspace Context Summary accepted | #224 synchronization, then one separately released bounded provenance/explanation increment |
+| Product and UX | Strong local MVP; Phase 2 and Product Depth releases dispatched; Workspace Context Summary + provenance/unknown-state explanation milestones accepted | #228 synchronization, then Workspace Context Trust & Provenance release/dispatch evaluation |
 | Knowledge and Safe Action | Source-backed reading, explainable search, evidence navigation, lifecycle/recovery guidance, governed planning/execution/audit/undo | Preserve truthful evidence and action-scope semantics |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host history exists separately | Explicit priority plus privileged authority before live host work |
-| Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency, unchanged-head evidence, focused workflows, rollback, and truthful blocker discipline |
+| Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency, unchanged-head evidence, all focused workflows, rollback, and truthful blocker discipline |
 
 ## Active dependency sequence
 
@@ -97,37 +128,44 @@ Accepted behavior:
 CROSS_SURFACE_CONTEXT_CONTINUITY_PASS accepted and dispatched
   -> #220 synchronization accepted
     -> #222 Workspace Context Summary accepted
-      -> #224 canonical synchronization + next bounded gate
-        -> accept/reject #224 after full CI + all focused context workflows + final documentation review
-          -> if accepted, release exactly one bounded implementation issue
+      -> #224 synchronization accepted
+        -> #226 Workspace Context Provenance accepted
+          -> #228 canonical synchronization + tranche gate preparation
+            -> accept/reject #228 after full CI + all focused context workflows + final documentation review
+              -> if accepted, release a Workspace Context Trust & Provenance release/dispatch evaluation issue
 ```
 
-Issue #224 does not itself authorize another product/runtime implementation milestone.
+Issue #228 does not itself dispatch the Workspace Context increment or authorize another product/runtime implementation milestone.
 
 ## Recommended next bounded direction
 
-**Workspace Context Provenance & Unknown-State Explanations**
+**Workspace Context Trust & Provenance — release/dispatch evaluation**
 
-Goal: make the accepted read-only Workspace Context Summary easier to trust and diagnose without adding backend intelligence, routing changes, or mutation semantics.
+The accepted #222 and #226 behaviors form a coherent local-first Product & UX increment. Rather than adding another feature, the next dependency-safe action after #228 is a fresh tranche-level release candidate and explicit release decision.
 
-A separately released implementation issue may add narrowly testable read-only behavior such as:
+The release gate must:
 
-- identify the genuine client-side origin of each displayed summary fact (current query, valid selected source, Knowledge Base origin, configured Folder Path, recorded safe-return target);
-- explain why an unavailable summary field is unknown (for example no recorded origin, stale source no longer present, or no configured Folder Path) without inventing causes beyond existing state;
-- preserve current safe-return controls and existing explicit context-clearing behavior;
-- keep all action/recovery scope semantics unchanged;
-- use only existing Client Workspace state and identifiers.
+- validate one fresh unchanged candidate with the complete inherited CI matrix;
+- rerun `EverythingAI Workspace Context Provenance`;
+- rerun `EverythingAI Workspace Context Summary`;
+- rerun `EverythingAI Source Recovery Return Context`;
+- rerun `EverythingAI Multi-hop Return Context`;
+- rerun `EverythingAI Return Context Provenance`;
+- independently review tranche scope, safety semantics, rollback, and regression wiring;
+- write explicit PASS/FAIL release-decision evidence and a handover before any dispatch claim;
+- validate any changed final decision head again before merge.
 
-This is the only recommended next bounded option after #224. It requires a separate implementation issue and full inherited validation before code changes are accepted.
+This gate is release validation only. It does not authorize a new feature, backend/routing architecture, mutation behavior, Enterprise Platform work, privileged-host work, or material connector/runtime expansion.
 
 ## Mandatory inherited release discipline
 
-Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. The focused baseline now includes:
+Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. The focused baseline includes:
 
 - EverythingAI Source Recovery Return Context;
 - EverythingAI Multi-hop Return Context;
 - EverythingAI Return Context Provenance;
-- EverythingAI Workspace Context Summary.
+- EverythingAI Workspace Context Summary;
+- EverythingAI Workspace Context Provenance.
 
 Historical green results are supporting evidence only and never substitute for current validation. Every accepted change retains milestone-scoped rollback evidence and final independent review.
 
@@ -151,4 +189,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-Issue #224 is documentation-only and independently reversible. Reverting #224 must not alter the accepted runtime behavior from #222 or any earlier release.
+Issue #228 is documentation-only and independently reversible. Reverting #228 must not alter accepted runtime behavior from #222, #226, or any earlier release.
