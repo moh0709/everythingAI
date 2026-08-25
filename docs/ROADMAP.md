@@ -133,7 +133,7 @@ The following remain material expansion and require explicit CEO selection/appro
 
 ## Mandatory inherited release discipline
 
-Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head. The accepted cross-surface context-continuity acceptance from #202 plus the focused/full-matrix source-to-recovery return-context acceptance from #206 are now part of that baseline. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
+Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head, and the accepted focused `EverythingAI Source Recovery Return Context` workflow must also pass on that same unchanged candidate. The accepted cross-surface context-continuity acceptance from #202 remains part of the full matrix. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
 
 ## Issue #69
 
