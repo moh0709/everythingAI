@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity accepted through #210  
-Current gate: issue #212 canonical synchronization and next bounded continuity decision gate
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity accepted through #214  
+Current gate: issue #216 canonical synchronization and Cross-Surface Context Continuity release/dispatch gate
 
 ## Mandatory startup sequence
 
@@ -25,11 +25,13 @@ If a source lookup fails, exhaust repository/file fallbacks before declaring a b
 - Evidence/Search/Lifecycle/Recovery Comprehension release: #198 / PR #199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, status `PRODUCT_DEPTH_COMPREHENSION_PASS`.
 - Comprehension post-sync release candidate: `de8302a281badff75d8408fdcba1fbc15f9916ca`, CI #624 PASS.
 - Comprehension release-decision head: `94d303c8e687f01f4f8f1e4216ac2357cea0beb7`, CI #625 PASS, final documentation review clean.
-- Cross-Surface Context Continuity #202 / PR #203: merge `698d07aea66d00fbdf65c94eeacc1f15240fd4c2`; unchanged-head `d63cdb84c836e882d3734c6aeade98a5010043fc`; CI #629 PASS; final PM review clean.
+- Cross-Surface Context Continuity #202 / PR #203: merge `698d07aea66d00fbdf65c94eeacc1f15240fd4c2`; unchanged head `d63cdb84c836e882d3734c6aeade98a5010043fc`; CI #629 PASS; final PM review clean.
 - Source-to-Recovery Return Context #206 / PR #207: merge `21325da2ffb41899047b200d8e71877d022033b0`; focused workflow `EverythingAI Source Recovery Return Context` PASS on unchanged head `deb06e7055d57cf6feeb49e97222750f838f1a10`; full CI #634 PASS on the same head; final PM review clean.
-- Multi-Hop Return Context #210 / PR #211: merge `a4cc1fd89ea34a397d8537a8050ff68f56423d35`; unchanged head `968fab6f50c9a4b09262cb203fa0a2947809edd6`; CI #641 PASS; both focused workflows `EverythingAI Source Recovery Return Context` and `EverythingAI Multi-hop Return Context` PASS; final independent diff review clean.
+- Multi-Hop Return Context #210 / PR #211: merge `a4cc1fd89ea34a397d8537a8050ff68f56423d35`; unchanged head `968fab6f50c9a4b09262cb203fa0a2947809edd6`; CI #641 PASS; `EverythingAI Source Recovery Return Context` and `EverythingAI Multi-hop Return Context` PASS; final independent diff review clean.
+- Return-Context Provenance Visibility & Explicit Context Clearing #214 / PR #215: merge `a92803adaf5b15a3c5990efb01e4e469a5938311`; unchanged head `44a2df64e14f946aef3438194a80c64250c2d047`; CI #645 PASS; `EverythingAI Return Context Provenance`, `EverythingAI Source Recovery Return Context`, and `EverythingAI Multi-hop Return Context` PASS; final independent diff review clean.
 - Release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`.
 - Handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
+- Current tranche gate: `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_GATE_2026-08-25.md`.
 
 ## Program tracks
 
@@ -100,9 +102,10 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 - source-root recovery-context acceptance;
 - recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence scenarios;
 - cross-surface context-continuity acceptance;
-- focused source-to-recovery return-context workflow acceptance;
-- focused multi-hop return-context workflow acceptance;
-- complete inherited CI matrix validation on the same unchanged candidate as both focused gates;
+- focused `EverythingAI Source Recovery Return Context` acceptance;
+- focused `EverythingAI Multi-hop Return Context` acceptance;
+- focused `EverythingAI Return Context Provenance` acceptance;
+- complete inherited CI matrix validation on the same unchanged candidate as all three focused return-context gates;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent final review with no unresolved Critical or Important findings;
@@ -145,15 +148,28 @@ Accepted Cross-Surface Context Continuity additionally preserves:
 - multi-hop return context may carry only genuine recorded origins across Knowledge Base → Source Inspection → Recovery → Source Inspection → Knowledge Base;
 - stale selected-source IDs never fall back to another file, and stale document context is cleared when refresh proves the source no longer exists;
 - missing/stale page or source context remains unavailable/unknown rather than inferred;
+- the UI exposes only genuinely recorded return-context provenance and clearly distinguishes navigation context from recovery/action scope;
+- explicit clearing of remembered return context modifies client navigation memory only and triggers no backend, file, recovery, Knowledge Base, or filesystem mutation;
+- cleared or missing history remains unknown and is not reconstructed from nearby files/pages;
 - existing Client Workspace identifiers/state only unless a separately approved gate proves a minimal contract is required.
 
-No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, or material connector/runtime expansion is authorized.
+No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, new routing architecture, or material connector/runtime expansion is authorized.
 
-## Current bounded direction gate
+## Current release gate
 
-Issue #212 is the sole active governance task. It synchronizes accepted #210 evidence and prepares exactly one next bounded Cross-Surface Context Continuity option.
+Issue #216 is the sole active governance task. It synchronizes accepted #214 evidence and prepares a bounded Cross-Surface Context Continuity tranche release/dispatch decision covering #202, #206, #210, and #214.
 
-After #212 acceptance, the next implementation issue should target **return-context provenance visibility and explicit context clearing** across existing Client Workspace surfaces. It may expose only genuinely recorded navigation origins, must clearly distinguish navigation context from recovery/action scope, must allow the user to explicitly clear remembered return context, must keep missing history unknown rather than reconstruct it, remain frontend/local-first, and pass the complete inherited regression matrix plus both focused return-context workflows.
+No release PASS may be declared from milestone history alone. A fresh unchanged candidate must pass:
+
+- the complete inherited CI matrix;
+- `EverythingAI Source Recovery Return Context`;
+- `EverythingAI Multi-hop Return Context`;
+- `EverythingAI Return Context Provenance`;
+- final independent release review with no unresolved Critical or Important findings.
+
+The allowed release outcomes are `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`, `HOLD`, `REJECT`, or `BLOCKED`, as defined in `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_GATE_2026-08-25.md`.
+
+Do not release another product feature merely because #216 synchronization completes.
 
 CEO-gated directions remain Enterprise Platform expansion, privileged-host/systemd work, auth/tenancy/cloud/database/object-storage work, or material connector/runtime expansion.
 
@@ -163,4 +179,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #212 is documentation-only and can be reverted independently from product/runtime code.
+Every accepted milestone remains independently reversible by its recorded merge. #216 is documentation-only and can be reverted independently from product/runtime code.
