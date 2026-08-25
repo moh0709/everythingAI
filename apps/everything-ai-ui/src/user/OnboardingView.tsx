@@ -3,6 +3,7 @@ import { CheckCircle2, FolderOpen, Server, Sparkles } from 'lucide-react';
 import type { SetupStep } from './types';
 import type { ScanReport } from './scanReportTypes';
 import type { WatcherStatusPayload } from './useWatcherControls';
+import { SourceRecoveryContext } from './SourceRecoveryContext';
 import './localSettingsHelp.css';
 
 type OnboardingViewProps = {
@@ -57,6 +58,8 @@ export function OnboardingView({
 
     {error && <div className="error">{error}</div>}
     <div className={`status-strip ${busy ? 'working' : 'ready'}`}>{busy ? 'Processing...' : status}</div>
+
+    <SourceRecoveryContext folderPath={folderPath} scanReport={scanReport} watcherStatus={watcherStatus} />
 
     <section className="panel">
       <div className="panel-title">
