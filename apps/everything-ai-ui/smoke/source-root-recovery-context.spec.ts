@@ -88,7 +88,9 @@ test('source-root recovery context is truthful, root-scoped, and non-executing w
   await expect(recovery).toContainText('does not offer a per-file retry');
   await expect(recovery).toContainText('does not start a scan, extraction, Knowledge Base rebuild, watcher, or file mutation');
   await expect(recovery).toContainText('No persisted scan report is loaded in this view.');
+  await expect(recovery).toContainText('No scan outcome can be concluded from this view until a persisted scan report is available.');
   await expect(recovery).toContainText('Status: watching. Running: No · Pending: Yes · Scheduled: Yes.');
+  await expect(recovery).toContainText('Watcher state is monitoring evidence only. It does not prove extraction, recovery, or Knowledge Base success.');
   await expect(recovery).toContainText('Use the existing Build Knowledge or watcher controls only when you intentionally want to re-scan or resume monitoring.');
 
   expect(mutationRequests).toEqual([]);
