@@ -10,7 +10,7 @@ import {
   withInFlightSummary,
   type FileProgressRecord,
 } from '../shared/fileProgress';
-import { deriveSourceLifecycle } from '../shared/sourceLifecycle';
+import { deriveSourceLifecycle, type SourceLifecycleState } from '../shared/sourceLifecycle';
 import '../shared/sourceLifecycle.css';
 import './localSettingsHelp.css';
 
@@ -97,6 +97,24 @@ function lifecycleRefinementFor(file: IndexedFile): LifecycleRefinement | null {
   if (!hasLifecycleData && searchMatchFor(file)) return null;
   const lifecycle = deriveSourceLifecycle(file as FileProgressRecord);
   return { state: lifecycle.state, label: lifecycle.label };
+}
+
+function lifecycleNextStep(state: SourceLifecycleState) {
+  switch (state) {
+    case 'ready':
+      return 'No action is required. The source is indexed and extracted; inspect its text or use it as source evidence.';
+    case 'extracting':
+      return 'Wait for extraction to finish, then refresh the file list to load the latest persisted state.';
+    case 'indexing':
+      return 'Wait for indexing to finish, then refresh the file list to load the latest persisted state.';
+    case 'intake':
+      return 'No indexing record exists yet. Start or complete the source scan outside this panel, then refresh the file list.';
+    case 'unsupported':
+      return 'Text extraction is a capability limitation for this file type. Metadata remains available; no retry action is supported here.';
+    case 'index_failed':
+    case 'extraction_failed':
+      return 'Use source-root recovery to inspect or re-scan the configured source. No per-file retry is available.';
+  }
 }
 
 export function ExploreView({
@@ -304,6 +322,12 @@ export function ExploreView({
           <p><strong>View type:</strong> File content / source context</p>
           <p><strong>Path:</strong> {documentContext.file?.absolute_path}</p>
           <p><strong>Recovery:</strong> {selectedRecord?.recovery_status || 'active'}</p>
+          <section className={`source-lifecycle source-lifecycle-${selectedLifecycle.state}`} aria-label="Selected source lifecycle guidance">
+            <h3>Lifecycle guidance</h3>
+            <p><strong>Current state:</strong> {selectedLifecycle.label}</p>
+            <p><strong>Why:</strong> {selectedLifecycle.detail}</p>
+            <p><strong>Safe next step:</strong> {lifecycleNextStep(selectedLifecycle.state)}</p>
+          </section>
           <p><strong>Lifecycle:</strong> {selectedLifecycle.label} — {selectedLifecycle.detail}</p>
           <p><strong>Lifecycle state:</strong> {selectedLifecycle.state}</p>
           {selectedLifecycle.recoveryTarget === 'source_root' && <>
