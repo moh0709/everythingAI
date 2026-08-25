@@ -100,7 +100,7 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 - recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence scenarios;
 - cross-surface context-continuity acceptance;
 - focused source-to-recovery return-context workflow acceptance;
-- source-to-recovery return-context acceptance in the full inherited matrix;
+- complete inherited CI matrix validation on the same unchanged candidate as that focused gate;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent final review with no unresolved Critical or Important findings;
