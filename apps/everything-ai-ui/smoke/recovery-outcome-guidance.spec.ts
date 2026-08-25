@@ -87,7 +87,7 @@ test('recovery context interprets persisted scan and watcher outcomes without in
   await expect(recovery).toContainText('Watcher state is monitoring evidence only. It does not prove extraction, recovery, or Knowledge Base success.');
 
   await page.getByRole('button', { name: 'Build Knowledge' }).click();
-  await expect(page.getByRole('button', { name: 'Knowledge Base' })).toHaveClass(/active/);
+  await expect(page.getByRole('button', { name: 'Knowledge Base', exact: true })).toHaveClass(/active/);
 
   mutationRequests.length = 0;
   await page.getByRole('button', { name: 'Home' }).click();
