@@ -2,7 +2,7 @@
 
 Date: 2026-08-25  
 Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth releases  
-Current governance issue: #188
+Current governance issue: #192
 
 ## Current program stage
 
@@ -10,7 +10,9 @@ Current governance issue: #188
 
 Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
 
-Bounded Product Depth work has continued without authorizing Enterprise Platform or privileged-host expansion. The latest accepted product milestone is **#186 — Source-Root Recovery Context & Safe Guidance**, merged through PR #187 as `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49` after unchanged-head CI Smoke #604 on `3c2b09dfabce86bb85fe80094f1e80e0ef75b0c9` and final PM diff review with no unresolved Critical or Important findings.
+Bounded Product Depth work continues without authorizing Enterprise Platform or privileged-host expansion. The latest accepted product milestone is **#190 — Recovery Outcome Interpretation & Safe Next-Step Guidance**, merged through PR #191 as `da4fa079927f3d38dc6a3c444db5d93bbeca40c6` after unchanged-head CI Smoke #611 on `e8a6e705cde81bf804cdaa45e5572860ee784eaa` and final PM diff review with no unresolved Critical or Important findings.
+
+The previous canonical synchronization #188 / PR #189 was accepted and merged as `037a38f362b5619aa2706e16b22e7f91a7f59cd6` after CI Smoke #606.
 
 ## Authority order
 
@@ -28,8 +30,8 @@ Implementation completion alone is never acceptance.
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy search, governed-action lifecycle, evidence/freshness guidance, search refinement/lifecycle, source lifecycle guidance, and source-root recovery context accepted | #188 canonical synchronization, then one bounded recovery-outcome comprehension milestone if #188 is accepted |
-| Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, source-root recovery context, governed planning/execution/audit/undo accepted | Improve interpretation of already persisted scan/watcher outcomes and safe next-step guidance only |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy search, governed-action lifecycle, evidence/freshness guidance, search refinement/lifecycle, source lifecycle guidance, source-root recovery context, and recovery-outcome guidance accepted | #192 canonical synchronization, then one bounded recovery-evidence scope-alignment milestone if #192 is accepted |
+| Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, source-root recovery context, recovery outcome interpretation, governed planning/execution/audit/undo accepted | Improve whether persisted recovery evidence clearly belongs to the currently configured source root without inventing freshness, success, or cause |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work remains separate | Explicit selection plus required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve exact evidence, rollback, inherited-gate coverage, and truthful blocker handling |
@@ -61,11 +63,15 @@ Implementation completion alone is never acceptance.
 - #180 — canonical synchronization — merge `ff85d2fe90eb5f2903ea8c986e759e2bfcc3101d` — CI #597.
 - #182 — selected-source lifecycle next-step clarity — merge `2c4b5596230b498a8fa20977bdf1790b13ff4955` — CI #600.
 - #184 — canonical synchronization — merge `980b47937dd6601533776ef12478b6904faf4e0f` — CI #602.
-- #186 — source-root recovery context/safe guidance — merge `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49` — unchanged-head CI #604 on `3c2b09dfabce86bb85fe80094f1e80e0ef75b0c9`.
+- #186 — source-root recovery context/safe guidance — merge `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49` — CI #604.
+- #188 — canonical synchronization — merge `037a38f362b5619aa2706e16b22e7f91a7f59cd6` — CI #606.
+- #190 — recovery outcome interpretation/safe next-step guidance — merge `da4fa079927f3d38dc6a3c444db5d93bbeca40c6` — unchanged-head CI #611 on `e8a6e705cde81bf804cdaa45e5572860ee784eaa`.
 
 ## Product Depth safety contract
 
-Product Depth remains local-first and bounded. It preserves backend-returned search order, source provenance, truthful match-basis labeling, and the rule that ranking signals are not presented as calibrated confidence. Lifecycle guidance uses only persisted indexing/extraction state. Source-root recovery guidance uses only the configured source root, persisted scan report, persisted watcher status, and existing explicit controls; opening recovery context is read-only and does not start scanning, extraction, Knowledge Base rebuild, watcher activity, retry, or filesystem mutation. There is no per-file retry in the accepted client flow.
+Product Depth remains local-first and bounded. It preserves backend-returned search order, source provenance, truthful match-basis labeling, and the rule that ranking signals are not presented as calibrated confidence. Lifecycle guidance uses only persisted indexing/extraction state. Recovery guidance uses only configured source-root identity, persisted scan report, persisted watcher status, and existing explicit controls.
+
+Accepted #190 semantics are exact: `indexed`, `skipped`, and `failed` are interpreted only as persisted scan outcomes; watcher state is monitoring evidence only; missing scan/watcher state remains unknown/unavailable; opening recovery guidance is read-only and triggers no scan, extraction, Knowledge Base rebuild, watcher change, retry, or filesystem mutation. There is no per-file retry in the accepted client flow.
 
 Governed planning preserves backend policy, approval, audit, undo, and the global one-filesystem-mutation-per-file guard.
 
@@ -96,10 +102,11 @@ Subsequent product work must preserve, where applicable:
 21. lifecycle-status refinement/processing-state acceptance;
 22. selected-source lifecycle guidance acceptance;
 23. source-root recovery-context acceptance from #186;
-24. disposable-folder RC acceptance;
-25. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-26. independent diff review with no unresolved Critical or Important findings;
-27. milestone-scoped rollback evidence.
+24. recovery-outcome guidance acceptance from #190;
+25. disposable-folder RC acceptance;
+26. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+27. independent diff review with no unresolved Critical or Important findings;
+28. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for validating a new candidate. Previously accepted focused gates must remain wired into CI unless explicitly superseded by an accepted decision.
 
@@ -119,14 +126,14 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #188 is the sole active Product Depth governance task. It synchronizes canonical state after accepted #186 and prepares one bounded decision gate.
+Issue #192 is the sole active Product Depth governance task. It synchronizes canonical state after accepted #190 and prepares one bounded decision gate.
 
 ## Current next action
 
-Complete #188 with the full inherited CI matrix on one unchanged documentation candidate and final documentation diff review. If accepted, the recommended next bounded milestone is **Recovery Outcome Interpretation & Safe Next-Step Guidance**, defined in `docs/PRODUCT_DEPTH_RECOVERY_OUTCOME_GUIDANCE_DECISION_GATE_2026-08-25.md`.
+Complete #192 with the full inherited CI matrix on one unchanged documentation candidate and final documentation diff review. If accepted, the recommended next bounded milestone is **Recovery Evidence Scope Alignment & Context Clarity**, defined in `docs/PRODUCT_DEPTH_RECOVERY_EVIDENCE_SCOPE_ALIGNMENT_DECISION_GATE_2026-08-25.md`.
 
-That recommendation must remain read-only/frontend-bounded and may interpret only already persisted scan counts/status and watcher state. It must not infer root cause, success, health, progress, freshness, confidence, or repair completion; must not add per-file retry or automatic recovery; and must not expand backend lifecycle, mutation, Enterprise Platform, connector runtime, or privileged-host scope.
+The proposed milestone is frontend-only and uses facts already present in `SourceRecoveryContext`: the configured recovery root, `scanReport.rootPath`, and watcher `rootPath`. If persisted scan evidence belongs to a different root than the active recovery root, the UI should say so explicitly and must not imply that those counts describe the active root. Matching evidence remains genuine; mismatched evidence remains visible but clearly scoped to its recorded root. No freshness, health, success, root cause, retry, recovery, or mutation fact may be invented.
 
 ## Rollback
 
-#188 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.
+#192 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.

@@ -56,22 +56,24 @@ Accepted as `PRODUCT_DEPTH_ACTION_LIFECYCLE_PASS` through #162 / PR #163 merge `
 17. #168 canonical synchronization — `26fcc0fc68bcf7f784241b5c45d52835b5b0d0c4`, CI #576.
 18. #170 read-only search refinement/filtering UX — `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, CI #579.
 19. #172 canonical synchronization — `3b750a1467a0ba01bd30ef3dbd18b38f969099af`, CI #581.
-20. #174 search refinement lifecycle/query-context clarity — `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, final unchanged-head CI #584.
-21. #176 canonical synchronization — `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e`, final unchanged-head CI #590.
+20. #174 search refinement lifecycle/query-context clarity — `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, CI #584.
+21. #176 canonical synchronization — `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e`, CI #590.
 22. #178 lifecycle-status refinement/processing-state clarity — `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, CI #595.
 23. #180 canonical synchronization — `ff85d2fe90eb5f2903ea8c986e759e2bfcc3101d`, CI #597.
 24. #182 selected-source lifecycle next-step clarity — `2c4b5596230b498a8fa20977bdf1790b13ff4955`, CI #600.
 25. #184 canonical synchronization — `980b47937dd6601533776ef12478b6904faf4e0f`, CI #602.
-26. #186 source-root recovery context/safe guidance — `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, final unchanged head `3c2b09dfabce86bb85fe80094f1e80e0ef75b0c9`, CI #604.
+26. #186 source-root recovery context/safe guidance — `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, CI #604.
+27. #188 canonical synchronization — `037a38f362b5619aa2706e16b22e7f91a7f59cd6`, CI #606.
+28. #190 recovery outcome interpretation/safe next-step guidance — `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, final unchanged head `e8a6e705cde81bf804cdaa45e5572860ee784eaa`, CI #611.
 
-The accepted continuation remains read-only unless a user explicitly invokes an existing control. Search refinement preserves backend order and query-context boundaries. Lifecycle guidance derives only from persisted facts. Recovery context is source-root scoped, exposes persisted scan/watcher evidence, has no per-file retry, and opening it does not trigger a scan, extraction, rebuild, watcher, retry, or file mutation.
+The accepted continuation remains read-only unless a user explicitly invokes an existing control. Search refinement preserves backend order and query-context boundaries. Lifecycle guidance derives only from persisted facts. Recovery context is source-root scoped; persisted `indexed`, `skipped`, and `failed` scan outcomes remain distinct; watcher state is monitoring evidence only; missing state remains unknown; and opening recovery guidance does not trigger scan, extraction, rebuild, watcher changes, retry, or file mutation.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 dispatched; bounded Product Depth accepted through source-root recovery context | Complete #188; if accepted, release one recovery-outcome interpretation/safe-next-step milestone |
-| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, source-root recovery context, governed planning/execution/audit/undo | Improve comprehension of existing persisted scan/watcher outcomes without new recovery mechanics |
+| Product and UX | Strong local MVP; Phase 2 dispatched; bounded Product Depth accepted through recovery outcome interpretation | Complete #192; if accepted, release one recovery-evidence scope-alignment/context-clarity milestone |
+| Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, recovery context/outcome interpretation, governed planning/execution/audit/undo | Clarify whether persisted scan/watcher evidence belongs to the currently configured source root without new recovery mechanics |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before implementation expansion |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority plus privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue/PR/CI/review loop proven | Preserve exact dependency, inherited CI wiring, rollback, and truthful blocker discipline |
@@ -79,36 +81,37 @@ The accepted continuation remains read-only unless a user explicitly invokes an 
 ## Active dependency sequence
 
 ```text
-#186 accepted
-  -> #188 canonical synchronization + next decision package
-    -> recovery outcome interpretation & safe next-step guidance (recommended bounded gate)
+#190 accepted
+  -> #192 canonical synchronization + next decision package
+    -> recovery evidence scope alignment & context clarity (recommended bounded gate)
 ```
 
-Issue #188 does not itself authorize product/runtime implementation. Its decision package recommends one bounded next milestone only after #188 is accepted.
+Issue #192 does not itself authorize product/runtime implementation. Its decision package recommends one bounded next milestone only after #192 is accepted.
 
 ## Recommended next bounded milestone
 
-**Recovery Outcome Interpretation & Safe Next-Step Guidance**
+**Recovery Evidence Scope Alignment & Context Clarity**
 
-Decision package: `docs/PRODUCT_DEPTH_RECOVERY_OUTCOME_GUIDANCE_DECISION_GATE_2026-08-25.md`.
+Decision package: `docs/PRODUCT_DEPTH_RECOVERY_EVIDENCE_SCOPE_ALIGNMENT_DECISION_GATE_2026-08-25.md`.
 
-Inspection of the accepted `SourceRecoveryContext` shows the client already has enough persisted facts to improve comprehension without backend changes: source-root identity, latest scan `indexed` / `skipped` / `failed` counts, and watcher `status` / `running` / `pending` / `scheduled` fields.
+Inspection of accepted `SourceRecoveryContext.tsx` shows that three genuine root identities already exist in the client: the configured recovery root, `scanReport.rootPath`, and watcher `rootPath`. The view currently renders scan evidence even when the persisted scan report belongs to a different root than the configured recovery root. That evidence is real, but its applicability can be ambiguous.
 
 Allowed direction:
 
-- explain persisted scan counts in plain language without inferring cause or completion beyond the report itself;
-- distinguish failed, skipped, and indexed counts without calling skipped files failed or ready;
-- explain watcher state as persisted monitoring state, not extraction/recovery success;
-- provide safe next-step copy that points only to already existing Folder Path, Scan Report, Build Knowledge, and watcher controls;
-- explicitly preserve that opening/reading the guidance is non-mutating and does not start recovery;
-- add a focused browser acceptance and preserve every inherited gate through #186.
+- compare the configured recovery root with the persisted scan-report root and watcher root using only exact existing values;
+- clearly label evidence as aligned when it belongs to the active recovery root;
+- when the persisted scan report belongs to another root, keep it visible but explicitly say it does not describe the active recovery root;
+- keep unmatched watcher state absent/unknown rather than borrowing state from another root;
+- preserve the exact #190 semantics for indexed/skipped/failed outcomes and watcher monitoring evidence;
+- add focused browser acceptance for matching-root, mismatched-root, and missing-root/evidence scenarios;
+- preserve every inherited gate through #190.
 
 Prohibited expansion:
 
-- root-cause diagnosis not present in persisted data;
-- health, progress, freshness, confidence, success, or repair-completion scores;
-- per-file retry;
-- automatic scan/extraction/recovery/rebuild/watcher mutation;
+- path guessing, normalization rules that can change identity semantics, or cross-root merging;
+- freshness, health, progress, confidence, success, root-cause, repair-completion, or retry inference;
+- per-file retry or automatic recovery;
+- automatic scan/extraction/rebuild/watcher mutation;
 - backend lifecycle/recovery redesign;
 - search/ranking/provider changes;
 - planning/mutation/approval/audit/undo changes;
@@ -116,7 +119,7 @@ Prohibited expansion:
 
 ## Mandatory inherited release discipline
 
-Every new product candidate must pass the full applicable inherited matrix on one unchanged head, including accepted Product Depth browser gates through #186, disposable-folder RC acceptance, and UI-governed action/undo acceptance. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise.
+Every new product candidate must pass the full applicable inherited matrix on one unchanged head, including accepted Product Depth browser gates through #190, disposable-folder RC acceptance, and UI-governed action/undo acceptance. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise.
 
 ## Issue #69
 
