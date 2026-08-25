@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-26  
-Authority: current accepted repository state after Product & UX milestone #226  
-Current governance issue: #228
+Authority: current release-decision state for Workspace Context Trust & Provenance  
+Current governance issue: #230
 
 ## Current program stage
 
@@ -15,6 +15,21 @@ Current governance issue: #228
 **Product & UX milestone #222 — Workspace Context Summary & Safe Return Map is ACCEPTED.**
 
 **Product & UX milestone #226 — Workspace Context Provenance & Unknown-State Explanations is ACCEPTED.**
+
+**Workspace Context Trust & Provenance release decision is `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`, subject to the required changed-final-head validation and merge gate in #230.**
+
+Fresh tranche release candidate `209ad11c2a0a7602c14fb3313931ddd1f9de38c8` passed:
+
+- EverythingAI CI Smoke #666 — PASS;
+- EverythingAI Workspace Context Provenance #5 — PASS;
+- EverythingAI Workspace Context Summary #9 — PASS;
+- EverythingAI Source Recovery Return Context #33 — PASS;
+- EverythingAI Multi-hop Return Context #26 — PASS;
+- EverythingAI Return Context Provenance #22 — PASS;
+- independent release review — no unresolved Critical or Important findings.
+
+Release decision: `docs/WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE_DECISION_2026-08-26.md`  
+Handover: `docs/HANDOVER_2026-08-26_WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE.json`
 
 Accepted #222 evidence:
 
@@ -49,7 +64,19 @@ Accepted #226 evidence:
 - EverythingAI Return Context Provenance run #18 — PASS;
 - final independent diff review — no unresolved Critical or Important findings.
 
-Issue #228 is documentation-only canonical synchronization and preparation of a bounded Workspace Context release/dispatch evaluation gate. It does not itself dispatch a release or authorize another product/runtime implementation.
+Accepted #228 synchronization evidence:
+
+- PR #229 merged as `cb02a32ef271a72f99ab7d967d25fa24103df004`;
+- unchanged documentation head `9a67781926927331eaeebfb5544e6d4a56daaac1`;
+- EverythingAI CI Smoke #664 — PASS;
+- EverythingAI Workspace Context Provenance #3 — PASS;
+- EverythingAI Workspace Context Summary #7 — PASS;
+- EverythingAI Source Recovery Return Context #31 — PASS;
+- EverythingAI Multi-hop Return Context #24 — PASS;
+- EverythingAI Return Context Provenance #20 — PASS;
+- final documentation review — no unresolved Critical or Important findings.
+
+Issue #230 is the tranche-level release/dispatch decision gate. Its changed final decision head must pass the complete inherited matrix plus all five focused context workflows before the release-decision merge may be accepted and dispatch becomes canonical on `main`.
 
 ## Authority order
 
@@ -74,6 +101,8 @@ Implementation completion alone is never acceptance.
 - Workspace Context Summary & Safe Return Map — #222/#223 — merge `17195747cb4fed58202992a0907816696b3ca3e1` — unchanged-head CI #658 plus Workspace Context Summary #1 and all three prior focused return-context workflows.
 - Workspace Context canonical synchronization — #224/#225 — merge `e5517027c922c0697441a22b4e946ffa0a44e13e` — CI #660 plus Workspace Context Summary #3 and all three prior focused return-context workflows.
 - Workspace Context Provenance & Unknown-State Explanations — #226/#227 — merge `d7a5002582f0b0fb13d95d4656dbaedba651fcb0` — unchanged-head CI #662 plus Workspace Context Provenance #1, Workspace Context Summary #5, and all three return-context workflows.
+- Workspace Context tranche synchronization — #228/#229 — merge `cb02a32ef271a72f99ab7d967d25fa24103df004` — unchanged-head CI #664 plus all five focused context workflows.
+- Workspace Context Trust & Provenance — #230 release decision `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`; fresh candidate `209ad11c2a0a7602c14fb3313931ddd1f9de38c8` passed CI #666 plus all five focused context workflows; final decision head remains merge-gated until fresh validation completes.
 
 Cross-Surface Context Continuity milestone merges remain independently reversible:
 
@@ -87,7 +116,7 @@ Cross-Surface Context Continuity milestone merges remain independently reversibl
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2, Product Depth comprehension, Cross-Surface Context Continuity dispatched; Workspace Context Summary and provenance/unknown-state explanations accepted | #228 synchronization, then bounded Workspace Context release/dispatch evaluation |
+| Product and UX | Local MVP release-hardened; Phase 2, Product Depth comprehension, Cross-Surface Context Continuity dispatched; Workspace Context Summary and provenance/unknown-state explanations accepted | #230 final-head validation and release-decision merge for Workspace Context Trust & Provenance |
 | Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed planning/execution/audit/undo, truthful navigation provenance | Preserve evidence/action-scope semantics; no policy or mutation expansion |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host history remains separate | Explicit business priority plus privileged authority before live infrastructure work |
@@ -172,9 +201,9 @@ Historical green evidence is supporting evidence only and never substitutes for 
 
 ## Current next action
 
-Complete #228 documentation synchronization. Validate its unchanged documentation head with EverythingAI CI Smoke, Workspace Context Provenance, Workspace Context Summary, Source Recovery Return Context, Multi-hop Return Context, and Return Context Provenance workflows, then perform final documentation review before merge.
+Validate the changed #230 final release-decision head with EverythingAI CI Smoke, Workspace Context Provenance, Workspace Context Summary, Source Recovery Return Context, Multi-hop Return Context, and Return Context Provenance on one unchanged head. If all pass and the final diff remains free of unresolved Critical or Important findings, merge PR #231 and close #230 as completed, thereby making `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS` canonical on `main`.
 
-If #228 is accepted, prepare a separate **Workspace Context Trust & Provenance release/dispatch gate** covering the already accepted #222 and #226 behaviors. That gate must use a fresh unchanged release candidate, rerun the complete inherited CI matrix plus every focused context workflow, independently review the tranche, and write explicit PASS/FAIL release evidence before dispatch. It does not authorize another feature.
+After dispatch, do not automatically start another product feature. The next direction must be selected through a separate bounded five-track governance gate.
 
 ## CEO-gated material expansion
 
@@ -196,4 +225,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback
 
-#228 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. All earlier accepted milestone rollback evidence remains independently valid.
+#230 release documentation and canonical-state update are documentation-only and independently reversible. Accepted #222 and #226 milestone merges remain independently reversible, and all earlier rollback evidence remains valid.

@@ -1,0 +1,59 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-26",
+  "release": "Workspace Context Trust & Provenance",
+  "issue": 230,
+  "status": "WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS",
+  "accepted_sync_baseline": {
+    "merge": "cb02a32ef271a72f99ab7d967d25fa24103df004",
+    "issue": 228,
+    "pr": 229
+  },
+  "fresh_release_candidate": {
+    "sha": "209ad11c2a0a7602c14fb3313931ddd1f9de38c8",
+    "ci_smoke_run": 666,
+    "workspace_context_provenance_run": 5,
+    "workspace_context_summary_run": 9,
+    "source_recovery_return_context_run": 33,
+    "multi_hop_return_context_run": 26,
+    "return_context_provenance_run": 22,
+    "result": "PASS"
+  },
+  "accepted_milestones": [
+    {
+      "issue": 222,
+      "pr": 223,
+      "merge": "17195747cb4fed58202992a0907816696b3ca3e1",
+      "unchanged_head": "598bbd007547644380c18b880513f695fd49f147",
+      "ci_run": 658
+    },
+    {
+      "issue": 226,
+      "pr": 227,
+      "merge": "d7a5002582f0b0fb13d95d4656dbaedba651fcb0",
+      "unchanged_head": "28a853b3b01be6dfad7ce025b89e251b2bdb0106",
+      "ci_run": 662
+    }
+  ],
+  "supporting_synchronization": [
+    {"issue": 224, "pr": 225, "merge": "e5517027c922c0697441a22b4e946ffa0a44e13e", "ci_run": 660},
+    {"issue": 228, "pr": 229, "merge": "cb02a32ef271a72f99ab7d967d25fa24103df004", "ci_run": 664}
+  ],
+  "safety_semantics": {
+    "workspace_context_read_only": true,
+    "provenance_inferred": false,
+    "unknown_root_cause_invented": false,
+    "stale_source_substitution": false,
+    "recovery_scope": "source-root",
+    "navigation_provenance_is_recovery_or_action_scope": false,
+    "direct_navigation_fabricates_history": false,
+    "explicit_context_clear_mutates_backend_or_filesystem": false,
+    "existing_governed_action_controls_changed": false
+  },
+  "rollback": "Revert only the affected accepted milestone merge; #224/#228 synchronization and #230 release documentation are independently reversible.",
+  "enterprise_platform_scope_expanded": false,
+  "backend_or_routing_architecture_expanded": false,
+  "mutation_scope_expanded": false,
+  "protected_historical_issue_69_modified": false,
+  "next_state": "Merge the release decision only after the changed final decision head itself passes full CI plus Workspace Context Provenance, Workspace Context Summary, Source Recovery Return Context, Multi-hop Return Context, and Return Context Provenance. After dispatch, select any next product direction through a separate bounded governance gate."
+}
