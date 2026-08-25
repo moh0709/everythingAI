@@ -204,6 +204,30 @@ export function UserApp() {
     workspaceQuery || selectedFileId || workspaceSelectedSource || exploreReturnWikiPageId || recoveryReturnFileId || configuredSourceRoot,
   );
 
+  const queryContextExplanation = workspaceQuery
+    ? 'Provenance: current query comes from the Client Workspace search input.'
+    : 'Unavailable because no query is currently recorded.';
+  const selectedSourceContextExplanation = selectedFileId
+    ? workspaceSelectedSource
+      ? 'Provenance: selected source comes from the current Client Workspace file selection.'
+      : 'Unavailable because the recorded selected source is no longer present in the current file list; no replacement is inferred.'
+    : workspaceSelectedSource
+      ? 'Provenance: selected source comes from the current Client Workspace file selection.'
+      : 'Unavailable because no source is currently selected.';
+  const knowledgeOriginContextExplanation = exploreReturnWikiPageId
+    ? exploreReturnWikiPage
+      ? 'Provenance: Knowledge Base origin comes from the recorded return context.'
+      : 'Unavailable because the recorded Knowledge Base origin is no longer present; no replacement is inferred.'
+    : 'Unavailable because no Knowledge Base origin is recorded.';
+  const sourceRootContextExplanation = configuredSourceRoot
+    ? 'Provenance: configured source root comes only from Folder Path.'
+    : 'Unavailable because no Folder Path is configured.';
+  const safeReturnContextExplanation = recoveryReturnFileId
+    ? 'Provenance: safe return target comes from the recorded Source Recovery return context.'
+    : exploreReturnWikiPageId
+      ? 'Provenance: safe return target comes from the recorded Knowledge Base return context.'
+      : 'Unavailable because no safe return target is currently recorded.';
+
   function openWikiSourceContext(fileId: string) {
     setExploreReturnWikiPageId(selectedWikiPageId || null);
     openSourceContext(fileId);
@@ -259,6 +283,7 @@ export function UserApp() {
           <div>
             <dt>Query</dt>
             <dd>{workspaceQuery ? `Query: “${workspaceQuery}”` : 'Query: none recorded.'}</dd>
+            <dd className="muted">{queryContextExplanation}</dd>
           </div>
           <div>
             <dt>Selected source</dt>
@@ -269,6 +294,7 @@ export function UserApp() {
               : workspaceSelectedSource
                 ? `Selected source: “${workspaceSelectedSource.filename}”`
                 : 'Selected source: none selected.'}</dd>
+            <dd className="muted">{selectedSourceContextExplanation}</dd>
           </div>
           <div>
             <dt>Knowledge Base origin</dt>
@@ -277,14 +303,17 @@ export function UserApp() {
                 ? `Knowledge Base origin: “${exploreReturnWikiPage.title}”`
                 : 'Knowledge Base origin: unavailable; no replacement page is inferred.'
               : 'Knowledge Base origin: none recorded.'}</dd>
+            <dd className="muted">{knowledgeOriginContextExplanation}</dd>
           </div>
           <div>
             <dt>Configured source root</dt>
             <dd>{configuredSourceRoot ? `Configured source root: ${configuredSourceRoot}` : 'Configured source root: not configured.'}</dd>
+            <dd className="muted">{sourceRootContextExplanation}</dd>
           </div>
           <div>
             <dt>Safe return target</dt>
             <dd>{safeReturnTarget ? `Safe return target: ${safeReturnTarget}` : 'Safe return target: none recorded.'}</dd>
+            <dd className="muted">{safeReturnContextExplanation}</dd>
           </div>
         </dl>
         {recoveryReturnFileId ? <p className="muted">Recovery scope remains the configured source root; the selected source is navigation context only.</p> : null}
