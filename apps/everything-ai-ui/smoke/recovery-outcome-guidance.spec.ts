@@ -131,11 +131,15 @@ test('recovery context keeps mismatched persisted evidence visible without apply
 
 test('recovery context does not promote persisted scan or watcher roots into configured-root evidence', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.removeItem('everythingai.ui.folderPath');
+    localStorage.setItem('everythingai.ui.folderPath', '/tmp/recovery-root');
   });
   await stubRecoveryRoutes(page);
   await page.goto(BASE_URL, { waitUntil: 'networkidle' });
   await buildKnowledgeAndReturnHome(page);
+
+  const folderInput = page.getByLabel('Folder Path');
+  await folderInput.fill('');
+  await page.evaluate(() => localStorage.removeItem('everythingai.ui.folderPath'));
 
   const recovery = page.getByLabel('Source-root recovery context');
   await expect(recovery).toContainText('No source root is currently configured in the persisted client state.');
