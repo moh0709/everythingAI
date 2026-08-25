@@ -73,6 +73,7 @@ export function UserApp() {
   const [query, setQuery] = useState('');
   const [scanReport, setScanReport] = useState<ScanReport | null>(null);
   const [exploreReturnWikiPageId, setExploreReturnWikiPageId] = useState<string | null>(null);
+  const [recoveryReturnFileId, setRecoveryReturnFileId] = useState<string | null>(null);
 
   const { refreshFiles, searchEverything, loadDocumentContext: loadDocumentContextWorkflow, revealSourceFile } = useFileDocumentWorkflows({
     options,
@@ -186,6 +187,9 @@ export function UserApp() {
   const exploreReturnWikiPage = exploreReturnWikiPageId
     ? wiki?.pages.find((page) => page.id === exploreReturnWikiPageId)
     : undefined;
+  const recoveryReturnFile = recoveryReturnFileId
+    ? files.find((file) => file.id === recoveryReturnFileId)
+    : undefined;
 
   function openWikiSourceContext(fileId: string) {
     setExploreReturnWikiPageId(selectedWikiPageId || null);
@@ -202,8 +206,23 @@ export function UserApp() {
     setView('wiki');
   }
 
+  function openSelectedSourceRecovery() {
+    setRecoveryReturnFileId(selectedFileId || null);
+    setView('onboarding');
+    window.requestAnimationFrame(() => document.getElementById('client-source-root-heading')?.focus());
+  }
+
+  function returnToSourceOrigin() {
+    const fileId = recoveryReturnFileId;
+    const fileStillExists = Boolean(fileId && files.some((file) => file.id === fileId));
+    setRecoveryReturnFileId(null);
+    setView('explore');
+    if (fileId && fileStillExists) loadDocumentContextWorkflow(fileId);
+  }
+
   function handleTopNavView(nextView: UserView) {
     if (nextView === 'explore') setExploreReturnWikiPageId(null);
+    setRecoveryReturnFileId(null);
     setView(nextView);
   }
 
@@ -211,21 +230,35 @@ export function UserApp() {
     <UserTopNav view={view} setView={handleTopNavView} openAskView={openAskView} />
 
     <main className="page">
-      {view === 'onboarding' && <OnboardingView
-        error={error} busy={busy} status={status}
-        setupSteps={setupSteps}
-        scanReport={scanReport}
-        watcherStatus={watcherStatus}
-        folderPath={folderPath} setFolderPath={setFolderPath}
-        baseUrl={baseUrl} setBaseUrl={setBaseUrl}
-        token={token} setToken={setToken}
-        selectFolder={selectFolder}
-        buildKnowledgeWorkspace={buildKnowledgeWorkspace}
-        startWatcher={startWatcher}
-        stopWatcher={stopWatcher}
-        refreshWatcherStatus={() => refreshWatcherStatus()}
-        saveConnection={saveConnection}
-      />}
+      {view === 'onboarding' && <>
+        {recoveryReturnFileId ? <section className="panel" aria-label="Recovery navigation context">
+          <div className="panel-title">
+            <div>
+              <h2>Source inspection context</h2>
+              <p>{recoveryReturnFile
+                ? `Recovery was opened while inspecting “${recoveryReturnFile.filename}”. The selected file is only the navigation origin; recovery remains scoped to the configured source root.`
+                : 'The source that opened recovery is no longer present in the current file list. Recovery remains scoped to the configured source root, and no replacement source is assumed.'}</p>
+              <p>The current search query is preserved. Opening this context does not start recovery, scanning, extraction, rebuilding, watcher activity, or file mutation.</p>
+            </div>
+            <button className="outline" onClick={returnToSourceOrigin}>Back to Sources & Files</button>
+          </div>
+        </section> : null}
+        <OnboardingView
+          error={error} busy={busy} status={status}
+          setupSteps={setupSteps}
+          scanReport={scanReport}
+          watcherStatus={watcherStatus}
+          folderPath={folderPath} setFolderPath={setFolderPath}
+          baseUrl={baseUrl} setBaseUrl={setBaseUrl}
+          token={token} setToken={setToken}
+          selectFolder={selectFolder}
+          buildKnowledgeWorkspace={buildKnowledgeWorkspace}
+          startWatcher={startWatcher}
+          stopWatcher={stopWatcher}
+          refreshWatcherStatus={() => refreshWatcherStatus()}
+          saveConnection={saveConnection}
+        />
+      </>}
 
       {view === 'explore' && <>
         {exploreReturnWikiPageId ? <section className="panel" aria-label="Navigation context">
@@ -251,10 +284,7 @@ export function UserApp() {
           handleAskFromHero={handleAskFromHero}
           loadDocumentContext={(fileId) => loadDocumentContextWorkflow(fileId)}
           saveConnection={saveConnection}
-          openSourceRecovery={() => {
-            setView('onboarding');
-            window.requestAnimationFrame(() => document.getElementById('client-source-root-heading')?.focus());
-          }}
+          openSourceRecovery={openSelectedSourceRecovery}
         />
       </>}
 
