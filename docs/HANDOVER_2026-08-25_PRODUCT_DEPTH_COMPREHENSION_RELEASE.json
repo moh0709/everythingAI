@@ -1,0 +1,38 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-25",
+  "release": "Product Depth — Evidence, Search, Lifecycle & Recovery Comprehension",
+  "issue": 198,
+  "status": "PRODUCT_DEPTH_COMPREHENSION_PASS",
+  "release_candidate": {
+    "sha": "de8302a281badff75d8408fdcba1fbc15f9916ca",
+    "ci_run": 624,
+    "result": "PASS"
+  },
+  "accepted_milestones": [
+    {"issue": 166, "merge": "9b41167f41b89ff6ae5a8deb7064c817bfb205fb", "ci_run": 574},
+    {"issue": 170, "merge": "7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce", "ci_run": 579},
+    {"issue": 174, "merge": "6ba75a928b5d126a893ed7089d9c7a391b75ee02", "ci_run": 584},
+    {"issue": 178, "merge": "48531f7d1ff843c6a23180b5331f3c05fd2df1da", "ci_run": 595},
+    {"issue": 182, "merge": "2c4b5596230b498a8fa20977bdf1790b13ff4955", "ci_run": 600},
+    {"issue": 186, "merge": "3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49", "ci_run": 604},
+    {"issue": 190, "merge": "da4fa079927f3d38dc6a3c444db5d93bbeca40c6", "ci_run": 611},
+    {"issue": 194, "merge": "a869b305457d8fc18bd3b9265990e9d0065d2c6b", "ci_run": 618},
+    {"issue": 196, "merge": "de8302a281badff75d8408fdcba1fbc15f9916ca", "ci_run": 623}
+  ],
+  "safety_semantics": {
+    "configured_root_identity": "Folder Path only",
+    "scan_and_watcher_roots": "evidence identities only",
+    "root_applicability": "exact match only",
+    "missing_configured_root": "unknown even when persisted evidence exists",
+    "scan_outcomes": ["indexed", "skipped", "failed"],
+    "watcher_state": "monitoring evidence only",
+    "automatic_recovery_added": false,
+    "per_file_retry_added": false,
+    "filesystem_mutation_added": false
+  },
+  "rollback": "Revert only the affected accepted milestone merge; release documentation and #196 synchronization are independently reversible.",
+  "enterprise_platform_scope_expanded": false,
+  "protected_historical_issue_69_modified": false,
+  "next_state": "Dispatch the tranche after the release-decision PR itself passes unchanged-head CI and final documentation review; choose any subsequent implementation direction through a separate five-track decision gate."
+}
