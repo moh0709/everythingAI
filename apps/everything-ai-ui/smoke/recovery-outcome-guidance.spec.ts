@@ -129,6 +129,23 @@ test('recovery context keeps mismatched persisted evidence visible without apply
   await expect(recovery).not.toContainText('Watcher scope: exact match for /tmp/recovery-root');
 });
 
+test('recovery context does not promote persisted scan or watcher roots into configured-root evidence', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.removeItem('everythingai.ui.folderPath');
+  });
+  await stubRecoveryRoutes(page);
+  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  await buildKnowledgeAndReturnHome(page);
+
+  const recovery = page.getByLabel('Source-root recovery context');
+  await expect(recovery).toContainText('No source root is currently configured in the persisted client state.');
+  await expect(recovery).toContainText('Persisted scan report for /tmp/recovery-root: 4 indexed, 2 skipped, 1 failed.');
+  await expect(recovery).toContainText('applicability to a configured recovery root is unknown because no source root is currently configured');
+  await expect(recovery).toContainText('Watcher applicability is unknown because no configured recovery root is available.');
+  await expect(recovery).not.toContainText('this persisted scan report matches the configured source root exactly');
+  await expect(recovery).not.toContainText('Watcher scope: exact match for /tmp/recovery-root');
+});
+
 test('recovery context leaves missing root and persisted evidence unavailable instead of inferring applicability', async ({ page }) => {
   const mutationRequests: string[] = [];
   await page.addInitScript(() => {
@@ -144,7 +161,7 @@ test('recovery context leaves missing root and persisted evidence unavailable in
   await page.goto(BASE_URL, { waitUntil: 'networkidle' });
 
   const recovery = page.getByLabel('Source-root recovery context');
-  await expect(recovery).toContainText('No source root is currently available in the persisted client state.');
+  await expect(recovery).toContainText('No source root is currently configured in the persisted client state.');
   await expect(recovery).toContainText('No persisted scan report is loaded in this view.');
   await expect(recovery).toContainText('Watcher applicability is unknown because no configured recovery root is available.');
   expect(mutationRequests).toEqual([]);
