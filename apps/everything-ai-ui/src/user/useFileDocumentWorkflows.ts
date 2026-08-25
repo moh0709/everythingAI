@@ -38,6 +38,7 @@ type UseFileDocumentWorkflowsArgs = {
 export function useFileDocumentWorkflows({
   options,
   query,
+  selectedFileId,
   run,
   loadFiles,
   selectFile,
@@ -48,9 +49,13 @@ export function useFileDocumentWorkflows({
   async function refreshFiles() {
     await run('Loading indexed files...', async () => {
       const payload = await apiRequest<{ files: IndexedFile[] }>(options, '/api/files?limit=250');
-      loadFiles(payload.files || []);
-      if (payload.files?.length) setView((current) => current === 'onboarding' ? 'explore' : current);
-      setStatus(`Loaded ${payload.files?.length || 0} file(s).`);
+      const nextFiles = payload.files || [];
+      loadFiles(nextFiles);
+      if (selectedFileId && !nextFiles.some((file) => file.id === selectedFileId)) {
+        setDocumentContext(null);
+      }
+      if (nextFiles.length) setView((current) => current === 'onboarding' ? 'explore' : current);
+      setStatus(`Loaded ${nextFiles.length} file(s).`);
     });
   }
 
