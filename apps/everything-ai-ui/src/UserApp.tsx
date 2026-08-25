@@ -190,6 +190,19 @@ export function UserApp() {
   const recoveryReturnFile = recoveryReturnFileId
     ? files.find((file) => file.id === recoveryReturnFileId)
     : undefined;
+  const workspaceSelectedSource = selectedFileId
+    ? files.find((file) => file.id === selectedFileId)
+    : selectedFile;
+  const workspaceQuery = query.trim();
+  const configuredSourceRoot = folderPath.trim();
+  const safeReturnTarget = recoveryReturnFileId
+    ? 'Sources & Files'
+    : exploreReturnWikiPageId
+      ? 'Knowledge Base'
+      : null;
+  const shouldShowWorkspaceContext = Boolean(
+    workspaceQuery || selectedFileId || workspaceSelectedSource || exploreReturnWikiPageId || recoveryReturnFileId || configuredSourceRoot,
+  );
 
   function openWikiSourceContext(fileId: string) {
     setExploreReturnWikiPageId(selectedWikiPageId || null);
@@ -235,6 +248,48 @@ export function UserApp() {
     <UserTopNav view={view} setView={handleTopNavView} openAskView={openAskView} />
 
     <main className="page">
+      {shouldShowWorkspaceContext ? <section className="panel" aria-label="Workspace context summary">
+        <div className="panel-title">
+          <div>
+            <h2>Workspace context</h2>
+            <p>This read-only summary reports only context already present in the Client Workspace. It does not start recovery, scanning, extraction, rebuilding, governed actions, or file mutation.</p>
+          </div>
+        </div>
+        <dl className="wiki-citation-focus-meta">
+          <div>
+            <dt>Query</dt>
+            <dd>{workspaceQuery ? `Query: “${workspaceQuery}”` : 'Query: none recorded.'}</dd>
+          </div>
+          <div>
+            <dt>Selected source</dt>
+            <dd>{selectedFileId
+              ? workspaceSelectedSource
+                ? `Selected source: “${workspaceSelectedSource.filename}”`
+                : 'Selected source: unavailable; no replacement source is inferred.'
+              : workspaceSelectedSource
+                ? `Selected source: “${workspaceSelectedSource.filename}”`
+                : 'Selected source: none selected.'}</dd>
+          </div>
+          <div>
+            <dt>Knowledge Base origin</dt>
+            <dd>{exploreReturnWikiPageId
+              ? exploreReturnWikiPage
+                ? `Knowledge Base origin: “${exploreReturnWikiPage.title}”`
+                : 'Knowledge Base origin: unavailable; no replacement page is inferred.'
+              : 'Knowledge Base origin: none recorded.'}</dd>
+          </div>
+          <div>
+            <dt>Configured source root</dt>
+            <dd>{configuredSourceRoot ? `Configured source root: ${configuredSourceRoot}` : 'Configured source root: not configured.'}</dd>
+          </div>
+          <div>
+            <dt>Safe return target</dt>
+            <dd>{safeReturnTarget ? `Safe return target: ${safeReturnTarget}` : 'Safe return target: none recorded.'}</dd>
+          </div>
+        </dl>
+        {recoveryReturnFileId ? <p className="muted">Recovery scope remains the configured source root; the selected source is navigation context only.</p> : null}
+      </section> : null}
+
       {view === 'onboarding' && <>
         {recoveryReturnFileId ? <section className="panel" aria-label="Recovery navigation context">
           <div className="panel-title">
