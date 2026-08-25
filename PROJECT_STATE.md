@@ -2,7 +2,7 @@
 
 Date: 2026-08-25  
 Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth releases  
-Current governance issue: #180
+Current governance issue: #184
 
 ## Current program stage
 
@@ -18,6 +18,7 @@ Accepted bounded Product Depth releases and milestones include:
 - **Search Refinement & Filtering** — #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, final CI Smoke #579, independent diff review clean.
 - **Search Refinement Lifecycle & Query-Context Clarity** — #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, final unchanged-head CI Smoke #584 on `4bdc4823917f9249eb9bb23528741e2a2e9faa43`, PM diff review clean.
 - **Lifecycle-Status Refinement & Processing-State Clarity** — #178 / PR #179 merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, final unchanged head `0fd7b5638b142cddd1ce5f4f1795839d50eb583a`, final CI Smoke #595, PM diff review clean. CI #595 explicitly restored and passed the inherited #174 search-refinement lifecycle acceptance before #178 was accepted.
+- **Selected-Source Lifecycle Next-Step Clarity** — #182 / PR #183 merge `2c4b5596230b498a8fa20977bdf1790b13ff4955`, final unchanged head `b973508701ac7be3e0f3f8108755976d12f4bd91`, final CI Smoke #600, PM diff review clean.
 
 No Enterprise Platform or privileged-host implementation is authorized by Product Depth work.
 
@@ -37,8 +38,8 @@ Implementation completion alone is never acceptance.
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy-search, governed-action lifecycle, evidence-quality, search refinement/filtering, search-context lifecycle, and lifecycle-status Product Depth milestones accepted | #180 canonical synchronization, then one bounded selected-source lifecycle clarity milestone if #180 is accepted |
-| Knowledge and Safe Action | Source provenance, explainable search, evidence navigation, diagnostics, lifecycle-state filtering, governed planning/execution/audit/undo lifecycle accepted | Improve selected-source lifecycle comprehension using existing persisted facts only |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy-search, governed-action lifecycle, evidence-quality, search refinement/filtering, search-context lifecycle, lifecycle-status, and selected-source lifecycle Product Depth milestones accepted | #184 canonical synchronization, then one bounded source-recovery-context comprehension milestone if #184 is accepted |
+| Knowledge and Safe Action | Source provenance, explainable search, evidence navigation, diagnostics, lifecycle-state filtering, selected-source lifecycle guidance, governed planning/execution/audit/undo lifecycle accepted | Improve source-root recovery comprehension using existing persisted recovery facts/navigation only |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work remains a separate operational track | Explicit selection plus required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve exact evidence, rollback, inherited-gate coverage, and truthful blocker handling |
@@ -76,10 +77,12 @@ Implementation completion alone is never acceptance.
 - #174 — search refinement lifecycle/query-context clarity — merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02` — CI #584.
 - #176 — canonical synchronization — merge `1b103e614ba117cdf8b5e2e08cd39eebc5bdeb2e` — final unchanged-head CI #590.
 - #178 — lifecycle-status refinement and processing-state clarity — merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da` — final unchanged head `0fd7b5638b142cddd1ce5f4f1795839d50eb583a` — CI #595.
+- #180 — canonical synchronization — merge `ff85d2fe90eb5f2903ea8c986e759e2bfcc3101d` — CI #597.
+- #182 — selected-source lifecycle next-step clarity — merge `2c4b5596230b498a8fa20977bdf1790b13ff4955` — final unchanged head `b973508701ac7be3e0f3f8108755976d12f4bd91` — CI #600.
 
 ## Product Depth safety contract
 
-Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Search refinements preserve backend result order, belong to the current result context, and reset before a new explicit search or base-file refresh changes that context. Lifecycle refinements use only persisted indexing/extraction facts through the accepted `deriveSourceLifecycle` mapping; they do not invent progress, completion, retry, health, freshness, confidence, or recovery semantics. Planning and governed-action UX preserves backend policy, the global one-filesystem-mutation-per-file guard, approval, audit, undo, and filesystem behavior.
+Product Depth preserves read-only Client search/diagnostic behavior, source provenance, truthful match-basis labeling, exact persisted-page navigation, and the rule that deterministic/semantic ranking signals are not presented as calibrated confidence. Search refinements preserve backend result order, belong to the current result context, and reset before a new explicit search or base-file refresh changes that context. Lifecycle refinements use only persisted indexing/extraction facts through the accepted `deriveSourceLifecycle` mapping; they do not invent progress, completion, retry, health, freshness, confidence, or recovery semantics. Selected-source guidance reuses that same lifecycle mapping and exposes only the already accepted source-root recovery navigation for supported failure states. Planning and governed-action UX preserves backend policy, the global one-filesystem-mutation-per-file guard, approval, audit, undo, and filesystem behavior.
 
 ## Mandatory inherited regression baseline
 
@@ -106,10 +109,11 @@ Subsequent product work must preserve, where applicable:
 19. Product Depth search-refinement/filtering acceptance;
 20. Product Depth search-refinement lifecycle/query-context acceptance;
 21. Product Depth lifecycle-status refinement/processing-state acceptance;
-22. disposable-folder RC acceptance;
-23. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-24. independent diff review with no unresolved Critical or Important findings;
-25. milestone-scoped rollback evidence.
+22. Product Depth selected-source lifecycle guidance acceptance;
+23. disposable-folder RC acceptance;
+24. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+25. independent diff review with no unresolved Critical or Important findings;
+26. milestone-scoped rollback evidence.
 
 A historical test result is not a substitute for validation of a new candidate. CI wiring for previously accepted focused gates is part of the inherited baseline and must not silently regress.
 
@@ -129,13 +133,13 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** and retained as historical Ph
 
 ## Current issue state
 
-Issue #180 is the sole active Product Depth governance task. It synchronizes canonical state after accepted #178 and prepares the next bounded decision gate.
+Issue #184 is the sole active Product Depth governance task. It synchronizes canonical state after accepted #182 and prepares the next bounded decision gate.
 
 ## Current next action
 
-Complete #180 with full inherited CI on one unchanged documentation candidate and final documentation diff review. If accepted, the recommended next bounded milestone is **Selected-Source Lifecycle Next-Step Clarity**, defined in `docs/PRODUCT_DEPTH_SELECTED_SOURCE_LIFECYCLE_DECISION_GATE_2026-08-25.md`.
+Complete #184 with full inherited CI on one unchanged documentation candidate and final documentation diff review. If accepted, the recommended next bounded milestone is **Source-Root Recovery Context & Safe Guidance**, defined in `docs/PRODUCT_DEPTH_SOURCE_RECOVERY_CONTEXT_DECISION_GATE_2026-08-25.md`.
 
-That recommendation is frontend/read-only except for reusing already accepted source-root recovery navigation. It must not add per-file retry, automatic scan/extraction/recovery, progress percentages, new confidence/freshness/provenance calculations, backend lifecycle redesign, search ranking changes, mutation behavior, Enterprise Platform scope, or privileged-host work.
+That recommendation is frontend/read-only and must reuse only existing persisted recovery facts and the already accepted source-root recovery navigation. It must not add automatic scan/extraction/recovery, per-file retry, invented progress/health/confidence/freshness facts, backend lifecycle redesign, planning or mutation changes, Enterprise Platform scope, or privileged-host work.
 
 ## Historical archive
 
@@ -143,4 +147,4 @@ The exact pre-Phase-2-reconciliation canonical file remains preserved at:
 
 `docs/archive/2026-08-23-pre-phase2-reconciliation/PROJECT_STATE.md`
 
-The archive is historical evidence, not current execution authority. Git history preserves every later canonical revision; #180 rollback is a revert of the documentation synchronization merge only.
+The archive is historical evidence, not current execution authority. Git history preserves every later canonical revision; #184 rollback is a revert of the documentation synchronization merge only.
