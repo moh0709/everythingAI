@@ -72,6 +72,7 @@ export function UserApp() {
   const [view, setView] = useState<UserView>('onboarding');
   const [query, setQuery] = useState('');
   const [scanReport, setScanReport] = useState<ScanReport | null>(null);
+  const [exploreReturnWikiPageId, setExploreReturnWikiPageId] = useState<string | null>(null);
 
   const { refreshFiles, searchEverything, loadDocumentContext: loadDocumentContextWorkflow, revealSourceFile } = useFileDocumentWorkflows({
     options,
@@ -182,8 +183,32 @@ export function UserApp() {
     loadDocumentContext: loadDocumentContextWorkflow,
   });
 
+  const exploreReturnWikiPage = exploreReturnWikiPageId
+    ? wiki?.pages.find((page) => page.id === exploreReturnWikiPageId)
+    : undefined;
+
+  function openWikiSourceContext(fileId: string) {
+    setExploreReturnWikiPageId(selectedWikiPageId || null);
+    openSourceContext(fileId);
+  }
+
+  function returnToWikiOrigin() {
+    const pageId = exploreReturnWikiPageId;
+    setExploreReturnWikiPageId(null);
+    if (pageId && wiki?.pages.some((page) => page.id === pageId)) {
+      openWikiPage(pageId);
+      return;
+    }
+    setView('wiki');
+  }
+
+  function handleTopNavView(nextView: UserView) {
+    if (nextView === 'explore') setExploreReturnWikiPageId(null);
+    setView(nextView);
+  }
+
   return <div className={`app ${readingMode ? 'wiki-reading-mode-active' : ''}`}>
-    <UserTopNav view={view} setView={setView} openAskView={openAskView} />
+    <UserTopNav view={view} setView={handleTopNavView} openAskView={openAskView} />
 
     <main className="page">
       {view === 'onboarding' && <OnboardingView
@@ -202,23 +227,36 @@ export function UserApp() {
         saveConnection={saveConnection}
       />}
 
-      {view === 'explore' && <ExploreView
-        error={error} busy={busy} status={status}
-        baseUrl={baseUrl} setBaseUrl={setBaseUrl}
-        token={token} setToken={setToken}
-        query={query} setQuery={setQuery}
-        files={files} selectedFile={selectedFile}
-        documentContext={documentContext}
-        refreshFiles={refreshFiles}
-        searchEverything={searchEverything}
-        handleAskFromHero={handleAskFromHero}
-        loadDocumentContext={(fileId) => loadDocumentContextWorkflow(fileId)}
-        saveConnection={saveConnection}
-        openSourceRecovery={() => {
-          setView('onboarding');
-          window.requestAnimationFrame(() => document.getElementById('client-source-root-heading')?.focus());
-        }}
-      />}
+      {view === 'explore' && <>
+        {exploreReturnWikiPageId ? <section className="panel" aria-label="Navigation context">
+          <div className="panel-title">
+            <div>
+              <h2>Knowledge Base context</h2>
+              <p>{exploreReturnWikiPage
+                ? `This source was opened from “${exploreReturnWikiPage.title}”. Return there without losing the current search query.`
+                : 'The Knowledge Base page that opened this source is no longer present. Return to the Knowledge Base without assuming a replacement page.'}</p>
+            </div>
+            <button className="outline" onClick={returnToWikiOrigin}>Back to Knowledge Base</button>
+          </div>
+        </section> : null}
+        <ExploreView
+          error={error} busy={busy} status={status}
+          baseUrl={baseUrl} setBaseUrl={setBaseUrl}
+          token={token} setToken={setToken}
+          query={query} setQuery={setQuery}
+          files={files} selectedFile={selectedFile}
+          documentContext={documentContext}
+          refreshFiles={refreshFiles}
+          searchEverything={searchEverything}
+          handleAskFromHero={handleAskFromHero}
+          loadDocumentContext={(fileId) => loadDocumentContextWorkflow(fileId)}
+          saveConnection={saveConnection}
+          openSourceRecovery={() => {
+            setView('onboarding');
+            window.requestAnimationFrame(() => document.getElementById('client-source-root-heading')?.focus());
+          }}
+        />
+      </>}
 
       {view === 'wiki' && <WikiView
         error={error} busy={busy} status={status}
@@ -231,7 +269,7 @@ export function UserApp() {
         openWikiPage={openWikiPage}
         askAboutWikiPage={askAboutWikiPage}
         revealSourceFile={revealSourceFile}
-        openSourceContext={openSourceContext}
+        openSourceContext={openWikiSourceContext}
         handleCitationClick={handleCitationClick}
       />}
 
