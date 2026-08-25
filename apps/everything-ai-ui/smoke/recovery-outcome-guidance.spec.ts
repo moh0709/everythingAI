@@ -43,6 +43,33 @@ const watcherPayload = {
   }],
 };
 
+async function stubRecoveryRoutes(page: Page, watchers = watcherPayload) {
+  await page.route('**/api/watch/status', async (route) => {
+    await route.fulfill({ json: watchers });
+  });
+  await page.route('**/api/files?*', async (route) => {
+    await route.fulfill({ json: { files: [] } });
+  });
+  await page.route('**/api/wiki?*', async (route) => {
+    await route.fulfill({ json: { wiki: { generated_at: null, page_count: 0, pages: [] } } });
+  });
+  await page.route('**/api/index', async (route) => {
+    await route.fulfill({ json: scanReport });
+  });
+  await page.route('**/api/extract', async (route) => {
+    await route.fulfill({ json: { processed: 0 } });
+  });
+  await page.route('**/api/insights', async (route) => {
+    await route.fulfill({ json: { processed: 0 } });
+  });
+}
+
+async function buildKnowledgeAndReturnHome(page: Page) {
+  await page.getByRole('button', { name: 'Build Knowledge' }).click();
+  await expect(page.getByRole('button', { name: 'Knowledge Base', exact: true })).toHaveClass(/active/);
+  await page.getByRole('button', { name: 'Home' }).click();
+}
+
 test('recovery context interprets persisted scan and watcher outcomes without inventing recovery success', async ({ page }) => {
   const mutationRequests: string[] = [];
 
@@ -56,30 +83,7 @@ test('recovery context interprets persisted scan and watcher outcomes without in
     }
   });
 
-  await page.route('**/api/watch/status', async (route) => {
-    await route.fulfill({ json: watcherPayload });
-  });
-
-  await page.route('**/api/files?*', async (route) => {
-    await route.fulfill({ json: { files: [] } });
-  });
-
-  await page.route('**/api/wiki?*', async (route) => {
-    await route.fulfill({ json: { wiki: { generated_at: null, page_count: 0, pages: [] } } });
-  });
-
-  await page.route('**/api/index', async (route) => {
-    await route.fulfill({ json: scanReport });
-  });
-
-  await page.route('**/api/extract', async (route) => {
-    await route.fulfill({ json: { processed: 0 } });
-  });
-
-  await page.route('**/api/insights', async (route) => {
-    await route.fulfill({ json: { processed: 0 } });
-  });
-
+  await stubRecoveryRoutes(page);
   await page.goto(BASE_URL, { waitUntil: 'networkidle' });
 
   const recovery = page.getByLabel('Source-root recovery context');
@@ -92,6 +96,8 @@ test('recovery context interprets persisted scan and watcher outcomes without in
   mutationRequests.length = 0;
   await page.getByRole('button', { name: 'Home' }).click();
 
+  await expect(recovery).toContainText('this persisted scan report matches the configured source root exactly');
+  await expect(recovery).toContainText('Watcher scope: exact match for /tmp/recovery-root');
   await expect(recovery).toContainText('4 indexed: recorded as indexed by the latest persisted scan report.');
   await expect(recovery).toContainText('2 skipped: skipped by that scan; skipped does not mean failed or ready.');
   await expect(recovery).toContainText('1 failed: recorded as failed by that scan; use the Scan Report below for persisted failure details rather than inferring a cause here.');
@@ -105,4 +111,62 @@ test('recovery context interprets persisted scan and watcher outcomes without in
     path: `${ARTIFACT_DIR}/product-depth-recovery-outcome-guidance.png`,
     fullPage: true,
   });
+});
+
+test('recovery context keeps mismatched persisted evidence visible without applying it to the configured root', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('everythingai.ui.folderPath', '/tmp/current-root');
+  });
+  await stubRecoveryRoutes(page);
+  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  await buildKnowledgeAndReturnHome(page);
+
+  const recovery = page.getByLabel('Source-root recovery context');
+  await expect(recovery).toContainText('Persisted scan report for /tmp/recovery-root: 4 indexed, 2 skipped, 1 failed.');
+  await expect(recovery).toContainText('this persisted scan report belongs to another source root');
+  await expect(recovery).toContainText('Its counts do not describe the configured recovery root /tmp/current-root.');
+  await expect(recovery).toContainText('No matching persisted watcher state is loaded for the configured source root /tmp/current-root.');
+  await expect(recovery).not.toContainText('Watcher scope: exact match for /tmp/recovery-root');
+});
+
+test('recovery context does not promote persisted scan or watcher roots into configured-root evidence', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('everythingai.ui.folderPath', '/tmp/recovery-root');
+  });
+  await stubRecoveryRoutes(page);
+  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  await buildKnowledgeAndReturnHome(page);
+
+  const folderInput = page.getByLabel('Folder Path');
+  await folderInput.fill('');
+  await page.evaluate(() => localStorage.removeItem('everythingai.ui.folderPath'));
+
+  const recovery = page.getByLabel('Source-root recovery context');
+  await expect(recovery).toContainText('No source root is currently configured in the persisted client state.');
+  await expect(recovery).toContainText('Persisted scan report for /tmp/recovery-root: 4 indexed, 2 skipped, 1 failed.');
+  await expect(recovery).toContainText('applicability to a configured recovery root is unknown because no source root is currently configured');
+  await expect(recovery).toContainText('Watcher applicability is unknown because no configured recovery root is available.');
+  await expect(recovery).not.toContainText('this persisted scan report matches the configured source root exactly');
+  await expect(recovery).not.toContainText('Watcher scope: exact match for /tmp/recovery-root');
+});
+
+test('recovery context leaves missing root and persisted evidence unavailable instead of inferring applicability', async ({ page }) => {
+  const mutationRequests: string[] = [];
+  await page.addInitScript(() => {
+    localStorage.removeItem('everythingai.ui.folderPath');
+  });
+  page.on('request', (request) => {
+    if (request.method() !== 'GET' && request.method() !== 'HEAD') {
+      mutationRequests.push(`${request.method()} ${new URL(request.url()).pathname}`);
+    }
+  });
+
+  await stubRecoveryRoutes(page, { active: 0, watchers: [] });
+  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+
+  const recovery = page.getByLabel('Source-root recovery context');
+  await expect(recovery).toContainText('No source root is currently configured in the persisted client state.');
+  await expect(recovery).toContainText('No persisted scan report is loaded in this view.');
+  await expect(recovery).toContainText('Watcher applicability is unknown because no configured recovery root is available.');
+  expect(mutationRequests).toEqual([]);
 });

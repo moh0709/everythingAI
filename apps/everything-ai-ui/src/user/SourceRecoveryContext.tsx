@@ -12,19 +12,13 @@ function count(value: number | undefined) {
   return Number.isFinite(value) ? value : 0;
 }
 
-function selectRecoveryRoot(folderPath: string, scanReport: ScanReport | null, watcherStatus: WatcherStatusPayload | null) {
-  const configured = folderPath.trim();
-  if (configured) return configured;
-  if (scanReport?.rootPath) return scanReport.rootPath;
-  return watcherStatus?.watchers?.find((watcher) => watcher.running)?.rootPath
-    || watcherStatus?.watchers?.[0]?.rootPath
-    || '';
-}
-
 export function SourceRecoveryContext({ folderPath, scanReport, watcherStatus }: SourceRecoveryContextProps) {
-  const recoveryRoot = selectRecoveryRoot(folderPath, scanReport, watcherStatus);
-  const matchingWatcher = recoveryRoot
-    ? watcherStatus?.watchers?.find((watcher) => watcher.rootPath === recoveryRoot)
+  const configuredRoot = folderPath.trim();
+  const scanRoot = scanReport?.rootPath || '';
+  const scanMatchesConfiguredRoot = Boolean(configuredRoot && scanRoot && configuredRoot === scanRoot);
+  const scanDiffersFromConfiguredRoot = Boolean(configuredRoot && scanRoot && configuredRoot !== scanRoot);
+  const matchingWatcher = configuredRoot
+    ? watcherStatus?.watchers?.find((watcher) => watcher.rootPath === configuredRoot)
     : undefined;
 
   return (
@@ -39,9 +33,9 @@ export function SourceRecoveryContext({ folderPath, scanReport, watcherStatus }:
       <div className="settings-help-grid">
         <div>
           <strong>Configured source root</strong>
-          {recoveryRoot
-            ? <p><code>{recoveryRoot}</code></p>
-            : <p>No source root is currently available in the persisted client state.</p>}
+          {configuredRoot
+            ? <p><code>{configuredRoot}</code></p>
+            : <p>No source root is currently configured in the persisted client state.</p>}
         </div>
         <div>
           <strong>Opening this view is read-only</strong>
@@ -58,6 +52,9 @@ export function SourceRecoveryContext({ folderPath, scanReport, watcherStatus }:
           <strong>Latest scan evidence</strong>
           {scanReport?.rootPath ? <>
             <p>Persisted scan report for <code>{scanReport.rootPath}</code>: {count(scanReport.indexed)} indexed, {count(scanReport.skipped)} skipped, {count(scanReport.failed)} failed.</p>
+            {scanMatchesConfiguredRoot ? <p><strong>Evidence scope:</strong> this persisted scan report matches the configured source root exactly, so these counts describe that recovery root.</p> : null}
+            {scanDiffersFromConfiguredRoot ? <p><strong>Evidence scope:</strong> this persisted scan report belongs to another source root. Its counts do not describe the configured recovery root <code>{configuredRoot}</code>.</p> : null}
+            {!configuredRoot ? <p><strong>Evidence scope:</strong> applicability to a configured recovery root is unknown because no source root is currently configured.</p> : null}
             <p>{count(scanReport.indexed)} indexed: recorded as indexed by the latest persisted scan report.</p>
             <p>{count(scanReport.skipped)} skipped: skipped by that scan; skipped does not mean failed or ready.</p>
             <p>{count(scanReport.failed)} failed: recorded as failed by that scan; use the Scan Report below for persisted failure details rather than inferring a cause here.</p>
@@ -69,8 +66,13 @@ export function SourceRecoveryContext({ folderPath, scanReport, watcherStatus }:
         <div>
           <strong>Watcher evidence</strong>
           {matchingWatcher
-            ? <p>Status: {matchingWatcher.status}. Running: {matchingWatcher.running ? 'Yes' : 'No'} · Pending: {matchingWatcher.pending ? 'Yes' : 'No'} · Scheduled: {matchingWatcher.scheduled ? 'Yes' : 'No'}.</p>
-            : <p>No matching persisted watcher state is loaded for this source root.</p>}
+            ? <>
+              <p>Watcher scope: exact match for <code>{configuredRoot}</code>.</p>
+              <p>Status: {matchingWatcher.status}. Running: {matchingWatcher.running ? 'Yes' : 'No'} · Pending: {matchingWatcher.pending ? 'Yes' : 'No'} · Scheduled: {matchingWatcher.scheduled ? 'Yes' : 'No'}.</p>
+            </>
+            : configuredRoot
+              ? <p>No matching persisted watcher state is loaded for the configured source root <code>{configuredRoot}</code>.</p>
+              : <p>Watcher applicability is unknown because no configured recovery root is available.</p>}
           <p>Watcher state is monitoring evidence only. It does not prove extraction, recovery, or Knowledge Base success.</p>
         </div>
         <div>
