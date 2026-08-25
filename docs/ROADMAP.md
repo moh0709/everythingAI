@@ -3,6 +3,7 @@
 Date: 2026-08-25  
 Current product state: **Phase 2 complete and dispatched (`PHASE2_PASS`)**  
 Current Product Depth state: **Evidence, Search, Lifecycle & Recovery Comprehension complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
+Cross-Surface Context Continuity: **milestone #202 accepted**  
 Accepted comprehension release merge: `e32f3a1db5b1c5447031842cd59bda59afadce90`
 
 ## Completed product sequence
@@ -55,13 +56,25 @@ Accepted implementation milestones in the comprehension tranche:
 7. #190 recovery outcome interpretation/safe next-step guidance — `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, CI #611.
 8. #194 recovery evidence scope alignment/context clarity — `a869b305457d8fc18bd3b9265990e9d0065d2c6b`, CI #618.
 
+### Product Depth — Cross-Surface Context Continuity
+
+Milestone #202 is accepted. PR #203 merged as `698d07aea66d00fbdf65c94eeacc1f15240fd4c2` after unchanged-head CI Smoke #629 passed on `d63cdb84c836e882d3734c6aeade98a5010043fc` and final PM review found no unresolved Critical or Important findings.
+
+Accepted behavior:
+
+- Knowledge Base source inspection remembers the genuine originating knowledge page;
+- current search query is preserved when opening genuine source context;
+- explicit safe return targets the recorded origin;
+- direct Sources & Files navigation does not fabricate a Knowledge Base return context;
+- the behavior uses existing Client Workspace state/identifiers and does not change mutation semantics.
+
 Canonical synchronization milestones remain governance evidence and do not add product behavior.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local MVP; Phase 2 and three Product Depth release tranches dispatched | Prefer a bounded cross-surface context-continuity milestone after #200 acceptance |
+| Product and UX | Strong local MVP; Phase 2 and Product Depth comprehension dispatched; first Cross-Surface Context Continuity milestone accepted | #204 synchronization, then exactly one bounded continuation issue may be released |
 | Knowledge and Safe Action | Proven source-backed reading, explainable search, evidence navigation, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo | Preserve truthful evidence scope while improving movement between existing surfaces |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO decision before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host history exists separately | Explicit business priority plus privileged authority before live host work |
@@ -71,30 +84,21 @@ Canonical synchronization milestones remain governance evidence and do not add p
 
 ```text
 PRODUCT_DEPTH_COMPREHENSION_PASS accepted and dispatched
-  -> #200 canonical synchronization + five-track direction package
-    -> accept/reject #200 after CI and final documentation review
-      -> if accepted, release exactly one bounded implementation issue
+  -> #202 Cross-Surface Context Continuity accepted
+    -> #204 canonical synchronization + bounded continuity decision gate
+      -> accept/reject #204 after CI and final documentation review
+        -> if accepted, release exactly one bounded implementation issue
 ```
 
-Issue #200 does not itself authorize another product/runtime implementation milestone.
+Issue #204 does not itself authorize another product/runtime implementation milestone.
 
 ## Recommended next bounded direction
 
-**Cross-Surface Context Continuity**
+**Cross-Surface Context Continuity — next bounded increment**
 
-Goal: reduce user context loss when moving among existing Client Workspace surfaces without adding a new backend intelligence model or changing mutation semantics.
+Goal: continue reducing context loss among existing Client Workspace surfaces without new backend intelligence, routing architecture, or mutation semantics.
 
-Candidate behaviors, subject to implementation inspection and a separate issue:
-
-- preserve the current search query and selected result when opening genuine source context;
-- preserve selected source/page identity when moving between Source Inspection and Knowledge Base;
-- carry existing source-root identity into Recovery context without inventing applicability;
-- provide explicit “back to previous context” navigation where existing routing/state supports it;
-- keep planning/recovery actions governed by their existing explicit controls;
-- use only existing identifiers and persisted facts;
-- keep missing context visibly unknown instead of inferring it.
-
-This is the preferred safe bounded continuation because it deepens usability of already accepted capabilities without requiring auth, tenancy, cloud/database/storage, provider architecture, privileged-host work, or new mutation semantics.
+A separately released implementation issue should select one narrowly testable behavior using existing state/identifiers. Candidate directions include preserving genuine source/page identity across another existing inspection transition or carrying an already-known source-root identity into read-only Recovery context without inventing applicability. Missing context must remain visibly unknown rather than inferred.
 
 ## CEO-gated directions
 
@@ -110,7 +114,7 @@ The following remain material expansion and require explicit CEO selection/appro
 
 ## Mandatory inherited release discipline
 
-Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
+Every new product/release candidate must pass the full applicable inherited matrix on one unchanged head. The accepted cross-surface context-continuity acceptance from #202 is now part of that baseline. Historical green results do not substitute for current validation. Previously accepted focused gates must remain wired into CI unless an explicit accepted supersession says otherwise. Every accepted change retains milestone-scoped rollback evidence.
 
 ## Issue #69
 

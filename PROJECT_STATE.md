@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-25  
-Authority: current accepted repository state after Product Depth comprehension dispatch  
-Current governance issue: #200
+Authority: current accepted repository state after Cross-Surface Context Continuity milestone #202  
+Current governance issue: #204
 
 ## Current program stage
 
@@ -10,17 +10,19 @@ Current governance issue: #200
 
 **Product Depth — Evidence, Search, Lifecycle & Recovery Comprehension is COMPLETE AND DISPATCHED (`PRODUCT_DEPTH_COMPREHENSION_PASS`).**
 
+**Cross-Surface Context Continuity milestone #202 is ACCEPTED.** PR #203 merged as `698d07aea66d00fbdf65c94eeacc1f15240fd4c2`; unchanged-head CI Smoke #629 passed on `d63cdb84c836e882d3734c6aeade98a5010043fc`; final PM review found no unresolved Critical or Important findings.
+
 Accepted comprehension release merge: `e32f3a1db5b1c5447031842cd59bda59afadce90`.
 
 Release evidence:
 
-- post-synchronization release candidate `de8302a281badff75d8408fdcba1fbc15f9916ca` — CI Smoke #624 PASS;
-- release-decision PR head `94d303c8e687f01f4f8f1e4216ac2357cea0beb7` — CI Smoke #625 PASS;
+- comprehension post-synchronization release candidate `de8302a281badff75d8408fdcba1fbc15f9916ca` — CI Smoke #624 PASS;
+- comprehension release-decision head `94d303c8e687f01f4f8f1e4216ac2357cea0beb7` — CI Smoke #625 PASS;
 - final documentation review — no unresolved Critical or Important findings;
 - release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`;
 - handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
 
-Issue #200 is documentation-only synchronization plus the next five-track decision gate. It does not itself authorize another product/runtime implementation.
+Issue #204 is documentation-only synchronization plus the next bounded context-continuity decision gate. It does not itself authorize backend architecture changes, new routing architecture, automatic actions, Enterprise Platform, privileged-host/systemd, or material connector/runtime expansion.
 
 ## Authority order
 
@@ -38,8 +40,8 @@ Implementation completion alone is never acceptance.
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy search, governed-action lifecycle, and comprehension tranche dispatched | #200 five-track direction selection; bounded local-first continuation is allowed only after explicit issue release |
-| Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo accepted | Preserve truthful evidence scope and explicit user control |
+| Product and UX | Local MVP release-hardened; Phase 2, trustworthy search, governed-action lifecycle, comprehension tranche, and first Cross-Surface Context Continuity milestone accepted | #204 synchronization and next bounded continuity decision gate |
+| Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo accepted | Preserve truthful evidence scope and explicit user control while improving movement between existing surfaces |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work remains separate | Explicit selection plus required privileged-host authority before live infrastructure work |
 | Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve exact evidence, rollback, inherited CI coverage, and truthful blocker handling |
@@ -49,6 +51,7 @@ Implementation completion alone is never acceptance.
 - Trustworthy Search Experience — #142 — merge `d8fad2df21454aa7dce0101abe208fd24b91a883` — final CI #535.
 - Governed-Action Lifecycle — #162 — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` — final CI #568.
 - Evidence, Search, Lifecycle & Recovery Comprehension — #198/#199 — merge `e32f3a1db5b1c5447031842cd59bda59afadce90` — release candidate CI #624 and final decision CI #625.
+- Cross-Surface Context Continuity #202/#203 — merge `698d07aea66d00fbdf65c94eeacc1f15240fd4c2` — unchanged-head CI #629 on `d63cdb84c836e882d3734c6aeade98a5010043fc` — final PM review clean.
 
 Accepted implementation milestones within the comprehension tranche:
 
@@ -82,6 +85,14 @@ Accepted recovery semantics remain exact:
 
 Governed planning preserves backend policy, approval, audit, undo, and the global one-filesystem-mutation-per-file guard.
 
+Accepted context-continuity semantics remain exact:
+
+1. Knowledge Base → Source Inspection may preserve the genuine originating knowledge-page identity.
+2. The current search query may be retained when opening genuine source context.
+3. Explicit return navigation must target the recorded originating context, not an inferred page.
+4. Direct Sources & Files navigation must not fabricate a Knowledge Base return context.
+5. Context continuity uses existing Client Workspace state/identifiers only and does not change mutation semantics.
+
 ## Mandatory inherited regression baseline
 
 Any subsequent product/release candidate must preserve the complete applicable Phase 1 + Phase 2 + Product Depth matrix on one unchanged candidate, including:
@@ -110,10 +121,11 @@ Any subsequent product/release candidate must preserve the complete applicable P
 22. selected-source lifecycle guidance acceptance;
 23. source-root recovery-context acceptance;
 24. recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence cases;
-25. disposable-folder RC acceptance;
-26. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-27. independent final review with no unresolved Critical or Important findings;
-28. milestone-scoped rollback evidence.
+25. cross-surface context-continuity acceptance;
+26. disposable-folder RC acceptance;
+27. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+28. independent final review with no unresolved Critical or Important findings;
+29. milestone-scoped rollback evidence.
 
 Historical green evidence is not a substitute for validating a new candidate. Previously accepted focused gates must remain wired into CI unless explicitly superseded by an accepted decision.
 
@@ -133,10 +145,10 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** historical Phase 3/Hermes rel
 
 ## Current next action
 
-Complete #200 canonical synchronization and five-track decision package. The recommended bounded continuation is **cross-surface context continuity**: improve navigation and retained context between existing Search, Source Inspection, Knowledge Base, Recovery, and governed-action surfaces using existing identifiers and facts only. This direction is not authorized for implementation until #200 is accepted and a separate implementation issue is released.
+Complete #204 canonical synchronization. After acceptance, the next bounded gate may deepen **Cross-Surface Context Continuity** using existing Client Workspace state/identifiers only. A separate implementation issue must define the exact behavior and acceptance before product/runtime changes begin.
 
 Enterprise Platform and privileged-host work remain CEO/authority gated.
 
 ## Rollback
 
-#200 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.
+#204 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.

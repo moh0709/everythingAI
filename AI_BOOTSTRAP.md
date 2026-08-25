@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension tranche dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)  
-Current gate: issue #200 canonical synchronization and next five-track decision package
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity #202 accepted  
+Current gate: issue #204 canonical synchronization and next bounded continuity decision gate
 
 ## Mandatory startup sequence
 
@@ -25,6 +25,7 @@ If a source lookup fails, exhaust repository/file fallbacks before declaring a b
 - Evidence/Search/Lifecycle/Recovery Comprehension release: #198 / PR #199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, status `PRODUCT_DEPTH_COMPREHENSION_PASS`.
 - Comprehension post-sync release candidate: `de8302a281badff75d8408fdcba1fbc15f9916ca`, CI #624 PASS.
 - Comprehension release-decision head: `94d303c8e687f01f4f8f1e4216ac2357cea0beb7`, CI #625 PASS, final documentation review clean.
+- Cross-Surface Context Continuity #202 / PR #203: merge `698d07aea66d00fbdf65c94eeacc1f15240fd4c2`; unchanged-head `d63cdb84c836e882d3734c6aeade98a5010043fc`; CI #629 PASS; final PM review clean.
 - Release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`.
 - Handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
 
@@ -96,6 +97,7 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 - selected-source lifecycle guidance acceptance;
 - source-root recovery-context acceptance;
 - recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence scenarios;
+- cross-surface context-continuity acceptance;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
 - independent final review with no unresolved Critical or Important findings;
@@ -124,22 +126,21 @@ Product Depth may improve existing local-first Client comprehension and inspecti
 - no per-file retry;
 - governed planning, approval, audit, undo, and filesystem safety boundaries.
 
+Accepted Cross-Surface Context Continuity additionally preserves:
+
+- genuine Knowledge Base origin identity when opening source inspection;
+- the current search query where genuine source context is opened;
+- explicit return navigation only to recorded origin context;
+- no fabricated Knowledge Base return context from direct Sources & Files navigation;
+- existing Client Workspace identifiers/state only unless a separately approved gate proves a minimal contract is required.
+
 No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, or material connector/runtime expansion is authorized.
 
-## Five-track direction gate
+## Current bounded direction gate
 
-Issue #200 is the sole active governance task. It synchronizes the accepted `PRODUCT_DEPTH_COMPREHENSION_PASS` release and prepares the next direction across all five tracks.
+Issue #204 is the sole active governance task. It synchronizes accepted #202 evidence and prepares the next bounded Cross-Surface Context Continuity gate.
 
-Safe bounded continuation may be recommended without authorizing implementation. The current recommended bounded direction is **cross-surface context continuity**: preserve selected source/query/page/recovery context when moving between existing Search, Source Inspection, Knowledge Base, Recovery, and governed-action surfaces, using only existing identifiers and persisted facts.
-
-This recommendation must remain:
-
-- local-first;
-- frontend/product-flow bounded unless inspection proves a minimal backend contract is required;
-- read-only except where an already-governed existing control is explicitly invoked;
-- non-destructive and reversible;
-- subject to the complete inherited regression matrix;
-- implemented only after #200 acceptance and release of a separate implementation issue.
+A next implementation issue may be released only after #204 acceptance. It must remain local-first, reversible, use existing Client Workspace state/identifiers, preserve truthful unknown states, and pass the complete inherited regression matrix.
 
 CEO-gated directions remain Enterprise Platform expansion, privileged-host/systemd work, auth/tenancy/cloud/database/object-storage work, or material connector/runtime expansion.
 
@@ -149,4 +150,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #200 is documentation-only and can be reverted independently from product/runtime code.
+Every accepted milestone remains independently reversible by its recorded merge. #204 is documentation-only and can be reverted independently from product/runtime code.
