@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-25  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); bounded Product Depth milestones accepted through #194 recovery-evidence scope alignment/context clarity  
-Current gate: issue #196 canonical synchronization and comprehension-tranche release preparation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension tranche dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)  
+Current gate: issue #200 canonical synchronization and next five-track decision package
 
 ## Mandatory startup sequence
 
@@ -17,19 +17,16 @@ Before any project-state decision or implementation:
 
 If a source lookup fails, exhaust repository/file fallbacks before declaring a blocker. Verify tool capabilities before claiming an action is unavailable.
 
-## Current accepted evidence
+## Current accepted release evidence
 
 - Phase 2 release: `266c2efa255ba11165ffaf5d0b6385affe0f261b` (`PHASE2_PASS`).
 - Trustworthy-search release: #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, final CI #535.
 - Governed-action lifecycle release: #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final CI #568.
-- Knowledge evidence/freshness guidance: #166 / PR #167 merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`, CI #574.
-- Search refinement/filtering: #170 / PR #171 merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, CI #579.
-- Search refinement lifecycle/query-context clarity: #174 / PR #175 merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, CI #584.
-- Lifecycle-status refinement/processing-state clarity: #178 / PR #179 merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, CI #595.
-- Selected-source lifecycle next-step clarity: #182 / PR #183 merge `2c4b5596230b498a8fa20977bdf1790b13ff4955`, CI #600.
-- Source-root recovery context/safe guidance: #186 / PR #187 merge `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, CI #604.
-- Recovery outcome interpretation/safe next-step guidance: #190 / PR #191 merge `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, CI #611.
-- Recovery evidence scope alignment/context clarity: #194 / PR #195 merge `a869b305457d8fc18bd3b9265990e9d0065d2c6b`, unchanged head `fd8c23d963fb0576ee047349da4e33052da89c95`, CI Smoke #618, final PM diff review clean.
+- Evidence/Search/Lifecycle/Recovery Comprehension release: #198 / PR #199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, status `PRODUCT_DEPTH_COMPREHENSION_PASS`.
+- Comprehension post-sync release candidate: `de8302a281badff75d8408fdcba1fbc15f9916ca`, CI #624 PASS.
+- Comprehension release-decision head: `94d303c8e687f01f4f8f1e4216ac2357cea0beb7`, CI #625 PASS, final documentation review clean.
+- Release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`.
+- Handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
 
 ## Program tracks
 
@@ -106,9 +103,9 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 
 Historical green evidence never substitutes for validating a new candidate. CI wiring for accepted focused gates is part of the baseline.
 
-## Product Depth safety boundaries
+## Accepted Product Depth safety boundaries
 
-Current Product Depth work may improve existing local-first Client comprehension and inspection, but must preserve:
+Product Depth may improve existing local-first Client comprehension and inspection, but must preserve:
 
 - backend-returned search order and existing match facts;
 - source provenance and citation evidence;
@@ -129,18 +126,27 @@ Current Product Depth work may improve existing local-first Client comprehension
 
 No authentication, tenancy, cloud deployment, database migration, object storage, privileged-host/systemd, automatic mutation/recovery/rebuild, or material connector/runtime expansion is authorized.
 
+## Five-track direction gate
+
+Issue #200 is the sole active governance task. It synchronizes the accepted `PRODUCT_DEPTH_COMPREHENSION_PASS` release and prepares the next direction across all five tracks.
+
+Safe bounded continuation may be recommended without authorizing implementation. The current recommended bounded direction is **cross-surface context continuity**: preserve selected source/query/page/recovery context when moving between existing Search, Source Inspection, Knowledge Base, Recovery, and governed-action surfaces, using only existing identifiers and persisted facts.
+
+This recommendation must remain:
+
+- local-first;
+- frontend/product-flow bounded unless inspection proves a minimal backend contract is required;
+- read-only except where an already-governed existing control is explicitly invoked;
+- non-destructive and reversible;
+- subject to the complete inherited regression matrix;
+- implemented only after #200 acceptance and release of a separate implementation issue.
+
+CEO-gated directions remain Enterprise Platform expansion, privileged-host/systemd work, auth/tenancy/cloud/database/object-storage work, or material connector/runtime expansion.
+
 ## Issue #69
 
 Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliability evidence. It is not an active dependency. Do not rewrite its historical acceptance record unless a newly discovered factual inconsistency is escalated for explicit CEO review.
 
-## Current gate
-
-Issue #196 is the sole active Product Depth governance task. It synchronizes accepted #194 evidence and prepares the bounded **Evidence, Search, Lifecycle & Recovery Comprehension** release/dispatch gate.
-
-The release gate is defined in `docs/PRODUCT_DEPTH_EVIDENCE_LIFECYCLE_RECOVERY_RELEASE_GATE_2026-08-25.md`. After #196 is accepted, the next action is one unchanged-candidate release validation against the complete inherited matrix. No another product feature is authorized by synchronization alone.
-
-A release decision may state PASS only if the complete matrix is green on one unchanged candidate and final independent review has no unresolved Critical or Important findings. The allowed release outcomes are `PRODUCT_DEPTH_COMPREHENSION_PASS`, `PRODUCT_DEPTH_COMPREHENSION_BLOCKED`, or `PRODUCT_DEPTH_COMPREHENSION_REJECTED`.
-
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #196 is documentation-only and can be reverted independently from product/runtime code.
+Every accepted milestone remains independently reversible by its recorded merge. #200 is documentation-only and can be reverted independently from product/runtime code.

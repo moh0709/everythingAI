@@ -1,18 +1,26 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-25  
-Authority: current accepted repository state after Phase 2 dispatch and bounded Product Depth releases  
-Current governance issue: #196
+Authority: current accepted repository state after Product Depth comprehension dispatch  
+Current governance issue: #200
 
 ## Current program stage
 
 **Phase 2 — Product Intelligence & Knowledge Experience is COMPLETE AND DISPATCHED (`PHASE2_PASS`).**
 
-Accepted Phase 2 release merge: `266c2efa255ba11165ffaf5d0b6385affe0f261b`.
+**Product Depth — Evidence, Search, Lifecycle & Recovery Comprehension is COMPLETE AND DISPATCHED (`PRODUCT_DEPTH_COMPREHENSION_PASS`).**
 
-Bounded Product Depth work continues without authorizing Enterprise Platform or privileged-host expansion. The latest accepted product milestone is **#194 — Recovery Evidence Scope Alignment & Context Clarity**, merged through PR #195 as `a869b305457d8fc18bd3b9265990e9d0065d2c6b` after unchanged-head CI Smoke #618 on `fd8c23d963fb0576ee047349da4e33052da89c95` and final PM diff review with no unresolved Critical or Important findings.
+Accepted comprehension release merge: `e32f3a1db5b1c5447031842cd59bda59afadce90`.
 
-Issue #196 is documentation-only canonical synchronization and the release/dispatch gate preparation for the completed **Evidence, Search, Lifecycle & Recovery Comprehension** tranche. It does not authorize another product feature.
+Release evidence:
+
+- post-synchronization release candidate `de8302a281badff75d8408fdcba1fbc15f9916ca` — CI Smoke #624 PASS;
+- release-decision PR head `94d303c8e687f01f4f8f1e4216ac2357cea0beb7` — CI Smoke #625 PASS;
+- final documentation review — no unresolved Critical or Important findings;
+- release decision: `docs/PRODUCT_DEPTH_COMPREHENSION_RELEASE_DECISION_2026-08-25.md`;
+- handover: `docs/HANDOVER_2026-08-25_PRODUCT_DEPTH_COMPREHENSION_RELEASE.json`.
+
+Issue #200 is documentation-only synchronization plus the next five-track decision gate. It does not itself authorize another product/runtime implementation.
 
 ## Authority order
 
@@ -30,39 +38,43 @@ Implementation completion alone is never acceptance.
 
 | Track | Accepted position | Current gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Phase 2 dispatched; Product Depth evidence/search/lifecycle/recovery comprehension accepted through #194 | #196 canonical synchronization, then one unchanged-candidate release/dispatch decision |
-| Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo accepted | Preserve truthful evidence scope while validating the completed tranche as one coherent release |
+| Product and UX | Local MVP release-hardened; Phase 2 dispatched; trustworthy search, governed-action lifecycle, and comprehension tranche dispatched | #200 five-track direction selection; bounded local-first continuation is allowed only after explicit issue release |
+| Knowledge and Safe Action | Source provenance, evidence navigation, trustworthy search, lifecycle guidance, exact-root recovery evidence, governed planning/execution/audit/undo accepted | Preserve truthful evidence scope and explicit user control |
 | Enterprise Platform | Architecture remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host work remains separate | Explicit selection plus required privileged-host authority before live infrastructure work |
-| Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve exact evidence, rollback, inherited-gate coverage, and truthful blocker handling |
+| Governance and Autonomous Delivery | Dependency-ordered issue → implementation → CI → review → merge loop proven | Preserve exact evidence, rollback, inherited CI coverage, and truthful blocker handling |
 
-## Accepted Product Depth release and milestone chain
+## Accepted Product Depth release chain
 
-- #142 — trustworthy-search release decision — merge `d8fad2df21454aa7dce0101abe208fd24b91a883` — final CI #535.
-- #162 — governed-action lifecycle release decision — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` — final CI #568.
-- #166 — knowledge evidence quality/safe freshness guidance — merge `9b41167f41b89ff6ae5a8deb7064c817bfb205fb` — CI #574.
-- #170 — read-only search refinement/filtering UX — merge `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce` — CI #579.
-- #174 — search refinement lifecycle/query-context clarity — merge `6ba75a928b5d126a893ed7089d9c7a391b75ee02` — CI #584.
-- #178 — lifecycle-status refinement/processing-state clarity — merge `48531f7d1ff843c6a23180b5331f3c05fd2df1da` — CI #595.
-- #182 — selected-source lifecycle next-step clarity — merge `2c4b5596230b498a8fa20977bdf1790b13ff4955` — CI #600.
-- #186 — source-root recovery context/safe guidance — merge `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49` — CI #604.
-- #190 — recovery outcome interpretation/safe next-step guidance — merge `da4fa079927f3d38dc6a3c444db5d93bbeca40c6` — CI #611.
-- #194 — recovery evidence scope alignment/context clarity — merge `a869b305457d8fc18bd3b9265990e9d0065d2c6b` — unchanged-head CI #618 on `fd8c23d963fb0576ee047349da4e33052da89c95`.
+- Trustworthy Search Experience — #142 — merge `d8fad2df21454aa7dce0101abe208fd24b91a883` — final CI #535.
+- Governed-Action Lifecycle — #162 — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` — final CI #568.
+- Evidence, Search, Lifecycle & Recovery Comprehension — #198/#199 — merge `e32f3a1db5b1c5447031842cd59bda59afadce90` — release candidate CI #624 and final decision CI #625.
 
-Canonical synchronization milestones between implementation milestones remain governance evidence and do not add product behavior. Detailed historical milestone evidence remains preserved in Git history and accepted issue/PR records.
+Accepted implementation milestones within the comprehension tranche:
+
+- #166 knowledge evidence quality/safe freshness guidance — `9b41167f41b89ff6ae5a8deb7064c817bfb205fb`, CI #574.
+- #170 read-only search refinement/filtering UX — `7be19cb1ec36eca6f20c73ed7ee93543d6a4d6ce`, CI #579.
+- #174 search refinement lifecycle/query-context clarity — `6ba75a928b5d126a893ed7089d9c7a391b75ee02`, CI #584.
+- #178 lifecycle-status refinement/processing-state clarity — `48531f7d1ff843c6a23180b5331f3c05fd2df1da`, CI #595.
+- #182 selected-source lifecycle next-step clarity — `2c4b5596230b498a8fa20977bdf1790b13ff4955`, CI #600.
+- #186 source-root recovery context/safe guidance — `3f7c4a4f7ec6560b9b588d22a1e22a658d4bec49`, CI #604.
+- #190 recovery outcome interpretation/safe next-step guidance — `da4fa079927f3d38dc6a3c444db5d93bbeca40c6`, CI #611.
+- #194 recovery evidence scope alignment/context clarity — `a869b305457d8fc18bd3b9265990e9d0065d2c6b`, CI #618.
+
+Canonical synchronization milestones are governance evidence and do not add product behavior.
 
 ## Product Depth safety contract
 
-Product Depth remains local-first and bounded. It preserves backend-returned search order, source provenance, truthful match-basis labeling, and the rule that ranking signals are not presented as calibrated confidence. Lifecycle guidance uses only persisted indexing/extraction state. Recovery guidance uses only configured source-root identity, persisted scan report, persisted watcher status, and existing explicit controls.
+Product Depth remains local-first and bounded. It preserves backend-returned search order, source provenance, truthful match-basis labeling, and the rule that ranking signals are not calibrated confidence. Lifecycle guidance uses only persisted indexing/extraction state. Recovery guidance uses only configured source-root identity, persisted scan report, persisted watcher status, and existing explicit controls.
 
-Accepted #194 semantics are exact:
+Accepted recovery semantics remain exact:
 
-1. Configured recovery-root identity comes **only** from the persisted/current Folder Path.
-2. `scanReport.rootPath` and watcher `rootPath` are evidence identities only; they must never be promoted into configured-root identity.
-3. Scan evidence is current-root evidence only when `scanReport.rootPath` exactly equals the configured Folder Path.
-4. Mismatched scan evidence may remain visible but must be explicitly scoped to its recorded root.
-5. Watcher evidence is applicable only on an exact configured-root match.
-6. If no Folder Path is configured, configured-root identity remains unknown even when persisted scan/watcher evidence exists.
+1. Configured recovery-root identity comes only from the persisted/current Folder Path.
+2. `scanReport.rootPath` and watcher `rootPath` are evidence identities only.
+3. Scan evidence is current-root evidence only on exact root match.
+4. Mismatched scan evidence may remain visible only when explicitly scoped to its recorded root.
+5. Watcher evidence is applicable only on exact configured-root match.
+6. If no Folder Path is configured, configured-root identity remains unknown even when persisted evidence exists.
 7. `indexed`, `skipped`, and `failed` remain distinct persisted outcomes; watcher state remains monitoring evidence only.
 8. No freshness, health, success, root-cause, retry, repair-completion, or mutation fact is inferred.
 9. Opening recovery guidance is read-only and triggers no scan, extraction, Knowledge Base rebuild, watcher change, retry, recovery mutation, or filesystem mutation.
@@ -121,8 +133,10 @@ Issue #69 (`EAI-TASK-046`) is **closed completed** historical Phase 3/Hermes rel
 
 ## Current next action
 
-Complete #196 documentation synchronization and validate PR #197. If #196 is accepted, execute the release-candidate validation defined in `docs/PRODUCT_DEPTH_EVIDENCE_LIFECYCLE_RECOVERY_RELEASE_GATE_2026-08-25.md` on one unchanged candidate. Do not start another product feature merely because synchronization is complete.
+Complete #200 canonical synchronization and five-track decision package. The recommended bounded continuation is **cross-surface context continuity**: improve navigation and retained context between existing Search, Source Inspection, Knowledge Base, Recovery, and governed-action surfaces using existing identifiers and facts only. This direction is not authorized for implementation until #200 is accepted and a separate implementation issue is released.
+
+Enterprise Platform and privileged-host work remain CEO/authority gated.
 
 ## Rollback
 
-#196 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.
+#200 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected.
