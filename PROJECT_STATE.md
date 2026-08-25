@@ -131,7 +131,7 @@ Any subsequent product/release candidate must preserve the complete applicable P
 24. recovery-outcome guidance acceptance including exact-root, mismatched-root, no-configured-root, and missing-evidence cases;
 25. cross-surface context-continuity acceptance;
 26. focused source-to-recovery return-context workflow acceptance;
-27. source-to-recovery return-context acceptance within the complete CI matrix;
+27. complete inherited CI matrix validation on the same unchanged candidate as that focused gate;
 28. disposable-folder RC acceptance;
 29. UI-governed planning → preview → approval → execution → audit → undo acceptance;
 30. independent final review with no unresolved Critical or Important findings;
