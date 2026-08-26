@@ -200,6 +200,16 @@ export function UserApp() {
     : exploreReturnWikiPageId
       ? 'Knowledge Base'
       : null;
+  const resumableContext = recoveryReturnFileId
+    ? recoveryReturnFile
+      ? `Sources & Files → “${recoveryReturnFile.filename}”`
+      : null
+    : exploreReturnWikiPageId
+      ? exploreReturnWikiPage
+        ? `Knowledge Base → “${exploreReturnWikiPage.title}”`
+        : null
+      : null;
+  const hasRecordedResumeContext = Boolean(recoveryReturnFileId || exploreReturnWikiPageId);
   const shouldShowWorkspaceContext = Boolean(
     workspaceQuery || selectedFileId || workspaceSelectedSource || exploreReturnWikiPageId || recoveryReturnFileId || configuredSourceRoot,
   );
@@ -255,6 +265,18 @@ export function UserApp() {
     setRecoveryReturnFileId(null);
     setView('explore');
     if (fileId && fileStillExists) loadDocumentContextWorkflow(fileId);
+  }
+
+  function resumePreviousContext() {
+    if (recoveryReturnFileId) {
+      if (!recoveryReturnFile) return;
+      returnToSourceOrigin();
+      return;
+    }
+    if (exploreReturnWikiPageId) {
+      if (!exploreReturnWikiPage) return;
+      returnToWikiOrigin();
+    }
   }
 
   function clearReturnContext() {
@@ -317,6 +339,10 @@ export function UserApp() {
           </div>
         </dl>
         {recoveryReturnFileId ? <p className="muted">Recovery scope remains the configured source root; the selected source is navigation context only.</p> : null}
+        {resumableContext ? <div className="source-actions" aria-label="Context-aware task resumption">
+          <p className="muted">Resume target: {resumableContext}. This uses only recorded client navigation context and performs no recovery or governed action.</p>
+          <button className="outline" onClick={resumePreviousContext}>Resume previous context</button>
+        </div> : hasRecordedResumeContext ? <p className="muted" aria-label="Context-aware task resumption unavailable">Resume previous context: unavailable because the recorded destination is no longer present; no replacement destination is inferred.</p> : null}
       </section> : null}
 
       {view === 'onboarding' && <>
