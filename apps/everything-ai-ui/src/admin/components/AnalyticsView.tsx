@@ -26,6 +26,8 @@ type ActionExecution = {
   undone_at?: string | null;
 };
 
+type EvidenceFilter = 'all' | 'with' | 'without';
+
 type AnalyticsViewProps = {
   options: ApiOptions;
   status: AppStatus | null;
@@ -89,6 +91,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
   const [executionError, setExecutionError] = useState('');
   const [undoingId, setUndoingId] = useState<string | null>(null);
   const [focusedAuditId, setFocusedAuditId] = useState<string | null>(null);
+  const [evidenceFilter, setEvidenceFilter] = useState<EvidenceFilter>('all');
 
   const auditByExecution = useMemo(() => {
     const events = new Map<string, AuditEvent[]>();
@@ -106,6 +109,14 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
 
     return events;
   }, [audit]);
+
+  const visibleExecutions = useMemo(() => {
+    if (evidenceFilter === 'all') return executions;
+    return executions.filter((execution) => {
+      const hasLoadedAuditEvidence = (auditByExecution.get(execution.id) || []).length > 0;
+      return evidenceFilter === 'with' ? hasLoadedAuditEvidence : !hasLoadedAuditEvidence;
+    });
+  }, [auditByExecution, evidenceFilter, executions]);
 
   async function refreshExecutions() {
     const payload = await apiRequest<{ executions: ActionExecution[] }>(
@@ -178,6 +189,20 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
     <div className="panel" data-testid="governed-execution-history">
       <h2>Governed Action History</h2>
       <p className="muted">Executed filesystem actions remain reviewable and can be undone only through explicit approval. Outcome labels below explain persisted execution and audit facts without changing them.</p>
+      <label htmlFor="audit-evidence-filter"><strong>Audit evidence filter</strong></label>
+      <select
+        id="audit-evidence-filter"
+        aria-label="Audit evidence filter"
+        value={evidenceFilter}
+        onChange={(event) => setEvidenceFilter(event.target.value as EvidenceFilter)}
+      >
+        <option value="all">All executions</option>
+        <option value="with">With loaded audit evidence</option>
+        <option value="without">Without loaded audit evidence</option>
+      </select>
+      <p className="muted" data-testid="governed-action-evidence-filter-context">
+        Showing {visibleExecutions.length} of {executions.length} executions. This filter uses only matching action-execution evidence in the loaded audit window; a missing loaded-window match does not prove that no audit exists elsewhere.
+      </p>
       {executionError && <p className="error">{executionError}</p>}
       {!executions.length && <p className="muted">No action executions recorded.</p>}
       {executions.length > 0 && <div style={{ minWidth: 0, maxWidth: '100%', overflowX: 'auto' }}>
@@ -186,7 +211,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
             <tr><th>Action</th><th>Source</th><th>Target</th><th>Outcome</th><th>Audit evidence</th><th>Recovery</th></tr>
           </thead>
           <tbody>
-            {executions.map((execution) => {
+            {visibleExecutions.map((execution) => {
               const outcome = executionOutcome(execution);
               const executionAudit = auditByExecution.get(execution.id) || [];
 
