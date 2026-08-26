@@ -152,6 +152,15 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       <StatCard title="Active Watchers" value={status?.active_watch_roots || 0} />
     </section>
 
+    <div className="panel" data-testid="governed-action-comprehension">
+      <h2>Governed Action State Guide</h2>
+      <p className="muted">Preview is proposal only. It does not execute an action or prove completion.</p>
+      <p><b>Ready for approval:</b> backend validation passed; execution still requires explicit approval through the existing governed control.</p>
+      <p><b>Blocked preview:</b> the action cannot execute in its current backend-validated state; the backend reason remains authoritative.</p>
+      <p><b>Executed:</b> the persisted execution status records that the governed action ran. <b>Failed:</b> persisted failure status and error text remain authoritative. <b>Undone:</b> persisted undo state records the approved undo result.</p>
+      <p className="muted">Audit evidence shown below is limited to the loaded audit window. No matching event in that window is not proof that no audit exists elsewhere.</p>
+    </div>
+
     <div className="panel" data-testid="governed-execution-history">
       <h2>Governed Action History</h2>
       <p className="muted">Executed filesystem actions remain reviewable and can be undone only through explicit approval. Outcome labels below explain persisted execution and audit facts without changing them.</p>
@@ -192,7 +201,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
                       {executionAudit.map((event) => <small key={event.id} className="muted" style={{ display: 'block' }}>
                         {event.event_type || 'audit event'} · {formatEventTime(event.created_at)}
                       </small>)}
-                    </> : <span className="muted">No matching action-execution audit event in the loaded log window.</span>}
+                    </> : <span className="muted">No matching action-execution audit event in the loaded log window; this does not prove that no audit exists outside the loaded window.</span>}
                   </div>
                 </td>
                 <td>
