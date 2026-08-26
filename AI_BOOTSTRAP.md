@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence release decision justified as `GOVERNED_ACTION_TRUST_EVIDENCE_PASS` pending changed-final-head validation and merge  
-Current gate: issue #246 final release-decision validation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)  
+Current gate: issue #248 post-dispatch canonical synchronization and next five-track decision gate
 
 ## Mandatory startup sequence
 
@@ -28,29 +28,44 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Context-Aware Task Resumption: #234/#235 merge `adf1cf0fb494010905396aaa8a63de1a668bf435`; unchanged head `a138af5008283e57806ebea0e782c986d0a75308`; CI #675 plus six focused workflows PASS.
 - Governed-Action Preview & Audit Comprehension: #238/#239 merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; unchanged head `82a2ccca97f7cdf106bd39977a1491f01c2f7869`; strict RED→GREEN; CI #680 plus seven focused workflows PASS.
 - Governed-Action Evidence Navigation: #242/#243 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; strict RED→GREEN; unchanged head `8434bee4f1de4b558ac1643a6c342df6f8f21b95`; CI #685 plus eight focused workflows PASS.
-- Governed-Action tranche synchronization: #244/#245 merge `149bf47a2fb43135a426d71de376eb5e5acb4d2f`; CI #689 plus all eight focused workflows PASS; final documentation review clean.
+- Governed-Action tranche synchronization: #244/#245 merge `149bf47a2fb43135a426d71de376eb5e5acb4d2f`; CI #689 plus all eight focused workflows PASS.
+- Governed-Action Trust & Evidence release: #246/#247 merge `9927ab9988e4b321619dd4a745af9023855c4d8b`; fresh candidate CI #691 and changed-final-head CI #696 plus all eight focused workflows on both required heads; final reviews clean; status `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`.
 
-## Current Governed-Action release authority evidence
+## Current release authority evidence
 
-Fresh unchanged release candidate: `4179b26af624398554166f0256ad6bc2495d4d1b`.
-
-- EverythingAI CI Smoke #691 — PASS;
-- Source Recovery Return Context #58 — PASS;
-- Multi-hop Return Context #51 — PASS;
-- Return Context Provenance #47 — PASS;
-- Workspace Context Summary #34 — PASS;
-- Workspace Context Provenance #30 — PASS;
-- Context-Aware Task Resumption #19 — PASS;
-- Governed-Action Comprehension #13 — PASS;
-- Governed-Action Evidence Navigation #8 — PASS;
-- independent release review — no unresolved Critical or Important findings.
-
-Decision artifacts now present on PR #247:
+Release decision:
 
 - `docs/GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE_DECISION_2026-08-26.md`
+
+Handover:
+
 - `docs/HANDOVER_2026-08-26_GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE.json`
 
-The decision is `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`, but dispatch remains merge-gated. The changed final decision head must itself pass full CI plus all eight focused workflows before merge.
+Fresh unchanged release candidate `4179b26af624398554166f0256ad6bc2495d4d1b` passed:
+
+- EverythingAI CI Smoke #691;
+- Source Recovery Return Context #58;
+- Multi-hop Return Context #51;
+- Return Context Provenance #47;
+- Workspace Context Summary #34;
+- Workspace Context Provenance #30;
+- Context-Aware Task Resumption #19;
+- Governed-Action Comprehension #13;
+- Governed-Action Evidence Navigation #8.
+
+Changed final decision head `7498e4ddb02cd5af6c4bdcbce3750c7b109361fa` passed:
+
+- EverythingAI CI Smoke #696;
+- Source Recovery Return Context #63;
+- Multi-hop Return Context #56;
+- Return Context Provenance #52;
+- Workspace Context Summary #39;
+- Workspace Context Provenance #35;
+- Context-Aware Task Resumption #24;
+- Governed-Action Comprehension #18;
+- Governed-Action Evidence Navigation #13.
+
+Independent release review and final documentation review found no unresolved Critical or Important findings.
 
 ## Program tracks
 
@@ -121,21 +136,13 @@ Historical green evidence never substitutes for validating a changed candidate. 
 
 ## Current governance gate
 
-Issue #246 has passed its fresh tranche candidate gate and independent release review. The release decision and handover have been written.
+Issue #248 is documentation-only post-dispatch synchronization and the next five-track decision gate.
 
-The sole next dependency is changed-final-head validation on PR #247. That unchanged final decision head must pass:
+It must record the exact #246/#247 dispatch evidence, preserve the complete inherited baseline and all eight focused workflows, and pass full inherited CI plus all eight focused workflows on one unchanged documentation head before merge.
 
-1. EverythingAI CI Smoke;
-2. Source Recovery Return Context;
-3. Multi-hop Return Context;
-4. Return Context Provenance;
-5. Workspace Context Summary;
-6. Workspace Context Provenance;
-7. Context-Aware Task Resumption;
-8. Governed-Action Comprehension;
-9. Governed-Action Evidence Navigation.
+The five-track gate may recommend bounded next options, but completion of #248 does not itself authorize another product/runtime implementation.
 
-If all pass and final documentation review remains clean, merge PR #247, close #246 completed, and dispatch `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`. Do not automatically release another product feature after dispatch.
+Safe bounded continuation must use existing state/contracts and preserve explicit approval, audit truthfulness, undo, context/recovery boundaries, and rollback. Enterprise Platform, privileged-host work, and material runtime expansion remain CEO-gated.
 
 ## CEO-gated directions
 
@@ -147,4 +154,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #246 release-decision/canonical synchronization is documentation-only and can be reverted independently. #242 remains independently reversible through merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; all earlier accepted rollback evidence remains valid.
+Every accepted milestone remains independently reversible by its recorded merge. #248 is documentation-only and can be reverted independently. #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, #242 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`, and #238 merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` remain independently reversible; all earlier accepted rollback evidence remains valid.

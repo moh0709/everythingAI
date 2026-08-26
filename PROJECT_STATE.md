@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-26  
-Authority: release-decision state for Governed-Action Trust & Evidence  
-Current governance issue: #246
+Authority: accepted repository state after Governed-Action Trust & Evidence dispatch  
+Current governance issue: #248
 
 ## Current program stage
 
@@ -14,17 +14,21 @@ Current governance issue: #246
 
 **Workspace Context Trust & Provenance is COMPLETE AND DISPATCHED (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`).**
 
-**Governed-Action Trust & Evidence has a justified release decision of `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`, pending changed-final-head validation and merge.**
+**Governed-Action Trust & Evidence is COMPLETE AND DISPATCHED (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`).**
 
-The bounded tranche contains exactly:
+Accepted release merge: `9927ab9988e4b321619dd4a745af9023855c4d8b` (#246 / PR #247).
+
+The dispatched bounded tranche contains exactly:
 
 1. #238 — Governed-Action Preview & Audit Comprehension.
 2. #242 — Governed-Action Evidence Navigation.
 
-Fresh tranche candidate `4179b26af624398554166f0256ad6bc2495d4d1b` passed EverythingAI CI Smoke #691 and all eight focused workflows on one unchanged candidate. Independent release review found no unresolved Critical or Important findings. The release decision and handover are now present on PR #247, but dispatch is not final until the changed final decision head itself passes the complete inherited CI matrix plus all eight focused workflows and is merged.
+Fresh tranche candidate `4179b26af624398554166f0256ad6bc2495d4d1b` passed EverythingAI CI Smoke #691 and all eight focused workflows. Changed final decision head `7498e4ddb02cd5af6c4bdcbce3750c7b109361fa` independently passed EverythingAI CI Smoke #696 and all eight focused workflows. Independent release review and final documentation review found no unresolved Critical or Important findings.
 
 Release decision: `docs/GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE_DECISION_2026-08-26.md`  
 Handover: `docs/HANDOVER_2026-08-26_GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE.json`
+
+Issue #248 is documentation-only post-dispatch synchronization and the next five-track decision gate. It does not itself authorize another product/runtime feature or material platform/infrastructure expansion.
 
 ## Authority order
 
@@ -47,17 +51,16 @@ Implementation completion alone is never acceptance.
 - Cross-Surface Context Continuity — #218/#219 — merge `6cbb3c15de8cb5e9624c5fb164a2781790336298` — candidate CI #652 and final-head CI #654 plus focused return-context workflows — `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
 - Workspace Context Trust & Provenance — #230/#231 — merge `dac62d9503d0b159d0997c224258e9bdb03a2473` — candidate CI #666 and final-head CI #669 plus five focused context workflows — `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
 - Context-Aware Task Resumption — #234/#235 — merge `adf1cf0fb494010905396aaa8a63de1a668bf435` — unchanged-head CI #675 plus six focused workflows.
-- Context-Aware Task Resumption sync — #236/#237 — merge `3512644a145994c3e53792243054a75bccd08a94` — CI #677 plus six focused workflows.
 - Governed-Action Preview & Audit Comprehension — #238/#239 — merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` — verified RED→GREEN, unchanged-head CI #680 plus seven focused workflows.
-- Governed-Action Comprehension sync — #240/#241 — merge `675110e0eb3a81a29e5352b1c87113c3d313de31` — CI #682 plus seven focused workflows.
 - Governed-Action Evidence Navigation — #242/#243 — merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33` — verified RED→GREEN, unchanged-head CI #685 plus eight focused workflows.
 - Governed-Action tranche sync — #244/#245 — merge `149bf47a2fb43135a426d71de376eb5e5acb4d2f` — unchanged-head CI #689 plus all eight focused workflows.
+- Governed-Action Trust & Evidence — #246/#247 — merge `9927ab9988e4b321619dd4a745af9023855c4d8b` — fresh candidate CI #691, changed-final-head CI #696, all eight focused workflows on both required heads — `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`.
 
 ## Governed-Action Trust & Evidence release evidence
 
 Accepted synchronization baseline: `149bf47a2fb43135a426d71de376eb5e5acb4d2f` (#244 / PR #245).
 
-Fresh unchanged release candidate: `4179b26af624398554166f0256ad6bc2495d4d1b`.
+Fresh unchanged release candidate `4179b26af624398554166f0256ad6bc2495d4d1b`:
 
 - EverythingAI CI Smoke #691 — PASS;
 - Source Recovery Return Context #58 — PASS;
@@ -67,10 +70,22 @@ Fresh unchanged release candidate: `4179b26af624398554166f0256ad6bc2495d4d1b`.
 - Workspace Context Provenance #30 — PASS;
 - Context-Aware Task Resumption #19 — PASS;
 - Governed-Action Comprehension #13 — PASS;
-- Governed-Action Evidence Navigation #8 — PASS;
-- independent release review — no unresolved Critical or Important findings.
+- Governed-Action Evidence Navigation #8 — PASS.
 
-Historical milestone evidence supported the review but did not substitute for the fresh tranche candidate.
+Changed final decision head `7498e4ddb02cd5af6c4bdcbce3750c7b109361fa`:
+
+- EverythingAI CI Smoke #696 — PASS;
+- Source Recovery Return Context #63 — PASS;
+- Multi-hop Return Context #56 — PASS;
+- Return Context Provenance #52 — PASS;
+- Workspace Context Summary #39 — PASS;
+- Workspace Context Provenance #35 — PASS;
+- Context-Aware Task Resumption #24 — PASS;
+- Governed-Action Comprehension #18 — PASS;
+- Governed-Action Evidence Navigation #13 — PASS;
+- final documentation review — no unresolved Critical or Important findings.
+
+Historical milestone evidence remained supporting evidence only and did not substitute for either required release validation head.
 
 ## Accepted safety contract
 
@@ -105,13 +120,23 @@ The mandatory focused workflow baseline contains eight workflows:
 
 Historical green evidence is supporting evidence only and never substitutes for validating a changed candidate.
 
+## Five-track decision gate
+
+Issue #248 prepares the next bounded direction without authorizing implementation.
+
+- **Product & UX:** safe bounded continuation may deepen comprehension, continuity, or evidence usability using existing state and contracts only.
+- **Knowledge & Safe Action:** preserve truthful evidence scope, explicit approval, loaded-window semantics, audit authority, and undo safety.
+- **Enterprise Platform:** remains future scope and CEO-gated.
+- **Engineering Operations:** remains separate and requires explicit priority plus any necessary privileged authority.
+- **Governance & Autonomous Delivery:** preserve unchanged-head CI, all eight focused workflows, rollback evidence, and independent review.
+
+No next feature is released merely because #248 completes. A separate issue must define one exact bounded behavior and acceptance criteria.
+
 ## Current next action
 
-Validate the changed final decision head for PR #247 with EverythingAI CI Smoke plus all eight focused workflows on that one unchanged head. Perform final release-documentation review after those checks.
+Complete #248 documentation synchronization and validate its unchanged documentation head with EverythingAI CI Smoke plus all eight focused workflows. Perform final documentation review before merge.
 
-If and only if every required gate passes and review remains clean, merge PR #247, close #246 completed, and dispatch `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`.
-
-Do not automatically release another product/runtime feature after dispatch. The next direction must be selected through a separate bounded governance gate.
+If #248 is accepted, stop at the five-track decision gate unless a separate bounded implementation issue is explicitly released under existing authority. Do not silently enter material platform or infrastructure scope.
 
 ## CEO-gated material expansion
 
@@ -123,4 +148,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback
 
-The release-decision/canonical synchronization is documentation-only and can be reverted independently. #242 remains independently reversible through merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; all earlier accepted milestone rollback evidence remains valid.
+#248 is documentation-only and can be reverted independently. #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, #242 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`, and #238 merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` remain independently reversible; all earlier accepted rollback evidence remains valid.
