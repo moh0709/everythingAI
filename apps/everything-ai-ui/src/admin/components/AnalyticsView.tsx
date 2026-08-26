@@ -164,6 +164,12 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
     });
   }
 
+  function clearReviewContext() {
+    setReviewReturnExecutionId(null);
+    setFocusedExecutionId(null);
+    setFocusedAuditId(null);
+  }
+
   async function undoExecution(execution: ActionExecution) {
     const description = `${execution.action_type}: ${execution.target_path || execution.source_path || execution.id}`;
     if (!window.confirm(`Undo approved action?\n\n${description}`)) return;
@@ -229,11 +235,17 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
         Showing {visibleExecutions.length} of {executions.length} executions. This filter uses only matching action-execution evidence in the loaded audit window; a missing loaded-window match does not prove that no audit exists elsewhere.
       </p>
       {reviewReturnExecutionId ? reviewReturnExecution && reviewReturnExecutionVisible ? <div data-testid="governed-action-review-context">
-        <p className="muted">Remembered execution review: {reviewReturnExecution.id}. This safe resume target comes only from already-loaded governed-action review state.</p>
+        <p className="muted">
+          Remembered execution review: {reviewReturnExecution.id}. This safe resume target remains part of already-loaded governed-action review state. This local navigation context was recorded only by explicit navigation from already-loaded governed-action audit evidence; it does not mean the backend persisted review state or that review is complete.
+        </p>
         <button type="button" className="outline" onClick={resumeExecutionReview}>Resume execution review</button>
-      </div> : <p className="muted" aria-label="Governed-action review resumption unavailable">
-        Resume execution review unavailable because the remembered execution is not visible in the current loaded review window; no replacement execution is inferred.
-      </p> : null}
+        <button type="button" className="outline" onClick={clearReviewContext}>Clear remembered review context</button>
+      </div> : <div data-testid="governed-action-review-context">
+        <p className="muted" aria-label="Governed-action review resumption unavailable">
+          Resume execution review unavailable because the remembered execution is not visible in the current loaded review window; no replacement execution is inferred.
+        </p>
+        <button type="button" className="outline" onClick={clearReviewContext}>Clear remembered review context</button>
+      </div> : null}
       {executionError && <p className="error">{executionError}</p>}
       {!executions.length && <p className="muted">No action executions recorded.</p>}
       {executions.length > 0 && <div style={{ minWidth: 0, maxWidth: '100%', overflowX: 'auto' }}>
