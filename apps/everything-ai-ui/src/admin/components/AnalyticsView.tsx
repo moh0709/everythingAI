@@ -88,6 +88,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
   const [executions, setExecutions] = useState<ActionExecution[]>([]);
   const [executionError, setExecutionError] = useState('');
   const [undoingId, setUndoingId] = useState<string | null>(null);
+  const [focusedAuditId, setFocusedAuditId] = useState<string | null>(null);
 
   const auditByExecution = useMemo(() => {
     const events = new Map<string, AuditEvent[]>();
@@ -112,6 +113,19 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       '/api/action-executions?limit=100',
     );
     setExecutions(payload.executions || []);
+  }
+
+  function navigateToAuditEvidence(executionAudit: AuditEvent[]) {
+    const target = executionAudit[0];
+    if (!target) return;
+
+    setFocusedAuditId(target.id);
+    window.requestAnimationFrame(() => {
+      const element = document.getElementById(`audit-evidence-${target.id}`);
+      if (!element) return;
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.focus();
+    });
   }
 
   async function undoExecution(execution: ActionExecution) {
@@ -201,6 +215,13 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
                       {executionAudit.map((event) => <small key={event.id} className="muted" style={{ display: 'block' }}>
                         {event.event_type || 'audit event'} · {formatEventTime(event.created_at)}
                       </small>)}
+                      <button
+                        type="button"
+                        onClick={() => navigateToAuditEvidence(executionAudit)}
+                        aria-label="View audit evidence"
+                      >
+                        View audit evidence
+                      </button>
                     </> : <span className="muted">No matching action-execution audit event in the loaded log window; this does not prove that no audit exists outside the loaded window.</span>}
                   </div>
                 </td>
@@ -233,8 +254,11 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
           <tbody>
             {audit.map((event) => <tr
               key={event.id}
+              id={`audit-evidence-${event.id}`}
+              tabIndex={-1}
               data-testid={`audit-${event.id}`}
               data-entity-id={event.entity_id || ''}
+              data-evidence-focus={focusedAuditId === event.id ? 'true' : undefined}
             >
               <td>{new Date(event.created_at).toLocaleString()}</td>
               <td>{event.entity_type}</td>
