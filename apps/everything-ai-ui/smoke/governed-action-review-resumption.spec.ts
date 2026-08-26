@@ -77,7 +77,7 @@ test('preserves and safely resumes the same governed-action review context from 
   const resume = page.getByRole('button', { name: 'Resume execution review' });
   await expect(resume).toBeVisible();
   await expect(page.getByTestId('governed-action-review-context')).toContainText('resume-review-target');
-  await expect(page.getByTestId('governed-action-review-context')).toContainText('loaded state');
+  await expect(page.getByTestId('governed-action-review-context')).toContainText('already-loaded governed-action review state');
 
   await resume.click();
   await expect(target).toBeFocused();
