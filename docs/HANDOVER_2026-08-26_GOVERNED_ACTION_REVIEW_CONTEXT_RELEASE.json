@@ -1,0 +1,78 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-26",
+  "release": "Governed-Action Review Context",
+  "issue": 262,
+  "status": "GOVERNED_ACTION_REVIEW_CONTEXT_PASS",
+  "accepted_sync_baseline": {
+    "issue": 260,
+    "pr": 261,
+    "merge": "98c531545c058aa9f5f2882ff25c6d7045b5d810",
+    "unchanged_head": "84deb65b01899f95f30eb51754cb74f751faa94d",
+    "ci_smoke_run": 715,
+    "focused_workflow_count": 11
+  },
+  "release_scope": [
+    {
+      "issue": 250,
+      "name": "Governed-Action Evidence Filtering",
+      "merge": "437a882ed1a2af55db5af89e68654fd1ea8e14af"
+    },
+    {
+      "issue": 254,
+      "name": "Governed-Action Review Resumption",
+      "merge": "ec96edf5bf9be64df9feab4c05fcd0188bbe60da"
+    },
+    {
+      "issue": 258,
+      "name": "Governed-Action Review Context Provenance & Explicit Clearing",
+      "merge": "bdfa7f24d86e81153c742c8bc5dc53fd906d3c07"
+    }
+  ],
+  "fresh_release_candidate": {
+    "sha": "87c9e7822125446363fcd67fc525fabdf03c7139",
+    "ci_smoke_run": 717,
+    "source_recovery_return_context_run": 84,
+    "multi_hop_return_context_run": 77,
+    "return_context_provenance_run": 73,
+    "workspace_context_summary_run": 60,
+    "workspace_context_provenance_run": 56,
+    "context_aware_task_resumption_run": 45,
+    "governed_action_comprehension_run": 39,
+    "governed_action_evidence_navigation_run": 34,
+    "governed_action_evidence_filtering_run": 18,
+    "governed_action_review_resumption_run": 13,
+    "governed_action_review_context_provenance_run": 7,
+    "result": "PASS"
+  },
+  "safety_semantics": {
+    "loaded_window_truthfulness_preserved": true,
+    "exact_target_review_resumption_preserved": true,
+    "replacement_execution_inferred": false,
+    "local_context_claimed_as_backend_persistence": false,
+    "local_context_claimed_as_review_completion": false,
+    "explicit_clearing_local_only": true,
+    "backend_request_to_manufacture_context": false,
+    "approval_execution_audit_undo_semantics_changed": false,
+    "backend_api_schema_persistence_expanded": false,
+    "routing_architecture_expanded": false,
+    "automatic_action_scope_expanded": false,
+    "recovery_scope_expanded": false,
+    "filesystem_safety_changed": false
+  },
+  "independent_review": {
+    "unresolved_critical_findings": 0,
+    "unresolved_important_findings": 0,
+    "sequence_coherent": true,
+    "result": "PASS"
+  },
+  "final_decision_head_validation": {
+    "status": "PENDING",
+    "requirement": "EverythingAI CI Smoke plus all eleven focused workflows must pass on the changed final decision head before merge and final dispatch."
+  },
+  "rollback": "#250, #254, and #258 remain independently reversible through their accepted merges. Release-gate documentation is independently reversible and changes no runtime/data behavior.",
+  "enterprise_platform_scope_expanded": false,
+  "material_connector_runtime_scope_expanded": false,
+  "protected_historical_issue_69_modified": false,
+  "next_state": "Validate the changed final release-decision head with EverythingAI CI Smoke plus all eleven focused workflows. Merge and dispatch only if that unchanged final head is green and final review remains clean."
+}
