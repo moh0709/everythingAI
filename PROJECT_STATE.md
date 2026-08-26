@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-08-26  
-Authority: accepted repository state after Context-Aware Task Resumption milestone #234  
-Current governance issue: #236
+Authority: accepted repository state after Governed-Action Preview & Audit Comprehension milestone #238  
+Current governance issue: #240
 
 ## Current program stage
 
@@ -15,6 +15,8 @@ Current governance issue: #236
 **Workspace Context Trust & Provenance is COMPLETE AND DISPATCHED (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`).**
 
 **Context-Aware Task Resumption milestone #234 is ACCEPTED.** PR #235 merged as `adf1cf0fb494010905396aaa8a63de1a668bf435` after unchanged-head EverythingAI CI Smoke #675 and all six applicable focused context/task-resumption workflows passed on `a138af5008283e57806ebea0e782c986d0a75308`; final diff review found no unresolved Critical or Important findings.
+
+**Governed-Action Preview & Audit Comprehension milestone #238 is ACCEPTED.** PR #239 merged as `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` after strict RED→GREEN validation and unchanged-head EverythingAI CI Smoke #680 plus all seven applicable focused context/task-resumption/governed-action workflows passed on `82a2ccca97f7cdf106bd39977a1491f01c2f7869`; final diff review found no unresolved Critical or Important findings.
 
 Accepted Workspace Context release merge: `dac62d9503d0b159d0997c224258e9bdb03a2473` (#230 / PR #231).
 
@@ -53,7 +55,25 @@ Context-Aware Task Resumption acceptance evidence:
 - Workspace Context Provenance #14 PASS;
 - final diff review — no unresolved Critical or Important findings.
 
-Issue #236 is documentation-only synchronization plus preparation of the next bounded five-track gate. It does not authorize another product/runtime feature or material platform/infrastructure expansion.
+Context-Aware Task Resumption synchronization #236 / PR #237 merged as `3512644a145994c3e53792243054a75bccd08a94` after unchanged documentation head `c599195de2491c5f4cdf3c15fc59e426074514eb` passed EverythingAI CI Smoke #677 and all six focused context/task-resumption workflows; final documentation review was clean.
+
+Governed-Action Preview & Audit Comprehension acceptance evidence:
+
+- #238 accepted and closed;
+- PR #239 merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`;
+- RED evidence: focused Governed-Action Comprehension #1 failed because the new comprehension panel did not yet exist before production implementation;
+- unchanged implementation head `82a2ccca97f7cdf106bd39977a1491f01c2f7869`;
+- EverythingAI Governed-Action Comprehension #2 PASS;
+- EverythingAI CI Smoke #680 PASS;
+- Context-Aware Task Resumption #8 PASS;
+- Source Recovery Return Context #47 PASS;
+- Multi-hop Return Context #40 PASS;
+- Return Context Provenance #36 PASS;
+- Workspace Context Summary #23 PASS;
+- Workspace Context Provenance #19 PASS;
+- final diff review — no unresolved Critical or Important findings.
+
+Issue #240 is documentation-only synchronization plus preparation of the next bounded five-track gate. It does not authorize another product/runtime feature or material platform/infrastructure expansion.
 
 ## Authority order
 
@@ -82,13 +102,15 @@ Implementation completion alone is never acceptance.
 - Workspace Context Trust & Provenance — #230/#231 — merge `dac62d9503d0b159d0997c224258e9bdb03a2473` — fresh candidate CI #666, changed-final-head CI #669, all five focused context workflows on both required candidates — `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
 - Workspace Context post-dispatch sync — #232/#233 — merge `8f9152f2bc1aa73efee9f6d092cebb86e866785d` — unchanged-head CI #671 plus all five focused context workflows.
 - Context-Aware Task Resumption — #234/#235 — merge `adf1cf0fb494010905396aaa8a63de1a668bf435` — unchanged-head CI #675 plus Context-Aware Task Resumption #3 and all five inherited focused context workflows.
+- Context-Aware Task Resumption sync — #236/#237 — merge `3512644a145994c3e53792243054a75bccd08a94` — unchanged-head CI #677 plus all six focused context/task-resumption workflows.
+- Governed-Action Preview & Audit Comprehension — #238/#239 — merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` — verified RED→GREEN, unchanged-head CI #680 plus Governed-Action Comprehension #2 and all six inherited focused workflows.
 
 ## Program tracks and next gate
 
 | Track | Accepted position | Next gate |
 |---|---|---|
-| Product and UX | Local MVP release-hardened; Workspace Context Trust & Provenance dispatched; bounded Context-Aware Task Resumption accepted | #236 synchronization, then exactly one separately scoped bounded continuation may be released |
-| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed planning/execution/audit/undo, truthful context provenance | Preferred bounded next option: read-only governed-action preview/audit comprehension using only existing authoritative state |
+| Product and UX | Local MVP release-hardened; Workspace Context Trust & Provenance dispatched; Context-Aware Task Resumption and Governed-Action Preview & Audit Comprehension accepted | #240 synchronization, then exactly one separately scoped bounded continuation may be released |
+| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed planning/execution/audit/undo, truthful context provenance, read-only action-state comprehension | Preferred bounded next option: Governed-Action Evidence Navigation using only already-loaded persisted audit/execution identifiers |
 | Enterprise Platform | Target architecture exists; production platform remains future scope | CEO approval required before auth, tenancy, cloud deployment, DB migration, object storage, or production-platform implementation |
 | Engineering Operations | Reliability/host history remains separate | Explicit priority plus required privileged authority before live host work |
 | Governance and Autonomous Delivery | Evidence-backed issue → implementation → CI → review → merge loop proven | Preserve exact dependency, unchanged-head validation, all focused workflows, rollback, and truthful blocker discipline |
@@ -111,6 +133,8 @@ Product Depth and Product & UX remain local-first and bounded.
 - Workspace Context remains read-only and exposes only genuinely known state plus truthful provenance/unknown-state explanation.
 - Context-Aware Task Resumption is explicit user-invoked navigation only; it resumes only a genuine currently recorded destination supported by existing client state.
 - Task resumption never auto-navigates on load, never substitutes stale/missing context, never manufactures a destination, and causes no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation merely by rendering or invoking the resume navigation.
+- Governed-Action Preview & Audit Comprehension is presentation-only: preview remains proposal-only, ready state still requires explicit execution approval, blocked state preserves backend-provided reason, and persisted executed/failed/undone status remains authoritative.
+- Missing matching audit evidence is scoped only to the currently loaded audit window and is never presented as proof that no audit exists elsewhere.
 - Governed planning preserves approval, execution, audit, undo, and the one-filesystem-mutation-per-file guard.
 
 ## Mandatory inherited regression baseline
@@ -148,25 +172,26 @@ Every subsequent product/release candidate must preserve the complete applicable
 29. focused `EverythingAI Workspace Context Summary` acceptance;
 30. focused `EverythingAI Workspace Context Provenance` acceptance;
 31. focused `EverythingAI Context-Aware Task Resumption` acceptance;
-32. complete inherited CI matrix validation on the required unchanged candidate together with all applicable focused gates;
-33. disposable-folder RC acceptance;
-34. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-35. independent final review with no unresolved Critical or Important findings;
-36. milestone-scoped rollback evidence.
+32. focused `EverythingAI Governed-Action Comprehension` acceptance;
+33. complete inherited CI matrix validation on the required unchanged candidate together with all applicable focused gates;
+34. disposable-folder RC acceptance;
+35. UI-governed planning → preview → approval → execution → audit → undo acceptance;
+36. independent final review with no unresolved Critical or Important findings;
+37. milestone-scoped rollback evidence.
 
 Historical green evidence is supporting evidence only and never substitutes for validating a changed candidate. Accepted focused workflows remain part of the baseline unless explicitly superseded by an accepted decision.
 
 ## Current next action
 
-Complete #236 documentation synchronization and validate its unchanged documentation head with EverythingAI CI Smoke plus all six focused context/task-resumption workflows. Perform final documentation review before merge.
+Complete #240 documentation synchronization and validate its unchanged documentation head with EverythingAI CI Smoke plus all seven focused context/task-resumption/governed-action workflows. Perform final documentation review before merge.
 
-If #236 is accepted, release exactly one separately scoped bounded implementation or governance issue selected from the five-track decision package. No new feature is automatically authorized merely because synchronization is complete.
+If #240 is accepted, release exactly one separately scoped bounded implementation or governance issue selected from the five-track decision package. No new feature is automatically authorized merely because synchronization is complete.
 
 ## Recommended bounded continuation
 
-The preferred next bounded direction is **Governed-Action Preview & Audit Comprehension**: improve read-only explanation of existing preview, approval, execution, audit, undo, and unavailable states using only facts already authoritative in the current governed-action model.
+The preferred next bounded direction is **Governed-Action Evidence Navigation**: improve read-only movement from a governed execution outcome to genuine matching audit evidence already present in the currently loaded Admin Analytics state, using existing execution/audit identifiers only.
 
-Any separately released implementation issue must remain read-only at the comprehension layer, preserve current policy/approval/mutation semantics, avoid new backend or routing architecture, avoid automatic actions, and keep unavailable/unknown state explicit rather than inferred.
+Any separately released implementation issue must keep loaded-window scope explicit, must not fabricate audit existence or completeness, must not add backend queries or persistence, and must not change preview, approval, execution, undo, policy, mutation, or filesystem semantics.
 
 ## CEO-gated material expansion
 
@@ -178,4 +203,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback
 
-#236 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`, and all earlier accepted milestone rollback evidence remains valid.
+#240 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`, #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`, and all earlier accepted milestone rollback evidence remains valid.
