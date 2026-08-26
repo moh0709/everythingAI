@@ -5,7 +5,8 @@ Phase 2: **complete and dispatched (`PHASE2_PASS`)**
 Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
 Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
-Context-Aware Task Resumption: **milestone #234 accepted**
+Context-Aware Task Resumption: **milestone #234 accepted**  
+Governed-Action Preview & Audit Comprehension: **milestone #238 accepted**
 
 ## Completed product sequence
 
@@ -67,15 +68,32 @@ Accepted behavior:
 - rendering or invoking resume navigation causes no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation;
 - no backend/routing architecture, persistence model, recovery/action scope, or material runtime expansion was added.
 
+Supporting synchronization #236/#237 merged as `3512644a145994c3e53792243054a75bccd08a94` after unchanged documentation head `c599195de2491c5f4cdf3c15fc59e426074514eb` passed EverythingAI CI Smoke #677 and all six focused context/task-resumption workflows; final documentation review was clean.
+
+### Product & UX / Knowledge & Safe Action — Governed-Action Preview & Audit Comprehension
+
+Milestone #238 is accepted. PR #239 merged as `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` after a strict RED→GREEN cycle. Focused Governed-Action Comprehension #1 proved the pre-implementation acceptance failure because the comprehension panel did not yet exist. Minimal presentation-only implementation followed, and unchanged implementation head `82a2ccca97f7cdf106bd39977a1491f01c2f7869` passed Governed-Action Comprehension #2, EverythingAI CI Smoke #680, Context-Aware Task Resumption #8, Source Recovery Return Context #47, Multi-hop Return Context #40, Return Context Provenance #36, Workspace Context Summary #23, and Workspace Context Provenance #19. Final diff review found no unresolved Critical or Important findings.
+
+Accepted behavior:
+
+- preview is explicitly explained as proposal-only and not execution/completion;
+- ready preview remains subject to the existing explicit execution approval;
+- blocked preview preserves the existing backend-provided reason as authoritative;
+- persisted executed, failed, and undone states remain distinct and authoritative;
+- matching audit evidence is derived only from already-loaded persisted audit events;
+- absence of a match is scoped to the loaded audit window and is not proof that no audit exists elsewhere;
+- existing undo confirmation, API, policy, mutation, filesystem, routing, schema, and persistence semantics remain unchanged;
+- no backend or material platform/runtime expansion was added.
+
 ## Current five-track position
 
 | Track | Position | Bounded next options |
 |---|---|---|
-| Product and UX | Strong local-first client with Workspace Context Trust & Provenance dispatched and Context-Aware Task Resumption accepted | Preserve current navigation/context semantics; only separately scoped bounded usability work |
-| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful provenance | Preferred next: read-only Governed-Action Preview & Audit Comprehension using only existing authoritative facts |
+| Product and UX | Strong local-first client with Workspace Context Trust & Provenance dispatched; Context-Aware Task Resumption and Governed-Action Preview & Audit Comprehension accepted | Preserve current action/context semantics; only separately scoped bounded usability work |
+| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful provenance, read-only governed-action state comprehension | Preferred next: Governed-Action Evidence Navigation using only loaded execution/audit identifiers |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: auth, tenancy, cloud, database/storage, production architecture |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and privileged authority is available; otherwise no live-host work |
-| Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Preserve all six focused context/task-resumption workflows plus unchanged-head evidence and rollback discipline |
+| Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Preserve all seven focused context/task-resumption/governed-action workflows plus unchanged-head evidence and rollback discipline |
 
 ## Active dependency sequence
 
@@ -83,30 +101,32 @@ Accepted behavior:
 WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS accepted and dispatched
   -> #232 post-dispatch synchronization accepted
     -> #234 Context-Aware Task Resumption accepted
-      -> #236 canonical synchronization + next five-track decision gate
-        -> accept/reject #236 after full inherited CI + all six focused context/task-resumption workflows + final documentation review
-          -> if accepted, release exactly one separately scoped bounded next issue
+      -> #236 Context-Aware Task Resumption synchronization accepted
+        -> #238 Governed-Action Preview & Audit Comprehension accepted
+          -> #240 canonical synchronization + next five-track decision gate
+            -> accept/reject #240 after full inherited CI + all seven focused workflows + final documentation review
+              -> if accepted, release exactly one separately scoped bounded next issue
 ```
 
-Issue #236 does not authorize another product/runtime feature.
+Issue #240 does not authorize another product/runtime feature.
 
 ## Recommended next bounded direction
 
-**Governed-Action Preview & Audit Comprehension**
+**Governed-Action Evidence Navigation**
 
-Goal: reduce uncertainty around already existing governed-action preview, approval, execution, audit, undo, and unavailable states by presenting clearer read-only explanations derived only from currently authoritative action/audit facts.
+Goal: reduce friction when validating an already-recorded governed action by allowing read-only movement from an execution outcome to genuine matching audit evidence already present in the currently loaded Admin Analytics state.
 
-A future implementation issue, if released, must first inspect current state ownership and exact backend-returned facts. It may improve explanation and navigation only; it must not change policy, approval requirements, execution semantics, mutation scope, undo rules, or filesystem guards.
+A future implementation issue, if released, must first inspect exact current state ownership. It may use existing execution IDs, audit `entity_id`, and existing client rendering state to focus/highlight or navigate within the loaded view. It must not issue new backend queries merely to manufacture a match, claim audit completeness, or change policy, approval, execution, mutation, undo, recovery, routing, or persistence semantics.
 
 Required boundaries:
 
-- no new policy inference or frontend-created action state;
+- no new policy inference or frontend-created execution/audit state;
 - no automatic approval, execution, retry, recovery, or undo;
-- no backend or routing architecture expansion unless separately CEO-approved;
+- no backend/API/schema/persistence or routing architecture expansion;
 - no action-scope expansion;
-- unknown/unavailable state remains explicit rather than inferred;
-- read-only comprehension layer only until an existing governed control is explicitly invoked;
-- all accepted focused context/task-resumption workflows and the complete inherited regression matrix remain mandatory.
+- no fabricated audit match and no claim that the loaded audit window is complete;
+- missing matching evidence remains explicitly scoped to the loaded window;
+- all accepted focused context/task-resumption/governed-action workflows and the complete inherited regression matrix remain mandatory.
 
 ## CEO-gated directions
 
@@ -121,7 +141,8 @@ Every changed product/release candidate must pass the full applicable inherited 
 - EverythingAI Return Context Provenance;
 - EverythingAI Workspace Context Summary;
 - EverythingAI Workspace Context Provenance;
-- EverythingAI Context-Aware Task Resumption.
+- EverythingAI Context-Aware Task Resumption;
+- EverythingAI Governed-Action Comprehension.
 
 Historical green results are supporting evidence only. Every accepted change retains milestone-scoped rollback evidence and final independent review.
 
@@ -131,4 +152,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-Issue #236 is documentation-only and independently reversible. Reverting #236 must not alter accepted runtime behavior from #234 or any earlier milestone. #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`.
+Issue #240 is documentation-only and independently reversible. Reverting #240 must not alter accepted runtime behavior from #238, #234, or any earlier milestone. #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`.
