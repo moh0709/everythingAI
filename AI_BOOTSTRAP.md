@@ -31,6 +31,10 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Governed-Action Comprehension synchronization: #240/#241 merge `675110e0eb3a81a29e5352b1c87113c3d313de31`; CI #682 plus all seven focused workflows PASS; final documentation review clean.
 - Governed-Action Evidence Navigation: #242/#243 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; strict RED→GREEN; unchanged head `8434bee4f1de4b558ac1643a6c342df6f8f21b95`; Governed-Action Evidence Navigation #2, CI #685, Governed-Action Comprehension #7, Context-Aware Task Resumption #13, Source Recovery Return Context #52, Multi-hop Return Context #45, Return Context Provenance #41, Workspace Context Summary #28, Workspace Context Provenance #24 PASS; final diff review clean.
 
+## Preserved release authority evidence
+
+Workspace Context fresh candidate `209ad11c2a0a7602c14fb3313931ddd1f9de38c8` passed CI #666, Workspace Context Provenance #5, Workspace Context Summary #9, Source Recovery Return Context #33, Multi-hop Return Context #26, and Return Context Provenance #22. Changed final decision head `ba96c37c9e4b4e45a7c21138b095c1add4fde53e` passed CI #669, Workspace Context Provenance #8, Workspace Context Summary #12, Source Recovery Return Context #36, Multi-hop Return Context #29, and Return Context Provenance #25. Final independent review was clean.
+
 Current release authority documents remain:
 
 - `docs/WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE_DECISION_2026-08-26.md`
