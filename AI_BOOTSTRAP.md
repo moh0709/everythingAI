@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Evidence Filtering #250 accepted; Governed-Action Review Resumption #254 accepted  
-Current gate: issue #256 canonical synchronization and next bounded decision gate
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Evidence Filtering #250 accepted; Governed-Action Review Resumption #254 accepted; Governed-Action Review Context Provenance & Explicit Clearing #258 accepted  
+Current gate: issue #260 canonical synchronization and bounded release/dispatch decision preparation
 
 ## Mandatory startup sequence
 
@@ -33,7 +33,9 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Governed-Action post-dispatch synchronization: #248/#249 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`; unchanged-head CI #698 plus all eight focused workflows PASS.
 - Governed-Action Evidence Filtering: #250/#251 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`; strict RED→GREEN; unchanged head `8275461c62aca177921083f0c3129a190e32660f`; CI #701 plus all eight inherited workflows and Evidence Filtering #2 PASS; final review clean.
 - Evidence Filtering synchronization: #252/#253 merge `3611326f45ebecc643b68d0ec32b3bde315496dc`; unchanged-head CI #703 plus all nine focused workflows PASS; final documentation review clean.
-- Governed-Action Review Resumption: #254/#255 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`; strict RED→GREEN; final unchanged head `9995b785ce016dfa6fde6ebb848cfcc2a47e772a`; Governed-Action Review Resumption #3, CI #707, and all nine inherited workflows PASS; final review clean with no review threads.
+- Governed-Action Review Resumption: #254/#255 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`; strict RED→GREEN; final unchanged head `9995b785ce016dfa6fde6ebb848cfcc2a47e772a`; Review Resumption #3, CI #707, and all nine inherited workflows PASS; final review clean with no review threads.
+- Review Resumption synchronization: #256/#257 merge `37d71eb8bb1dbc8a01ed065d00baa1300041a3a5`; unchanged-head CI #709 plus all ten focused workflows PASS; final documentation review clean.
+- Governed-Action Review Context Provenance & Explicit Clearing: #258/#259 merge `bdfa7f24d86e81153c742c8bc5dc53fd906d3c07`; strict RED→GREEN. Review Context Provenance #1 failed on pre-implementation head `16b853bdf73f0f03103209b2e3dc420eec44be07`; intermediate `3089564c410e7c424a37a490925a9544c940a486` exposed an inherited Review Resumption wording regression; final unchanged head `ff32f168ec561e6167f60a0793a7723d8e2b5524` corrected compatibility and passed CI #713, all ten inherited focused workflows, Review Context Provenance #3, and Review Resumption #9; final review clean with no review threads.
 
 ## Current release authority evidence
 
@@ -86,7 +88,7 @@ Rules:
 
 For subsequent product/release work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth/Product & UX gates: root regression; backend tests; frontend typecheck/build; Client/Admin smoke; all accepted citation/search/navigation/lifecycle/recovery/planning/execution/audit/undo acceptance; disposable-folder RC; UI-governed planning → preview → approval → execution → audit → undo; independent final review; and milestone-scoped rollback evidence.
 
-The focused workflow baseline contains **ten mandatory workflows**:
+The focused workflow baseline contains **eleven mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -97,7 +99,8 @@ The focused workflow baseline contains **ten mandatory workflows**:
 7. `EverythingAI Governed-Action Comprehension`;
 8. `EverythingAI Governed-Action Evidence Navigation`;
 9. `EverythingAI Governed-Action Evidence Filtering`;
-10. `EverythingAI Governed-Action Review Resumption`.
+10. `EverythingAI Governed-Action Review Resumption`;
+11. `EverythingAI Governed-Action Review Context Provenance`.
 
 Historical green evidence never substitutes for validating a changed candidate. CI/focused-workflow wiring is part of the accepted baseline.
 
@@ -111,20 +114,22 @@ Historical green evidence never substitutes for validating a changed candidate. 
 - “without loaded audit evidence” is scoped only to the current loaded audit window and never proves global absence;
 - review resumption preserves only the exact remembered execution that opened already-loaded audit evidence;
 - if that execution is absent from the current loaded review window, resumption is explicitly unavailable and no replacement execution is inferred;
-- evidence navigation/filtering/review resumption must not trigger a backend query merely to manufacture context or discover a replacement;
+- review-context provenance may identify only the genuine local navigation origin already represented in loaded state and must not imply backend persistence or review completion;
+- explicit context clearing removes only remembered local navigation context, selects no replacement execution, and triggers no backend/action/recovery/filesystem mutation;
+- evidence navigation/filtering/review resumption/provenance/clearing must not trigger a backend query merely to manufacture or reconstruct context;
 - no new backend/API/schema/persistence/routing architecture, action scope, automatic approval/execution/retry/recovery/undo, or filesystem mutation is authorized;
 - existing context, recovery, task-resumption, planning, approval, audit, undo, and filesystem safety boundaries remain unchanged;
 - stale/missing context remains unknown or unavailable rather than inferred.
 
 ## Current governance gate
 
-Issue #256 is documentation-only synchronization after accepted #254.
+Issue #260 is documentation-only synchronization after accepted #258.
 
-It must record exact #254/#255 acceptance evidence, preserve the complete inherited baseline, expand the mandatory focused-workflow baseline from nine to ten workflows, and pass full inherited CI plus all ten focused workflows on one unchanged documentation head before merge.
+It must record exact #258/#259 acceptance evidence, preserve the complete inherited baseline, expand the mandatory focused-workflow baseline from ten to eleven workflows, and pass full inherited CI plus all eleven focused workflows on one unchanged documentation head before merge.
 
-The one recommended next bounded option is **Governed-Action Review Context Provenance & Explicit Clearing**. It may use only genuine existing identifiers and already-loaded Client/Admin state. It may explain where the remembered review target came from and allow the user to clear that local navigation context, but must not imply backend persistence or review completion, select a different execution, issue backend requests merely to reconstruct context, or alter approval/execution/audit/undo semantics.
+The accepted post-dispatch continuation now comprises #250 Evidence Filtering, #254 Review Resumption, and #258 Review Context Provenance & Explicit Clearing. The next dependency-safe option is a **fresh release/dispatch evaluation of that coherent three-milestone sequence**. This is governance/release work, not another product feature.
 
-Completion of #256 does not itself authorize that implementation. A separate bounded issue is required after #256 acceptance.
+Completion of #260 does not itself dispatch the sequence. After #260 acceptance, a separate release-gate issue must validate a fresh unchanged candidate using the complete inherited CI matrix plus all eleven focused workflows, perform independent tranche review, and record an evidence-backed PASS/BLOCKED/REJECTED decision before any dispatch claim.
 
 ## CEO-gated directions
 
@@ -136,4 +141,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #256 is documentation-only and can be reverted independently. #254 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`, #252 merge `3611326f45ebecc643b68d0ec32b3bde315496dc`, #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #248 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted rollback evidence remain valid.
+Every accepted milestone remains independently reversible by its recorded merge. #260 is documentation-only and can be reverted independently. #258 merge `bdfa7f24d86e81153c742c8bc5dc53fd906d3c07`, #256 merge `37d71eb8bb1dbc8a01ed065d00baa1300041a3a5`, #254 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`, #252 merge `3611326f45ebecc643b68d0ec32b3bde315496dc`, #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #248 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted rollback evidence remain valid.
