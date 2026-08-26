@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)  
-Current gate: issue #232 post-dispatch canonical synchronization and next five-track decision package
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Context-Aware Task Resumption #234 accepted  
+Current gate: issue #236 canonical synchronization and next bounded five-track decision package
 
 ## Mandatory startup sequence
 
@@ -25,6 +25,7 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Evidence/Search/Lifecycle/Recovery Comprehension: #198/#199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, `PRODUCT_DEPTH_COMPREHENSION_PASS`.
 - Cross-Surface Context Continuity: #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
 - Workspace Context Trust & Provenance: #230/#231 merge `dac62d9503d0b159d0997c224258e9bdb03a2473`, `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
+- Context-Aware Task Resumption: #234/#235 merge `adf1cf0fb494010905396aaa8a63de1a668bf435`; unchanged head `a138af5008283e57806ebea0e782c986d0a75308`; CI #675 PASS; focused Context-Aware Task Resumption #3 plus the five inherited context workflows PASS; final diff review clean.
 
 Workspace Context final release evidence:
 
@@ -111,6 +112,7 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 - focused `EverythingAI Return Context Provenance` acceptance;
 - focused `EverythingAI Workspace Context Summary` acceptance;
 - focused `EverythingAI Workspace Context Provenance` acceptance;
+- focused `EverythingAI Context-Aware Task Resumption` acceptance;
 - complete inherited CI matrix validation on the required unchanged candidate together with all applicable focused gates;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
@@ -133,15 +135,18 @@ Historical green evidence never substitutes for validating a changed candidate. 
 - direct navigation never fabricates history;
 - explicit context clearing changes client navigation memory only and triggers no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation;
 - Workspace Context remains read-only and reports only genuinely known facts/provenance;
+- Context-Aware Task Resumption is explicit user-invoked navigation only and resumes only a genuine recorded destination still present in current client state;
+- task resumption never auto-navigates on load, substitutes stale context, invents history, manufactures a destination, or expands recovery/action scope;
+- rendering or invoking resume navigation itself causes no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation;
 - governed planning, approval, execution, audit, undo, and filesystem safety boundaries remain unchanged.
 
 ## Current governance gate
 
-Issue #232 is the sole active governance task. It records accepted `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS` dispatch evidence in canonical state and prepares the next five-track decision package.
+Issue #236 is the sole active governance task. It synchronizes accepted #234 Context-Aware Task Resumption evidence into canonical state and prepares the next bounded five-track decision package.
 
-#232 does not authorize another product/runtime feature. It must remain documentation-only, preserve all accepted baseline workflows and rollback evidence, pass full inherited CI plus all five focused context workflows, and receive final documentation review before merge.
+#236 is documentation-only. It must preserve all accepted baseline workflows and rollback evidence, pass full inherited CI plus all six focused context/task-resumption workflows on one unchanged documentation head, and receive final documentation review before merge.
 
-If accepted, release exactly one next bounded issue only after selecting a direction from the five-track package. The preferred safe continuation is **Context-Aware Task Resumption**, subject to separate inspection, exact acceptance criteria, and issue release.
+If accepted, release exactly one next bounded issue only after selecting a direction from the five-track package. The preferred safe continuation is **Governed-Action Preview & Audit Comprehension**, subject to separate inspection, exact acceptance criteria, and issue release.
 
 ## CEO-gated directions
 
@@ -153,4 +158,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #232 is documentation-only and can be reverted independently from product/runtime code. All earlier accepted rollback evidence remains valid.
+Every accepted milestone remains independently reversible by its recorded merge. #236 is documentation-only and can be reverted independently from product/runtime code. #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`; all earlier accepted rollback evidence remains valid.
