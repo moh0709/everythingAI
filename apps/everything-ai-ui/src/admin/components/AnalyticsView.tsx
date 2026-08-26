@@ -236,7 +236,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       </p>
       {reviewReturnExecutionId ? reviewReturnExecution && reviewReturnExecutionVisible ? <div data-testid="governed-action-review-context">
         <p className="muted">
-          Remembered execution review: {reviewReturnExecution.id}. This local navigation context was recorded only by explicit navigation from already-loaded governed-action audit evidence; it does not mean the backend persisted review state or that review is complete.
+          Remembered execution review: {reviewReturnExecution.id}. This safe resume target remains part of already-loaded governed-action review state. This local navigation context was recorded only by explicit navigation from already-loaded governed-action audit evidence; it does not mean the backend persisted review state or that review is complete.
         </p>
         <button type="button" className="outline" onClick={resumeExecutionReview}>Resume execution review</button>
         <button type="button" className="outline" onClick={clearReviewContext}>Clear remembered review context</button>
