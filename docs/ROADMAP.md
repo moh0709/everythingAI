@@ -6,7 +6,8 @@ Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHEN
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
 Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
 Governed-Action Trust & Evidence: **complete and dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)**  
-Governed-Action Evidence Filtering: **milestone #250 accepted**
+Governed-Action Evidence Filtering: **milestone #250 accepted**  
+Governed-Action Review Resumption: **milestone #254 accepted**
 
 ## Completed product sequence
 
@@ -62,48 +63,77 @@ Accepted behavior:
 - filtering triggers no backend request merely to discover or manufacture matching evidence;
 - execution, approval, audit, undo, routing, API, schema, persistence, and filesystem semantics remain unchanged.
 
+### Governance — Evidence Filtering Synchronization
+Issue #252 is accepted through PR #253 merge `3611326f45ebecc643b68d0ec32b3bde315496dc` after unchanged-head EverythingAI CI Smoke #703, all nine mandatory focused workflows, and clean final documentation review.
+
+### Product & UX / Knowledge & Safe Action — Governed-Action Review Resumption
+Milestone #254 is accepted through PR #255 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da` after strict RED→GREEN development.
+
+Strict evidence:
+
+- initial head `c6f1ac93bf98f7a7ccc78a2ad7c44dffc009593b` failed `EverythingAI Governed-Action Review Resumption` because `Resume execution review` did not yet exist;
+- implementation preserved the exact execution that opened already-loaded audit evidence and added an explicit safe return to that same execution;
+- final unchanged head `9995b785ce016dfa6fde6ebb848cfcc2a47e772a` passed `EverythingAI Governed-Action Review Resumption` #3, EverythingAI CI Smoke #707, and all nine inherited focused workflows;
+- final independent review found no unresolved Critical or Important findings and no review threads remained.
+
+Accepted behavior:
+
+- the exact remembered governed-action execution may be resumed from already-loaded review state;
+- if filtering removes that execution from the current loaded review window, resumption becomes explicitly unavailable;
+- no replacement execution is inferred or auto-selected;
+- no backend request is introduced merely to manufacture review context;
+- approval, execution, audit, undo, routing, API, schema, persistence, recovery, and filesystem semantics remain unchanged.
+
 ## Current five-track position
 
 | Track | Accepted position | Next gate |
 |---|---|---|
-| Product and UX | Strong local-first client; context trust/provenance, task resumption, Governed-Action Trust & Evidence dispatch, and evidence filtering accepted | #252 synchronization, then one separately released bounded Task-resumption continuity for governed-action review milestone may be considered |
-| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful loaded-window evidence semantics | Preserve backend authority, explicit approval, audit truthfulness, undo, and unknown-state discipline |
+| Product and UX | Strong local-first client; context trust/provenance, task resumption, Governed-Action Trust & Evidence dispatch, evidence filtering, and exact-target review resumption accepted | #256 synchronization, then one separately released bounded review-context provenance/clearing milestone may be considered |
+| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful loaded-window evidence and exact-target review semantics | Preserve backend authority, explicit approval, audit truthfulness, undo, exact-target resumption, and unknown-state discipline |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: auth, tenancy, cloud, database/storage, production architecture |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and privileged authority is available; otherwise no live-host work |
-| Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Preserve all nine focused workflows, unchanged-head evidence, final review, rollback, and truthful blocker discipline |
+| Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Preserve all ten focused workflows, unchanged-head evidence, final review, rollback, and truthful blocker discipline |
 
 ## Active dependency sequence
 
 ```text
 GOVERNED_ACTION_TRUST_EVIDENCE_PASS accepted and dispatched
   -> #250 Governed-Action Evidence Filtering accepted
-    -> #252 canonical synchronization + next bounded decision gate
-      -> accept/reject #252 after full inherited CI + all nine focused workflows + final documentation review
-        -> if accepted, release exactly one separate bounded implementation issue only
+    -> #252 synchronization accepted
+      -> #254 Governed-Action Review Resumption accepted
+        -> #256 canonical synchronization + next bounded decision gate
+          -> accept/reject #256 after full inherited CI + all ten focused workflows + final documentation review
+            -> if accepted, release exactly one separate bounded implementation issue only
 ```
 
-Issue #252 does not itself authorize another product/runtime implementation milestone.
+Issue #256 does not itself authorize another product/runtime implementation milestone.
 
 ## Next bounded direction
 
-**Task-resumption continuity for governed-action review**
+**Governed-Action Review Context Provenance & Explicit Clearing**
 
-Goal: preserve genuine current review context when a user moves across already-existing client/admin surfaces, using only existing identifiers and already-loaded state.
+Goal: make remembered review context more understandable and controllable without adding backend state, routing, or action semantics.
 
-The separately released implementation issue must remain narrow and testable. It may preserve a genuine selected execution/review origin and safe return target, but it must not:
+The separately released implementation issue may:
 
-- invent review state or completion;
-- silently select a different execution if the remembered execution is absent;
-- trigger a backend request merely to manufacture context;
-- alter approval, execution, audit, undo, routing, API, schema, persistence, or filesystem semantics.
+- explain that the remembered execution review target came from an explicit navigation from already-loaded governed-action audit evidence;
+- show the exact remembered execution identifier when genuinely known;
+- provide an explicit local control to clear that remembered review navigation context;
+- keep cleared/stale context unavailable without selecting another execution.
 
-Missing or stale review context must remain explicitly unavailable rather than inferred.
+It must not:
+
+- imply that remembered review context is persisted by the backend or represents review completion;
+- invent provenance or reconstruct missing context;
+- silently select another execution if the target is stale or cleared;
+- trigger a backend request merely to reconstruct review context;
+- alter approval, execution, audit, undo, routing, API, schema, persistence, recovery, or filesystem semantics.
 
 ## Mandatory inherited release discipline
 
 Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results are supporting evidence only. Accepted focused workflows remain mandatory unless explicitly superseded by an accepted decision. Every accepted change retains milestone-scoped rollback evidence.
 
-The focused workflow baseline contains **nine mandatory workflows**:
+The focused workflow baseline contains **ten mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -113,7 +143,8 @@ The focused workflow baseline contains **nine mandatory workflows**:
 6. `EverythingAI Context-Aware Task Resumption`;
 7. `EverythingAI Governed-Action Comprehension`;
 8. `EverythingAI Governed-Action Evidence Navigation`;
-9. `EverythingAI Governed-Action Evidence Filtering`.
+9. `EverythingAI Governed-Action Evidence Filtering`;
+10. `EverythingAI Governed-Action Review Resumption`.
 
 ## CEO-gated directions
 
@@ -125,4 +156,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-#252 synchronization is documentation-only and independently reversible. #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #248 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
+#256 synchronization is documentation-only and independently reversible. #254 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`, #252 merge `3611326f45ebecc643b68d0ec32b3bde315496dc`, #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #248 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
