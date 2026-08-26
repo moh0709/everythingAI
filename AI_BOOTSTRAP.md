@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Context-Aware Task Resumption #234 accepted  
-Current gate: issue #236 canonical synchronization and next bounded five-track decision package
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Context-Aware Task Resumption #234 accepted; Governed-Action Preview & Audit Comprehension #238 accepted  
+Current gate: issue #240 canonical synchronization and next bounded five-track decision package
 
 ## Mandatory startup sequence
 
@@ -26,6 +26,8 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Cross-Surface Context Continuity: #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
 - Workspace Context Trust & Provenance: #230/#231 merge `dac62d9503d0b159d0997c224258e9bdb03a2473`, `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
 - Context-Aware Task Resumption: #234/#235 merge `adf1cf0fb494010905396aaa8a63de1a668bf435`; unchanged head `a138af5008283e57806ebea0e782c986d0a75308`; CI #675 PASS; focused Context-Aware Task Resumption #3 plus the five inherited context workflows PASS; final diff review clean.
+- Context-Aware Task Resumption synchronization: #236/#237 merge `3512644a145994c3e53792243054a75bccd08a94`; unchanged documentation head `c599195de2491c5f4cdf3c15fc59e426074514eb`; CI #677 plus all six focused workflows PASS; final documentation review clean.
+- Governed-Action Preview & Audit Comprehension: #238/#239 merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; unchanged head `82a2ccca97f7cdf106bd39977a1491f01c2f7869`; strict RED→GREEN evidence; CI #680 PASS; Governed-Action Comprehension #2 plus all six inherited focused workflows PASS; final diff review clean.
 
 Workspace Context final release evidence:
 
@@ -113,6 +115,7 @@ For subsequent product/release work, preserve all applicable accepted Phase 1 + 
 - focused `EverythingAI Workspace Context Summary` acceptance;
 - focused `EverythingAI Workspace Context Provenance` acceptance;
 - focused `EverythingAI Context-Aware Task Resumption` acceptance;
+- focused `EverythingAI Governed-Action Comprehension` acceptance;
 - complete inherited CI matrix validation on the required unchanged candidate together with all applicable focused gates;
 - disposable-folder RC acceptance;
 - UI-governed planning → preview → approval → execution → audit → undo acceptance;
@@ -138,15 +141,18 @@ Historical green evidence never substitutes for validating a changed candidate. 
 - Context-Aware Task Resumption is explicit user-invoked navigation only and resumes only a genuine recorded destination still present in current client state;
 - task resumption never auto-navigates on load, substitutes stale context, invents history, manufactures a destination, or expands recovery/action scope;
 - rendering or invoking resume navigation itself causes no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation;
+- Governed-Action Preview & Audit Comprehension is presentation-only and uses existing authoritative preview/execution/audit fields;
+- ready previews still require explicit execution approval, blocked previews preserve backend-provided reasons, and persisted executed/failed/undone statuses remain authoritative;
+- absence of a matching audit event in the loaded window is not proof that no audit exists elsewhere;
 - governed planning, approval, execution, audit, undo, and filesystem safety boundaries remain unchanged.
 
 ## Current governance gate
 
-Issue #236 is the sole active governance task. It synchronizes accepted #234 Context-Aware Task Resumption evidence into canonical state and prepares the next bounded five-track decision package.
+Issue #240 is the sole active governance task. It synchronizes accepted #238 Governed-Action Preview & Audit Comprehension evidence into canonical state and prepares the next bounded five-track decision package.
 
-#236 is documentation-only. It must preserve all accepted baseline workflows and rollback evidence, pass full inherited CI plus all six focused context/task-resumption workflows on one unchanged documentation head, and receive final documentation review before merge.
+#240 is documentation-only. It must preserve all accepted baseline workflows and rollback evidence, pass full inherited CI plus all seven focused context/task-resumption/governed-action workflows on one unchanged documentation head, and receive final documentation review before merge.
 
-If accepted, release exactly one next bounded issue only after selecting a direction from the five-track package. The preferred safe continuation is **Governed-Action Preview & Audit Comprehension**, subject to separate inspection, exact acceptance criteria, and issue release.
+If accepted, release exactly one next bounded issue only after selecting a direction from the five-track package. The preferred safe continuation is **Governed-Action Evidence Navigation**, subject to separate inspection, exact acceptance criteria, and issue release.
 
 ## CEO-gated directions
 
@@ -158,4 +164,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #236 is documentation-only and can be reverted independently from product/runtime code. #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`; all earlier accepted rollback evidence remains valid.
+Every accepted milestone remains independently reversible by its recorded merge. #240 is documentation-only and can be reverted independently from product/runtime code. #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`; all earlier accepted rollback evidence remains valid.
