@@ -91,6 +91,8 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
   const [executionError, setExecutionError] = useState('');
   const [undoingId, setUndoingId] = useState<string | null>(null);
   const [focusedAuditId, setFocusedAuditId] = useState<string | null>(null);
+  const [focusedExecutionId, setFocusedExecutionId] = useState<string | null>(null);
+  const [reviewReturnExecutionId, setReviewReturnExecutionId] = useState<string | null>(null);
   const [evidenceFilter, setEvidenceFilter] = useState<EvidenceFilter>('all');
 
   const auditByExecution = useMemo(() => {
@@ -118,6 +120,13 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
     });
   }, [auditByExecution, evidenceFilter, executions]);
 
+  const reviewReturnExecution = reviewReturnExecutionId
+    ? executions.find((execution) => execution.id === reviewReturnExecutionId)
+    : undefined;
+  const reviewReturnExecutionVisible = Boolean(
+    reviewReturnExecutionId && visibleExecutions.some((execution) => execution.id === reviewReturnExecutionId),
+  );
+
   async function refreshExecutions() {
     const payload = await apiRequest<{ executions: ActionExecution[] }>(
       options,
@@ -126,13 +135,29 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
     setExecutions(payload.executions || []);
   }
 
-  function navigateToAuditEvidence(executionAudit: AuditEvent[]) {
+  function navigateToAuditEvidence(executionId: string, executionAudit: AuditEvent[]) {
     const target = executionAudit[0];
     if (!target) return;
 
+    setReviewReturnExecutionId(executionId);
+    setFocusedExecutionId(null);
     setFocusedAuditId(target.id);
     window.requestAnimationFrame(() => {
       const element = document.getElementById(`audit-evidence-${target.id}`);
+      if (!element) return;
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.focus();
+    });
+  }
+
+  function resumeExecutionReview() {
+    const executionId = reviewReturnExecutionId;
+    if (!executionId || !reviewReturnExecutionVisible) return;
+
+    setFocusedAuditId(null);
+    setFocusedExecutionId(executionId);
+    window.requestAnimationFrame(() => {
+      const element = document.getElementById(`execution-review-${executionId}`);
       if (!element) return;
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       element.focus();
@@ -203,6 +228,12 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       <p className="muted" data-testid="governed-action-evidence-filter-context">
         Showing {visibleExecutions.length} of {executions.length} executions. This filter uses only matching action-execution evidence in the loaded audit window; a missing loaded-window match does not prove that no audit exists elsewhere.
       </p>
+      {reviewReturnExecutionId ? reviewReturnExecution && reviewReturnExecutionVisible ? <div data-testid="governed-action-review-context">
+        <p className="muted">Remembered execution review: {reviewReturnExecution.id}. This safe resume target comes only from already-loaded governed-action review state.</p>
+        <button type="button" className="outline" onClick={resumeExecutionReview}>Resume execution review</button>
+      </div> : <p className="muted" aria-label="Governed-action review resumption unavailable">
+        Resume execution review unavailable because the remembered execution is not visible in the current loaded review window; no replacement execution is inferred.
+      </p> : null}
       {executionError && <p className="error">{executionError}</p>}
       {!executions.length && <p className="muted">No action executions recorded.</p>}
       {executions.length > 0 && <div style={{ minWidth: 0, maxWidth: '100%', overflowX: 'auto' }}>
@@ -217,8 +248,11 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
 
               return <tr
                 key={execution.id}
+                id={`execution-review-${execution.id}`}
+                tabIndex={-1}
                 data-testid={`execution-${execution.id}`}
                 data-execution-status={execution.status}
+                data-review-focus={focusedExecutionId === execution.id ? 'true' : undefined}
               >
                 <td>
                   <strong>{execution.action_type}</strong>
@@ -242,7 +276,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
                       </small>)}
                       <button
                         type="button"
-                        onClick={() => navigateToAuditEvidence(executionAudit)}
+                        onClick={() => navigateToAuditEvidence(execution.id, executionAudit)}
                         aria-label="View audit evidence"
                       >
                         View audit evidence
