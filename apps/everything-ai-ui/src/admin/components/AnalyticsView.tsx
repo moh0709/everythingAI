@@ -244,14 +244,21 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       {reviewReturnExecutionId ? <div data-testid="governed-action-review-context-summary">
         <h3>Review context summary</h3>
         <p><b>Remembered execution:</b> {reviewReturnExecutionId}</p>
+        <small className="muted" style={{ display: 'block' }}>Provenance: local remembered execution identifier recorded by explicit navigation from already-loaded audit evidence.</small>
         <p><b>Loaded audit evidence:</b> {reviewReturnAudit.length
           ? `Available in the current loaded audit window (${reviewReturnAudit.length} event${reviewReturnAudit.length === 1 ? '' : 's'})`
           : 'Unavailable in the current loaded audit window; this does not prove that no audit exists elsewhere.'}</p>
+        <small className="muted" style={{ display: 'block' }}>Provenance: matching events from the currently loaded audit window only.</small>
+        {!reviewReturnAudit.length ? <small className="muted" style={{ display: 'block' }}>Unknown-state explanation: no matching event is present in the currently loaded audit window; global audit absence is not inferred.</small> : null}
         <p><b>Navigation origin:</b> Already-loaded governed-action audit evidence</p>
+        <small className="muted" style={{ display: 'block' }}>Provenance: explicit local navigation from already-loaded governed-action audit evidence.</small>
         <p><b>Loaded evidence filter:</b> {evidenceFilterLabel(evidenceFilter)}</p>
+        <small className="muted" style={{ display: 'block' }}>Provenance: current local audit-evidence filter selection.</small>
         <p><b>Safe return target:</b> {reviewReturnExecution && reviewReturnExecutionVisible
           ? 'Resume exact remembered execution review'
           : 'Unavailable — remembered execution is not visible in the current loaded review window; no replacement execution is inferred.'}</p>
+        <small className="muted" style={{ display: 'block' }}>Provenance: safe return is derived only from whether the exact remembered execution remains visible in the currently loaded review window.</small>
+        {!(reviewReturnExecution && reviewReturnExecutionVisible) ? <small className="muted" style={{ display: 'block' }}>Unknown-state explanation: the exact remembered execution is not visible under the current loaded-window filter; no replacement execution or review completion is inferred.</small> : null}
         <p className="muted">Local navigation only; this does not prove backend persistence or review completion.</p>
       </div> : null}
       {reviewReturnExecutionId ? reviewReturnExecution && reviewReturnExecutionVisible ? <div data-testid="governed-action-review-context">

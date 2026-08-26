@@ -1,0 +1,80 @@
+name: EverythingAI Governed-Action Review Context Summary Provenance
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  governed-action-review-context-summary-provenance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install backend dependencies
+        working-directory: services/api
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: apps/everything-ai-ui
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        working-directory: apps/everything-ai-ui
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend API
+        working-directory: services/api
+        run: |
+          nohup npm start > ../../backend-ci.log 2>&1 &
+          echo $! > ../../backend.pid
+
+      - name: Wait for backend API
+        run: |
+          STATUS="000"
+          for i in {1..60}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4100/api/status || true)
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "401" ]; then
+              echo "Backend ready (HTTP $STATUS)"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend failed to start. Last HTTP status: $STATUS"
+          cat backend-ci.log || true
+          exit 1
+
+      - name: Start frontend dev server
+        working-directory: apps/everything-ai-ui
+        run: |
+          nohup npm run dev -- --host 127.0.0.1 > ../../frontend-ci.log 2>&1 &
+          echo $! > ../../frontend.pid
+
+      - name: Wait for frontend
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:5151 >/dev/null; then
+              echo "Frontend ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Frontend failed to start"
+          cat frontend-ci.log || true
+          exit 1
+
+      - name: Run Governed-Action Review Context Summary Provenance acceptance
+        working-directory: apps/everything-ai-ui
+        env:
+          EVERYTHINGAI_API_URL: http://127.0.0.1:4100
+          EVERYTHINGAI_UI_URL: http://127.0.0.1:5151
+          EVERYTHINGAI_SMOKE_ARTIFACT_DIR: smoke-artifacts/everythingai-smoke
+        run: npx playwright test smoke/governed-action-review-context-summary-provenance.spec.ts
