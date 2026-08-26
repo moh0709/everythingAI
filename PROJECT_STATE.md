@@ -41,12 +41,39 @@ Implementation completion alone is never acceptance.
 - Governed-Action Lifecycle — #162/#163 — merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` — final CI #568.
 - Evidence, Search, Lifecycle & Recovery Comprehension — #198/#199 — merge `e32f3a1db5b1c5447031842cd59bda59afadce90` — release candidate CI #624 and final decision CI #625 — `PRODUCT_DEPTH_COMPREHENSION_PASS`.
 - Cross-Surface Context Continuity — #218/#219 — merge `6cbb3c15de8cb5e9624c5fb164a2781790336298` — fresh candidate CI #652 and changed-final-head CI #654 plus all focused return-context workflows — `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
+- Canonical post-dispatch sync — #220/#221 — merge `dcffd7e9648e37784b91db9852f628e09bed3ee4` — CI #656 plus all three focused return-context workflows.
+- Workspace Context Summary & Safe Return Map — #222/#223 — merge `17195747cb4fed58202992a0907816696b3ca3e1` — unchanged-head CI #658 plus focused context workflows.
+- Workspace Context canonical sync — #224/#225 — merge `e5517027c922c0697441a22b4e946ffa0a44e13e` — CI #660 plus focused context workflows.
+- Workspace Context Provenance & Unknown-State Explanations — #226/#227 — merge `d7a5002582f0b0fb13d95d4656dbaedba651fcb0` — unchanged-head CI #662 plus all applicable focused context workflows.
+- Workspace Context tranche sync — #228/#229 — merge `cb02a32ef271a72f99ab7d967d25fa24103df004` — unchanged-head CI #664 plus all five focused context workflows.
 - Workspace Context Trust & Provenance — #230/#231 — merge `dac62d9503d0b159d0997c224258e9bdb03a2473` — fresh candidate CI #666, changed-final-head CI #669, all five focused context workflows on required candidates — `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
+- Workspace Context post-dispatch sync — #232/#233 — merge `8f9152f2bc1aa73efee9f6d092cebb86e866785d` — unchanged-head CI #671 plus all five focused context workflows.
 - Context-Aware Task Resumption — #234/#235 — merge `adf1cf0fb494010905396aaa8a63de1a668bf435` — unchanged-head CI #675 plus all six focused workflows.
 - Context-Aware Task Resumption sync — #236/#237 — merge `3512644a145994c3e53792243054a75bccd08a94` — unchanged-head CI #677 plus all six focused workflows.
 - Governed-Action Preview & Audit Comprehension — #238/#239 — merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` — verified RED→GREEN, unchanged-head CI #680 plus all seven focused workflows.
 - Governed-Action Comprehension sync — #240/#241 — merge `675110e0eb3a81a29e5352b1c87113c3d313de31` — unchanged-head CI #682 plus all seven focused workflows.
 - Governed-Action Evidence Navigation — #242/#243 — merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33` — verified RED→GREEN, unchanged-head CI #685 plus all eight focused workflows.
+
+## Preserved Workspace Context release evidence
+
+Accepted Workspace Context release merge: `dac62d9503d0b159d0997c224258e9bdb03a2473` (#230 / PR #231).
+
+- fresh tranche candidate `209ad11c2a0a7602c14fb3313931ddd1f9de38c8` — EverythingAI CI Smoke #666 PASS;
+- candidate Workspace Context Provenance #5 PASS;
+- candidate Workspace Context Summary #9 PASS;
+- candidate Source Recovery Return Context #33 PASS;
+- candidate Multi-hop Return Context #26 PASS;
+- candidate Return Context Provenance #22 PASS;
+- changed final decision head `ba96c37c9e4b4e45a7c21138b095c1add4fde53e` — EverythingAI CI Smoke #669 PASS;
+- final-head Workspace Context Provenance #8 PASS;
+- final-head Workspace Context Summary #12 PASS;
+- final-head Source Recovery Return Context #36 PASS;
+- final-head Multi-hop Return Context #29 PASS;
+- final-head Return Context Provenance #25 PASS;
+- final independent review — no unresolved Critical or Important findings.
+
+Release decision: `docs/WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE_DECISION_2026-08-26.md`  
+Handover: `docs/HANDOVER_2026-08-26_WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE.json`
 
 ## Governed-Action Trust & Evidence tranche boundary
 
@@ -105,4 +132,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback
 
-#244 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. #242 remains independently reversible through merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; all earlier accepted rollback evidence remains valid.
+#244 is documentation-only. Revert only its synchronization merge if required. Product/runtime/data behavior is unaffected. #242 remains independently reversible through merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; all earlier accepted milestone rollback evidence remains valid.
