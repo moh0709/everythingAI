@@ -1,0 +1,81 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-26",
+  "release": "Governed-Action Trust & Evidence",
+  "issue": 246,
+  "status": "GOVERNED_ACTION_TRUST_EVIDENCE_PASS",
+  "accepted_sync_baseline": {
+    "merge": "149bf47a2fb43135a426d71de376eb5e5acb4d2f",
+    "issue": 244,
+    "pr": 245,
+    "ci_run": 689
+  },
+  "fresh_release_candidate": {
+    "sha": "4179b26af624398554166f0256ad6bc2495d4d1b",
+    "ci_smoke_run": 691,
+    "source_recovery_return_context_run": 58,
+    "multi_hop_return_context_run": 51,
+    "return_context_provenance_run": 47,
+    "workspace_context_summary_run": 34,
+    "workspace_context_provenance_run": 30,
+    "context_aware_task_resumption_run": 19,
+    "governed_action_comprehension_run": 13,
+    "governed_action_evidence_navigation_run": 8,
+    "result": "PASS"
+  },
+  "accepted_milestones": [
+    {
+      "issue": 238,
+      "pr": 239,
+      "merge": "cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa",
+      "unchanged_head": "82a2ccca97f7cdf106bd39977a1491f01c2f7869",
+      "ci_run": 680
+    },
+    {
+      "issue": 242,
+      "pr": 243,
+      "merge": "e0a1c54bf72204f0a3262ddded7545c8f6c69b33",
+      "unchanged_head": "8434bee4f1de4b558ac1643a6c342df6f8f21b95",
+      "ci_run": 685
+    }
+  ],
+  "supporting_synchronization": [
+    {
+      "issue": 240,
+      "pr": 241,
+      "merge": "675110e0eb3a81a29e5352b1c87113c3d313de31",
+      "ci_run": 682
+    },
+    {
+      "issue": 244,
+      "pr": 245,
+      "merge": "149bf47a2fb43135a426d71de376eb5e5acb4d2f",
+      "ci_run": 689
+    }
+  ],
+  "safety_semantics": {
+    "preview_is_proposal_only": true,
+    "ready_requires_explicit_approval": true,
+    "backend_block_reason_authoritative": true,
+    "persisted_execution_states_authoritative": true,
+    "evidence_navigation_read_only": true,
+    "audit_match_must_be_in_loaded_window": true,
+    "missing_loaded_match_proves_global_absence": false,
+    "extra_backend_query_to_manufacture_match": false,
+    "backend_api_schema_persistence_expanded": false,
+    "routing_architecture_expanded": false,
+    "automatic_action_scope_expanded": false,
+    "recovery_scope_expanded": false,
+    "filesystem_safety_changed": false
+  },
+  "independent_review": {
+    "unresolved_critical_findings": 0,
+    "unresolved_important_findings": 0,
+    "result": "PASS"
+  },
+  "rollback": "Revert only the affected accepted milestone merge; #240/#244 synchronization and #246 release documentation are independently reversible.",
+  "enterprise_platform_scope_expanded": false,
+  "material_connector_runtime_scope_expanded": false,
+  "protected_historical_issue_69_modified": false,
+  "next_state": "Validate the changed final release-decision head with EverythingAI CI Smoke plus all eight focused workflows. Merge and dispatch only if that unchanged final head is green and final review remains clean. After dispatch, select any next direction through a separate bounded governance gate."
+}
