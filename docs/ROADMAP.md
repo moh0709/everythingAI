@@ -4,7 +4,8 @@ Date: 2026-08-26
 Phase 2: **complete and dispatched (`PHASE2_PASS`)**  
 Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
-Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**
+Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
+Context-Aware Task Resumption: **milestone #234 accepted**
 
 ## Completed product sequence
 
@@ -41,8 +42,9 @@ Supporting synchronization:
 
 - #224/#225 — merge `e5517027c922c0697441a22b4e946ffa0a44e13e`, CI #660 plus focused context workflows.
 - #228/#229 — merge `cb02a32ef271a72f99ab7d967d25fa24103df004`, CI #664 plus all five focused context workflows.
+- #232/#233 — merge `8f9152f2bc1aa73efee9f6d092cebb86e866785d`, unchanged-head CI #671 plus all five focused context workflows.
 
-Fresh release validation:
+Fresh Workspace Context release validation:
 
 - candidate `209ad11c2a0a7602c14fb3313931ddd1f9de38c8`: CI #666, Workspace Context Provenance #5, Workspace Context Summary #9, Source Recovery Return Context #33, Multi-hop Return Context #26, Return Context Provenance #22 — all PASS;
 - changed final decision head `ba96c37c9e4b4e45a7c21138b095c1add4fde53e`: CI #669, Workspace Context Provenance #8, Workspace Context Summary #12, Source Recovery Return Context #36, Multi-hop Return Context #29, Return Context Provenance #25 — all PASS;
@@ -51,52 +53,60 @@ Fresh release validation:
 Release decision: `docs/WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE_DECISION_2026-08-26.md`  
 Handover: `docs/HANDOVER_2026-08-26_WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE.json`
 
+### Product & UX — Context-Aware Task Resumption
+
+Milestone #234 is accepted. PR #235 merged as `adf1cf0fb494010905396aaa8a63de1a668bf435` after unchanged implementation head `a138af5008283e57806ebea0e782c986d0a75308` passed EverythingAI CI Smoke #675, Context-Aware Task Resumption #3, Source Recovery Return Context #42, Multi-hop Return Context #35, Return Context Provenance #31, Workspace Context Summary #18, and Workspace Context Provenance #14. Final diff review found no unresolved Critical or Important findings.
+
+Accepted behavior:
+
+- `Resume previous context` appears only for a genuine recorded destination still present in current client state;
+- invocation is explicit and reuses existing client-side return/navigation handlers;
+- applicable query/source/Knowledge Base provenance remains truthful;
+- stale or missing destinations remain unavailable and do not fall back to another source/page;
+- direct/no-history entry does not fabricate resumable context;
+- rendering or invoking resume navigation causes no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation;
+- no backend/routing architecture, persistence model, recovery/action scope, or material runtime expansion was added.
+
 ## Current five-track position
 
 | Track | Position | Bounded next options |
 |---|---|---|
-| Product and UX | Strong local-first client with dispatched context-trust/provenance tranche | Preferred: Context-Aware Task Resumption using only existing recorded client context; alternative: bounded usability polish on existing surfaces |
-| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful provenance | Improve read-only comprehension around existing preview/audit/evidence flows without policy or mutation expansion |
+| Product and UX | Strong local-first client with Workspace Context Trust & Provenance dispatched and Context-Aware Task Resumption accepted | Preserve current navigation/context semantics; only separately scoped bounded usability work |
+| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful provenance | Preferred next: read-only Governed-Action Preview & Audit Comprehension using only existing authoritative facts |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: auth, tenancy, cloud, database/storage, production architecture |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and privileged authority is available; otherwise no live-host work |
-| Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Option: simplify test/governance ergonomics without weakening any accepted gate or evidence requirement |
+| Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Preserve all six focused context/task-resumption workflows plus unchanged-head evidence and rollback discipline |
 
 ## Active dependency sequence
 
 ```text
 WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS accepted and dispatched
-  -> #232 canonical post-dispatch synchronization + five-track decision package
-    -> accept/reject #232 after full inherited CI + all five focused context workflows + final documentation review
-      -> if accepted, release exactly one separately scoped bounded next issue
+  -> #232 post-dispatch synchronization accepted
+    -> #234 Context-Aware Task Resumption accepted
+      -> #236 canonical synchronization + next five-track decision gate
+        -> accept/reject #236 after full inherited CI + all six focused context/task-resumption workflows + final documentation review
+          -> if accepted, release exactly one separately scoped bounded next issue
 ```
 
-Issue #232 does not authorize another product/runtime feature.
+Issue #236 does not authorize another product/runtime feature.
 
 ## Recommended next bounded direction
 
-**Context-Aware Task Resumption**
+**Governed-Action Preview & Audit Comprehension**
 
-Goal: reduce reorientation cost when a user returns to the Client Workspace by presenting a read-only, explicit resume path derived only from genuinely recorded existing client context.
+Goal: reduce uncertainty around already existing governed-action preview, approval, execution, audit, undo, and unavailable states by presenting clearer read-only explanations derived only from currently authoritative action/audit facts.
 
-A future implementation issue, if released, should first inspect current state ownership and then define one narrow behavior. Candidate behavior is an explicit “Resume previous context” affordance that can restore only a genuinely recorded safe-return/selected-source/Knowledge Base origin/query context already supported by existing client state.
+A future implementation issue, if released, must first inspect current state ownership and exact backend-returned facts. It may improve explanation and navigation only; it must not change policy, approval requirements, execution semantics, mutation scope, undo rules, or filesystem guards.
 
 Required boundaries:
 
-- no invented history;
-- no automatic navigation or action on load;
-- no backend or routing architecture;
-- no recovery/action scope expansion;
-- stale/missing context remains unavailable;
-- explicit user invocation only;
-- mutation-free until an already-governed existing control is separately invoked;
-- all accepted focused context workflows and complete inherited regression matrix remain mandatory.
-
-## Alternative bounded options
-
-1. **Governed-action comprehension polish** — read-only clarification of existing preview/audit/undo state, using only already authoritative facts and no policy/mutation expansion.
-2. **Governance/test-harness simplification** — reduce duplication or maintenance cost in focused workflow orchestration while preserving every accepted gate, unchanged-head requirement, and review/rollback discipline.
-
-Exactly one option may be released at a time after #232 acceptance. None is authorized merely by appearing here.
+- no new policy inference or frontend-created action state;
+- no automatic approval, execution, retry, recovery, or undo;
+- no backend or routing architecture expansion unless separately CEO-approved;
+- no action-scope expansion;
+- unknown/unavailable state remains explicit rather than inferred;
+- read-only comprehension layer only until an existing governed control is explicitly invoked;
+- all accepted focused context/task-resumption workflows and the complete inherited regression matrix remain mandatory.
 
 ## CEO-gated directions
 
@@ -110,7 +120,8 @@ Every changed product/release candidate must pass the full applicable inherited 
 - EverythingAI Multi-hop Return Context;
 - EverythingAI Return Context Provenance;
 - EverythingAI Workspace Context Summary;
-- EverythingAI Workspace Context Provenance.
+- EverythingAI Workspace Context Provenance;
+- EverythingAI Context-Aware Task Resumption.
 
 Historical green results are supporting evidence only. Every accepted change retains milestone-scoped rollback evidence and final independent review.
 
@@ -120,4 +131,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-Issue #232 is documentation-only and independently reversible. Reverting #232 must not alter accepted runtime behavior from #222, #226, or any earlier release.
+Issue #236 is documentation-only and independently reversible. Reverting #236 must not alter accepted runtime behavior from #234 or any earlier milestone. #234 remains independently reversible through merge `adf1cf0fb494010905396aaa8a63de1a668bf435`.
