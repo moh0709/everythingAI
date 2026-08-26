@@ -7,7 +7,8 @@ Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONT
 Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
 Context-Aware Task Resumption: **milestone #234 accepted**  
 Governed-Action Preview & Audit Comprehension: **milestone #238 accepted**  
-Governed-Action Evidence Navigation: **milestone #242 accepted**
+Governed-Action Evidence Navigation: **milestone #242 accepted**  
+Governed-Action Trust & Evidence: **release decision `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`, pending changed-final-head validation and merge**
 
 ## Completed product sequence
 
@@ -30,7 +31,7 @@ Accepted through #162/#163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, fin
 Accepted and dispatched as `PRODUCT_DEPTH_COMPREHENSION_PASS` through #198/#199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, release candidate CI #624 and final decision CI #625.
 
 ### Product Depth — Cross-Surface Context Continuity
-Accepted and dispatched as `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS` through #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, fresh candidate CI #652 and changed-final-head CI #654 plus all focused return-context workflows.
+Accepted and dispatched as `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS` through #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, fresh candidate CI #652 and changed-final-head CI #654 plus focused return-context workflows.
 
 ### Product & UX — Workspace Context Trust & Provenance
 Accepted and dispatched as `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS` through #230/#231 merge `dac62d9503d0b159d0997c224258e9bdb03a2473`.
@@ -52,7 +53,7 @@ Accepted behavior:
 - no backend/API/schema/persistence/routing or mutation semantics changed.
 
 ### Product & UX / Knowledge & Safe Action — Governed-Action Evidence Navigation
-Milestone #242 is accepted. PR #243 merged as `e0a1c54bf72204f0a3262ddded7545c8f6c69b33` after strict RED→GREEN development. Focused Governed-Action Evidence Navigation #1 failed before implementation because no matching-audit navigation control existed. Minimal read-only implementation followed; unchanged head `8434bee4f1de4b558ac1643a6c342df6f8f21b95` passed Governed-Action Evidence Navigation #2, EverythingAI CI Smoke #685, Governed-Action Comprehension #7, Context-Aware Task Resumption #13, Source Recovery Return Context #52, Multi-hop Return Context #45, Return Context Provenance #41, Workspace Context Summary #28, and Workspace Context Provenance #24. Final diff review found no unresolved Critical or Important findings.
+Milestone #242 accepted through PR #243 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33` after strict RED→GREEN development. Unchanged head `8434bee4f1de4b558ac1643a6c342df6f8f21b95` passed Governed-Action Evidence Navigation #2, EverythingAI CI Smoke #685, and all seven inherited focused workflows. Supporting synchronization #244/#245 merged as `149bf47a2fb43135a426d71de376eb5e5acb4d2f` after EverythingAI CI Smoke #689 plus all eight focused workflows and final documentation review.
 
 Accepted behavior:
 
@@ -62,21 +63,38 @@ Accepted behavior:
 - missing evidence remains explicitly scoped to the loaded audit window and is not proof that no audit exists elsewhere;
 - approval, execution, undo, policy, recovery, routing, API, schema, persistence, mutation, and filesystem semantics remain unchanged.
 
-## Governed-Action Trust & Evidence tranche
+## Governed-Action Trust & Evidence release gate
 
-The coherent bounded release tranche under evaluation contains exactly:
+The bounded tranche contains exactly:
 
 1. #238 — Governed-Action Preview & Audit Comprehension.
 2. #242 — Governed-Action Evidence Navigation.
 
-Both milestones are accepted, but the tranche is **not yet dispatched**. Release/dispatch requires fresh validation from the accepted #244 synchronization merge; historical milestone green results do not constitute tranche PASS.
+Fresh unchanged release candidate `4179b26af624398554166f0256ad6bc2495d4d1b` passed:
+
+- EverythingAI CI Smoke #691;
+- Source Recovery Return Context #58;
+- Multi-hop Return Context #51;
+- Return Context Provenance #47;
+- Workspace Context Summary #34;
+- Workspace Context Provenance #30;
+- Context-Aware Task Resumption #19;
+- Governed-Action Comprehension #13;
+- Governed-Action Evidence Navigation #8.
+
+Independent release review found no unresolved Critical or Important findings. The decision is therefore `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`.
+
+Release decision: `docs/GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE_DECISION_2026-08-26.md`  
+Handover: `docs/HANDOVER_2026-08-26_GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE.json`
+
+Dispatch remains merge-gated: the changed final decision head must itself pass the complete inherited CI matrix plus all eight focused workflows before PR #247 may merge.
 
 ## Current five-track position
 
 | Track | Position | Next gate |
 |---|---|---|
-| Product and UX | Strong local-first client; Context-Aware Task Resumption, Governed-Action Comprehension, and Evidence Navigation accepted | #244 synchronization, then fresh Governed-Action Trust & Evidence release-candidate evaluation |
-| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful context provenance, read-only action-state/evidence comprehension | Evaluate #238 + #242 as one bounded release tranche; do not add another feature during the release gate |
+| Product and UX | Strong local-first client; Context-Aware Task Resumption and Governed-Action Trust & Evidence tranche behavior accepted | Finish #246 changed-final-head release validation; after dispatch, select a new bounded direction through governance rather than automatically extending features |
+| Knowledge and Safe Action | Source-backed reading, explainable search, lifecycle/recovery guidance, governed actions, truthful context provenance, read-only action-state/evidence comprehension | Preserve backend authority, loaded-window truthfulness, explicit approval, audit, and undo semantics |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: auth, tenancy, cloud, database/storage, production architecture |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and privileged authority is available; otherwise no live-host work |
 | Governance and Autonomous Delivery | Proven issue/PR/CI/review loop with extensive inherited gates | Preserve all eight focused workflows, unchanged-head evidence, final review, and rollback discipline |
@@ -85,43 +103,37 @@ Both milestones are accepted, but the tranche is **not yet dispatched**. Release
 
 ```text
 #238 Governed-Action Preview & Audit Comprehension accepted
-  -> #240 canonical synchronization accepted
+  -> #240 synchronization accepted
     -> #242 Governed-Action Evidence Navigation accepted
-      -> #244 synchronization + tranche release-gate preparation
-        -> accept/reject #244 after full inherited CI + all eight focused workflows + final documentation review
-          -> if accepted, create fresh Governed-Action Trust & Evidence release candidate
-            -> validate complete inherited CI + all eight focused workflows on one unchanged candidate
-              -> prepare release decision only if green
-                -> validate changed final decision head before dispatch
+      -> #244 synchronization accepted
+        -> #246 fresh Governed-Action Trust & Evidence candidate
+          -> candidate head 4179b26... PASS: CI #691 + all eight focused workflows
+            -> independent release review PASS
+              -> release decision + handover + canonical state written
+                -> validate changed final decision head
+                  -> if green, merge #247, close #246, dispatch GOVERNED_ACTION_TRUST_EVIDENCE_PASS
 ```
 
-Issue #244 does not authorize another product/runtime feature.
-
-## Release-candidate validation package
-
-A fresh candidate created from the accepted #244 synchronization merge must pass:
-
-- complete EverythingAI inherited CI matrix on one unchanged head;
-- `EverythingAI Source Recovery Return Context`;
-- `EverythingAI Multi-hop Return Context`;
-- `EverythingAI Return Context Provenance`;
-- `EverythingAI Workspace Context Summary`;
-- `EverythingAI Workspace Context Provenance`;
-- `EverythingAI Context-Aware Task Resumption`;
-- `EverythingAI Governed-Action Comprehension`;
-- `EverythingAI Governed-Action Evidence Navigation`;
-- independent final review with no unresolved Critical or Important findings;
-- explicit tranche-scoped rollback evidence.
-
-No release status is to be invented. A changed release-decision head must itself be validated before merge/dispatch.
+No subsequent feature is authorized by this release gate.
 
 ## Mandatory inherited release discipline
 
 Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results are supporting evidence only. Accepted focused workflows remain mandatory unless explicitly superseded by an accepted decision. Every accepted change retains milestone-scoped rollback evidence.
 
+The focused workflow baseline contains eight mandatory workflows:
+
+1. `EverythingAI Source Recovery Return Context`;
+2. `EverythingAI Multi-hop Return Context`;
+3. `EverythingAI Return Context Provenance`;
+4. `EverythingAI Workspace Context Summary`;
+5. `EverythingAI Workspace Context Provenance`;
+6. `EverythingAI Context-Aware Task Resumption`;
+7. `EverythingAI Governed-Action Comprehension`;
+8. `EverythingAI Governed-Action Evidence Navigation`.
+
 ## CEO-gated directions
 
-Require explicit CEO approval before authentication/tenancy, cloud deployment, DB migration/object storage, privileged-host/systemd work, production-platform architecture execution, new routing architecture, automatic action/recovery/rebuild behavior, material connector/runtime expansion, new backend/API/schema/persistence for this tranche, or new semantic/provider architecture with material runtime/cost/trust implications.
+Require explicit CEO approval before authentication/tenancy, cloud deployment, DB migration/object storage, privileged-host/systemd work, production-platform architecture execution, new routing architecture, automatic action/recovery/rebuild behavior, material connector/runtime expansion, new backend/API/schema/persistence expansion, or new semantic/provider architecture with material runtime/cost/trust implications.
 
 ## Issue #69
 
@@ -129,4 +141,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-Issue #244 is documentation-only and independently reversible. Reverting #244 must not alter accepted runtime behavior from #242, #238, #234, or earlier milestones. #242 remains independently reversible through merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`.
+The #246 release-decision/canonical synchronization is documentation-only and independently reversible. #242 remains independently reversible through merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; #238 remains independently reversible through merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa`; all earlier accepted rollback evidence remains intact.
