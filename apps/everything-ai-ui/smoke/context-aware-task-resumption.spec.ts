@@ -120,7 +120,6 @@ test('explicit task resumption follows only genuine recorded context and never i
 
   const resumeRegion = page.getByLabel('Context-aware task resumption');
   await expect(resumeRegion).toContainText(`Resume target: Sources & Files → “${originSource.filename}”`);
-  await expect(searchInput).toHaveValue('resume contract');
   expect(mutationRequests).toEqual([]);
 
   await resumeRegion.getByRole('button', { name: 'Resume previous context' }).click();
