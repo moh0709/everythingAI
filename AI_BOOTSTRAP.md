@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Summary #222 and Workspace Context Provenance #226 accepted  
-Current gate: issue #228 canonical synchronization and Workspace Context release/dispatch-gate preparation
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)  
+Current gate: issue #232 post-dispatch canonical synchronization and next five-track decision package
 
 ## Mandatory startup sequence
 
@@ -19,22 +19,23 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 
 ## Current accepted release authority
 
-- Phase 2 release: `266c2efa255ba11165ffaf5d0b6385affe0f261b` (`PHASE2_PASS`).
+- Phase 2: `266c2efa255ba11165ffaf5d0b6385affe0f261b` (`PHASE2_PASS`).
 - Trustworthy Search: #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883`, final CI #535.
-- Governed-Action Lifecycle: #162 / PR #163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final CI #568.
-- Evidence/Search/Lifecycle/Recovery Comprehension: #198 / PR #199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, `PRODUCT_DEPTH_COMPREHENSION_PASS`.
-- Cross-Surface Context Continuity: #218 / PR #219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
-- Post-dispatch canonical sync: #220 / PR #221 merge `dcffd7e9648e37784b91db9852f628e09bed3ee4`, CI #656 plus all three focused return-context workflows.
-- Workspace Context Summary & Safe Return Map: #222 / PR #223 merge `17195747cb4fed58202992a0907816696b3ca3e1`; unchanged head `598bbd007547644380c18b880513f695fd49f147`; CI #658 PASS; Workspace Context Summary #1 PASS; Source Recovery Return Context #25 PASS; Multi-hop Return Context #18 PASS; Return Context Provenance #14 PASS; final independent review clean.
-- Workspace Context canonical synchronization: #224 / PR #225 merge `e5517027c922c0697441a22b4e946ffa0a44e13e`; CI #660 PASS; Workspace Context Summary #3 PASS; Source Recovery Return Context #27 PASS; Multi-hop Return Context #20 PASS; Return Context Provenance #16 PASS; final documentation review clean.
-- Workspace Context Provenance & Unknown-State Explanations: #226 / PR #227 merge `d7a5002582f0b0fb13d95d4656dbaedba651fcb0`; unchanged head `28a853b3b01be6dfad7ce025b89e251b2bdb0106`; CI #662 PASS; Workspace Context Provenance #1 PASS; Workspace Context Summary #5 PASS; Source Recovery Return Context #29 PASS; Multi-hop Return Context #22 PASS; Return Context Provenance #18 PASS; final independent review clean.
+- Governed-Action Lifecycle: #162/#163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2`, final CI #568.
+- Evidence/Search/Lifecycle/Recovery Comprehension: #198/#199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, `PRODUCT_DEPTH_COMPREHENSION_PASS`.
+- Cross-Surface Context Continuity: #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
+- Workspace Context Trust & Provenance: #230/#231 merge `dac62d9503d0b159d0997c224258e9bdb03a2473`, `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
+
+Workspace Context final release evidence:
+
+- fresh candidate `209ad11c2a0a7602c14fb3313931ddd1f9de38c8`: CI #666; Workspace Context Provenance #5; Workspace Context Summary #9; Source Recovery Return Context #33; Multi-hop Return Context #26; Return Context Provenance #22 — all PASS;
+- changed final decision head `ba96c37c9e4b4e45a7c21138b095c1add4fde53e`: CI #669; Workspace Context Provenance #8; Workspace Context Summary #12; Source Recovery Return Context #36; Multi-hop Return Context #29; Return Context Provenance #25 — all PASS;
+- final independent review clean.
 
 Current release authority documents:
 
-- `docs/CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE_DECISION_2026-08-25.md`
-- `docs/HANDOVER_2026-08-25_CROSS_SURFACE_CONTEXT_CONTINUITY_RELEASE.json`
-
-No Workspace Context tranche-level PASS exists yet. #222 and #226 are accepted milestones only until a fresh release/dispatch gate explicitly validates and decides the tranche.
+- `docs/WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE_DECISION_2026-08-26.md`
+- `docs/HANDOVER_2026-08-26_WORKSPACE_CONTEXT_TRUST_PROVENANCE_RELEASE.json`
 
 ## Program tracks
 
@@ -74,7 +75,7 @@ Rules:
 - no PASS without independently reviewable evidence;
 - truthful BLOCKED outcomes are valid;
 - every accepted milestone records exact commit/merge, validation, risks, and rollback;
-- previously accepted focused workflows remain wired into the inherited baseline unless explicitly superseded.
+- accepted focused workflows remain wired into the inherited baseline unless explicitly superseded.
 
 ## Mandatory inherited product regression baseline
 
@@ -120,62 +121,31 @@ Historical green evidence never substitutes for validating a changed candidate. 
 
 ## Accepted safety boundaries
 
-Product Depth and Product & UX remain local-first and bounded:
-
 - backend-returned search order and match facts are preserved;
 - source provenance and citation evidence remain authoritative;
-- ranking signals are not presented as calibrated confidence;
+- ranking signals are not calibrated confidence;
 - frontend does not invent progress, completion, freshness, trust, retry, recovery success, or mutation facts;
-- lifecycle semantics remain based on persisted indexing/extraction state;
-- recovery remains source-root scoped and uses configured Folder Path plus persisted scan/watcher evidence under exact-root rules;
-- no per-file retry is introduced;
-- selected source is navigation provenance only, never recovery scope;
+- recovery remains source-root scoped under exact configured-root rules;
+- selected source is navigation provenance only, never recovery or action scope;
 - genuine query/page/source/return provenance is retained only where actually recorded;
-- direct navigation never fabricates history;
 - stale source IDs never select a substitute source;
 - missing/stale page/source/history remains unknown or unavailable;
+- direct navigation never fabricates history;
 - explicit context clearing changes client navigation memory only and triggers no backend/file/recovery/Knowledge Base/governed-action/filesystem mutation;
+- Workspace Context remains read-only and reports only genuinely known facts/provenance;
 - governed planning, approval, execution, audit, undo, and filesystem safety boundaries remain unchanged.
-
-Workspace Context Summary #222 additionally guarantees:
-
-- summary is read-only;
-- only genuinely known query, valid selected source, recorded Knowledge Base origin, configured source root, and genuine safe-return target are shown;
-- stale selected-source state is unavailable rather than substituted;
-- missing context stays unknown/unavailable rather than inferred;
-- summary display triggers no backend or mutation action;
-- existing Client Workspace identifiers/state are used; no backend or routing architecture was added.
-
-Workspace Context Provenance #226 additionally guarantees:
-
-- each shown summary fact names only its genuine existing client-side origin;
-- unavailable fields explain only supported absence/staleness conditions and never invent an unseen root cause;
-- stale source identity remains unavailable and cannot select another source;
-- missing query, knowledge origin, Folder Path, or safe-return history remains explicitly unknown/unavailable;
-- provenance/explanation UI is read-only and triggers no backend or mutation action;
-- safe-return, context-clearing, recovery-scope, and governed-action semantics remain unchanged.
 
 ## Current governance gate
 
-Issue #228 is the sole active governance task. It synchronizes accepted #226 evidence into canonical startup/roadmap state and adds `EverythingAI Workspace Context Provenance` to the mandatory focused regression baseline.
+Issue #232 is the sole active governance task. It records accepted `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS` dispatch evidence in canonical state and prepares the next five-track decision package.
 
-The accepted #222 + #226 behaviors now form a coherent bounded Product & UX increment: **Workspace Context Trust & Provenance**. If #228 passes unchanged-head CI, all focused context workflows, and final documentation review, the next dependency-safe task is a separate tranche-level release/dispatch evaluation. That release gate must create a fresh unchanged candidate, rerun the complete inherited matrix plus every focused context workflow, independently review scope/evidence, and record explicit PASS/FAIL before dispatch.
+#232 does not authorize another product/runtime feature. It must remain documentation-only, preserve all accepted baseline workflows and rollback evidence, pass full inherited CI plus all five focused context workflows, and receive final documentation review before merge.
 
-No additional feature is authorized by #228 or by release-gate preparation.
+If accepted, release exactly one next bounded issue only after selecting a direction from the five-track package. The preferred safe continuation is **Context-Aware Task Resumption**, subject to separate inspection, exact acceptance criteria, and issue release.
 
 ## CEO-gated directions
 
-Explicit CEO approval remains required before:
-
-- authentication or tenancy;
-- cloud deployment;
-- database migration or object storage;
-- privileged-host/systemd work;
-- production-platform architecture execution;
-- new routing architecture;
-- automatic action/recovery/rebuild behavior;
-- material connector/runtime expansion;
-- new semantic/provider architecture with material runtime, cost, or trust implications.
+Explicit CEO approval remains required before authentication/tenancy, cloud deployment, DB migration/object storage, privileged-host/systemd work, production-platform architecture execution, new routing architecture, automatic action/recovery/rebuild behavior, material connector/runtime expansion, or new semantic/provider architecture with material runtime/cost/trust implications.
 
 ## Issue #69
 
@@ -183,4 +153,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #228 is documentation-only and can be reverted independently from product/runtime code. All earlier accepted rollback evidence remains valid.
+Every accepted milestone remains independently reversible by its recorded merge. #232 is documentation-only and can be reverted independently from product/runtime code. All earlier accepted rollback evidence remains valid.
