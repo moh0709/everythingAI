@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)  
-Current gate: issue #248 post-dispatch canonical synchronization and next five-track decision gate
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Evidence Filtering #250 accepted  
+Current gate: issue #252 canonical synchronization and next bounded decision gate
 
 ## Mandatory startup sequence
 
@@ -30,42 +30,17 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Governed-Action Evidence Navigation: #242/#243 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`; strict RED→GREEN; unchanged head `8434bee4f1de4b558ac1643a6c342df6f8f21b95`; CI #685 plus eight focused workflows PASS.
 - Governed-Action tranche synchronization: #244/#245 merge `149bf47a2fb43135a426d71de376eb5e5acb4d2f`; CI #689 plus all eight focused workflows PASS.
 - Governed-Action Trust & Evidence release: #246/#247 merge `9927ab9988e4b321619dd4a745af9023855c4d8b`; fresh candidate CI #691 and changed-final-head CI #696 plus all eight focused workflows on both required heads; final reviews clean; status `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`.
+- Governed-Action post-dispatch synchronization: #248/#249 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`; unchanged-head CI #698 plus all eight focused workflows PASS.
+- Governed-Action Evidence Filtering: #250/#251 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`; strict focused RED→GREEN; unchanged head `8275461c62aca177921083f0c3129a190e32660f`; EverythingAI CI Smoke #701 plus all eight inherited workflows and Governed-Action Evidence Filtering #2 PASS; final review clean.
 
 ## Current release authority evidence
 
-Release decision:
+Release decision: `docs/GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE_DECISION_2026-08-26.md`  
+Handover: `docs/HANDOVER_2026-08-26_GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE.json`
 
-- `docs/GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE_DECISION_2026-08-26.md`
+Fresh unchanged release candidate `4179b26af624398554166f0256ad6bc2495d4d1b` passed EverythingAI CI Smoke #691 plus all eight then-mandatory focused workflows.
 
-Handover:
-
-- `docs/HANDOVER_2026-08-26_GOVERNED_ACTION_TRUST_EVIDENCE_RELEASE.json`
-
-Fresh unchanged release candidate `4179b26af624398554166f0256ad6bc2495d4d1b` passed:
-
-- EverythingAI CI Smoke #691;
-- Source Recovery Return Context #58;
-- Multi-hop Return Context #51;
-- Return Context Provenance #47;
-- Workspace Context Summary #34;
-- Workspace Context Provenance #30;
-- Context-Aware Task Resumption #19;
-- Governed-Action Comprehension #13;
-- Governed-Action Evidence Navigation #8.
-
-Changed final decision head `7498e4ddb02cd5af6c4bdcbce3750c7b109361fa` passed:
-
-- EverythingAI CI Smoke #696;
-- Source Recovery Return Context #63;
-- Multi-hop Return Context #56;
-- Return Context Provenance #52;
-- Workspace Context Summary #39;
-- Workspace Context Provenance #35;
-- Context-Aware Task Resumption #24;
-- Governed-Action Comprehension #18;
-- Governed-Action Evidence Navigation #13.
-
-Independent release review and final documentation review found no unresolved Critical or Important findings.
+Changed final decision head `7498e4ddb02cd5af6c4bdcbce3750c7b109361fa` passed EverythingAI CI Smoke #696 plus all eight then-mandatory focused workflows. Independent release review and final documentation review found no unresolved Critical or Important findings.
 
 ## Program tracks
 
@@ -109,7 +84,7 @@ Rules:
 
 For subsequent product/release work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth/Product & UX gates: root regression; backend tests; frontend typecheck/build; Client/Admin smoke; all accepted citation/search/navigation/lifecycle/recovery/planning/execution/audit/undo acceptance; disposable-folder RC; UI-governed planning → preview → approval → execution → audit → undo; independent final review; and milestone-scoped rollback evidence.
 
-The focused workflow baseline contains eight mandatory workflows:
+The focused workflow baseline contains **nine mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -118,7 +93,8 @@ The focused workflow baseline contains eight mandatory workflows:
 5. `EverythingAI Workspace Context Provenance`;
 6. `EverythingAI Context-Aware Task Resumption`;
 7. `EverythingAI Governed-Action Comprehension`;
-8. `EverythingAI Governed-Action Evidence Navigation`.
+8. `EverythingAI Governed-Action Evidence Navigation`;
+9. `EverythingAI Governed-Action Evidence Filtering`.
 
 Historical green evidence never substitutes for validating a changed candidate. CI/focused-workflow wiring is part of the accepted baseline.
 
@@ -128,21 +104,22 @@ Historical green evidence never substitutes for validating a changed candidate. 
 - preview remains proposal-only; ready state requires explicit execution approval; blocked reasons remain backend-authoritative;
 - executed, failed, and undone remain distinct persisted states;
 - evidence navigation is read-only and may target only genuine matching audit evidence already present in the loaded audit window;
-- a missing match is scoped only to the loaded audit window and is never proof that no audit exists elsewhere;
-- evidence navigation must not trigger a backend query merely to manufacture a match;
+- evidence filtering is read-only and uses already-loaded execution/audit state only;
+- “without loaded audit evidence” is scoped only to the current loaded audit window and never proves global absence;
+- evidence navigation/filtering must not trigger a backend query merely to manufacture or discover a match;
 - no new backend/API/schema/persistence/routing architecture, action scope, automatic approval/execution/retry/recovery/undo, or filesystem mutation is authorized;
 - existing context, recovery, task-resumption, planning, approval, audit, undo, and filesystem safety boundaries remain unchanged;
 - stale/missing context remains unknown or unavailable rather than inferred.
 
 ## Current governance gate
 
-Issue #248 is documentation-only post-dispatch synchronization and the next five-track decision gate.
+Issue #252 is documentation-only synchronization after accepted #250.
 
-It must record the exact #246/#247 dispatch evidence, preserve the complete inherited baseline and all eight focused workflows, and pass full inherited CI plus all eight focused workflows on one unchanged documentation head before merge.
+It must record exact #250/#251 acceptance evidence, preserve the complete inherited baseline, expand the mandatory focused-workflow baseline from eight to nine workflows, and pass full inherited CI plus all nine focused workflows on one unchanged documentation head before merge.
 
-The five-track gate may recommend bounded next options, but completion of #248 does not itself authorize another product/runtime implementation.
+The one recommended next bounded option is **Task-resumption continuity for governed-action review**. It may use only genuine existing identifiers and loaded state, and must not invent review state, auto-select a different execution, issue backend requests merely to manufacture context, or alter approval/execution/audit/undo semantics.
 
-Safe bounded continuation must use existing state/contracts and preserve explicit approval, audit truthfulness, undo, context/recovery boundaries, and rollback. Enterprise Platform, privileged-host work, and material runtime expansion remain CEO-gated.
+Completion of #252 does not itself authorize that implementation. A separate bounded issue is required after #252 acceptance.
 
 ## CEO-gated directions
 
@@ -154,4 +131,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #248 is documentation-only and can be reverted independently. #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, #242 merge `e0a1c54bf72204f0a3262ddded7545c8f6c69b33`, and #238 merge `cb80bc71ea9e29cd5f1a0ed3d5c5a8b8fb05fefa` remain independently reversible; all earlier accepted rollback evidence remains valid.
+Every accepted milestone remains independently reversible by its recorded merge. #252 is documentation-only and can be reverted independently. #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #248 merge `cc683bce1ead46738e701a8b6664b9d12f7e3807`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted rollback evidence remain valid.
