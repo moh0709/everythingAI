@@ -108,12 +108,12 @@ test('explicit task resumption follows only genuine recorded context and never i
   await expect(summary).toBeVisible();
   await expect(summary.getByRole('button', { name: 'Resume previous context' })).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Sources & Files' }).click();
+  await page.getByRole('button', { name: 'Sources & Files', exact: true }).click();
   await page.getByRole('button', { name: 'Refresh' }).last().click();
   const searchInput = page.getByPlaceholder('Search filenames, paths, or extracted file content...');
   await searchInput.fill('resume contract');
 
-  await page.getByRole('button', { name: 'Knowledge Base' }).click();
+  await page.getByRole('button', { name: 'Knowledge Base', exact: true }).click();
   const sourceCard = page.locator('.wiki-source-card').filter({ hasText: originSource.filename });
   await sourceCard.getByRole('button', { name: 'Open file context' }).click();
   await page.getByRole('button', { name: 'Open source recovery' }).click();
@@ -137,7 +137,7 @@ test('explicit task resumption follows only genuine recorded context and never i
 
   await sourceCard.getByRole('button', { name: 'Open file context' }).click();
   wikiPages = [];
-  await page.getByRole('button', { name: 'Knowledge Base' }).click();
+  await page.getByRole('button', { name: 'Knowledge Base', exact: true }).click();
   await page.getByRole('button', { name: 'Refresh' }).last().click();
   await expect(summary).toContainText('Knowledge Base origin: unavailable; no replacement page is inferred.');
   await expect(page.getByLabel('Context-aware task resumption unavailable')).toContainText('no replacement destination is inferred');
@@ -145,7 +145,7 @@ test('explicit task resumption follows only genuine recorded context and never i
   expect(mutationRequests).toEqual([]);
 
   files = [unrelatedSource];
-  await page.getByRole('button', { name: 'Sources & Files' }).click();
+  await page.getByRole('button', { name: 'Sources & Files', exact: true }).click();
   await page.getByRole('button', { name: 'Refresh' }).last().click();
   await expect(summary).not.toContainText(`Selected source: “${unrelatedSource.filename}”`);
 
