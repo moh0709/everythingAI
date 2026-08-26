@@ -86,6 +86,12 @@ function executionOutcome(execution: ActionExecution) {
   };
 }
 
+function evidenceFilterLabel(filter: EvidenceFilter) {
+  if (filter === 'with') return 'With loaded audit evidence';
+  if (filter === 'without') return 'Without loaded audit evidence';
+  return 'All executions';
+}
+
 export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
   const [executions, setExecutions] = useState<ActionExecution[]>([]);
   const [executionError, setExecutionError] = useState('');
@@ -126,6 +132,7 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
   const reviewReturnExecutionVisible = Boolean(
     reviewReturnExecutionId && visibleExecutions.some((execution) => execution.id === reviewReturnExecutionId),
   );
+  const reviewReturnAudit = reviewReturnExecutionId ? auditByExecution.get(reviewReturnExecutionId) || [] : [];
 
   async function refreshExecutions() {
     const payload = await apiRequest<{ executions: ActionExecution[] }>(
@@ -234,6 +241,19 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       <p className="muted" data-testid="governed-action-evidence-filter-context">
         Showing {visibleExecutions.length} of {executions.length} executions. This filter uses only matching action-execution evidence in the loaded audit window; a missing loaded-window match does not prove that no audit exists elsewhere.
       </p>
+      {reviewReturnExecutionId ? <div data-testid="governed-action-review-context-summary">
+        <h3>Review context summary</h3>
+        <p><b>Remembered execution:</b> {reviewReturnExecutionId}</p>
+        <p><b>Loaded audit evidence:</b> {reviewReturnAudit.length
+          ? `Available in the current loaded audit window (${reviewReturnAudit.length} event${reviewReturnAudit.length === 1 ? '' : 's'})`
+          : 'Unavailable in the current loaded audit window; this does not prove that no audit exists elsewhere.'}</p>
+        <p><b>Navigation origin:</b> Already-loaded governed-action audit evidence</p>
+        <p><b>Loaded evidence filter:</b> {evidenceFilterLabel(evidenceFilter)}</p>
+        <p><b>Safe return target:</b> {reviewReturnExecution && reviewReturnExecutionVisible
+          ? 'Resume exact remembered execution review'
+          : 'Unavailable — remembered execution is not visible in the current loaded review window; no replacement execution is inferred.'}</p>
+        <p className="muted">Local navigation only; this does not prove backend persistence or review completion.</p>
+      </div> : null}
       {reviewReturnExecutionId ? reviewReturnExecution && reviewReturnExecutionVisible ? <div data-testid="governed-action-review-context">
         <p className="muted">
           Remembered execution review: {reviewReturnExecution.id}. This safe resume target remains part of already-loaded governed-action review state. This local navigation context was recorded only by explicit navigation from already-loaded governed-action audit evidence; it does not mean the backend persisted review state or that review is complete.
