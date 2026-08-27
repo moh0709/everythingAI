@@ -7,7 +7,8 @@ Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONT
 Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
 Governed-Action Trust & Evidence: **complete and dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)**  
 Governed-Action Review Context: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`)**  
-Governed-Action Review Context Summary: **milestone #266 accepted**
+Governed-Action Review Context Summary: **#266 accepted**  
+Governed-Action Review Context Summary Provenance: **#270 accepted**
 
 ## Completed sequence
 
@@ -70,15 +71,32 @@ Acceptance evidence:
 
 Accepted behavior is read-only and limited to already-loaded state: remembered execution identity, loaded-evidence availability, genuine local navigation origin, active loaded-window filter scope, genuine safe return/resume target, and explicit unknown/unavailable states where facts cannot be proven.
 
+### Review Context Summary synchronization
+
+#268 / PR #269 merged as `f6c67a0bc53c7c888eaf9476ae5575b19e2ea996` after unchanged-head EverythingAI CI Smoke #726, all twelve mandatory focused workflows, clean final documentation review, and no unresolved review threads.
+
+### Product & UX — Governed-Action Review Context Summary Provenance & Unknown-State Explanations
+
+#270 / PR #271 merged as `7afeaedf5821422a955b1a244337fe4ca049e026`.
+
+Acceptance evidence:
+
+- strict RED workflow `EverythingAI Governed-Action Review Context Summary Provenance` #1 failed on pre-implementation head `72cf0d358ea5361f9f27c08e98b494e6df63ec05` because the required provenance text did not exist;
+- final unchanged head `c8a6e7b4cdcd5e811803a0b348ca276f9291f07e` passed EverythingAI CI Smoke #729;
+- the same unchanged head passed all twelve inherited mandatory focused workflows plus new `EverythingAI Governed-Action Review Context Summary Provenance` #2;
+- independent final diff review found no unresolved Critical or Important findings and no review threads remained.
+
+Accepted behavior explains only the genuine source of each Review Context Summary fact from already-loaded/local state and why an unavailable fact is unknown. It does not fetch missing evidence, infer global audit absence, infer review completion, claim local memory as backend persistence, or select a replacement execution.
+
 ## Current five-track position
 
 | Track | Accepted position | Next gate |
 |---|---|---|
-| Product and UX | Strong local-first client; Governed-Action Review Context dispatched; Review Context Summary & Safe Return Map accepted | #268 synchronization, then one bounded summary-trust continuation may be released |
-| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful loaded-window audit/evidence semantics, exact-target review behavior, provenance and unknown-state discipline | Preserve backend authority and explain only facts provable from loaded state |
+| Product and UX | Strong local-first client; Governed-Action Review Context dispatched; Review Context Summary + Summary Provenance accepted | #272 synchronization, then dedicated release/dispatch evaluation of the coherent #266 + #270 sequence |
+| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful loaded-window audit/evidence semantics, exact-target review behavior, provenance and unknown-state discipline | Preserve backend authority and explain only facts provable from loaded/local state |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: authentication, tenancy, cloud, database/storage, production-platform execution |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and required privileged authority is available |
-| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all twelve focused workflows, strict RED→GREEN for new behavior, final review, rollback, and truthful blocker discipline |
+| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all thirteen focused workflows, final review, rollback, truthful blocker discipline, and changed-final-head revalidation for release documentation |
 
 ## Active dependency sequence
 
@@ -86,44 +104,41 @@ Accepted behavior is read-only and limited to already-loaded state: remembered e
 GOVERNED_ACTION_REVIEW_CONTEXT_PASS accepted and dispatched
   -> #264 post-dispatch synchronization accepted
     -> #266 Review Context Summary & Safe Return Map accepted
-      -> #268 canonical synchronization + bounded decision gate
-        -> accept/reject #268 after full inherited CI + all twelve focused workflows + final documentation review
-          -> if accepted, release exactly one bounded implementation issue
+      -> #268 synchronization accepted
+        -> #270 Summary Provenance & Unknown-State Explanations accepted
+          -> #272 canonical synchronization + coherent sequence evaluation
+            -> accept/reject #272 after full inherited CI + all thirteen focused workflows + final documentation review
+              -> if accepted, release dedicated Review Context Summary Trust release/dispatch gate
 ```
 
-Issue #268 does not itself authorize another product/runtime implementation milestone.
+Issue #272 does not itself authorize another product/runtime implementation milestone.
 
 ## Selected next bounded direction
 
-**Governed-Action Review Context Summary Provenance & Unknown-State Explanations**
+**Governed-Action Review Context Summary Trust — release/dispatch evaluation**
 
-Goal: deepen trust in the accepted Review Context Summary using only already-loaded local state.
+The accepted #266 + #270 sequence is coherent without another feature:
 
-A separate implementation issue may expose, for each summary fact, only truthful provenance and unknown-state reasoning such as:
+- #266 provides the read-only Review Context Summary & Safe Return Map from already-loaded state;
+- #270 adds truthful provenance and explicit unknown-state explanations to those same summary facts;
+- exact-target review resumption, loaded-window truthfulness, no replacement execution inference, and no backend reconstruction request remain intact;
+- both milestones are independently reversible.
 
-- remembered execution identity originates from genuine remembered local review context;
-- loaded-evidence availability is derived only from the current loaded audit window;
-- navigation origin is local context and is not backend persistence or review completion;
-- filter scope describes only the active loaded-window view;
-- safe return/resume is available only when the exact remembered execution remains represented in loaded state;
-- unavailable values explain that the required loaded fact is missing/stale rather than inferring a replacement or global absence.
+Therefore, after #272 acceptance, the next dependency-safe step is a fresh release/dispatch candidate for this bounded sequence rather than another implementation milestone.
 
-It must not:
+The release gate must:
 
-- query the backend merely to fill or reconstruct summary provenance;
-- imply that absent loaded audit evidence means no audit exists globally;
-- infer review completion or backend persistence from local context;
-- select or infer a replacement execution;
-- change approval, execution, audit, undo, routing, API, schema, persistence, recovery, or filesystem semantics;
-- authorize any CEO-gated material expansion.
-
-This is the selected safe continuation because it improves comprehension/trust over an already accepted read-only summary and is independently reversible.
+- validate one fresh unchanged candidate with EverythingAI CI Smoke plus all thirteen focused workflows;
+- independently review the #266 + #270 sequence for coherence, safety, and rollback;
+- write a release decision and handover only if the fresh candidate is green and review is clean;
+- revalidate the changed final decision head with the complete inherited matrix and all thirteen focused workflows before merge/final dispatch;
+- avoid any new product feature, backend/API/schema/persistence/routing expansion, automatic action/recovery behavior, Enterprise Platform, privileged-host/systemd, authentication/tenancy/cloud/database/object-storage, material connector/runtime expansion, or semantic/provider architecture expansion.
 
 ## Mandatory inherited release discipline
 
 Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results are supporting evidence only. Accepted focused workflows remain mandatory unless explicitly superseded by an accepted decision. Every accepted change retains milestone-scoped rollback evidence.
 
-The focused workflow baseline is now **twelve mandatory workflows**:
+The focused workflow baseline is now **thirteen mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -136,7 +151,8 @@ The focused workflow baseline is now **twelve mandatory workflows**:
 9. `EverythingAI Governed-Action Evidence Filtering`;
 10. `EverythingAI Governed-Action Review Resumption`;
 11. `EverythingAI Governed-Action Review Context Provenance`;
-12. `EverythingAI Governed-Action Review Context Summary`.
+12. `EverythingAI Governed-Action Review Context Summary`;
+13. `EverythingAI Governed-Action Review Context Summary Provenance`.
 
 ## CEO-gated directions
 
@@ -148,4 +164,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-#268 synchronization is documentation-only and independently reversible. #266 merge `71f4e9051a0d2aba50108decadf5280264dde771`, #264 synchronization merge `5321b5dc0b1f49554faa75fb6b29d665dd8cbbff`, #262 release merge `39232ca75ac5e58e2de4fbdc0125de0ef78ba261`, #260 merge `98c531545c058aa9f5f2882ff25c6d7045b5d810`, #258 merge `bdfa7f24d86e81153c742c8bc5dc53fd906d3c07`, #254 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`, #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
+#272 synchronization is documentation-only and independently reversible. #270 merge `7afeaedf5821422a955b1a244337fe4ca049e026`, #268 synchronization merge `f6c67a0bc53c7c888eaf9476ae5575b19e2ea996`, #266 merge `71f4e9051a0d2aba50108decadf5280264dde771`, #264 synchronization merge `5321b5dc0b1f49554faa75fb6b29d665dd8cbbff`, #262 release merge `39232ca75ac5e58e2de4fbdc0125de0ef78ba261`, #260 merge `98c531545c058aa9f5f2882ff25c6d7045b5d810`, #258 merge `bdfa7f24d86e81153c742c8bc5dc53fd906d3c07`, #254 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`, #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
