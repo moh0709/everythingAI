@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-08-26  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Review Context Summary #266 and Summary Provenance #270 accepted  
-Current gate: issue #272 canonical synchronization and Review Context Summary Trust release-gate preparation
+Date: 2026-08-27  
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)  
+Current gate: issue #276 post-dispatch synchronization and next five-track decision gate
 
 ## Mandatory startup sequence
 
@@ -20,24 +20,22 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 ## Current accepted authority
 
 - Phase 2 — merge `266c2efa255ba11165ffaf5d0b6385affe0f261b` — `PHASE2_PASS`.
-- Trustworthy Search — #142 merge `d8fad2df21454aa7dce0101abe208fd24b91a883` — final CI #535.
-- Governed-Action Lifecycle — #162/#163 merge `241b8c8cb723a43be1ede211fdfc55acf15d96e2` — final CI #568.
 - Evidence/Search/Lifecycle/Recovery Comprehension — #198/#199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90` — `PRODUCT_DEPTH_COMPREHENSION_PASS`.
 - Cross-Surface Context Continuity — #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298` — `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`.
 - Workspace Context Trust & Provenance — #230/#231 merge `dac62d9503d0b159d0997c224258e9bdb03a2473` — `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`.
 - Governed-Action Trust & Evidence — #246/#247 merge `9927ab9988e4b321619dd4a745af9023855c4d8b` — `GOVERNED_ACTION_TRUST_EVIDENCE_PASS`.
 - Governed-Action Review Context — #262/#263 merge `39232ca75ac5e58e2de4fbdc0125de0ef78ba261` — `GOVERNED_ACTION_REVIEW_CONTEXT_PASS`.
-- Post-dispatch synchronization — #264/#265 merge `5321b5dc0b1f49554faa75fb6b29d665dd8cbbff` — CI #721 plus eleven focused workflows.
-- Governed-Action Review Context Summary & Safe Return Map — #266/#267 merge `71f4e9051a0d2aba50108decadf5280264dde771` — strict RED→GREEN; final unchanged head `ff0cb0602aacaff4cdd776f65209f811b84d94fd`; CI #724; Summary workflow #2; final review clean.
-- Review Context Summary synchronization — #268/#269 merge `f6c67a0bc53c7c888eaf9476ae5575b19e2ea996` — CI #726 plus twelve focused workflows; final documentation review clean.
-- Governed-Action Review Context Summary Provenance & Unknown-State Explanations — #270/#271 merge `7afeaedf5821422a955b1a244337fe4ca049e026` — strict RED→GREEN; RED head `72cf0d358ea5361f9f27c08e98b494e6df63ec05`; final unchanged head `c8a6e7b4cdcd5e811803a0b348ca276f9291f07e`; CI #729; Summary Provenance workflow #2; final review clean.
+- Review Context Summary & Safe Return Map — #266/#267 merge `71f4e9051a0d2aba50108decadf5280264dde771` — strict RED→GREEN; CI #724.
+- Review Context Summary Provenance & Unknown-State Explanations — #270/#271 merge `7afeaedf5821422a955b1a244337fe4ca049e026` — strict RED→GREEN; CI #729.
+- Review Context Summary Trust synchronization — #272/#273 merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9` — CI #733 plus thirteen focused workflows.
+- Review Context Summary Trust release — #274/#275 merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed` — candidate CI #735 and changed-final-head CI #736 plus thirteen focused workflows — `GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`.
 
 ## Current release authority evidence
 
-Release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_RELEASE_DECISION_2026-08-26.md`  
-Handover: `docs/HANDOVER_2026-08-26_GOVERNED_ACTION_REVIEW_CONTEXT_RELEASE.json`
+Release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`  
+Handover: `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`
 
-The dispatched Governed-Action Review Context tranche remains authoritative. #266 and #270 are later bounded accepted Product & UX continuations and do not alter that release status until a separate release gate is accepted.
+The release decision is authoritative together with the completed final-head validation and accepted merge #275. Issue #276 is synchronization only.
 
 ## Program tracks
 
@@ -81,7 +79,7 @@ Rules:
 
 For subsequent product/release work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth/Product & UX gates: root regression; backend tests; frontend typecheck/build; Client/Admin smoke; all accepted citation/search/navigation/lifecycle/recovery/planning/execution/audit/undo acceptance; disposable-folder RC; UI-governed planning → preview → approval → execution → audit → undo; independent final review; and milestone-scoped rollback evidence.
 
-The focused workflow baseline is now **thirteen mandatory workflows**:
+The focused workflow baseline remains **thirteen mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -118,18 +116,11 @@ Historical green evidence never substitutes for validating a changed candidate. 
 
 ## Current governance gate
 
-Issue #272 is documentation-only synchronization after accepted #270/#271.
+Issue #276 is documentation-only synchronization after accepted #274/#275 dispatch.
 
-It must record exact #270 evidence, expand the focused baseline from twelve to thirteen without removing any inherited workflow, preserve rollback/safety semantics, and pass full inherited CI plus all thirteen focused workflows on one unchanged documentation head before merge.
+It must record exact release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, candidate CI #735, final-head CI #736, and `GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`; preserve all thirteen focused workflows and accepted safety/rollback semantics; and pass full inherited CI plus all thirteen focused workflows on one unchanged documentation head before merge.
 
-The accepted #266 + #270 sequence is coherent and bounded enough for a dedicated release/dispatch evaluation:
-
-- #266 supplies the read-only Review Context Summary & Safe Return Map;
-- #270 supplies truthful provenance and unknown-state explanations for that same summary;
-- both use already-loaded state and preserve loaded-window truthfulness, exact-target review semantics, no inferred replacement execution, and no backend fetch merely to manufacture context;
-- both remain independently reversible.
-
-If #272 is accepted, the next dependency-safe step is a separate **Governed-Action Review Context Summary Trust release/dispatch evaluation gate**. No additional implementation feature is authorized by this synchronization.
+The recommended bounded continuation after #276 acceptance is **Review Context Orientation Clarity**: improve how the existing UI distinguishes the currently visible loaded audit window from remembered local review context, using only already-loaded state and without new persistence, backend fetches, routing architecture, or mutation semantics. This is a recommendation only. A separate issue is required before implementation.
 
 ## CEO-gated directions
 
@@ -141,4 +132,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #272 is documentation-only and can be reverted independently. #270 merge `7afeaedf5821422a955b1a244337fe4ca049e026`, #268 synchronization merge `f6c67a0bc53c7c888eaf9476ae5575b19e2ea996`, #266 merge `71f4e9051a0d2aba50108decadf5280264dde771`, #264 synchronization merge `5321b5dc0b1f49554faa75fb6b29d665dd8cbbff`, #262 release merge `39232ca75ac5e58e2de4fbdc0125de0ef78ba261`, #260 synchronization merge `98c531545c058aa9f5f2882ff25c6d7045b5d810`, #258 merge `bdfa7f24d86e81153c742c8bc5dc53fd906d3c07`, #254 merge `ec96edf5bf9be64df9feab4c05fcd0188bbe60da`, #250 merge `437a882ed1a2af55db5af89e68654fd1ea8e14af`, #246 release merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, and all earlier accepted rollback evidence remain valid.
+Every accepted milestone remains independently reversible by its recorded merge. #276 is documentation-only and can be reverted independently. Release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted rollback evidence remain valid.
