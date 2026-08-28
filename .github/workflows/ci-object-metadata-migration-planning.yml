@@ -1,0 +1,28 @@
+name: EverythingAI Object Metadata Migration Planning
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  object-metadata-migration-planning:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install backend dependencies
+        working-directory: services/api
+        run: npm ci
+
+      - name: Run object metadata migration planning acceptance
+        working-directory: services/api
+        run: node --test test/objectMetadataMigrationPlanning.test.js
