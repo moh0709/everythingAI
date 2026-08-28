@@ -1,6 +1,8 @@
 import { buildScopedObjectKey } from '../../storage/objectStorage.js';
 import { withEnterpriseScopedTransaction } from './enterpriseScopedTransaction.js';
 
+const SHA256_HEX = /^[0-9a-f]{64}$/;
+
 function assertClient(client) {
   if (!client || typeof client.query !== 'function') {
     throw new TypeError('A PostgreSQL client with query(sql, params) is required.');
@@ -25,6 +27,17 @@ function normalizeContentType(value) {
   if (typeof value !== 'string') throw new Error('Object content type must be a string');
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeComputedPlanChecksum(value) {
+  if (typeof value !== 'string') {
+    throw new Error('Computed migration plan checksum is required');
+  }
+  const normalized = value.trim().toLowerCase();
+  if (!SHA256_HEX.test(normalized)) {
+    throw new Error('Computed migration plan checksum must be a SHA-256 hex digest');
+  }
+  return normalized;
 }
 
 function mapRow(row) {
@@ -96,6 +109,68 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
             normalizedAdapter,
             storageKey,
             normalizedSize,
+            normalizedContentType,
+          ],
+        );
+        return mapRow(result.rows?.[0]);
+      });
+    },
+
+    async recordComputedPlanObject({ scope, storageAdapter, planItem } = {}) {
+      if (!planItem || typeof planItem !== 'object') {
+        throw new Error('Computed migration plan item is required');
+      }
+      if (planItem.checksumComputedForPlan !== true) {
+        throw new Error('Migration plan checksum must be computed for the plan');
+      }
+      if (planItem.checksumVerifiedForCutover !== false) {
+        throw new Error('Migration plan checksum must remain unverified for cutover');
+      }
+      if (planItem.migrationState !== undefined && planItem.migrationState !== 'planned') {
+        throw new Error('Computed migration metadata may only be recorded in planned state');
+      }
+
+      const objectId = planItem.objectId;
+      const storageKey = buildScopedObjectKey(scope, objectId);
+      const normalizedAdapter = normalizeStorageAdapter(storageAdapter);
+      const normalizedSize = normalizeOptionalSize(planItem.size);
+      const normalizedChecksum = normalizeComputedPlanChecksum(planItem.checksumSha256);
+      const normalizedContentType = normalizeContentType(planItem.contentType);
+
+      return withEnterpriseScopedTransaction(client, scope, async (scopedClient, exactScope) => {
+        const result = await scopedClient.query(
+          `INSERT INTO workspace_object_metadata (
+             tenant_id,
+             workspace_id,
+             object_id,
+             storage_adapter,
+             storage_key,
+             size_bytes,
+             checksum_sha256,
+             checksum_verified,
+             content_type,
+             migration_state,
+             updated_at
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, FALSE, $8, 'planned', now())
+           ON CONFLICT (tenant_id, workspace_id, object_id)
+           DO UPDATE SET
+             storage_adapter = EXCLUDED.storage_adapter,
+             storage_key = EXCLUDED.storage_key,
+             size_bytes = EXCLUDED.size_bytes,
+             checksum_sha256 = EXCLUDED.checksum_sha256,
+             checksum_verified = FALSE,
+             content_type = EXCLUDED.content_type,
+             migration_state = 'planned',
+             updated_at = now()
+           RETURNING *`,
+          [
+            exactScope.tenantId,
+            exactScope.workspaceId,
+            objectId,
+            normalizedAdapter,
+            storageKey,
+            normalizedSize,
+            normalizedChecksum,
             normalizedContentType,
           ],
         );
