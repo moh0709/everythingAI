@@ -25,4 +25,4 @@ jobs:
 
       - name: Run object metadata migration planning acceptance
         working-directory: services/api
-        run: node --test test/objectMetadataMigrationPlanning.test.js
+        run: node --test test/objectMetadataMigrationPlanning.test.js test/objectMetadataIntegrity.test.js
