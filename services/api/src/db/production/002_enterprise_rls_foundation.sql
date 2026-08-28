@@ -53,12 +53,31 @@ CREATE POLICY eai_workspaces_scope ON workspaces
     AND id = eai_runtime.current_workspace_id()
   );
 
+-- Defense in depth for every workspace-owned table: matching a workspace UUID
+-- alone is not sufficient. The selected workspace must also be visible inside
+-- the selected tenant under the workspaces RLS policy above.
+CREATE OR REPLACE FUNCTION eai_runtime.workspace_in_current_scope(target_workspace_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY INVOKER
+SET search_path = public, pg_temp
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.workspaces w
+    WHERE w.id = target_workspace_id
+      AND w.id = eai_runtime.current_workspace_id()
+      AND w.tenant_id = eai_runtime.current_tenant_id()
+  );
+$$;
+
 ALTER TABLE workspace_memberships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_memberships FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eai_workspace_memberships_scope ON workspace_memberships;
 CREATE POLICY eai_workspace_memberships_scope ON workspace_memberships
-  USING (workspace_id = eai_runtime.current_workspace_id())
-  WITH CHECK (workspace_id = eai_runtime.current_workspace_id());
+  USING (eai_runtime.workspace_in_current_scope(workspace_id))
+  WITH CHECK (eai_runtime.workspace_in_current_scope(workspace_id));
 
 ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roles FORCE ROW LEVEL SECURITY;
@@ -66,11 +85,17 @@ DROP POLICY IF EXISTS eai_roles_scope ON roles;
 CREATE POLICY eai_roles_scope ON roles
   USING (
     tenant_id = eai_runtime.current_tenant_id()
-    AND (workspace_id IS NULL OR workspace_id = eai_runtime.current_workspace_id())
+    AND (
+      workspace_id IS NULL
+      OR eai_runtime.workspace_in_current_scope(workspace_id)
+    )
   )
   WITH CHECK (
     tenant_id = eai_runtime.current_tenant_id()
-    AND (workspace_id IS NULL OR workspace_id = eai_runtime.current_workspace_id())
+    AND (
+      workspace_id IS NULL
+      OR eai_runtime.workspace_in_current_scope(workspace_id)
+    )
   );
 
 ALTER TABLE permission_grants ENABLE ROW LEVEL SECURITY;
@@ -79,11 +104,13 @@ DROP POLICY IF EXISTS eai_permission_grants_scope ON permission_grants;
 CREATE POLICY eai_permission_grants_scope ON permission_grants
   USING (
     tenant_id = eai_runtime.current_tenant_id()
-    AND workspace_id = eai_runtime.current_workspace_id()
+    AND workspace_id IS NOT NULL
+    AND eai_runtime.workspace_in_current_scope(workspace_id)
   )
   WITH CHECK (
     tenant_id = eai_runtime.current_tenant_id()
-    AND workspace_id = eai_runtime.current_workspace_id()
+    AND workspace_id IS NOT NULL
+    AND eai_runtime.workspace_in_current_scope(workspace_id)
   );
 
 ALTER TABLE service_principals ENABLE ROW LEVEL SECURITY;
@@ -92,11 +119,17 @@ DROP POLICY IF EXISTS eai_service_principals_scope ON service_principals;
 CREATE POLICY eai_service_principals_scope ON service_principals
   USING (
     tenant_id = eai_runtime.current_tenant_id()
-    AND (workspace_id IS NULL OR workspace_id = eai_runtime.current_workspace_id())
+    AND (
+      workspace_id IS NULL
+      OR eai_runtime.workspace_in_current_scope(workspace_id)
+    )
   )
   WITH CHECK (
     tenant_id = eai_runtime.current_tenant_id()
-    AND (workspace_id IS NULL OR workspace_id = eai_runtime.current_workspace_id())
+    AND (
+      workspace_id IS NULL
+      OR eai_runtime.workspace_in_current_scope(workspace_id)
+    )
   );
 
 ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
@@ -105,40 +138,42 @@ DROP POLICY IF EXISTS eai_audit_events_scope ON audit_events;
 CREATE POLICY eai_audit_events_scope ON audit_events
   USING (
     tenant_id = eai_runtime.current_tenant_id()
-    AND workspace_id = eai_runtime.current_workspace_id()
+    AND workspace_id IS NOT NULL
+    AND eai_runtime.workspace_in_current_scope(workspace_id)
   )
   WITH CHECK (
     tenant_id = eai_runtime.current_tenant_id()
-    AND workspace_id = eai_runtime.current_workspace_id()
+    AND workspace_id IS NOT NULL
+    AND eai_runtime.workspace_in_current_scope(workspace_id)
   );
 
 ALTER TABLE workspace_sources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_sources FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eai_workspace_sources_scope ON workspace_sources;
 CREATE POLICY eai_workspace_sources_scope ON workspace_sources
-  USING (workspace_id = eai_runtime.current_workspace_id())
-  WITH CHECK (workspace_id = eai_runtime.current_workspace_id());
+  USING (eai_runtime.workspace_in_current_scope(workspace_id))
+  WITH CHECK (eai_runtime.workspace_in_current_scope(workspace_id));
 
 ALTER TABLE workspace_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_documents FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eai_workspace_documents_scope ON workspace_documents;
 CREATE POLICY eai_workspace_documents_scope ON workspace_documents
-  USING (workspace_id = eai_runtime.current_workspace_id())
-  WITH CHECK (workspace_id = eai_runtime.current_workspace_id());
+  USING (eai_runtime.workspace_in_current_scope(workspace_id))
+  WITH CHECK (eai_runtime.workspace_in_current_scope(workspace_id));
 
 ALTER TABLE workspace_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_jobs FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eai_workspace_jobs_scope ON workspace_jobs;
 CREATE POLICY eai_workspace_jobs_scope ON workspace_jobs
-  USING (workspace_id = eai_runtime.current_workspace_id())
-  WITH CHECK (workspace_id = eai_runtime.current_workspace_id());
+  USING (eai_runtime.workspace_in_current_scope(workspace_id))
+  WITH CHECK (eai_runtime.workspace_in_current_scope(workspace_id));
 
 ALTER TABLE workspace_connector_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workspace_connector_links FORCE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS eai_workspace_connector_links_scope ON workspace_connector_links;
 CREATE POLICY eai_workspace_connector_links_scope ON workspace_connector_links
-  USING (workspace_id = eai_runtime.current_workspace_id())
-  WITH CHECK (workspace_id = eai_runtime.current_workspace_id());
+  USING (eai_runtime.workspace_in_current_scope(workspace_id))
+  WITH CHECK (eai_runtime.workspace_in_current_scope(workspace_id));
 
 -- Child tables inherit scope by requiring their parent to be visible in the
 -- current RLS-filtered transaction. These policies intentionally do not infer
