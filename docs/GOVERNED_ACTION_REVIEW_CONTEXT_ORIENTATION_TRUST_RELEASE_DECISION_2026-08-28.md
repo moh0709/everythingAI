@@ -2,7 +2,7 @@
 
 Date: 2026-08-28  
 Governance issue: #286  
-Decision candidate: **GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS — VALIDATION_PENDING**
+Decision: **GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS — FINAL_HEAD_VALIDATION_PENDING**
 
 ## Release scope
 
@@ -33,7 +33,7 @@ Historical milestone results are supporting evidence only and do not substitute 
 
 ## Trust-contract evaluation
 
-The accepted #278 + #282 sequence is coherent and bounded if fresh release validation remains green:
+The accepted #278 + #282 sequence is coherent and bounded:
 
 - current loaded audit-window facts are distinguished from remembered local review context using already-loaded/local state only;
 - orientation provenance identifies only genuine already-loaded/local origins of displayed facts;
@@ -47,38 +47,47 @@ The accepted #278 + #282 sequence is coherent and bounded if fresh release valid
 
 ## Fresh release-candidate validation
 
-**PENDING.** The documentation-only release candidate created for #286 must pass on one unchanged head:
+Fresh documentation-only release candidate head `b02880c12127123a74207e073362c9be14f716a1` passed on one unchanged head:
 
-1. `EverythingAI CI Smoke`;
-2. `EverythingAI Source Recovery Return Context`;
-3. `EverythingAI Multi-hop Return Context`;
-4. `EverythingAI Return Context Provenance`;
-5. `EverythingAI Workspace Context Summary`;
-6. `EverythingAI Workspace Context Provenance`;
-7. `EverythingAI Context-Aware Task Resumption`;
-8. `EverythingAI Governed-Action Comprehension`;
-9. `EverythingAI Governed-Action Evidence Navigation`;
-10. `EverythingAI Governed-Action Evidence Filtering`;
-11. `EverythingAI Governed-Action Review Resumption`;
-12. `EverythingAI Governed-Action Review Context Provenance`;
-13. `EverythingAI Governed-Action Review Context Summary`;
-14. `EverythingAI Governed-Action Review Context Summary Provenance`;
-15. `EverythingAI Governed-Action Review Context Orientation`;
-16. `EverythingAI Governed-Action Review Context Orientation Provenance`.
+1. `EverythingAI CI Smoke` #751 — PASS;
+2. `EverythingAI Source Recovery Return Context` #117 — PASS;
+3. `EverythingAI Multi-hop Return Context` #110 — PASS;
+4. `EverythingAI Return Context Provenance` #106 — PASS;
+5. `EverythingAI Workspace Context Summary` #93 — PASS;
+6. `EverythingAI Workspace Context Provenance` #89 — PASS;
+7. `EverythingAI Context-Aware Task Resumption` #78 — PASS;
+8. `EverythingAI Governed-Action Comprehension` #72 — PASS;
+9. `EverythingAI Governed-Action Evidence Navigation` #67 — PASS;
+10. `EverythingAI Governed-Action Evidence Filtering` #51 — PASS;
+11. `EverythingAI Governed-Action Review Resumption` #46 — PASS;
+12. `EverythingAI Governed-Action Review Context Provenance` #40 — PASS;
+13. `EverythingAI Governed-Action Review Context Summary` #28 — PASS;
+14. `EverythingAI Governed-Action Review Context Summary Provenance` #23 — PASS;
+15. `EverythingAI Governed-Action Review Context Orientation` #12 — PASS;
+16. `EverythingAI Governed-Action Review Context Orientation Provenance` #6 — PASS.
 
-The fifteen focused workflows are mandatory in addition to CI Smoke. Historical green evidence does not replace this fresh unchanged-head validation.
+The fifteen focused workflows are mandatory in addition to CI Smoke. Historical green evidence was not substituted for this fresh unchanged-head validation.
 
 ## Independent release review
 
-**PENDING.** Before acceptance, final review must confirm no unresolved Critical or Important findings and no unresolved review threads, and must verify that this release gate changes documentation/governance only.
+Independent review of PR #287 found:
 
-## Decision rule
+- no unresolved Critical findings;
+- no unresolved Important findings;
+- no unresolved review threads;
+- the diff is limited to release-decision/handover documentation;
+- no product/runtime behavior or material architecture is added;
+- accepted #278/#282 provenance, unknown-state, exact-target, backend-authority, approval/audit/undo, rollback, and issue #69 historical boundaries remain preserved.
 
-Dispatch **`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`** only if the fresh unchanged candidate passes EverythingAI CI Smoke plus all fifteen mandatory focused workflows and independent review is clean.
+Result: **PASS**.
 
-If this decision/handover is materially updated after candidate validation, the changed final decision head must again pass the same matrix before merge and final dispatch.
+## Decision
 
-Until those requirements are satisfied, status remains **VALIDATION_PENDING**.
+The fresh release candidate passed EverythingAI CI Smoke plus all fifteen mandatory focused workflows, the #278 + #282 sequence is coherent without additional product/runtime work, rollback remains bounded, and independent review is clean.
+
+Decision: **`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`**.
+
+This release-decision/handover update changes the validated candidate. The changed final decision head must therefore again pass EverythingAI CI Smoke plus all fifteen mandatory focused workflows before merge and final dispatch. Until that second validation finishes, final dispatch remains merge-gated.
 
 ## Rollback
 
