@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDatabase } from './db/client.js';
 import { createProductionWorkspaceContextMiddleware } from './db/production/index.js';
+import { resolveEnterpriseRuntimeConfig, createEnterpriseHealthReporter } from './enterprise/runtimeHealth.js';
 import { requireApiToken } from './middleware/auth.js';
 import { attachRequestContext } from './middleware/requestContext.js';
 import { attachWorkspaceContext } from './middleware/workspaceContext.js';
@@ -53,6 +54,11 @@ export function resolveWorkspaceContextMiddleware(options = {}, dependencies = {
 export function createApiApp(options = {}, dependencies = {}) {
   const app = express();
   const workspaceContextMiddleware = resolveWorkspaceContextMiddleware(options, dependencies);
+  const runtimeConfig = resolveEnterpriseRuntimeConfig(options.runtimeEnv ?? process.env);
+  const healthReporter = createEnterpriseHealthReporter({
+    config: runtimeConfig,
+    checks: dependencies.enterpriseHealthChecks ?? {},
+  });
 
   app.use(helmet());
   app.use(cors());
@@ -81,6 +87,19 @@ export function createApiApp(options = {}, dependencies = {}) {
       service: 'everythingai-api',
       timestamp: new Date().toISOString(),
     });
+  });
+
+  app.get('/health/live', (_req, res) => {
+    res.json(healthReporter.liveness());
+  });
+
+  app.get('/health/ready', async (_req, res, next) => {
+    try {
+      const readiness = await healthReporter.readiness();
+      res.status(readiness.status === 'ready' ? 200 : 503).json(readiness);
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.use('/api', attachRequestContext, workspaceContextMiddleware, requireApiToken);
