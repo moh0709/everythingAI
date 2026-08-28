@@ -31,11 +31,11 @@
     "evidence_head": "5cc3ffe0f8842ea2250ddb986d9cb86444e3df2a",
     "dependency_security_audit_run": 8
   },
-  "release_candidate_validation_before_handover_correction": {
-    "head": "5142886319bc64c8070076eb09f9182de3649cae",
-    "ci_smoke": 844,
-    "inherited_focused_workflow_count": 15,
-    "enterprise_workflows": [
+  "release_candidate_validation": {
+    "evidence_location": "PR #307 unchanged merge head and associated GitHub Actions runs",
+    "required_ci": [
+      "EverythingAI CI Smoke",
+      "all 15 inherited focused workflows",
       "Enterprise Isolation",
       "Object Storage",
       "Object Metadata Migration Planning",
@@ -43,25 +43,7 @@
       "Enterprise Backup Restore Validation",
       "Enterprise Capacity & Security"
     ],
-    "all_green": true
-  },
-  "final_unchanged_head_validation": {
-    "head": "PENDING_FINAL_CORRECTED_DOCUMENTATION_HEAD",
-    "ci_smoke": null,
-    "inherited_focused_workflow_count": 15,
-    "enterprise_workflows": [
-      "Enterprise Isolation",
-      "Object Storage",
-      "Object Metadata Migration Planning",
-      "Enterprise Runtime Health",
-      "Enterprise Backup Restore Validation",
-      "Enterprise Capacity & Security"
-    ],
-    "all_green": false,
-    "note": "Must be replaced with the corrected documentation head and its fresh unchanged-head validation before merge.",
-    "unresolved_critical": 0,
-    "unresolved_important": 0,
-    "unresolved_review_threads": 0
+    "rule": "The PR must be merged only after every required workflow is green on the same unchanged final head and final documentation/security review has no unresolved Critical/Important finding or review thread. Exact final head/run evidence is immutable PR/Actions evidence and must not be encoded self-referentially inside the candidate commit itself."
   },
   "preserved_boundaries": {
     "local_first_sqlite_supported": true,
