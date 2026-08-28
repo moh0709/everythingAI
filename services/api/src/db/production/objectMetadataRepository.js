@@ -2,11 +2,43 @@ import { buildScopedObjectKey } from '../../storage/objectStorage.js';
 import { withEnterpriseScopedTransaction } from './enterpriseScopedTransaction.js';
 
 const SHA256_HEX = /^[0-9a-f]{64}$/;
+const SAFE_SCOPE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 function assertClient(client) {
   if (!client || typeof client.query !== 'function') {
     throw new TypeError('A PostgreSQL client with query(sql, params) is required.');
   }
+}
+
+function requireScopeGuard(scopeGuard) {
+  if (typeof scopeGuard !== 'function') {
+    throw new Error('Production object metadata scopeGuard is required');
+  }
+  return scopeGuard;
+}
+
+function normalizeScope(scope) {
+  if (!scope || typeof scope !== 'object') {
+    throw new Error('Tenant and workspace scope are required');
+  }
+  const tenantId = typeof scope.tenantId === 'string' ? scope.tenantId.trim() : '';
+  const workspaceId = typeof scope.workspaceId === 'string' ? scope.workspaceId.trim() : '';
+  if (!tenantId || !workspaceId) {
+    throw new Error('Tenant and workspace scope are required');
+  }
+  if (!SAFE_SCOPE_ID.test(tenantId) || !SAFE_SCOPE_ID.test(workspaceId)) {
+    throw new Error('Invalid tenant or workspace scope');
+  }
+  return { tenantId, workspaceId };
+}
+
+async function requireAuthorizedScope(scopeGuard, scope) {
+  const exactScope = normalizeScope(scope);
+  const authorized = await scopeGuard(exactScope);
+  if (authorized !== true) {
+    throw new Error('Object metadata scope is not authorized');
+  }
+  return exactScope;
 }
 
 function normalizeStorageAdapter(value) {
@@ -58,8 +90,9 @@ function mapRow(row) {
   };
 }
 
-export function createPostgresObjectMetadataRepository({ client } = {}) {
+export function createPostgresObjectMetadataRepository({ client, scopeGuard } = {}) {
   assertClient(client);
+  const guard = requireScopeGuard(scopeGuard);
 
   return {
     repositoryType: 'postgres-object-metadata',
@@ -71,12 +104,13 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
       size = null,
       contentType = null,
     } = {}) {
-      const storageKey = buildScopedObjectKey(scope, objectId);
+      const exactScope = await requireAuthorizedScope(guard, scope);
+      const storageKey = buildScopedObjectKey(exactScope, objectId);
       const normalizedAdapter = normalizeStorageAdapter(storageAdapter);
       const normalizedSize = normalizeOptionalSize(size);
       const normalizedContentType = normalizeContentType(contentType);
 
-      return withEnterpriseScopedTransaction(client, scope, async (scopedClient, exactScope) => {
+      return withEnterpriseScopedTransaction(client, exactScope, async (scopedClient, transactionScope) => {
         const result = await scopedClient.query(
           `INSERT INTO workspace_object_metadata (
              tenant_id,
@@ -103,8 +137,8 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
              updated_at = now()
            RETURNING *`,
           [
-            exactScope.tenantId,
-            exactScope.workspaceId,
+            transactionScope.tenantId,
+            transactionScope.workspaceId,
             objectId,
             normalizedAdapter,
             storageKey,
@@ -130,14 +164,15 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
         throw new Error('Computed migration metadata may only be recorded in planned state');
       }
 
+      const exactScope = await requireAuthorizedScope(guard, scope);
       const objectId = planItem.objectId;
-      const storageKey = buildScopedObjectKey(scope, objectId);
+      const storageKey = buildScopedObjectKey(exactScope, objectId);
       const normalizedAdapter = normalizeStorageAdapter(storageAdapter);
       const normalizedSize = normalizeOptionalSize(planItem.size);
       const normalizedChecksum = normalizeComputedPlanChecksum(planItem.checksumSha256);
       const normalizedContentType = normalizeContentType(planItem.contentType);
 
-      return withEnterpriseScopedTransaction(client, scope, async (scopedClient, exactScope) => {
+      return withEnterpriseScopedTransaction(client, exactScope, async (scopedClient, transactionScope) => {
         const result = await scopedClient.query(
           `INSERT INTO workspace_object_metadata (
              tenant_id,
@@ -164,8 +199,8 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
              updated_at = now()
            RETURNING *`,
           [
-            exactScope.tenantId,
-            exactScope.workspaceId,
+            transactionScope.tenantId,
+            transactionScope.workspaceId,
             objectId,
             normalizedAdapter,
             storageKey,
@@ -179,8 +214,9 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
     },
 
     async getObject({ scope, objectId } = {}) {
-      const storageKey = buildScopedObjectKey(scope, objectId);
-      return withEnterpriseScopedTransaction(client, scope, async (scopedClient, exactScope) => {
+      const exactScope = await requireAuthorizedScope(guard, scope);
+      const storageKey = buildScopedObjectKey(exactScope, objectId);
+      return withEnterpriseScopedTransaction(client, exactScope, async (scopedClient, transactionScope) => {
         const result = await scopedClient.query(
           `SELECT *
            FROM workspace_object_metadata
@@ -189,14 +225,15 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
              AND object_id = $3
              AND storage_key = $4
            LIMIT 1`,
-          [exactScope.tenantId, exactScope.workspaceId, objectId, storageKey],
+          [transactionScope.tenantId, transactionScope.workspaceId, objectId, storageKey],
         );
         return mapRow(result.rows?.[0]);
       });
     },
 
     async listPlannedObjects({ scope } = {}) {
-      return withEnterpriseScopedTransaction(client, scope, async (scopedClient, exactScope) => {
+      const exactScope = await requireAuthorizedScope(guard, scope);
+      return withEnterpriseScopedTransaction(client, exactScope, async (scopedClient, transactionScope) => {
         const result = await scopedClient.query(
           `SELECT *
            FROM workspace_object_metadata
@@ -204,7 +241,7 @@ export function createPostgresObjectMetadataRepository({ client } = {}) {
              AND workspace_id = $2
              AND migration_state = 'planned'
            ORDER BY object_id ASC`,
-          [exactScope.tenantId, exactScope.workspaceId],
+          [transactionScope.tenantId, transactionScope.workspaceId],
         );
         return (result.rows ?? []).map(mapRow);
       });
