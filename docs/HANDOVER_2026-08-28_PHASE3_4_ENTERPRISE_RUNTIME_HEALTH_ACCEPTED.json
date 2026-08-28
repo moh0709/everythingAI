@@ -1,0 +1,50 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-28",
+  "track": "Enterprise Platform",
+  "milestone": "Phase 3.4 Enterprise Runtime Configuration and Health Foundation",
+  "status": "ACCEPTED",
+  "issue": 298,
+  "pr": 299,
+  "merge": "81831a8ae6239a170b8645e8ec0bfbc0f3cbd571",
+  "final_unchanged_head": "32aae3878d5b519017f7e6e25685ea19829f5994",
+  "strict_red_green": {
+    "red_head": "c76ae03213099fd19b10c516826eeebe86d0f94d",
+    "red_actions_run_id": 33171098361,
+    "red_job_id": 98848186846,
+    "failure": "ERR_MODULE_NOT_FOUND for services/api/src/enterprise/runtimeHealth.js",
+    "acceptance_weakened": false
+  },
+  "validation": {
+    "ci_smoke_run_number": 795,
+    "inherited_focused_workflow_count": 15,
+    "enterprise_isolation_run_number": 37,
+    "object_storage_run_number": 21,
+    "object_metadata_migration_planning_run_number": 16,
+    "enterprise_runtime_health_run_number": 4,
+    "final_review": "PASS",
+    "unresolved_critical": 0,
+    "unresolved_important": 0,
+    "unresolved_review_threads": 0
+  },
+  "accepted_behavior": [
+    "explicit opt-in enterprise runtime configuration validation",
+    "local-first runtime remains default and does not probe production dependencies from stray enterprise variables",
+    "enterprise configuration failure is fail-closed",
+    "dependency-independent liveness",
+    "fail-closed enterprise readiness with bounded dependency categories",
+    "secret-safe health responses",
+    "legacy /health behavior preserved"
+  ],
+  "preserved_boundaries": {
+    "systemd_modified": false,
+    "root_sudo_ssh_work": false,
+    "production_secret_provisioning": false,
+    "tls_reverse_proxy_cloud_deployment": false,
+    "production_byte_migration": false,
+    "unrelated_connector_runtime_expansion": false,
+    "historical_issue_69_modified": false
+  },
+  "rollback": "Revert merge 81831a8ae6239a170b8645e8ec0bfbc0f3cbd571; pre-existing local-first /health and accepted Phase 3.1-3.3 foundations remain.",
+  "next_dependency": "Phase 3.5 non-destructive enterprise backup, restore and disaster-recovery validation foundation in isolated/disposable targets."
+}
