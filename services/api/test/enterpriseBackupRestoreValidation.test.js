@@ -43,7 +43,7 @@ function baseInput() {
 }
 
 function validationArgs(overrides = {}) {
-  return {
+  const args = {
     expectedScope: scope,
     scopeGuard: exactScopeGuard,
     targetGuard: disposableTargetGuard,
@@ -51,6 +51,10 @@ function validationArgs(overrides = {}) {
     target: { isolated: true, disposable: true, id: 'restore-test-default' },
     ...overrides,
   };
+  if (args.manifest && !Object.prototype.hasOwnProperty.call(overrides, 'trustedManifestSha256')) {
+    args.trustedManifestSha256 = args.manifest.manifestSha256;
+  }
+  return args;
 }
 
 test('backup manifest is deterministic, provider-neutral, scoped and secret-free', () => {
@@ -69,6 +73,17 @@ test('backup manifest is deterministic, provider-neutral, scoped and secret-free
   assert.equal(JSON.stringify(first).includes('password'), false);
   assert.equal(JSON.stringify(first).includes('databaseUrl'), false);
   assert.equal(JSON.stringify(first).includes('accessKey'), false);
+});
+
+test('backup manifest requires an explicit object inventory, including an explicitly empty inventory', () => {
+  const missingInventory = baseInput();
+  delete missingInventory.objects;
+  assert.throws(() => createEnterpriseBackupManifest(missingInventory), /object inventory.*required/i);
+
+  const emptyInventory = baseInput();
+  emptyInventory.objects = [];
+  const manifest = createEnterpriseBackupManifest(emptyInventory);
+  assert.deepEqual(manifest.objects, []);
 });
 
 test('backup manifest rejects secret-bearing input instead of serializing it', () => {
@@ -90,10 +105,12 @@ test('manifest preserves checksum verification truth and never upgrades unverifi
 
 test('restore validation fails closed on tampering before adapters are invoked', async () => {
   const manifest = createEnterpriseBackupManifest(baseInput());
+  const trustedManifestSha256 = manifest.manifestSha256;
   manifest.objects[0].size += 1;
   let adapterCalls = 0;
   const result = await validateEnterpriseRestoreCandidate(validationArgs({
     manifest,
+    trustedManifestSha256,
     target: { isolated: true, disposable: true, id: 'restore-test-1' },
     adapters: {
       postgres: async () => { adapterCalls += 1; return { ok: true }; },
@@ -103,6 +120,41 @@ test('restore validation fails closed on tampering before adapters are invoked',
   assert.equal(result.status, 'blocked');
   assert.match(result.reason, /tamper|manifest.*integrity/i);
   assert.equal(adapterCalls, 0);
+});
+
+test('restore validation rejects a re-hashed replacement manifest without trusted external digest evidence', async () => {
+  const trusted = createEnterpriseBackupManifest(baseInput());
+  const replacementInput = baseInput();
+  replacementInput.objects[0].size += 1;
+  const replacement = createEnterpriseBackupManifest(replacementInput);
+  let adapterCalls = 0;
+
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest: replacement,
+    trustedManifestSha256: trusted.manifestSha256,
+    adapters: {
+      postgres: async () => { adapterCalls += 1; return { ok: true }; },
+      object: async () => { adapterCalls += 1; return { ok: true }; },
+    },
+  }));
+
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /trusted.*digest|digest.*match/i);
+  assert.equal(adapterCalls, 0);
+});
+
+test('restore validation requires trusted external digest evidence', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    trustedManifestSha256: undefined,
+    adapters: {
+      postgres: async () => ({ ok: true }),
+      object: async () => ({ ok: true }),
+    },
+  }));
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /trusted.*digest.*required|trusted.*digest.*match/i);
 });
 
 test('restore validation denies cross-tenant and cross-workspace scope before adapters are invoked', async () => {
