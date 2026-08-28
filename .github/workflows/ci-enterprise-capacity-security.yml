@@ -1,0 +1,25 @@
+name: EverythingAI Enterprise Capacity & Security
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/src/enterprise/**'
+      - 'services/api/test/enterpriseCapacitySecurity.test.js'
+      - '.github/workflows/ci-enterprise-capacity-security.yml'
+  workflow_dispatch:
+
+jobs:
+  enterprise-capacity-security:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: services/api/package-lock.json
+      - run: npm ci
+      - run: node --test test/enterpriseCapacitySecurity.test.js
