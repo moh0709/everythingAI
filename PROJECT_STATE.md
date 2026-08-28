@@ -1,10 +1,14 @@
 # EverythingAI — Canonical Project State
 
-Date: 2026-08-28  
-Authority: accepted repository state after Governed-Action Review Context Orientation Trust dispatch  
-Current governance issue: #288
+Date: 2026-08-29  
+Authority: accepted repository state through Phase 3.6 plus dependency-security remediation; Enterprise Readiness Foundation dispatch  
+Current governance issue: #304
 
 ## Current program stage
+
+**Phase 3 — Enterprise Readiness Foundation is COMPLETE AND DISPATCHED (`ENTERPRISE_READINESS_FOUNDATION_PASS`).**
+
+Accepted Enterprise Readiness Foundation release evidence is recorded in `docs/ENTERPRISE_READINESS_FOUNDATION_RELEASE_DECISION_2026-08-29.md` and `docs/HANDOVER_2026-08-29_ENTERPRISE_READINESS_FOUNDATION_RELEASE.json`. Phase 3.1–3.6 are accepted through #292–#303, and the dependency-security release blocker is closed through #305 / PR #306 merge `d69af031bc4bfd82441ebb22b17040879cfdd93f`. Final dependency-remediation head `5cc3ffe0f8842ea2250ddb986d9cb86444e3df2a` passed CI Smoke #836, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, and Dependency Security Audit #8 with a clean exact-lock audit.
 
 **Phase 2 — Product Intelligence & Knowledge Experience is COMPLETE AND DISPATCHED (`PHASE2_PASS`).**
 
@@ -51,7 +55,7 @@ Latest acceptance evidence:
 - #284 / PR #285 merged as `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1` after unchanged documentation head `bc233a3fca74d9719202dcc8ad24ccc7a170f334` passed EverythingAI CI Smoke #749 plus all fifteen mandatory focused workflows and clean final documentation review;
 - #286 / PR #287 merged as `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`; fresh candidate `b02880c12127123a74207e073362c9be14f716a1` passed EverythingAI CI Smoke #751 plus all fifteen mandatory focused workflows; changed final decision head `41f2195052df9fb1273ab8a133727e85cbcd4184` passed EverythingAI CI Smoke #753 plus all fifteen mandatory focused workflows; final release review was clean; dispatch decision `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`.
 
-Issue #288 is documentation-only synchronization after the accepted #286/#287 dispatch. It prepares the next five-track decision gate without authorizing product/runtime behavior or material architecture expansion.
+Issue #304 is the accepted Phase 3 Enterprise Readiness Foundation release/canonical synchronization gate. It records the bounded `ENTERPRISE_READINESS_FOUNDATION_PASS` without claiming production deployment readiness. Production secrets, privileged-host provisioning, destructive migration/cutover, external penetration testing/certification, production load qualification, and commercial SLA commitments remain separate CEO-gated work.
 
 ## Authority order
 
@@ -96,6 +100,10 @@ Implementation completion alone is never acceptance.
 - Review Context Orientation Trust release — #286/#287 — merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b` — candidate CI #751 and changed-final-head CI #753 plus fifteen focused workflows — `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`.
 
 All earlier accepted synchronization milestones and rollback records remain valid historical governance evidence.
+
+## Phase 3 enterprise regression baseline
+
+Phase 3 release validation inherits the complete product baseline plus: Enterprise Isolation; Object Storage; Object Metadata Migration Planning; Enterprise Runtime Health; Enterprise Backup Restore Validation; Enterprise Capacity & Security; and the read-only exact-lock Dependency Security Audit. Backend dependency-lock changes must trigger the applicable enterprise validation gates. Historical green evidence never substitutes for validating a changed candidate.
 
 ## Accepted safety contract
 
