@@ -91,7 +91,10 @@ test('release evidence is exact-head attributable, secret-free and truthful abou
   assert.equal(report.rollbackBoundary, `revert ${exactHead}`);
   assert.equal(report.claims.productionCapacityValidated, false);
   assert.equal(report.claims.penetrationTestCertified, false);
-  assert.doesNotMatch(JSON.stringify(report), /super-secret|postgres:\/\/user:secret|S3_SECRET_ACCESS_KEY/i);
+  assert.equal(report.environment.DATABASE_URL, '[REDACTED]');
+  assert.equal(report.environment.S3_SECRET_ACCESS_KEY, '[REDACTED]');
+  assert.equal(report.environment.harmless, 'visible');
+  assert.doesNotMatch(JSON.stringify(report), /super-secret|postgres:\/\/user:secret/i);
 
   assert.equal(createEnterpriseReleaseEvidence({ commitSha: exactHead }).status, 'blocked');
   assert.equal(createEnterpriseReleaseEvidence({
@@ -125,5 +128,7 @@ test('evidence redaction removes credential-bearing fields and URI credentials r
   });
 
   const serialized = JSON.stringify(sanitized);
+  assert.equal(sanitized.token, '[REDACTED]');
+  assert.equal(sanitized.nested.password, '[REDACTED]');
   assert.doesNotMatch(serialized, /secret-token|secret-password|user:secret|postgres:\/\/user:secret/i);
 });
