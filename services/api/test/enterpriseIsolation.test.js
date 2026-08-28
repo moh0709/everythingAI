@@ -8,6 +8,7 @@ import {
   createEnterpriseAuthorizationContext,
   mapOidcIdentityClaims,
 } from '../src/enterprise/identityAuthorization.js';
+import { withEnterpriseScopedTransaction } from '../src/db/production/enterpriseScopedTransaction.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rlsMigrationPath = path.resolve(__dirname, '../src/db/production/002_enterprise_rls_foundation.sql');
@@ -129,4 +130,72 @@ test('enterprise RLS migration is fail-closed and covers tenant/workspace produc
   assert.match(sql, /ALTER TABLE workspace_jobs ENABLE ROW LEVEL SECURITY/);
   assert.match(sql, /CREATE POLICY eai_workspace_documents_scope/);
   assert.match(sql, /WITH CHECK/);
+});
+
+test('scoped PostgreSQL transaction sets tenant/workspace locally before persistence work and commits', async () => {
+  const calls = [];
+  const client = {
+    async query(sql, params) {
+      calls.push({ sql, params: params ?? [] });
+      return { rows: [] };
+    },
+  };
+
+  const result = await withEnterpriseScopedTransaction(
+    client,
+    { tenantId: ' tenant-123 ', workspaceId: ' workspace-789 ' },
+    async (scopedClient, scope) => {
+      assert.equal(scopedClient, client);
+      assert.deepEqual(scope, { tenantId: 'tenant-123', workspaceId: 'workspace-789' });
+      await scopedClient.query('SELECT * FROM workspace_documents');
+      return 'done';
+    },
+  );
+
+  assert.equal(result, 'done');
+  assert.deepEqual(calls, [
+    { sql: 'BEGIN', params: [] },
+    { sql: "SELECT set_config('eai.tenant_id', $1, true)", params: ['tenant-123'] },
+    { sql: "SELECT set_config('eai.workspace_id', $1, true)", params: ['workspace-789'] },
+    { sql: 'SELECT * FROM workspace_documents', params: [] },
+    { sql: 'COMMIT', params: [] },
+  ]);
+});
+
+test('scoped PostgreSQL transaction rejects missing scope before BEGIN and rolls back operation failures', async () => {
+  const missingScopeCalls = [];
+  const missingScopeClient = {
+    async query(sql, params) {
+      missingScopeCalls.push({ sql, params });
+      return { rows: [] };
+    },
+  };
+
+  await assert.rejects(
+    withEnterpriseScopedTransaction(missingScopeClient, { tenantId: 'tenant-123' }, async () => null),
+    /tenant and workspace scope are required/i,
+  );
+  assert.deepEqual(missingScopeCalls, []);
+
+  const rollbackCalls = [];
+  const rollbackClient = {
+    async query(sql, params) {
+      rollbackCalls.push({ sql, params: params ?? [] });
+      return { rows: [] };
+    },
+  };
+
+  await assert.rejects(
+    withEnterpriseScopedTransaction(
+      rollbackClient,
+      { tenantId: 'tenant-123', workspaceId: 'workspace-789' },
+      async () => {
+        throw new Error('persistence failed');
+      },
+    ),
+    /persistence failed/,
+  );
+
+  assert.equal(rollbackCalls.at(-1).sql, 'ROLLBACK');
+  assert.equal(rollbackCalls.some((call) => call.sql === 'COMMIT'), false);
 });
