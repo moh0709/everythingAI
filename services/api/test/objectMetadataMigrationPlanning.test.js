@@ -15,6 +15,9 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const migrationPath = path.resolve(__dirname, '../src/db/production/003_object_metadata.sql');
 const scope = { tenantId: 'tenant-123', workspaceId: 'workspace-789' };
+const exactScopeGuard = async (candidate) => (
+  candidate.tenantId === scope.tenantId && candidate.workspaceId === scope.workspaceId
+);
 
 function createQueryClient(rowsByStatement = new Map()) {
   const calls = [];
@@ -56,7 +59,7 @@ test('metadata repository uses scoped transactions and derives storage keys inst
       size_bytes: 5, checksum_sha256: null, checksum_verified: false, content_type: 'text/plain', migration_state: 'planned',
     }]],
   ]));
-  const repository = createPostgresObjectMetadataRepository({ client });
+  const repository = createPostgresObjectMetadataRepository({ client, scopeGuard: exactScopeGuard });
 
   const saved = await repository.recordPlannedObject({
     scope,
@@ -83,7 +86,7 @@ test('metadata repository uses scoped transactions and derives storage keys inst
 
 test('metadata repository rejects incomplete scope before persistence access', async () => {
   const client = createQueryClient();
-  const repository = createPostgresObjectMetadataRepository({ client });
+  const repository = createPostgresObjectMetadataRepository({ client, scopeGuard: exactScopeGuard });
   await assert.rejects(
     repository.getObject({ scope: { tenantId: 'tenant-123' }, objectId: 'object-1' }),
     /tenant and workspace scope are required/i,
