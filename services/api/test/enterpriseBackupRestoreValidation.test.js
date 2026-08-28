@@ -1,0 +1,292 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  createEnterpriseBackupManifest,
+  validateEnterpriseRestoreCandidate,
+} from '../src/enterprise/backupRestore.js';
+
+const scope = { tenantId: 'tenant-123', workspaceId: 'workspace-789' };
+const exactScopeGuard = async (candidate) => (
+  candidate.tenantId === scope.tenantId && candidate.workspaceId === scope.workspaceId
+);
+const disposableTargetGuard = async (target) => (
+  target?.isolated === true && target?.disposable === true && String(target.id || '').startsWith('restore-test-')
+);
+
+function baseInput() {
+  return {
+    scope,
+    schemaVersion: '003_object_metadata',
+    postgres: {
+      backupId: 'pg-backup-2026-08-28T120000Z',
+      checksumSha256: 'a'.repeat(64),
+      checksumVerified: true,
+    },
+    objects: [
+      {
+        objectId: 'obj-b',
+        storageKey: 'tenants/tenant-123/workspaces/workspace-789/objects/obj-b',
+        size: 7,
+        checksumSha256: 'b'.repeat(64),
+        checksumVerified: false,
+      },
+      {
+        objectId: 'obj-a',
+        storageKey: 'tenants/tenant-123/workspaces/workspace-789/objects/obj-a',
+        size: 5,
+        checksumSha256: 'c'.repeat(64),
+        checksumVerified: true,
+      },
+    ],
+    createdAt: '2026-08-28T12:00:00.000Z',
+  };
+}
+
+function validationArgs(overrides = {}) {
+  const args = {
+    expectedScope: scope,
+    scopeGuard: exactScopeGuard,
+    targetGuard: disposableTargetGuard,
+    supportedSchemaVersions: ['003_object_metadata'],
+    target: { isolated: true, disposable: true, id: 'restore-test-default' },
+    ...overrides,
+  };
+  if (args.manifest && !Object.prototype.hasOwnProperty.call(overrides, 'trustedManifestSha256')) {
+    args.trustedManifestSha256 = args.manifest.manifestSha256;
+  }
+  return args;
+}
+
+test('backup manifest is deterministic, provider-neutral, scoped and secret-free', () => {
+  const first = createEnterpriseBackupManifest(baseInput());
+  const reordered = baseInput();
+  reordered.objects.reverse();
+  const second = createEnterpriseBackupManifest(reordered);
+
+  assert.deepEqual(first, second);
+  assert.equal(first.kind, 'everythingai.enterprise-backup-manifest');
+  assert.equal(first.version, 1);
+  assert.equal(first.scope.tenantId, scope.tenantId);
+  assert.equal(first.scope.workspaceId, scope.workspaceId);
+  assert.deepEqual(first.objects.map((item) => item.objectId), ['obj-a', 'obj-b']);
+  assert.match(first.manifestSha256, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(first).includes('password'), false);
+  assert.equal(JSON.stringify(first).includes('databaseUrl'), false);
+  assert.equal(JSON.stringify(first).includes('accessKey'), false);
+});
+
+test('backup manifest requires an explicit object inventory, including an explicitly empty inventory', () => {
+  const missingInventory = baseInput();
+  delete missingInventory.objects;
+  assert.throws(() => createEnterpriseBackupManifest(missingInventory), /object inventory.*required/i);
+
+  const emptyInventory = baseInput();
+  emptyInventory.objects = [];
+  const manifest = createEnterpriseBackupManifest(emptyInventory);
+  assert.deepEqual(manifest.objects, []);
+});
+
+test('backup manifest rejects secret-bearing input instead of serializing it', () => {
+  const input = baseInput();
+  input.postgres.databaseUrl = 'postgres://user:secret@example/db';
+  assert.throws(() => createEnterpriseBackupManifest(input), /secret|credential|connection/i);
+
+  const s3Input = baseInput();
+  s3Input.objects[0].accessKey = 'AKIA_TEST_SECRET';
+  assert.throws(() => createEnterpriseBackupManifest(s3Input), /secret|credential/i);
+});
+
+test('backup manifest rejects credential-bearing or path-like PostgreSQL backup identities', () => {
+  for (const backupId of [
+    'postgres://user:secret@example/db',
+    '../backups/pg.dump',
+    '/var/backups/pg.dump',
+    'folder\\pg.dump',
+  ]) {
+    const input = baseInput();
+    input.postgres.backupId = backupId;
+    assert.throws(() => createEnterpriseBackupManifest(input), /backupId.*opaque|backupId.*path-safe/i);
+  }
+});
+
+test('manifest preserves checksum verification truth and never upgrades unverified evidence', () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const unverified = manifest.objects.find((item) => item.objectId === 'obj-b');
+  assert.equal(unverified.checksumVerified, false);
+  assert.equal(unverified.checksumSha256, 'b'.repeat(64));
+});
+
+test('restore validation fails closed on tampering before adapters are invoked', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const trustedManifestSha256 = manifest.manifestSha256;
+  manifest.objects[0].size += 1;
+  let adapterCalls = 0;
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    trustedManifestSha256,
+    target: { isolated: true, disposable: true, id: 'restore-test-1' },
+    adapters: {
+      postgres: async () => { adapterCalls += 1; return { ok: true }; },
+      object: async () => { adapterCalls += 1; return { ok: true }; },
+    },
+  }));
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /tamper|manifest.*integrity/i);
+  assert.equal(adapterCalls, 0);
+});
+
+test('restore validation rejects a re-hashed replacement manifest without trusted external digest evidence', async () => {
+  const trusted = createEnterpriseBackupManifest(baseInput());
+  const replacementInput = baseInput();
+  replacementInput.objects[0].size += 1;
+  const replacement = createEnterpriseBackupManifest(replacementInput);
+  let adapterCalls = 0;
+
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest: replacement,
+    trustedManifestSha256: trusted.manifestSha256,
+    adapters: {
+      postgres: async () => { adapterCalls += 1; return { ok: true }; },
+      object: async () => { adapterCalls += 1; return { ok: true }; },
+    },
+  }));
+
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /trusted.*digest|digest.*match/i);
+  assert.equal(adapterCalls, 0);
+});
+
+test('restore validation requires trusted external digest evidence', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    trustedManifestSha256: undefined,
+    adapters: {
+      postgres: async () => ({ ok: true }),
+      object: async () => ({ ok: true }),
+    },
+  }));
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /trusted.*digest.*required|trusted.*digest.*match/i);
+});
+
+test('restore validation denies cross-tenant and cross-workspace scope before adapters are invoked', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  let adapterCalls = 0;
+  for (const expectedScope of [
+    { tenantId: 'tenant-other', workspaceId: scope.workspaceId },
+    { tenantId: scope.tenantId, workspaceId: 'workspace-other' },
+  ]) {
+    const result = await validateEnterpriseRestoreCandidate(validationArgs({
+      manifest,
+      expectedScope,
+      target: { isolated: true, disposable: true, id: 'restore-test-2' },
+      adapters: {
+        postgres: async () => { adapterCalls += 1; return { ok: true }; },
+        object: async () => { adapterCalls += 1; return { ok: true }; },
+      },
+    }));
+    assert.equal(result.status, 'blocked');
+    assert.match(result.reason, /scope|tenant|workspace/i);
+  }
+  assert.equal(adapterCalls, 0);
+});
+
+test('restore validation requires trusted authorization of scope, not caller equality alone', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  let adapterCalls = 0;
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    scopeGuard: async () => false,
+    adapters: {
+      postgres: async () => { adapterCalls += 1; return { ok: true }; },
+      object: async () => { adapterCalls += 1; return { ok: true }; },
+    },
+  }));
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /authorized|scope guard/i);
+  assert.equal(adapterCalls, 0);
+});
+
+test('restore validation requires a trusted isolated disposable target, not caller flags alone', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  let adapterCalls = 0;
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    target: { isolated: true, disposable: true, id: 'production' },
+    targetGuard: async () => false,
+    adapters: {
+      postgres: async () => { adapterCalls += 1; return { ok: true }; },
+      object: async () => { adapterCalls += 1; return { ok: true }; },
+    },
+  }));
+  assert.equal(result.status, 'blocked');
+  assert.match(result.reason, /trusted|target guard|authorized/i);
+  assert.equal(adapterCalls, 0);
+});
+
+test('restore validation requires an isolated disposable target and supported schema', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const unsafe = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    target: { isolated: false, disposable: false, id: 'production' },
+    adapters: {},
+  }));
+  assert.equal(unsafe.status, 'blocked');
+  assert.match(unsafe.reason, /isolated|disposable/i);
+
+  const unsupported = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    supportedSchemaVersions: ['999_future'],
+    target: { isolated: true, disposable: true, id: 'restore-test-3' },
+    adapters: {},
+  }));
+  assert.equal(unsupported.status, 'blocked');
+  assert.match(unsupported.reason, /schema|migration/i);
+});
+
+test('restore validation blocks required unverified checksums and distinguishes validated state truthfully', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const blocked = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    requireVerifiedChecksums: true,
+    target: { isolated: true, disposable: true, id: 'restore-test-4' },
+    adapters: {},
+  }));
+  assert.equal(blocked.status, 'blocked');
+  assert.match(blocked.reason, /checksum.*unverified|unverified.*checksum/i);
+
+  const verifiedInput = baseInput();
+  verifiedInput.objects = verifiedInput.objects.map((item) => ({ ...item, checksumVerified: true }));
+  const verifiedManifest = createEnterpriseBackupManifest(verifiedInput);
+  const validated = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest: verifiedManifest,
+    requireVerifiedChecksums: true,
+    target: { isolated: true, disposable: true, id: 'restore-test-5' },
+    adapters: {
+      postgres: async ({ backup }) => ({ ok: backup.backupId === verifiedManifest.postgres.backupId }),
+      object: async ({ object }) => ({ ok: object.storageKey.startsWith('tenants/tenant-123/workspaces/workspace-789/') }),
+    },
+  }));
+  assert.equal(validated.status, 'validated');
+  assert.equal(validated.destructive, false);
+  assert.equal(validated.productionRestorePerformed, false);
+});
+
+test('restore validation never returns raw adapter errors that may contain credentials', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    adapters: {
+      postgres: async () => {
+        throw new Error('postgres://user:super-secret@example/db');
+      },
+      object: async () => ({ ok: true }),
+    },
+  }));
+
+  assert.equal(result.status, 'failed');
+  assert.match(result.reason, /adapter|restore validation failed/i);
+  assert.equal(result.reason.includes('super-secret'), false);
+  assert.equal(result.reason.includes('postgres://'), false);
+});
