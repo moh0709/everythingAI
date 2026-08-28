@@ -243,6 +243,12 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
       </p>
       {reviewReturnExecutionId ? <div data-testid="governed-action-review-context-summary">
         <h3>Review context summary</h3>
+        <div data-testid="governed-action-review-context-orientation">
+          <p><b>Current loaded review window:</b> {visibleExecutions.length} of {executions.length} executions are visible under the local filter {evidenceFilterLabel(evidenceFilter)}.</p>
+          <p><b>Remembered review context:</b> The remembered local target is {reviewReturnExecutionId}.</p>
+          <p className="muted">Changing the loaded-window filter can hide this target without deleting or replacing the remembered local identifier.</p>
+          {!reviewReturnExecutionVisible ? <p className="muted">Safe return is unavailable while the remembered target is outside the current loaded review window; no replacement execution is inferred.</p> : null}
+        </div>
         <p><b>Remembered execution:</b> {reviewReturnExecutionId}</p>
         <small className="muted" style={{ display: 'block' }}>Provenance: local remembered execution identifier recorded by explicit navigation from already-loaded audit evidence.</small>
         <p><b>Loaded audit evidence:</b> {reviewReturnAudit.length
