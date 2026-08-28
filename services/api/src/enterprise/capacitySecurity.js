@@ -46,12 +46,36 @@ export function redactEnterpriseEvidence(value, seen = new WeakSet()) {
   return output;
 }
 
+async function runWithTimeout(operation, context, timeoutMs) {
+  let timer;
+  const controller = new AbortController();
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      const error = new Error('Capacity operation timed out');
+      error.code = 'CAPACITY_OPERATION_TIMEOUT';
+      reject(error);
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([
+      Promise.resolve().then(() => operation({ ...context, signal: controller.signal })),
+      timeout,
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function runBoundedCapacityScenario({
   name,
   iterations,
   concurrency,
   maxIterations = 100,
   maxConcurrency = 8,
+  operationTimeoutMs = 5000,
+  maxOperationTimeoutMs = 30000,
   operation,
 } = {}) {
   const scenarioName = normalizeString(name);
@@ -59,6 +83,8 @@ export async function runBoundedCapacityScenario({
   const concurrencyLimit = normalizePositiveInteger(concurrency);
   const boundedIterations = normalizePositiveInteger(maxIterations);
   const boundedConcurrency = normalizePositiveInteger(maxConcurrency);
+  const timeoutMs = normalizePositiveInteger(operationTimeoutMs);
+  const boundedTimeoutMs = normalizePositiveInteger(maxOperationTimeoutMs);
 
   if (
     !scenarioName
@@ -66,8 +92,11 @@ export async function runBoundedCapacityScenario({
     || !concurrencyLimit
     || !boundedIterations
     || !boundedConcurrency
+    || !timeoutMs
+    || !boundedTimeoutMs
     || iterationCount > boundedIterations
     || concurrencyLimit > boundedConcurrency
+    || timeoutMs > boundedTimeoutMs
     || typeof operation !== 'function'
   ) {
     throw new Error('Bounded capacity configuration denied');
@@ -77,6 +106,7 @@ export async function runBoundedCapacityScenario({
   let inFlight = 0;
   let peakConcurrency = 0;
   let failures = 0;
+  let timeouts = 0;
   const startedAt = performance.now();
 
   async function worker() {
@@ -87,10 +117,11 @@ export async function runBoundedCapacityScenario({
       inFlight += 1;
       peakConcurrency = Math.max(peakConcurrency, inFlight);
       try {
-        const result = await operation({ index });
+        const result = await runWithTimeout(operation, { index }, timeoutMs);
         if (result === false || result?.ok === false) failures += 1;
-      } catch {
+      } catch (error) {
         failures += 1;
+        if (error?.code === 'CAPACITY_OPERATION_TIMEOUT') timeouts += 1;
       } finally {
         inFlight -= 1;
       }
@@ -111,12 +142,18 @@ export async function runBoundedCapacityScenario({
       configuredConcurrency: concurrencyLimit,
       peakConcurrency,
       failures,
+      timeouts,
       durationMs: Number(durationMs.toFixed(3)),
       operationsPerSecond: durationMs > 0
         ? Number(((iterationCount / durationMs) * 1000).toFixed(3))
         : null,
     },
-    bounds: { maxIterations: boundedIterations, maxConcurrency: boundedConcurrency },
+    bounds: {
+      maxIterations: boundedIterations,
+      maxConcurrency: boundedConcurrency,
+      operationTimeoutMs: timeoutMs,
+      maxOperationTimeoutMs: boundedTimeoutMs,
+    },
     claims: { regressionEvidenceOnly: true, productionValidated: false, sla: null },
   };
 }
