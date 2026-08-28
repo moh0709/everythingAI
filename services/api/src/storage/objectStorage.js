@@ -126,6 +126,22 @@ function requireClientMethod(client, methodName) {
   return client[methodName].bind(client);
 }
 
+function requireScopeGuard(scopeGuard) {
+  if (typeof scopeGuard !== 'function') {
+    throw new Error('S3-compatible object storage scopeGuard is required');
+  }
+  return scopeGuard;
+}
+
+async function assertAuthorizedScope(scopeGuard, scope) {
+  const normalizedScope = normalizeScope(scope);
+  const authorized = await scopeGuard(normalizedScope);
+  if (authorized !== true) {
+    throw new Error('Object storage scope is not authorized');
+  }
+  return normalizedScope;
+}
+
 export function createS3CompatibleObjectStorageAdapter(options = {}) {
   const { client } = options;
   const bucket = typeof options.bucket === 'string' ? options.bucket.trim() : '';
@@ -135,15 +151,21 @@ export function createS3CompatibleObjectStorageAdapter(options = {}) {
   // configuration-boundary inputs. They are not retained, serialized, logged,
   // or forwarded with individual object operations; client construction belongs
   // to the deployment/configuration layer.
+  const scopeGuard = requireScopeGuard(options.scopeGuard);
   const put = requireClientMethod(client, 'putObject');
   const get = requireClientMethod(client, 'getObject');
   const head = requireClientMethod(client, 'headObject');
   const remove = requireClientMethod(client, 'deleteObject');
 
+  async function authorizedKey(scope, objectId) {
+    const authorizedScope = await assertAuthorizedScope(scopeGuard, scope);
+    return buildScopedObjectKey(authorizedScope, objectId);
+  }
+
   return {
     adapterType: 's3-compatible-object-storage',
     async putObject({ scope, objectId, body, contentType = null } = {}) {
-      const key = buildScopedObjectKey(scope, objectId);
+      const key = await authorizedKey(scope, objectId);
       const bytes = toBuffer(body);
       const result = await put({ bucket, key, body: bytes, contentType });
       return {
@@ -154,7 +176,7 @@ export function createS3CompatibleObjectStorageAdapter(options = {}) {
       };
     },
     async getObject({ scope, objectId } = {}) {
-      const key = buildScopedObjectKey(scope, objectId);
+      const key = await authorizedKey(scope, objectId);
       try {
         const result = await get({ bucket, key });
         const body = toBuffer(result?.body ?? result?.Body ?? Buffer.alloc(0));
@@ -172,7 +194,7 @@ export function createS3CompatibleObjectStorageAdapter(options = {}) {
       }
     },
     async headObject({ scope, objectId } = {}) {
-      const key = buildScopedObjectKey(scope, objectId);
+      const key = await authorizedKey(scope, objectId);
       try {
         const result = await head({ bucket, key });
         return {
@@ -188,7 +210,7 @@ export function createS3CompatibleObjectStorageAdapter(options = {}) {
       }
     },
     async deleteObject({ scope, objectId } = {}) {
-      const key = buildScopedObjectKey(scope, objectId);
+      const key = await authorizedKey(scope, objectId);
       try {
         await remove({ bucket, key });
         return { deleted: true, key };
