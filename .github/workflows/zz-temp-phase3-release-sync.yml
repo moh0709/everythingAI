@@ -1,0 +1,34 @@
+name: Temporary Phase 3 Release Governance Sync
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync-governance:
+    if: github.head_ref == 'phase3-enterprise-readiness-release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Synchronize canonical governance files
+        run: node scripts/phase3-release-sync.cjs
+      - name: Commit synchronized canonical state
+        run: |
+          git add PROJECT_STATE.md AI_BOOTSTRAP.md docs/ROADMAP.md
+          if git diff --cached --quiet; then
+            echo "Canonical governance files are already synchronized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: synchronize enterprise readiness foundation state"
+          git push origin HEAD:${{ github.head_ref }}
