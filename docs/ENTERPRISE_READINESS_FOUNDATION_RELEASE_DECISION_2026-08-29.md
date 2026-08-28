@@ -44,6 +44,10 @@ All accepted Phase 1, Phase 2, Product Depth/Product & UX, governed-action, audi
 
 Historical issue #69 remains completed evidence and is not rewritten by this release.
 
+## Release-candidate validation discipline
+
+The canonical release synchronization is accepted only after one unchanged final documentation head passes EverythingAI CI Smoke, all fifteen inherited focused workflows, Enterprise Isolation, Object Storage, Object Metadata Migration Planning, Enterprise Runtime Health, Enterprise Backup Restore Validation, and Enterprise Capacity & Security, followed by a clean independent documentation/security review. Historical green evidence above is preserved evidence, not a substitute for validation of the changed release candidate.
+
 ## Production-only work explicitly unresolved
 
 The following are **not** claimed complete by `ENTERPRISE_READINESS_FOUNDATION_PASS` and require their own authorized gates where applicable:
