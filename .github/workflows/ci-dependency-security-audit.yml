@@ -1,0 +1,27 @@
+name: EverythingAI Dependency Security Audit
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/package.json'
+      - 'services/api/package-lock.json'
+      - '.github/workflows/ci-dependency-security-audit.yml'
+  workflow_dispatch:
+
+jobs:
+  backend-dependency-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: services/api/package-lock.json
+      - name: Install exact backend dependencies
+        run: npm ci
+      - name: Audit backend dependencies
+        run: npm audit --audit-level=high --json
