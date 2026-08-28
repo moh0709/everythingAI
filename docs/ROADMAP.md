@@ -1,13 +1,14 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-08-27  
+Date: 2026-08-28  
 Phase 2: **complete and dispatched (`PHASE2_PASS`)**  
 Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
 Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
 Governed-Action Trust & Evidence: **complete and dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)**  
 Governed-Action Review Context: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`)**  
-Governed-Action Review Context Summary Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)**
+Governed-Action Review Context Summary Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)**  
+Review Context Orientation Clarity: **accepted through #278 / PR #279**
 
 ## Completed sequence
 
@@ -55,53 +56,67 @@ Release evidence:
 - release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`;
 - handover: `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`.
 
-The dispatched tranche preserves loaded-window truthfulness, exact-target review resumption/return, provenance and explicit unknown-state discipline, no replacement execution inference, no backend fetch merely to manufacture context, and existing approval/audit/undo/recovery/filesystem safety semantics.
+### Review Context Summary Trust post-dispatch synchronization
+#276 / PR #277 merged as `bdd65c656558e9c715c8346887a156d872dd89f3` after unchanged-head EverythingAI CI Smoke #738 plus all thirteen mandatory focused workflows and clean final documentation review.
+
+### Product & UX — Review Context Orientation Clarity
+#278 / PR #279 merged as `b54f74a8c73c69850a2059e3e593b03a39a3ca18` after strict RED→GREEN development.
+
+Acceptance evidence:
+
+- RED head `ec20ce898896d0adcbc6f2880fd8656a28460acb` — `EverythingAI Governed-Action Review Context Orientation` #1 failed because the required orientation explanation did not yet exist;
+- final unchanged implementation head `ab511573969ca8706b2110fac7e9a7540a9fa91e` — EverythingAI CI Smoke #741 PASS, all thirteen inherited mandatory focused workflows PASS, and `EverythingAI Governed-Action Review Context Orientation` #2 PASS;
+- final review — no unresolved Critical or Important findings and no review threads;
+- accepted merge — `b54f74a8c73c69850a2059e3e593b03a39a3ca18`.
+
+The accepted orientation behavior distinguishes the currently visible loaded audit window from remembered local review context using already-loaded/local state only. It adds no backend fetch, persistence, routing architecture, mutation semantics, replacement-execution inference, or global audit-absence claim.
 
 ## Current five-track position
 
 | Track | Accepted position | Next gate |
 |---|---|---|
-| Product and UX | Strong local-first client; Review Context Summary Trust now dispatched | #276 synchronization, then at most one separately released bounded continuation |
+| Product and UX | Strong local-first client; Review Context Summary Trust dispatched and Orientation Clarity accepted | #280 synchronization and evaluation of at most one separately released bounded continuation |
 | Knowledge and Safe Action | Source-backed reading, explicit approval, truthful loaded-window audit/evidence semantics, exact-target review behavior, provenance and unknown-state discipline | Preserve backend authority and explain only facts provable from loaded/local state |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: authentication, tenancy, cloud, database/storage, production-platform execution |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and required privileged authority is available |
-| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all thirteen focused workflows, final review, rollback, and truthful blocker discipline |
+| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all fourteen focused workflows, final review, rollback, and truthful blocker discipline |
 
 ## Active dependency sequence
 
 ```text
-GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS accepted and dispatched
-  -> #276 post-dispatch canonical synchronization + five-track gate
-    -> accept/reject #276 after full inherited CI + all thirteen focused workflows + final documentation review
-      -> if accepted, release at most one separately bounded implementation issue
+Review Context Orientation Clarity accepted (#278 / #279)
+  -> #280 canonical synchronization + fourteen-workflow baseline + five-track gate
+    -> accept/reject #280 after EverythingAI CI Smoke + all fourteen focused workflows + final documentation review
+      -> if accepted, evaluate and release at most one separately bounded next issue within existing authority
 ```
 
-Issue #276 does not itself authorize another product/runtime implementation milestone.
+Issue #280 does not itself authorize another product/runtime implementation milestone.
 
 ## Recommended next bounded direction
 
-**Review Context Orientation Clarity**
+**Review Context Orientation Provenance & Unknown-State Clarity — evaluation candidate**
 
-Goal: reduce ambiguity between the currently visible loaded audit window and remembered local review context without adding persistence, new backend requests, new routing architecture, or mutation semantics.
+Goal: determine whether the existing orientation surface can more explicitly communicate the genuine loaded/local origin of its orientation facts and why unavailable orientation facts are unknown, without expanding data acquisition or mutation scope.
 
-A separately released implementation issue may inspect and select one narrowly testable behavior, such as making the distinction between current loaded-window scope and remembered review target more explicit in the existing Review Context surfaces. Any implementation must:
+Any separately released implementation issue must remain narrowly testable and must:
 
 - use only already-loaded/local state;
 - preserve exact-target review resumption and return;
+- distinguish current loaded-window facts from remembered local review context without implying persistence;
 - keep missing/stale context explicitly unknown or unavailable;
 - never infer a replacement execution;
 - never claim global audit absence from the loaded window;
-- trigger no backend request merely to reconstruct navigation context;
+- trigger no backend request merely to reconstruct or enrich navigation/orientation context;
 - preserve approval, execution, audit, undo, recovery, task-resumption, and filesystem safety semantics;
-- pass the complete inherited matrix plus all thirteen mandatory focused workflows.
+- pass the complete inherited matrix plus all fourteen mandatory focused workflows.
 
-This is a recommendation only. Implementation is not authorized until #276 is accepted and a separate bounded issue is released.
+This remains an evaluation candidate only. #280 does not authorize implementation.
 
 ## Mandatory inherited release discipline
 
 Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results are supporting evidence only. Accepted focused workflows remain mandatory unless explicitly superseded by an accepted decision. Every accepted change retains milestone-scoped rollback evidence.
 
-The focused workflow baseline remains **thirteen mandatory workflows**:
+The focused workflow baseline is now **fourteen mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -115,7 +130,8 @@ The focused workflow baseline remains **thirteen mandatory workflows**:
 10. `EverythingAI Governed-Action Review Resumption`;
 11. `EverythingAI Governed-Action Review Context Provenance`;
 12. `EverythingAI Governed-Action Review Context Summary`;
-13. `EverythingAI Governed-Action Review Context Summary Provenance`.
+13. `EverythingAI Governed-Action Review Context Summary Provenance`;
+14. `EverythingAI Governed-Action Review Context Orientation`.
 
 ## CEO-gated directions
 
@@ -127,4 +143,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-#276 synchronization is documentation-only and independently reversible. Release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
+#280 synchronization is documentation-only and independently reversible. Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
