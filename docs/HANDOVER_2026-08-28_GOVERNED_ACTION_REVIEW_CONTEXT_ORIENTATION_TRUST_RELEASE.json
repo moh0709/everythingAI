@@ -3,7 +3,7 @@
   "date": "2026-08-28",
   "release": "Governed-Action Review Context Orientation Trust",
   "issue": 286,
-  "status": "VALIDATION_PENDING",
+  "status": "FINAL_HEAD_VALIDATION_PENDING",
   "proposed_dispatch": "GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS",
   "accepted_sync_baseline": {
     "issue": 284,
@@ -50,24 +50,42 @@
     "filesystem_safety_changed": false
   },
   "fresh_release_candidate": {
-    "status": "PENDING",
-    "required_ci_smoke": true,
-    "required_focused_workflow_count": 15,
+    "sha": "b02880c12127123a74207e073362c9be14f716a1",
+    "status": "PASS",
+    "ci_smoke_run": 751,
+    "source_recovery_return_context_run": 117,
+    "multi_hop_return_context_run": 110,
+    "return_context_provenance_run": 106,
+    "workspace_context_summary_run": 93,
+    "workspace_context_provenance_run": 89,
+    "context_aware_task_resumption_run": 78,
+    "governed_action_comprehension_run": 72,
+    "governed_action_evidence_navigation_run": 67,
+    "governed_action_evidence_filtering_run": 51,
+    "governed_action_review_resumption_run": 46,
+    "governed_action_review_context_provenance_run": 40,
+    "governed_action_review_context_summary_run": 28,
+    "governed_action_review_context_summary_provenance_run": 23,
+    "governed_action_review_context_orientation_run": 12,
+    "governed_action_review_context_orientation_provenance_run": 6,
+    "focused_workflow_count": 15,
     "historical_green_substitution_allowed": false
   },
   "independent_review": {
-    "status": "PENDING",
-    "required_unresolved_critical_findings": 0,
-    "required_unresolved_important_findings": 0,
-    "required_open_review_threads": 0
+    "status": "PASS",
+    "unresolved_critical_findings": 0,
+    "unresolved_important_findings": 0,
+    "open_review_threads": 0,
+    "documentation_only": true,
+    "sequence_coherent": true
   },
   "final_decision_head_validation": {
     "status": "PENDING",
-    "requirement": "If release-decision or handover changes after candidate validation, EverythingAI CI Smoke plus all fifteen mandatory focused workflows must pass on the changed final decision head before merge and final dispatch."
+    "requirement": "EverythingAI CI Smoke plus all fifteen mandatory focused workflows must pass on the changed final decision head before merge and final dispatch."
   },
   "rollback": "#278 and #282 remain independently reversible through their accepted merges. #284 synchronization and #286 release-gate documentation are independently reversible and change no runtime/data behavior.",
   "enterprise_platform_scope_expanded": false,
   "material_connector_runtime_scope_expanded": false,
   "protected_historical_issue_69_modified": false,
-  "next_state": "Validate the unchanged #286 release candidate with EverythingAI CI Smoke plus all fifteen mandatory focused workflows, perform independent final review, then record the exact candidate/final-head evidence before merge and dispatch."
+  "next_state": "Validate the changed final decision head with EverythingAI CI Smoke plus all fifteen mandatory focused workflows. Merge and dispatch only if that unchanged final head is green and final review remains clean."
 }
