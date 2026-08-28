@@ -6,6 +6,9 @@ const BEARER_TOKEN = /\b(Bearer\s+)[A-Za-z0-9._~+\-/=]+/gi;
 const SENSITIVE_ASSIGNMENT = /\b(password|passwd|secret|token|credential|authorization|api[_-]?key|access[_-]?key|private[_-]?key|database_url|dsn)\s*([=:])\s*([^\s&,;]+)/gi;
 const SENSITIVE_QUERY_PARAM = /([?&])(password|passwd|secret|token|credential|authorization|api[_-]?key|access[_-]?key|private[_-]?key|database_url|dsn)=([^&#\s]+)/gi;
 const EXACT_COMMIT_SHA = /^[0-9a-f]{40}$/i;
+const EXACT_ROLLBACK_BOUNDARY = /^revert [0-9a-f]{40}$/i;
+const SAFE_ENVIRONMENT_STRING = /^[A-Za-z0-9._+-]{1,120}$/;
+const SAFE_ENVIRONMENT_FIELDS = new Set(['runtime', 'nodeVersion', 'platform', 'architecture']);
 
 function normalizePositiveInteger(value) {
   return Number.isSafeInteger(value) && value > 0 ? value : null;
@@ -23,6 +26,18 @@ function redactString(value) {
     .replace(BEARER_TOKEN, '$1[REDACTED]')
     .replace(SENSITIVE_QUERY_PARAM, '$1$2=[REDACTED]')
     .replace(SENSITIVE_ASSIGNMENT, '$1$2[REDACTED]');
+}
+
+function normalizeEnvironmentEvidence(environment) {
+  if (!environment || typeof environment !== 'object' || Array.isArray(environment)) return {};
+
+  const output = {};
+  if (typeof environment.ci === 'boolean') output.ci = environment.ci;
+  for (const field of SAFE_ENVIRONMENT_FIELDS) {
+    const value = normalizeString(environment[field]);
+    if (value && SAFE_ENVIRONMENT_STRING.test(value)) output[field] = value;
+  }
+  return output;
 }
 
 export function redactEnterpriseEvidence(value, seen = new WeakSet()) {
@@ -199,7 +214,10 @@ export function createEnterpriseReleaseEvidence({
 } = {}) {
   const rawSha = normalizeString(commitSha);
   const sha = rawSha && EXACT_COMMIT_SHA.test(rawSha) ? rawSha.toLowerCase() : null;
-  const rollback = normalizeString(rollbackBoundary);
+  const rawRollback = normalizeString(rollbackBoundary);
+  const rollback = rawRollback && EXACT_ROLLBACK_BOUNDARY.test(rawRollback)
+    ? rawRollback.toLowerCase()
+    : null;
   const capacities = Array.isArray(capacityResults) ? capacityResults : [];
   const security = Array.isArray(securityResults) ? securityResults : [];
   const inherited = Array.isArray(inheritedValidation) ? inheritedValidation : [];
@@ -207,6 +225,7 @@ export function createEnterpriseReleaseEvidence({
   const requiredEvidencePresent = Boolean(
     sha
     && rollback
+    && rollback.endsWith(sha)
     && capacities.length > 0
     && security.length > 0
     && inherited.length > 0
@@ -220,11 +239,11 @@ export function createEnterpriseReleaseEvidence({
     schema: 'everythingai.enterprise-release-evidence.v1',
     status: !requiredEvidencePresent ? 'blocked' : allMeasuredEvidencePassed ? 'pass' : 'fail',
     code: { commitSha: sha },
-    rollbackBoundary: rollback ? redactString(rollback) : null,
+    rollbackBoundary: rollback,
     capacityResults: capacities,
     securityResults: security,
     inheritedValidation: inherited,
-    environment: environment && typeof environment === 'object' ? environment : {},
+    environment: normalizeEnvironmentEvidence(environment),
     claims: {
       ciDisposableRegressionEvidence: true,
       productionCapacityValidated: false,
