@@ -90,6 +90,36 @@ test('capacity scenario rejects unbounded or invalid workload configuration', as
   );
 });
 
+test('capacity scenario time-bounds stalled operations and records timeout failure', async () => {
+  const startedAt = Date.now();
+  const result = await runBoundedCapacityScenario({
+    name: 'stalled-operation',
+    iterations: 1,
+    concurrency: 1,
+    operationTimeoutMs: 25,
+    maxOperationTimeoutMs: 100,
+    operation: async () => new Promise(() => {}),
+  });
+
+  assert.equal(result.status, 'fail');
+  assert.equal(result.measured.failures, 1);
+  assert.equal(result.measured.timeouts, 1);
+  assert.equal(result.bounds.operationTimeoutMs, 25);
+  assert.ok(Date.now() - startedAt < 500);
+
+  await assert.rejects(
+    () => runBoundedCapacityScenario({
+      name: 'timeout-too-large',
+      iterations: 1,
+      concurrency: 1,
+      operationTimeoutMs: 101,
+      maxOperationTimeoutMs: 100,
+      operation: async () => true,
+    }),
+    /bounded capacity configuration denied/i,
+  );
+});
+
 test('security regression matrix exercises real fail-closed storage and restore boundaries', async () => {
   const report = await runEnterpriseSecurityRegressionMatrix({
     cases: [
