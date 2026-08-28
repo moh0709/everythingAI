@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-08-28  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Governed-Action Review Context Orientation Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)  
-Current gate: issue #288 canonical synchronization and next five-track decision gate
+Date: 2026-08-29  
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Governed-Action Review Context Orientation Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`); Enterprise Readiness Foundation dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)
+Current gate: #304 Enterprise Readiness Foundation dispatch complete; select next dependency from synchronized five-track roadmap
 
 ## Mandatory startup sequence
 
@@ -38,10 +38,14 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 
 ## Current release authority evidence
 
-Latest release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE_DECISION_2026-08-28.md`  
-Latest handover: `docs/HANDOVER_2026-08-28_GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE.json`
+### Phase 3 Enterprise Readiness Foundation
 
-The Review Context Orientation Trust dispatch is authoritative through #286/#287. Its release candidate and changed final decision head both passed the complete fifteen-workflow focused baseline, and final release review found no unresolved Critical or Important findings or review threads. Issue #288 synchronizes that dispatch into canonical governance state and does not itself authorize another runtime feature.
+Latest release decision: `docs/ENTERPRISE_READINESS_FOUNDATION_RELEASE_DECISION_2026-08-29.md`  
+Latest handover: `docs/HANDOVER_2026-08-29_ENTERPRISE_READINESS_FOUNDATION_RELEASE.json`
+
+`ENTERPRISE_READINESS_FOUNDATION_PASS` is authoritative for the bounded application-level foundation through Phase 3.1–3.6 plus #305/#306 dependency-security remediation. It does not claim production deployment, destructive cutover, production secret provisioning, external certification, production-load qualification, or commercial SLA readiness.
+
+Prior Review Context Orientation Trust release authority remains valid historical evidence through #286/#287; its release decision and handover remain preserved, but it is no longer the latest release authority.
 
 The prior Review Context Summary Trust release decision and handover remain valid historical release authority:
 
@@ -131,15 +135,13 @@ Historical green evidence never substitutes for validating a changed candidate. 
 
 ## Current governance gate
 
-Issue #288 is documentation-only synchronization after accepted #286/#287.
+Phase 3 Enterprise Readiness Foundation is dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` through #304. Final dependency-remediation head `5cc3ffe0f8842ea2250ddb986d9cb86444e3df2a` passed CI Smoke #836, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, and Dependency Security Audit #8. Select the next bounded dependency from the synchronized five-track roadmap.
 
-It must record exact #286/#287 candidate, changed-final-head, CI, review, merge, dispatch, and rollback evidence; preserve the fifteen-workflow baseline and accepted safety semantics; and pass EverythingAI CI Smoke plus all fifteen focused workflows on one unchanged documentation head before merge.
-
-After #288 acceptance, evaluate the next five-track direction from the synchronized state. Do not treat the Orientation Trust dispatch as automatic authorization for another product/runtime implementation. Release at most one next bounded issue only if it is dependency-safe, materially useful, reversible, and already within approved scope.
 
 ## CEO-gated directions
 
-Explicit CEO approval remains required before authentication/tenancy, cloud deployment, DB migration/object storage, privileged-host/systemd work, production-platform architecture execution, new routing architecture, automatic action/recovery/rebuild behavior, material connector/runtime expansion, new backend/API/schema/persistence expansion, or new semantic/provider architecture with material runtime/cost/trust implications.
+ER-1 through ER-5 are approved architecture authority. Additional CEO approval remains required before material production-platform execution beyond the accepted foundation, including privileged-host/root/sudo/SSH/systemd work, real production secrets or identity-provider provisioning, destructive database/object migration or cutover, external penetration/compliance/certification commitments, production load/capacity qualification, cloud-provider lock-in decisions beyond the provider-neutral architecture, or commercial SLA/SLO commitments.
+
 
 ## Issue #69
 
@@ -147,4 +149,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #288 is documentation-only and can be reverted independently. Review Context Orientation Trust release merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`, Review Context Orientation provenance synchronization merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`, Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted rollback evidence remain valid.
+Every accepted milestone remains independently reversible by its recorded merge. The #304 Enterprise Readiness Foundation release/canonical synchronization is documentation/governance-only and is independently reversible from the Phase 3 runtime implementation merges. Review Context Orientation Trust release merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`, Review Context Orientation provenance synchronization merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`, Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted rollback evidence remain valid.

@@ -1,6 +1,6 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-08-28  
+Date: 2026-08-29  
 Phase 2: **complete and dispatched (`PHASE2_PASS`)**  
 Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
@@ -8,7 +8,8 @@ Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONT
 Governed-Action Trust & Evidence: **complete and dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)**  
 Governed-Action Review Context: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`)**  
 Governed-Action Review Context Summary Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)**  
-Governed-Action Review Context Orientation Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)**
+Governed-Action Review Context Orientation Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)**  
+Enterprise Readiness Foundation: **complete and dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)**
 
 ## Completed sequence
 
@@ -101,38 +102,38 @@ Release evidence:
 - release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE_DECISION_2026-08-28.md`;
 - handover: `docs/HANDOVER_2026-08-28_GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE.json`.
 
+### Phase 3 — Enterprise Readiness Foundation
+Accepted and dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` through #304 after Phase 3.1–3.6 (#292–#303) and dependency-security remediation #305/#306. The accepted foundation covers application-level identity/tenancy isolation, PostgreSQL RLS foundations, provider-neutral object storage, durable object metadata and dry-run migration planning, runtime health, isolated backup/restore validation, bounded capacity/security validation, and exact-lock dependency security. It explicitly does not claim production deployment readiness.
+
 ## Current five-track position
 
 | Track | Accepted position | Next gate |
 |---|---|---|
-| Product and UX | Strong local-first client; Review Context Summary Trust and Review Context Orientation Trust dispatched | #288 synchronization, then evaluate whether another bounded Product & UX milestone adds distinct user value rather than recursively restating the same review-context facts |
-| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful loaded-window audit/evidence semantics, exact-target review behavior, provenance and unknown-state discipline | Preserve backend authority and pursue only materially useful safe-comprehension/action improvements within already approved scope |
-| Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: authentication, tenancy, cloud, database/storage, production-platform execution |
-| Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and required privileged authority is available |
-| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all fifteen focused workflows, final review, rollback, truthful blocker discipline, and avoid recursive trust-surface expansion without distinct value |
+| Product and UX | Phase 2/Product Depth and Review Context trust surfaces remain accepted and local-first | Choose only distinct user-value work that preserves existing trust and governed-action semantics |
+| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful evidence semantics and exact-target review behavior remain accepted | Continue only bounded improvements backed by authoritative or genuinely loaded/local evidence |
+| Enterprise Platform | Application-level Enterprise Readiness Foundation dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` | CEO-gated production execution: real infrastructure/secrets, destructive cutover, external certification/load qualification, SLA commitments |
+| Engineering Operations | CI/release discipline now includes exact-lock dependency audit and dependency-sensitive enterprise gates | Production/privileged-host operations require explicit authority and environment access |
+| Governance and Autonomous Delivery | Phase 3.1–3.6 + dependency remediation completed through merge `d69af031bc4bfd82441ebb22b17040879cfdd93f` and #304 dispatch | Select one bounded dependency at a time; preserve unchanged-head validation, review and rollback evidence |
 
 ## Active dependency sequence
 
 ```text
-Governed-Action Review Context Orientation Trust dispatched (#286 / #287)
-  -> #288 canonical synchronization + five-track gate
-    -> accept/reject #288 after EverythingAI CI Smoke + all fifteen focused workflows + final documentation review
-      -> evaluate one next bounded dependency only if materially useful and already within approved scope
+Phase 3.1–3.6 accepted (#292–#303)
+  -> dependency-security blocker #305 / PR #306 accepted
+    -> #304 canonical Enterprise Readiness Foundation release
+      -> ENTERPRISE_READINESS_FOUNDATION_PASS
+        -> select next five-track dependency
+          -> material production-platform execution remains CEO-gated
 ```
-
-Issue #288 does not itself authorize another product/runtime implementation milestone.
 
 ## Next five-track decision criteria
 
-After #288 is accepted, choose the next dependency from the synchronized state using these constraints:
+- **Product & UX:** pursue distinct user-visible value, not recursive restatement of already trusted review-context facts.
+- **Knowledge & Safe Action:** preserve backend authority, explicit approval, truthful unknown-state handling, audit/undo and filesystem safety.
+- **Enterprise Platform:** the application-level foundation is accepted; production secrets, privileged-host execution, destructive migration/cutover, external certification and production-load/SLA commitments remain separate gates.
+- **Engineering Operations:** keep dependency/security and enterprise validation wired to changes that can affect them; privileged production operations require explicit authority.
+- **Governance & Autonomous Delivery:** release only bounded, dependency-safe, reversible work with unchanged-head validation and independent final review.
 
-- **Product & UX:** prefer a distinct, user-visible comprehension or workflow improvement over further recursive labels/provenance about the same review-context state; no implementation is automatically authorized by the Orientation Trust dispatch.
-- **Knowledge & Safe Action:** improvements may expose or explain only evidence actually available from authoritative backend or already-loaded/local state; missing/stale evidence remains unknown or unavailable.
-- **Enterprise Platform:** authentication, tenancy, cloud, DB/object storage, production platform, and material platform architecture remain CEO-gated.
-- **Engineering Operations:** privileged-host/systemd or production operations remain explicitly prioritized, authority-dependent work rather than an implicit continuation.
-- **Governance & Autonomous Delivery:** any next issue must be bounded, dependency-safe, reversible, independently testable, and preserve the complete inherited baseline.
-
-Do not release another product/runtime issue merely to keep the queue moving. A truthful decision that the next useful direction is CEO-gated is valid.
 
 ## Mandatory inherited release discipline
 
@@ -158,7 +159,7 @@ The focused workflow baseline remains **fifteen mandatory workflows**:
 
 ## CEO-gated directions
 
-Require explicit CEO approval before authentication/tenancy, cloud deployment, DB migration/object storage, privileged-host/systemd work, production-platform architecture execution, new routing architecture, automatic action/recovery/rebuild behavior, material connector/runtime expansion, new backend/API/schema/persistence expansion, or new semantic/provider architecture with material runtime/cost/trust implications.
+ER-1 through ER-5 are already approved and implemented at the bounded application-foundation level. Explicit CEO approval is still required before material production-platform execution beyond that foundation, including privileged-host/root/sudo/SSH/systemd work, real production secrets or identity-provider provisioning, destructive database/object migration or cutover, external penetration/compliance/certification commitments, production load/capacity qualification, provider-specific cloud lock-in decisions beyond the approved neutral architecture, automatic action/recovery scope expansion, material connector/runtime expansion, or commercial SLA/SLO commitments.
 
 ## Issue #69
 
@@ -166,4 +167,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-#288 synchronization is documentation-only and independently reversible. Review Context Orientation Trust release merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`, Review Context Orientation provenance synchronization merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`, Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
+The #304 Enterprise Readiness Foundation release/canonical synchronization is documentation/governance-only and independently reversible from the Phase 3 runtime implementation merges. Review Context Orientation Trust release merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`, Review Context Orientation provenance synchronization merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`, Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.

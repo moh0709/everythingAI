@@ -4,6 +4,11 @@ on:
   pull_request:
     paths:
       - 'services/api/package-lock.json'
+      - 'PROJECT_STATE.md'
+      - 'AI_BOOTSTRAP.md'
+      - 'docs/ROADMAP.md'
+      - 'docs/ENTERPRISE_READINESS_FOUNDATION_RELEASE_DECISION_*.md'
+      - 'docs/HANDOVER_*ENTERPRISE_READINESS_FOUNDATION_RELEASE.json'
       - 'services/api/src/enterprise/**'
       - 'services/api/src/server.js'
       - 'services/api/test/enterpriseRuntimeHealth.test.js'
