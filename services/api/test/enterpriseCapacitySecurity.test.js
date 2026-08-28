@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   runBoundedCapacityScenario,
+  runEnterpriseSecurityRegressionMatrix,
   createEnterpriseReleaseEvidence,
   redactEnterpriseEvidence,
 } from '../src/enterprise/capacitySecurity.js';
@@ -48,6 +49,45 @@ test('capacity scenario rejects unbounded or invalid workload configuration', as
   );
 });
 
+test('security regression matrix requires fail-closed denial before adapter access', async () => {
+  const report = await runEnterpriseSecurityRegressionMatrix({
+    cases: [
+      {
+        name: 'cross-tenant-denial',
+        exercise: async () => ({ denied: true, adapterCalls: 0 }),
+      },
+      {
+        name: 'cross-workspace-denial',
+        exercise: async () => ({ denied: true, adapterCalls: 0 }),
+      },
+      {
+        name: 'untrusted-scope-guard-denial',
+        exercise: async () => ({ denied: true, adapterCalls: 0 }),
+      },
+      {
+        name: 'tampered-manifest-denial',
+        exercise: async () => ({ denied: true, adapterCalls: 0 }),
+      },
+      {
+        name: 'unsupported-schema-denial',
+        exercise: async () => ({ denied: true, adapterCalls: 0 }),
+      },
+    ],
+  });
+
+  assert.equal(report.status, 'pass');
+  assert.equal(report.results.length, 5);
+  assert.ok(report.results.every((entry) => entry.status === 'pass' && entry.adapterCalls === 0));
+
+  const unsafe = await runEnterpriseSecurityRegressionMatrix({
+    cases: [{
+      name: 'late-denial',
+      exercise: async () => ({ denied: true, adapterCalls: 1 }),
+    }],
+  });
+  assert.equal(unsafe.status, 'fail');
+});
+
 test('release evidence is exact-head attributable, secret-free and truthful about missing evidence', () => {
   const report = createEnterpriseReleaseEvidence({
     commitSha: 'abc123def456',
@@ -70,6 +110,17 @@ test('release evidence is exact-head attributable, secret-free and truthful abou
 
   const blocked = createEnterpriseReleaseEvidence({ commitSha: 'abc123def456' });
   assert.equal(blocked.status, 'blocked');
+});
+
+test('release evidence fails when any measured or inherited validation fails', () => {
+  const report = createEnterpriseReleaseEvidence({
+    commitSha: 'abc123def456',
+    rollbackBoundary: 'revert abc123def456',
+    capacityResults: [{ name: 'metadata-read', status: 'pass' }],
+    securityResults: [{ name: 'cross-tenant-denial', status: 'pass' }],
+    inheritedValidation: [{ name: 'enterprise-isolation', status: 'fail' }],
+  });
+  assert.equal(report.status, 'fail');
 });
 
 test('evidence redaction removes credential-bearing fields and URI credentials recursively', () => {
