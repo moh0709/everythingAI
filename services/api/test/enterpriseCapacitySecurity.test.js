@@ -239,18 +239,26 @@ test('release evidence fails when any measured or inherited validation fails', (
   assert.equal(report.status, 'fail');
 });
 
-test('evidence redaction removes credential-bearing fields and URI credentials recursively', () => {
+test('evidence redaction removes credential-bearing fields and embedded string secrets recursively', () => {
   const sanitized = redactEnterpriseEvidence({
     token: 'secret-token',
     nested: {
       password: 'secret-password',
-      url: 'https://user:secret@example.test/path',
-      message: 'failure connecting to postgres://user:secret@db.example.test/everythingai',
+      url: 'https://user:secret@example.test/path?token=query-secret&mode=test',
+      message: 'failure connecting to postgres://user:secret@db.example.test/everythingai Authorization=Bearer-value',
+      authMessage: 'request failed with Bearer bearer-secret-value',
+      details: 'api_key=assignment-secret',
     },
   });
 
   const serialized = JSON.stringify(sanitized);
   assert.equal(sanitized.token, '[REDACTED]');
   assert.equal(sanitized.nested.password, '[REDACTED]');
-  assert.doesNotMatch(serialized, /secret-token|secret-password|user:secret|postgres:\/\/user:secret/i);
+  assert.doesNotMatch(
+    serialized,
+    /secret-token|secret-password|user:secret|postgres:\/\/user:secret|query-secret|bearer-secret-value|assignment-secret|Bearer-value/i,
+  );
+  assert.match(sanitized.nested.url, /token=\[REDACTED\]/);
+  assert.match(sanitized.nested.authMessage, /Bearer \[REDACTED\]/i);
+  assert.match(sanitized.nested.details, /api_key=\[REDACTED\]/i);
 });
