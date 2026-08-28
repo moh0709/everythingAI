@@ -2,6 +2,9 @@ import { performance } from 'node:perf_hooks';
 
 const SENSITIVE_KEY = /(password|passwd|secret|token|credential|authorization|api[_-]?key|access[_-]?key|private[_-]?key|database_url|dsn)/i;
 const URI_WITH_CREDENTIALS = /\b([a-z][a-z0-9+.-]*:\/\/)([^\s/@:]+):([^\s/@]+)@/gi;
+const BEARER_TOKEN = /\b(Bearer\s+)[A-Za-z0-9._~+\-/=]+/gi;
+const SENSITIVE_ASSIGNMENT = /\b(password|passwd|secret|token|credential|authorization|api[_-]?key|access[_-]?key|private[_-]?key|database_url|dsn)\s*([=:])\s*([^\s&,;]+)/gi;
+const SENSITIVE_QUERY_PARAM = /([?&])(password|passwd|secret|token|credential|authorization|api[_-]?key|access[_-]?key|private[_-]?key|database_url|dsn)=([^&#\s]+)/gi;
 const EXACT_COMMIT_SHA = /^[0-9a-f]{40}$/i;
 
 function normalizePositiveInteger(value) {
@@ -15,7 +18,11 @@ function normalizeString(value) {
 }
 
 function redactString(value) {
-  return value.replace(URI_WITH_CREDENTIALS, '$1[REDACTED]@');
+  return value
+    .replace(URI_WITH_CREDENTIALS, '$1[REDACTED]@')
+    .replace(BEARER_TOKEN, '$1[REDACTED]')
+    .replace(SENSITIVE_QUERY_PARAM, '$1$2=[REDACTED]')
+    .replace(SENSITIVE_ASSIGNMENT, '$1$2[REDACTED]');
 }
 
 export function redactEnterpriseEvidence(value, seen = new WeakSet()) {
