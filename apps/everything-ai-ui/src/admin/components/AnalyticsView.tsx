@@ -246,8 +246,12 @@ export function AnalyticsView({ options, status, audit }: AnalyticsViewProps) {
         <div data-testid="governed-action-review-context-orientation">
           <p><b>Current loaded review window:</b> {visibleExecutions.length} of {executions.length} executions are visible under the local filter {evidenceFilterLabel(evidenceFilter)}.</p>
           <p><b>Remembered review context:</b> The remembered local target is {reviewReturnExecutionId}.</p>
+          <p className="muted"><b>Orientation provenance:</b> Loaded-window facts come from the currently loaded action executions and local audit-evidence filter. Remembered-context facts come only from the exact local execution identifier recorded by explicit navigation from already-loaded audit evidence.</p>
           <p className="muted">Changing the loaded-window filter can hide this target without deleting or replacing the remembered local identifier.</p>
-          {!reviewReturnExecutionVisible ? <p className="muted">Safe return is unavailable while the remembered target is outside the current loaded review window; no replacement execution is inferred.</p> : null}
+          {!reviewReturnExecutionVisible ? <>
+            <p className="muted">Safe return is unavailable while the remembered target is outside the current loaded review window; no replacement execution is inferred.</p>
+            <p className="muted"><b>Unknown-state explanation:</b> The remembered target is not visible in the current loaded review window. That loaded-window absence does not establish global audit absence, backend persistence, or review completion. No replacement execution is inferred.</p>
+          </> : null}
         </div>
         <p><b>Remembered execution:</b> {reviewReturnExecutionId}</p>
         <small className="muted" style={{ display: 'block' }}>Provenance: local remembered execution identifier recorded by explicit navigation from already-loaded audit evidence.</small>
