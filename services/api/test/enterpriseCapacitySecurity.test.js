@@ -8,6 +8,8 @@ import {
   redactEnterpriseEvidence,
 } from '../src/enterprise/capacitySecurity.js';
 
+const exactHead = '0123456789abcdef0123456789abcdef01234567';
+
 test('bounded capacity scenario records measured regression evidence without production claims', async () => {
   let inFlight = 0;
   let peak = 0;
@@ -52,26 +54,11 @@ test('capacity scenario rejects unbounded or invalid workload configuration', as
 test('security regression matrix requires fail-closed denial before adapter access', async () => {
   const report = await runEnterpriseSecurityRegressionMatrix({
     cases: [
-      {
-        name: 'cross-tenant-denial',
-        exercise: async () => ({ denied: true, adapterCalls: 0 }),
-      },
-      {
-        name: 'cross-workspace-denial',
-        exercise: async () => ({ denied: true, adapterCalls: 0 }),
-      },
-      {
-        name: 'untrusted-scope-guard-denial',
-        exercise: async () => ({ denied: true, adapterCalls: 0 }),
-      },
-      {
-        name: 'tampered-manifest-denial',
-        exercise: async () => ({ denied: true, adapterCalls: 0 }),
-      },
-      {
-        name: 'unsupported-schema-denial',
-        exercise: async () => ({ denied: true, adapterCalls: 0 }),
-      },
+      { name: 'cross-tenant-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
+      { name: 'cross-workspace-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
+      { name: 'untrusted-scope-guard-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
+      { name: 'tampered-manifest-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
+      { name: 'unsupported-schema-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
     ],
   });
 
@@ -80,20 +67,18 @@ test('security regression matrix requires fail-closed denial before adapter acce
   assert.ok(report.results.every((entry) => entry.status === 'pass' && entry.adapterCalls === 0));
 
   const unsafe = await runEnterpriseSecurityRegressionMatrix({
-    cases: [{
-      name: 'late-denial',
-      exercise: async () => ({ denied: true, adapterCalls: 1 }),
-    }],
+    cases: [{ name: 'late-denial', exercise: async () => ({ denied: true, adapterCalls: 1 }) }],
   });
   assert.equal(unsafe.status, 'fail');
 });
 
 test('release evidence is exact-head attributable, secret-free and truthful about missing evidence', () => {
   const report = createEnterpriseReleaseEvidence({
-    commitSha: 'abc123def456',
-    rollbackBoundary: 'revert abc123def456',
+    commitSha: exactHead,
+    rollbackBoundary: `revert ${exactHead}`,
     capacityResults: [{ name: 'metadata-read', status: 'pass', measured: { iterations: 10 } }],
     securityResults: [{ name: 'cross-tenant-denial', status: 'pass' }],
+    inheritedValidation: [{ name: 'enterprise-isolation', status: 'pass' }],
     environment: {
       DATABASE_URL: 'postgres://user:secret@db.example.test/everythingai',
       S3_SECRET_ACCESS_KEY: 'super-secret',
@@ -102,20 +87,26 @@ test('release evidence is exact-head attributable, secret-free and truthful abou
   });
 
   assert.equal(report.status, 'pass');
-  assert.equal(report.code.commitSha, 'abc123def456');
-  assert.equal(report.rollbackBoundary, 'revert abc123def456');
+  assert.equal(report.code.commitSha, exactHead);
+  assert.equal(report.rollbackBoundary, `revert ${exactHead}`);
   assert.equal(report.claims.productionCapacityValidated, false);
   assert.equal(report.claims.penetrationTestCertified, false);
   assert.doesNotMatch(JSON.stringify(report), /super-secret|postgres:\/\/user:secret|S3_SECRET_ACCESS_KEY/i);
 
-  const blocked = createEnterpriseReleaseEvidence({ commitSha: 'abc123def456' });
-  assert.equal(blocked.status, 'blocked');
+  assert.equal(createEnterpriseReleaseEvidence({ commitSha: exactHead }).status, 'blocked');
+  assert.equal(createEnterpriseReleaseEvidence({
+    commitSha: 'not-an-exact-head',
+    rollbackBoundary: 'revert something',
+    capacityResults: [{ status: 'pass' }],
+    securityResults: [{ status: 'pass' }],
+    inheritedValidation: [{ status: 'pass' }],
+  }).status, 'blocked');
 });
 
 test('release evidence fails when any measured or inherited validation fails', () => {
   const report = createEnterpriseReleaseEvidence({
-    commitSha: 'abc123def456',
-    rollbackBoundary: 'revert abc123def456',
+    commitSha: exactHead,
+    rollbackBoundary: `revert ${exactHead}`,
     capacityResults: [{ name: 'metadata-read', status: 'pass' }],
     securityResults: [{ name: 'cross-tenant-denial', status: 'pass' }],
     inheritedValidation: [{ name: 'enterprise-isolation', status: 'fail' }],
