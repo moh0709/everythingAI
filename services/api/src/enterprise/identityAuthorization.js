@@ -7,26 +7,25 @@ function normalizeString(value) {
   return normalized.length > 0 ? normalized : null;
 }
 
-function normalizeIssuer(value) {
-  const issuer = normalizeString(value);
-  if (!issuer) {
-    return null;
-  }
-
-  return issuer.replace(/\/+$/, '');
-}
-
 function normalizeEmail(value) {
   const email = normalizeString(value);
   return email ? email.toLowerCase() : null;
 }
 
-function stableRecordId(record) {
+function tenantRecordId(record) {
   if (!record || typeof record !== 'object') {
     return null;
   }
 
-  return normalizeString(record.id ?? record.tenant_id ?? record.tenantId ?? record.workspace_id ?? record.workspaceId);
+  return normalizeString(record.id ?? record.tenant_id ?? record.tenantId);
+}
+
+function workspaceRecordId(record) {
+  if (!record || typeof record !== 'object') {
+    return null;
+  }
+
+  return normalizeString(record.id ?? record.workspace_id ?? record.workspaceId);
 }
 
 function workspaceTenantId(workspace) {
@@ -70,8 +69,8 @@ export function createEnterpriseAuthorizationContext({ principal, workspaceConte
     return denied('workspace-scope-unresolved');
   }
 
-  const tenantId = stableRecordId(workspaceContext?.resolvedTenant);
-  const workspaceId = stableRecordId(workspaceContext?.resolvedWorkspace);
+  const tenantId = tenantRecordId(workspaceContext?.resolvedTenant);
+  const workspaceId = workspaceRecordId(workspaceContext?.resolvedWorkspace);
   if (!tenantId || !workspaceId) {
     return denied('workspace-scope-missing');
   }
@@ -116,11 +115,15 @@ export function assertEnterpriseResourceScope(authorization, resourceScope = {})
 
 /**
  * Provider-neutral mapping for claims that have already passed OIDC token
- * verification. Verification, key discovery, nonce/state handling, and session
- * issuance belong to the future identity-provider integration boundary.
+ * verification. The issuer identifier is preserved exactly after surrounding
+ * whitespace removal because OIDC issuer comparison is exact and distinct
+ * issuer identifiers must never be collapsed together.
+ *
+ * Verification, key discovery, nonce/state handling, and session issuance
+ * belong to the future identity-provider integration boundary.
  */
 export function mapOidcIdentityClaims({ issuer, subject, email, displayName } = {}) {
-  const provider = normalizeIssuer(issuer);
+  const provider = normalizeString(issuer);
   const normalizedSubject = normalizeString(subject);
 
   if (!provider || !normalizedSubject) {
