@@ -3,6 +3,9 @@ import assert from 'node:assert/strict';
 import { createPostgresObjectMetadataRepository } from '../src/db/production/objectMetadataRepository.js';
 
 const scope = { tenantId: 'tenant-123', workspaceId: 'workspace-789' };
+const exactScopeGuard = async (candidate) => (
+  candidate.tenantId === scope.tenantId && candidate.workspaceId === scope.workspaceId
+);
 
 function createClient() {
   const calls = [];
@@ -29,9 +32,37 @@ function createClient() {
   };
 }
 
+test('production object metadata repository requires an explicit trusted scope guard', () => {
+  assert.throws(
+    () => createPostgresObjectMetadataRepository({ client: createClient() }),
+    /scopeGuard is required/i,
+  );
+});
+
+test('production object metadata repository denies foreign scope before BEGIN', async () => {
+  const client = createClient();
+  const repository = createPostgresObjectMetadataRepository({ client, scopeGuard: exactScopeGuard });
+
+  await assert.rejects(
+    repository.getObject({
+      scope: { tenantId: 'tenant-999', workspaceId: 'workspace-789' },
+      objectId: 'object-1',
+    }),
+    /scope is not authorized/i,
+  );
+  await assert.rejects(
+    repository.getObject({
+      scope: { tenantId: 'tenant-123', workspaceId: 'workspace-999' },
+      objectId: 'object-1',
+    }),
+    /scope is not authorized/i,
+  );
+  assert.deepEqual(client.calls, []);
+});
+
 test('computed dry-run checksum can be durably recorded but remains unverified for cutover', async () => {
   const client = createClient();
-  const repository = createPostgresObjectMetadataRepository({ client });
+  const repository = createPostgresObjectMetadataRepository({ client, scopeGuard: exactScopeGuard });
   const saved = await repository.recordComputedPlanObject({
     scope,
     storageAdapter: 's3-compatible',
@@ -55,7 +86,7 @@ test('computed dry-run checksum can be durably recorded but remains unverified f
 
 test('computed-plan persistence rejects malformed or cutover-verified claims before database access', async () => {
   const client = createClient();
-  const repository = createPostgresObjectMetadataRepository({ client });
+  const repository = createPostgresObjectMetadataRepository({ client, scopeGuard: exactScopeGuard });
 
   await assert.rejects(
     repository.recordComputedPlanObject({
