@@ -22,6 +22,13 @@ Current governance issue: #280
 
 Accepted Review Context Summary Trust release merge: `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed` (#274 / PR #275).
 
+Prior release authority remains explicitly preserved:
+
+- fresh release candidate `9ab4d164a5c070ab9a68d13bbfe89c8ecd04c49f` passed EverythingAI CI Smoke #735 plus all thirteen mandatory focused workflows;
+- changed final decision head `3abb8f2155e9ab1914db2720b276ed1b36a3d50b` passed EverythingAI CI Smoke #736 plus all thirteen mandatory focused workflows;
+- release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`;
+- handover: `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`.
+
 Review Context Orientation Clarity is accepted through #278 / PR #279 merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`.
 
 Latest acceptance evidence:
