@@ -7,8 +7,47 @@ import {
   createEnterpriseReleaseEvidence,
   redactEnterpriseEvidence,
 } from '../src/enterprise/capacitySecurity.js';
+import { createS3CompatibleObjectStorageAdapter } from '../src/storage/objectStorage.js';
+import {
+  createEnterpriseBackupManifest,
+  validateEnterpriseRestoreCandidate,
+} from '../src/enterprise/backupRestore.js';
 
 const exactHead = '0123456789abcdef0123456789abcdef01234567';
+const allowedScope = { tenantId: 'tenant-a', workspaceId: 'workspace-a' };
+
+function createCountingS3Harness() {
+  let adapterCalls = 0;
+  const client = {
+    async putObject() { adapterCalls += 1; return {}; },
+    async getObject() { adapterCalls += 1; return { body: Buffer.from('ok') }; },
+    async headObject() { adapterCalls += 1; return { contentLength: 2 }; },
+    async deleteObject() { adapterCalls += 1; return {}; },
+  };
+  const adapter = createS3CompatibleObjectStorageAdapter({
+    bucket: 'enterprise-regression',
+    client,
+    scopeGuard: async (scope) => (
+      scope.tenantId === allowedScope.tenantId
+      && scope.workspaceId === allowedScope.workspaceId
+    ),
+  });
+  return { adapter, calls: () => adapterCalls };
+}
+
+function createRestoreManifest() {
+  return createEnterpriseBackupManifest({
+    scope: allowedScope,
+    schemaVersion: 'schema-v1',
+    createdAt: '2026-08-28T00:00:00.000Z',
+    postgres: { backupId: 'pg-backup-1' },
+    objects: [{
+      objectId: 'object-1',
+      storageKey: 'tenants/tenant-a/workspaces/workspace-a/objects/object-1',
+      size: 2,
+    }],
+  });
+}
 
 test('bounded capacity scenario records measured regression evidence without production claims', async () => {
   let inFlight = 0;
@@ -51,14 +90,97 @@ test('capacity scenario rejects unbounded or invalid workload configuration', as
   );
 });
 
-test('security regression matrix requires fail-closed denial before adapter access', async () => {
+test('security regression matrix exercises real fail-closed storage and restore boundaries', async () => {
   const report = await runEnterpriseSecurityRegressionMatrix({
     cases: [
-      { name: 'cross-tenant-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
-      { name: 'cross-workspace-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
-      { name: 'untrusted-scope-guard-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
-      { name: 'tampered-manifest-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
-      { name: 'unsupported-schema-denial', exercise: async () => ({ denied: true, adapterCalls: 0 }) },
+      {
+        name: 'cross-tenant-storage-denial',
+        exercise: async () => {
+          const harness = createCountingS3Harness();
+          let denied = false;
+          try {
+            await harness.adapter.getObject({
+              scope: { tenantId: 'tenant-b', workspaceId: 'workspace-a' },
+              objectId: 'object-1',
+            });
+          } catch {
+            denied = true;
+          }
+          return { denied, adapterCalls: harness.calls() };
+        },
+      },
+      {
+        name: 'cross-workspace-storage-denial',
+        exercise: async () => {
+          const harness = createCountingS3Harness();
+          let denied = false;
+          try {
+            await harness.adapter.getObject({
+              scope: { tenantId: 'tenant-a', workspaceId: 'workspace-b' },
+              objectId: 'object-1',
+            });
+          } catch {
+            denied = true;
+          }
+          return { denied, adapterCalls: harness.calls() };
+        },
+      },
+      {
+        name: 'unsafe-object-identifier-denial',
+        exercise: async () => {
+          const harness = createCountingS3Harness();
+          let denied = false;
+          try {
+            await harness.adapter.getObject({ scope: allowedScope, objectId: '../escape' });
+          } catch {
+            denied = true;
+          }
+          return { denied, adapterCalls: harness.calls() };
+        },
+      },
+      {
+        name: 'tampered-restore-manifest-denial',
+        exercise: async () => {
+          let adapterCalls = 0;
+          const manifest = createRestoreManifest();
+          const tampered = { ...manifest, schemaVersion: 'schema-v2' };
+          const result = await validateEnterpriseRestoreCandidate({
+            manifest: tampered,
+            trustedManifestSha256: manifest.manifestSha256,
+            expectedScope: allowedScope,
+            scopeGuard: async () => true,
+            supportedSchemaVersions: ['schema-v1'],
+            target: { id: 'restore-target-1', isolated: true, disposable: true },
+            targetGuard: async () => true,
+            adapters: {
+              postgres: async () => { adapterCalls += 1; return { ok: true }; },
+              object: async () => { adapterCalls += 1; return { ok: true }; },
+            },
+          });
+          return { denied: result.status === 'blocked', adapterCalls };
+        },
+      },
+      {
+        name: 'unsupported-restore-schema-denial',
+        exercise: async () => {
+          let adapterCalls = 0;
+          const manifest = createRestoreManifest();
+          const result = await validateEnterpriseRestoreCandidate({
+            manifest,
+            trustedManifestSha256: manifest.manifestSha256,
+            expectedScope: allowedScope,
+            scopeGuard: async () => true,
+            supportedSchemaVersions: [],
+            target: { id: 'restore-target-1', isolated: true, disposable: true },
+            targetGuard: async () => true,
+            adapters: {
+              postgres: async () => { adapterCalls += 1; return { ok: true }; },
+              object: async () => { adapterCalls += 1; return { ok: true }; },
+            },
+          });
+          return { denied: result.status === 'blocked', adapterCalls };
+        },
+      },
     ],
   });
 
