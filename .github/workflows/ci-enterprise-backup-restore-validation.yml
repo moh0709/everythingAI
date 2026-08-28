@@ -3,6 +3,7 @@ name: EverythingAI Enterprise Backup Restore Validation
 on:
   pull_request:
     paths:
+      - 'services/api/package-lock.json'
       - 'services/api/src/enterprise/**'
       - 'services/api/test/enterpriseBackupRestoreValidation.test.js'
       - '.github/workflows/ci-enterprise-backup-restore-validation.yml'

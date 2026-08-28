@@ -3,6 +3,7 @@ name: EverythingAI Enterprise Capacity & Security
 on:
   pull_request:
     paths:
+      - 'services/api/package-lock.json'
       - 'services/api/src/enterprise/**'
       - 'services/api/test/enterpriseCapacitySecurity*.test.js'
       - '.github/workflows/ci-enterprise-capacity-security.yml'

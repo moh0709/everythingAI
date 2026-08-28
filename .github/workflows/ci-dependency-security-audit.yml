@@ -1,17 +1,18 @@
-name: EverythingAI Enterprise Runtime Health
+name: EverythingAI Dependency Security Audit
 
 on:
   pull_request:
     paths:
+      - 'services/api/package.json'
       - 'services/api/package-lock.json'
-      - 'services/api/src/enterprise/**'
-      - 'services/api/src/server.js'
-      - 'services/api/test/enterpriseRuntimeHealth.test.js'
-      - '.github/workflows/ci-enterprise-runtime-health.yml'
+      - '.github/workflows/ci-dependency-security-audit.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  enterprise-runtime-health:
+  backend-dependency-audit:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,5 +24,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: services/api/package-lock.json
-      - run: npm ci
-      - run: node --test test/enterpriseRuntimeHealth.test.js
+      - name: Install exact backend dependencies
+        run: npm ci
+      - name: Audit exact backend dependency lock
+        run: npm audit --json
