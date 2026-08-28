@@ -25,4 +25,4 @@ jobs:
 
       - name: Run enterprise isolation acceptance
         working-directory: services/api
-        run: node --test test/enterpriseIsolation.test.js
+        run: node --test test/enterpriseIsolation.test.js test/enterpriseRlsTenantBinding.test.js
