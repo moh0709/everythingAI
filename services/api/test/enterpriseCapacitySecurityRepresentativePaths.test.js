@@ -173,6 +173,6 @@ test('bounded capacity evidence exercises representative enterprise paths rather
         object: async () => ({ ok: true }),
       },
     });
-    return { ok: result.status === 'pass' };
+    return { ok: result.status === 'validated' };
   });
 });
