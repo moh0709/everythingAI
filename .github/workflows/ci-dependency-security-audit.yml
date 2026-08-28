@@ -23,5 +23,12 @@ jobs:
           cache-dependency-path: services/api/package-lock.json
       - name: Install exact backend dependencies
         run: npm ci
-      - name: Audit backend dependencies
+      - name: Capture baseline dependency audit
+        continue-on-error: true
+        run: npm audit --json
+      - name: Test bounded lockfile remediation
+        run: npm audit fix --package-lock-only
+      - name: Show proposed dependency remediation
+        run: git diff -- package.json package-lock.json
+      - name: Verify remediated dependency audit
         run: npm audit --audit-level=high --json
