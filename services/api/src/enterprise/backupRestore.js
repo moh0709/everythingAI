@@ -81,9 +81,10 @@ function canonicalCore(input) {
   const schemaVersion = requireString(input.schemaVersion, 'schemaVersion');
   const createdAt = requireString(input.createdAt, 'createdAt');
   if (Number.isNaN(Date.parse(createdAt))) throw new Error('createdAt must be a valid timestamp');
-  const objects = Array.isArray(input.objects)
-    ? input.objects.map((object) => normalizeObject(object, scope)).sort((a, b) => a.objectId.localeCompare(b.objectId))
-    : [];
+  if (!Array.isArray(input.objects)) throw new Error('object inventory is required in backup manifest');
+  const objects = input.objects
+    .map((object) => normalizeObject(object, scope))
+    .sort((a, b) => a.objectId.localeCompare(b.objectId));
   const seen = new Set();
   for (const object of objects) {
     if (seen.has(object.objectId)) throw new Error(`duplicate objectId in backup manifest: ${object.objectId}`);
@@ -104,6 +105,13 @@ function hashCore(core) {
   return crypto.createHash('sha256').update(JSON.stringify(core)).digest('hex');
 }
 
+function trustedDigestMatches(actual, trusted) {
+  const actualValue = String(actual || '').toLowerCase();
+  const trustedValue = String(trusted || '').toLowerCase();
+  if (!SHA256_RE.test(actualValue) || !SHA256_RE.test(trustedValue)) return false;
+  return crypto.timingSafeEqual(Buffer.from(actualValue, 'hex'), Buffer.from(trustedValue, 'hex'));
+}
+
 export function createEnterpriseBackupManifest(input) {
   const core = canonicalCore(input);
   return { ...core, manifestSha256: hashCore(core) };
@@ -119,6 +127,7 @@ const failed = (reason) => outcome('failed', reason);
 
 export async function validateEnterpriseRestoreCandidate({
   manifest,
+  trustedManifestSha256,
   expectedScope,
   scopeGuard,
   supportedSchemaVersions = [],
@@ -143,8 +152,12 @@ export async function validateEnterpriseRestoreCandidate({
   } catch (error) {
     return blocked(error.message);
   }
-  if (!SHA256_RE.test(String(manifest.manifestSha256 || '')) || hashCore(core) !== manifest.manifestSha256) {
+  const computedManifestSha256 = hashCore(core);
+  if (!SHA256_RE.test(String(manifest.manifestSha256 || '')) || computedManifestSha256 !== String(manifest.manifestSha256).toLowerCase()) {
     return blocked('backup manifest integrity check failed; manifest may be tampered');
+  }
+  if (!trustedDigestMatches(computedManifestSha256, trustedManifestSha256)) {
+    return blocked('trusted backup manifest digest evidence is required and must match');
   }
 
   let scope;
