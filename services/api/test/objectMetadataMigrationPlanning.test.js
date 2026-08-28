@@ -42,8 +42,9 @@ test('object metadata migration creates tenant/workspace-scoped durable metadata
   assert.match(sql, /migration_state TEXT NOT NULL/);
   assert.match(sql, /ENABLE ROW LEVEL SECURITY/);
   assert.match(sql, /FORCE ROW LEVEL SECURITY/);
-  assert.match(sql, /current_setting\('eai\.tenant_id', true\)/);
-  assert.match(sql, /current_setting\('eai\.workspace_id', true\)/);
+  assert.match(sql, /eai_runtime\.current_tenant_id\(\)/);
+  assert.match(sql, /eai_runtime\.current_workspace_id\(\)/);
+  assert.match(sql, /eai_runtime\.workspace_in_current_scope\(workspace_id\)/);
   assert.match(sql, /WITH CHECK/);
 });
 
