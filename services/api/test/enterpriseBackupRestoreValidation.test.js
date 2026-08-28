@@ -96,6 +96,19 @@ test('backup manifest rejects secret-bearing input instead of serializing it', (
   assert.throws(() => createEnterpriseBackupManifest(s3Input), /secret|credential/i);
 });
 
+test('backup manifest rejects credential-bearing or path-like PostgreSQL backup identities', () => {
+  for (const backupId of [
+    'postgres://user:secret@example/db',
+    '../backups/pg.dump',
+    '/var/backups/pg.dump',
+    'folder\\pg.dump',
+  ]) {
+    const input = baseInput();
+    input.postgres.backupId = backupId;
+    assert.throws(() => createEnterpriseBackupManifest(input), /backupId.*opaque|backupId.*path-safe/i);
+  }
+});
+
 test('manifest preserves checksum verification truth and never upgrades unverified evidence', () => {
   const manifest = createEnterpriseBackupManifest(baseInput());
   const unverified = manifest.objects.find((item) => item.objectId === 'obj-b');
@@ -258,4 +271,22 @@ test('restore validation blocks required unverified checksums and distinguishes 
   assert.equal(validated.status, 'validated');
   assert.equal(validated.destructive, false);
   assert.equal(validated.productionRestorePerformed, false);
+});
+
+test('restore validation never returns raw adapter errors that may contain credentials', async () => {
+  const manifest = createEnterpriseBackupManifest(baseInput());
+  const result = await validateEnterpriseRestoreCandidate(validationArgs({
+    manifest,
+    adapters: {
+      postgres: async () => {
+        throw new Error('postgres://user:super-secret@example/db');
+      },
+      object: async () => ({ ok: true }),
+    },
+  }));
+
+  assert.equal(result.status, 'failed');
+  assert.match(result.reason, /adapter|restore validation failed/i);
+  assert.equal(result.reason.includes('super-secret'), false);
+  assert.equal(result.reason.includes('postgres://'), false);
 });
