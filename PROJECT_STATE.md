@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
-Date: 2026-08-27  
-Authority: accepted repository state after Governed-Action Review Context Summary Trust dispatch  
-Current governance issue: #276
+Date: 2026-08-28  
+Authority: accepted repository state after Review Context Orientation acceptance  
+Current governance issue: #280
 
 ## Current program stage
 
@@ -22,16 +22,16 @@ Current governance issue: #276
 
 Accepted Review Context Summary Trust release merge: `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed` (#274 / PR #275).
 
-Release evidence:
+Review Context Orientation Clarity is accepted through #278 / PR #279 merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`.
 
-- supporting synchronization #272 / PR #273 merged as `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9` after unchanged-head EverythingAI CI Smoke #733 plus all thirteen focused workflows and clean final documentation review;
-- fresh release candidate `9ab4d164a5c070ab9a68d13bbfe89c8ecd04c49f` passed EverythingAI CI Smoke #735 plus all thirteen mandatory focused workflows;
-- changed final decision head `3abb8f2155e9ab1914db2720b276ed1b36a3d50b` passed EverythingAI CI Smoke #736 plus all thirteen mandatory focused workflows;
-- final review found no unresolved Critical or Important findings and no review threads remained;
-- release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`;
-- handover: `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`.
+Latest acceptance evidence:
 
-Issue #276 is documentation-only post-dispatch synchronization and the next five-track decision gate. It does not itself authorize another product/runtime feature or material architecture expansion.
+- post-dispatch synchronization #276 / PR #277 merged as `bdd65c656558e9c715c8346887a156d872dd89f3` after unchanged-head EverythingAI CI Smoke #738 plus all thirteen mandatory focused workflows and clean final documentation review;
+- strict RED evidence for #278 is preserved on pre-implementation head `ec20ce898896d0adcbc6f2880fd8656a28460acb`, where `EverythingAI Governed-Action Review Context Orientation` #1 failed because the required orientation explanation did not yet exist;
+- final implementation head `ab511573969ca8706b2110fac7e9a7540a9fa91e` passed EverythingAI CI Smoke #741, all thirteen inherited mandatory focused workflows, and `EverythingAI Governed-Action Review Context Orientation` #2;
+- PR #279 merged as `b54f74a8c73c69850a2059e3e593b03a39a3ca18` after clean final review with no unresolved Critical or Important findings and no review threads.
+
+Issue #280 is documentation-only synchronization after #278 acceptance. It expands the mandatory focused regression baseline to fourteen workflows and evaluates the next five-track direction. It does not itself authorize another product/runtime feature or material architecture expansion.
 
 ## Authority order
 
@@ -68,6 +68,8 @@ Implementation completion alone is never acceptance.
 - Review Context Summary Provenance & Unknown-State Explanations — #270/#271 — merge `7afeaedf5821422a955b1a244337fe4ca049e026` — strict RED→GREEN; final head `c8a6e7b4cdcd5e811803a0b348ca276f9291f07e`; CI #729; Summary Provenance workflow #2.
 - Review Context Summary Trust synchronization — #272/#273 — merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9` — CI #733 plus thirteen focused workflows.
 - Review Context Summary Trust release — #274/#275 — merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed` — candidate CI #735 and final-head CI #736 plus thirteen focused workflows — `GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`.
+- Review Context Summary Trust post-dispatch synchronization — #276/#277 — merge `bdd65c656558e9c715c8346887a156d872dd89f3` — CI #738 plus thirteen focused workflows.
+- Review Context Orientation Clarity — #278/#279 — merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18` — strict RED→GREEN; final head `ab511573969ca8706b2110fac7e9a7540a9fa91e`; CI #741; Orientation workflow #2.
 
 All earlier accepted synchronization milestones and rollback records remain valid historical governance evidence.
 
@@ -78,16 +80,16 @@ Product Depth and Product & UX remain local-first and bounded.
 - Backend-returned search order, execution state, audit evidence, and persisted action status remain authoritative.
 - Preview remains proposal-only; ready state requires explicit execution approval; blocked state preserves the backend-provided reason.
 - Persisted executed, failed, and undone states remain distinct and authoritative.
-- Evidence navigation, filtering, review resumption, provenance display, explicit clearing, review-context summary, and summary-provenance explanations are read-only local-context behaviors over already-loaded state unless an existing governed control is explicitly invoked.
+- Evidence navigation, filtering, review resumption, provenance display, explicit clearing, review-context summary, summary-provenance explanations, and review-context orientation are read-only local-context behaviors over already-loaded state unless an existing governed control is explicitly invoked.
 - “Without loaded audit evidence” means only that no matching evidence exists in the currently loaded audit window; it never proves global absence.
 - Review resumption uses only the exact remembered execution identifier and may resume only when that same execution remains visible in the current loaded review window.
 - If filtering or refresh makes the remembered execution unavailable, resumption becomes explicitly unavailable; no replacement execution is inferred or auto-selected.
 - Review-context provenance describes only genuine local navigation origin and must not imply backend persistence or review completion.
 - Review Context Summary may expose only genuinely known loaded-state facts: remembered execution identity, loaded-evidence availability, genuine local navigation origin, current loaded-window filter scope, and genuine safe return/resume target.
 - Summary provenance may explain only the actual loaded/local origin of each fact and why unavailable facts are unknown; it must not convert missing loaded evidence into a global absence claim.
-- Missing or stale summary facts remain unknown/unavailable; the summary must not fetch missing evidence or infer review completion.
+- Review Context Orientation may distinguish the currently visible loaded audit window from remembered local review context only from already-loaded/local state; it must not imply persistence, global audit completeness, review completion, or a replacement execution.
+- Missing or stale summary/orientation facts remain unknown/unavailable; no backend request may be added merely to manufacture or reconstruct review context.
 - Explicit clearing removes only remembered local navigation context; it selects no replacement execution and causes no backend/action/recovery/filesystem mutation.
-- No backend request may be issued merely to manufacture or reconstruct navigation context/evidence.
 - No new backend/API/schema/persistence/routing architecture, automatic approval/execution/retry/recovery/undo, or action/recovery scope expansion is authorized.
 - Existing context, recovery, task-resumption, approval, audit, undo, and filesystem safety semantics remain unchanged.
 - Missing/stale source/page/query/review/history remains unknown or unavailable instead of inferred.
@@ -97,7 +99,7 @@ Product Depth and Product & UX remain local-first and bounded.
 
 Every changed product/release candidate must preserve the complete applicable Phase 1 + Phase 2 + Product Depth/Product & UX baseline on one unchanged candidate, including root regression, backend tests, frontend typecheck/build, Client/Admin Playwright smoke, all previously accepted Product Depth/Product & UX acceptance gates, disposable-folder RC, UI-governed planning → preview → approval → execution → audit → undo, independent final review, and milestone-scoped rollback evidence.
 
-The mandatory focused workflow baseline remains **thirteen workflows**:
+The mandatory focused workflow baseline is now **fourteen workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -111,27 +113,28 @@ The mandatory focused workflow baseline remains **thirteen workflows**:
 10. `EverythingAI Governed-Action Review Resumption`;
 11. `EverythingAI Governed-Action Review Context Provenance`;
 12. `EverythingAI Governed-Action Review Context Summary`;
-13. `EverythingAI Governed-Action Review Context Summary Provenance`.
+13. `EverythingAI Governed-Action Review Context Summary Provenance`;
+14. `EverythingAI Governed-Action Review Context Orientation`.
 
 Historical green evidence is supporting evidence only and never substitutes for validating a changed candidate. Accepted focused-workflow wiring is part of the baseline.
 
 ## Current five-track decision gate
 
-Issue #276 synchronizes the accepted `GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS` dispatch and prepares the next direction across the five program tracks.
+Issue #280 synchronizes accepted Review Context Orientation Clarity and prepares the next direction across the five program tracks.
 
-- **Product & UX:** the current summary-trust tranche is dispatched. The recommended next bounded option is **Review Context Orientation Clarity**: improve how the existing UI distinguishes the currently visible loaded audit window from remembered local review context, using already-loaded state only and without adding new persistence or fetches. This is a recommendation only and is not authorized for implementation until a separate issue is released.
-- **Knowledge & Safe Action:** preserve backend authority, loaded-window truthfulness, exact-target review behavior, approval/audit/undo semantics, and explicit unknown-state discipline.
+- **Product & UX:** Review Context Orientation Clarity is accepted. The next bounded option is to evaluate whether a narrowly scoped **Review Context Orientation Provenance & Unknown-State Clarity** milestone would materially reduce ambiguity around where orientation facts originate and when they are unavailable. This is a recommendation only and is not authorized for implementation by #280.
+- **Knowledge & Safe Action:** preserve backend authority, loaded-window truthfulness, exact-target review behavior, provenance discipline, explicit unknown-state handling, approval/audit/undo semantics, and no inferred replacement execution.
 - **Enterprise Platform:** remains future scope and CEO-gated.
 - **Engineering Operations:** remains separate and requires explicit priority plus necessary privileged authority.
-- **Governance & Autonomous Delivery:** preserve unchanged-head validation, all thirteen focused workflows, rollback evidence, independent review, and truthful blocker handling.
+- **Governance & Autonomous Delivery:** preserve unchanged-head validation, all fourteen focused workflows, rollback evidence, independent review, and truthful blocker handling.
 
 CEO-gated alternatives remain authentication/tenancy, cloud/database/object storage, privileged-host/systemd, production-platform execution, new backend/API/schema/persistence/routing architecture, automatic action/recovery behavior, material connector/runtime expansion, or semantic/provider architecture with material runtime/cost/trust implications.
 
 ## Current next action
 
-Validate #276 documentation synchronization on one unchanged head with EverythingAI CI Smoke plus all thirteen mandatory focused workflows. Perform final documentation review before merge.
+Validate #280 documentation synchronization on one unchanged head with EverythingAI CI Smoke plus all fourteen mandatory focused workflows. Perform final documentation review before merge.
 
-If #276 is accepted, release at most one separate bounded implementation issue for **Review Context Orientation Clarity**. No implementation is authorized merely by this synchronization.
+If #280 is accepted, evaluate the five-track gate and release at most one separately bounded next issue only if it remains within already-approved local-first Product & UX / Knowledge & Safe Action scope. Material architecture or scope expansion remains CEO-gated.
 
 ## Issue #69
 
@@ -139,4 +142,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback
 
-#276 is documentation-only and independently reversible. Release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone/release merges remain independently reversible; all earlier rollback evidence remains intact.
+#280 is documentation-only and independently reversible. Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone/release merges remain independently reversible; all earlier rollback evidence remains intact.
