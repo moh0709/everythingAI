@@ -2,6 +2,7 @@ import { performance } from 'node:perf_hooks';
 
 const SENSITIVE_KEY = /(password|passwd|secret|token|credential|authorization|api[_-]?key|access[_-]?key|private[_-]?key|database_url|dsn)/i;
 const URI_WITH_CREDENTIALS = /\b([a-z][a-z0-9+.-]*:\/\/)([^\s/@:]+):([^\s/@]+)@/gi;
+const EXACT_COMMIT_SHA = /^[0-9a-f]{40}$/i;
 
 function normalizePositiveInteger(value) {
   return Number.isSafeInteger(value) && value > 0 ? value : null;
@@ -89,11 +90,10 @@ export async function runBoundedCapacityScenario({
     }
   }
 
-  const workers = Array.from(
+  await Promise.all(Array.from(
     { length: Math.min(concurrencyLimit, iterationCount) },
     () => worker(),
-  );
-  await Promise.all(workers);
+  ));
   const durationMs = Math.max(0, performance.now() - startedAt);
 
   return {
@@ -109,15 +109,8 @@ export async function runBoundedCapacityScenario({
         ? Number(((iterationCount / durationMs) * 1000).toFixed(3))
         : null,
     },
-    bounds: {
-      maxIterations: boundedIterations,
-      maxConcurrency: boundedConcurrency,
-    },
-    claims: {
-      regressionEvidenceOnly: true,
-      productionValidated: false,
-      sla: null,
-    },
+    bounds: { maxIterations: boundedIterations, maxConcurrency: boundedConcurrency },
+    claims: { regressionEvidenceOnly: true, productionValidated: false, sla: null },
   };
 }
 
@@ -140,13 +133,7 @@ export async function runEnterpriseSecurityRegressionMatrix({ cases = [] } = {})
       const adapterCalls = Number.isSafeInteger(observed?.adapterCalls) ? observed.adapterCalls : null;
       const requirePreAdapterDenial = entry.requirePreAdapterDenial !== false;
       const pass = denied && (!requirePreAdapterDenial || adapterCalls === 0);
-      results.push({
-        name,
-        status: pass ? 'pass' : 'fail',
-        denied,
-        adapterCalls,
-        requirePreAdapterDenial,
-      });
+      results.push({ name, status: pass ? 'pass' : 'fail', denied, adapterCalls, requirePreAdapterDenial });
     } catch {
       results.push({ name, status: 'fail', denied: false, adapterCalls: null, reason: 'security-case-threw' });
     }
@@ -166,13 +153,20 @@ export function createEnterpriseReleaseEvidence({
   inheritedValidation,
   environment,
 } = {}) {
-  const sha = normalizeString(commitSha);
+  const rawSha = normalizeString(commitSha);
+  const sha = rawSha && EXACT_COMMIT_SHA.test(rawSha) ? rawSha.toLowerCase() : null;
   const rollback = normalizeString(rollbackBoundary);
   const capacities = Array.isArray(capacityResults) ? capacityResults : [];
   const security = Array.isArray(securityResults) ? securityResults : [];
   const inherited = Array.isArray(inheritedValidation) ? inheritedValidation : [];
 
-  const requiredEvidencePresent = Boolean(sha && rollback && capacities.length > 0 && security.length > 0);
+  const requiredEvidencePresent = Boolean(
+    sha
+    && rollback
+    && capacities.length > 0
+    && security.length > 0
+    && inherited.length > 0
+  );
   const allMeasuredEvidencePassed = requiredEvidencePresent
     && capacities.every((result) => result?.status === 'pass')
     && security.every((result) => result?.status === 'pass')
@@ -182,7 +176,7 @@ export function createEnterpriseReleaseEvidence({
     schema: 'everythingai.enterprise-release-evidence.v1',
     status: !requiredEvidencePresent ? 'blocked' : allMeasuredEvidencePassed ? 'pass' : 'fail',
     code: { commitSha: sha },
-    rollbackBoundary: rollback,
+    rollbackBoundary: rollback ? redactString(rollback) : null,
     capacityResults: capacities,
     securityResults: security,
     inheritedValidation: inherited,
