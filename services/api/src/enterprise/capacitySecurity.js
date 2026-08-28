@@ -121,17 +121,21 @@ export async function runBoundedCapacityScenario({
   }
 
   let nextIndex = 0;
+  let attemptedIterations = 0;
   let inFlight = 0;
   let peakConcurrency = 0;
   let failures = 0;
   let timeouts = 0;
+  let stopScheduling = false;
   const startedAt = performance.now();
 
   async function worker() {
     while (true) {
+      if (stopScheduling) return;
       const index = nextIndex;
       if (index >= iterationCount) return;
       nextIndex += 1;
+      attemptedIterations += 1;
       inFlight += 1;
       peakConcurrency = Math.max(peakConcurrency, inFlight);
       try {
@@ -139,7 +143,10 @@ export async function runBoundedCapacityScenario({
         if (result === false || result?.ok === false) failures += 1;
       } catch (error) {
         failures += 1;
-        if (error?.code === 'CAPACITY_OPERATION_TIMEOUT') timeouts += 1;
+        if (error?.code === 'CAPACITY_OPERATION_TIMEOUT') {
+          timeouts += 1;
+          stopScheduling = true;
+        }
       } finally {
         inFlight -= 1;
       }
@@ -154,16 +161,17 @@ export async function runBoundedCapacityScenario({
 
   return {
     name: scenarioName,
-    status: failures === 0 ? 'pass' : 'fail',
+    status: failures === 0 && attemptedIterations === iterationCount ? 'pass' : 'fail',
     measured: {
       iterations: iterationCount,
+      attemptedIterations,
       configuredConcurrency: concurrencyLimit,
       peakConcurrency,
       failures,
       timeouts,
       durationMs: Number(durationMs.toFixed(3)),
       operationsPerSecond: durationMs > 0
-        ? Number(((iterationCount / durationMs) * 1000).toFixed(3))
+        ? Number(((attemptedIterations / durationMs) * 1000).toFixed(3))
         : null,
     },
     bounds: {
