@@ -32,6 +32,9 @@ function normalizeEnvironmentEvidence(environment) {
   if (!environment || typeof environment !== 'object' || Array.isArray(environment)) return {};
 
   const output = {};
+  for (const key of Object.keys(environment)) {
+    if (SENSITIVE_KEY.test(key)) output[key] = '[REDACTED]';
+  }
   if (typeof environment.ci === 'boolean') output.ci = environment.ci;
   for (const field of SAFE_ENVIRONMENT_FIELDS) {
     const value = normalizeString(environment[field]);
