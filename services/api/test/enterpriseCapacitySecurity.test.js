@@ -245,8 +245,8 @@ test('release evidence is exact-head attributable, secret-free and truthful abou
   assert.equal(report.claims.penetrationTestCertified, false);
   assert.equal(report.environment.DATABASE_URL, '[REDACTED]');
   assert.equal(report.environment.S3_SECRET_ACCESS_KEY, '[REDACTED]');
-  assert.equal(report.environment.harmless, 'visible');
-  assert.doesNotMatch(JSON.stringify(report), /super-secret|postgres:\/\/user:secret/i);
+  assert.equal(report.environment.harmless, undefined);
+  assert.doesNotMatch(JSON.stringify(report), /super-secret|postgres:\/\/user:secret|harmless|visible/i);
 
   assert.equal(createEnterpriseReleaseEvidence({ commitSha: exactHead }).status, 'blocked');
   assert.equal(createEnterpriseReleaseEvidence({
