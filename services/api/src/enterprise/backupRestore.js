@@ -4,10 +4,19 @@ const MANIFEST_KIND = 'everythingai.enterprise-backup-manifest';
 const MANIFEST_VERSION = 1;
 const SHA256_RE = /^[a-f0-9]{64}$/i;
 const SECRET_KEY_RE = /(password|secret|token|databaseurl|connection(string|url)?|accesskey|secretkey|credential|authorization|privatekey|dsn)/i;
+const OPAQUE_ID_RE = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$/;
 
 function requireString(value, label) {
   if (typeof value !== 'string' || value.trim() === '') throw new Error(`${label} is required`);
   return value.trim();
+}
+
+function requireOpaqueId(value, label) {
+  const id = requireString(value, label);
+  if (!OPAQUE_ID_RE.test(id) || id === '.' || id === '..') {
+    throw new Error(`${label} must be opaque and path-safe`);
+  }
+  return id;
 }
 
 function normalizeScope(scope) {
@@ -69,7 +78,7 @@ function normalizePostgres(postgres) {
   const checksumVerified = postgres.checksumVerified === true;
   if (checksumVerified && !checksumSha256) throw new Error('verified PostgreSQL backup checksum requires checksum evidence');
   return {
-    backupId: requireString(postgres.backupId, 'PostgreSQL backupId'),
+    backupId: requireOpaqueId(postgres.backupId, 'PostgreSQL backupId'),
     checksumSha256,
     checksumVerified,
   };
@@ -212,8 +221,8 @@ export async function validateEnterpriseRestoreCandidate({
         return failed(`isolated object restore validation failed for ${object.objectId}`);
       }
     }
-  } catch (error) {
-    return failed(`isolated restore validation failed: ${error instanceof Error ? error.message : 'unknown adapter error'}`);
+  } catch {
+    return failed('isolated restore validation failed due to adapter error');
   }
 
   return {
