@@ -10,6 +10,18 @@ import {
 } from '../src/storage/objectStorage.js';
 
 const scope = { tenantId: 'tenant-123', workspaceId: 'workspace-789' };
+const exactScopeGuard = async (candidate) => (
+  candidate.tenantId === scope.tenantId && candidate.workspaceId === scope.workspaceId
+);
+
+function createFakeS3Client(calls = []) {
+  return {
+    async putObject(input) { calls.push({ op: 'put', input }); return { etag: 'etag-1' }; },
+    async getObject(input) { calls.push({ op: 'get', input }); return { body: Buffer.from('remote'), contentLength: 6, contentType: 'text/plain' }; },
+    async headObject(input) { calls.push({ op: 'head', input }); return { contentLength: 6, contentType: 'text/plain', etag: 'etag-1' }; },
+    async deleteObject(input) { calls.push({ op: 'delete', input }); return {}; },
+  };
+}
 
 test('scoped object keys are tenant/workspace bound and reject traversal or missing scope', () => {
   assert.equal(
@@ -55,12 +67,7 @@ test('local adapter round-trips scoped bytes without enterprise configuration', 
 
 test('S3-compatible adapter is provider-neutral, scoped, and never exposes credentials in results', async () => {
   const calls = [];
-  const client = {
-    async putObject(input) { calls.push({ op: 'put', input }); return { etag: 'etag-1' }; },
-    async getObject(input) { calls.push({ op: 'get', input }); return { body: Buffer.from('remote'), contentLength: 6, contentType: 'text/plain' }; },
-    async headObject(input) { calls.push({ op: 'head', input }); return { contentLength: 6, contentType: 'text/plain', etag: 'etag-1' }; },
-    async deleteObject(input) { calls.push({ op: 'delete', input }); return {}; },
-  };
+  const client = createFakeS3Client(calls);
 
   const storage = createS3CompatibleObjectStorageAdapter({
     client,
@@ -69,6 +76,7 @@ test('S3-compatible adapter is provider-neutral, scoped, and never exposes crede
     region: 'local',
     accessKeyId: 'secret-access-key-id',
     secretAccessKey: 'secret-access-key',
+    scopeGuard: exactScopeGuard,
   });
 
   const put = await storage.putObject({ scope, objectId: 'remote-1', body: Buffer.from('remote') });
@@ -92,14 +100,43 @@ test('S3-compatible adapter is provider-neutral, scoped, and never exposes crede
 
 test('S3-compatible adapter fails closed before client access when scope is incomplete', async () => {
   let called = false;
-  const client = {
-    async getObject() { called = true; return {}; },
-  };
-  const storage = createS3CompatibleObjectStorageAdapter({ client, bucket: 'documents' });
+  const client = createFakeS3Client();
+  client.getObject = async () => { called = true; return {}; };
+  const storage = createS3CompatibleObjectStorageAdapter({
+    client,
+    bucket: 'documents',
+    scopeGuard: exactScopeGuard,
+  });
 
   await assert.rejects(
     storage.getObject({ scope: { tenantId: 'tenant-123' }, objectId: 'remote-1' }),
     /tenant and workspace scope are required/i,
   );
   assert.equal(called, false);
+});
+
+test('S3-compatible adapter denies cross-tenant and cross-workspace access before client access', async () => {
+  const calls = [];
+  const storage = createS3CompatibleObjectStorageAdapter({
+    client: createFakeS3Client(calls),
+    bucket: 'documents',
+    scopeGuard: exactScopeGuard,
+  });
+
+  await assert.rejects(
+    storage.getObject({ scope: { tenantId: 'tenant-999', workspaceId: 'workspace-789' }, objectId: 'remote-1' }),
+    /scope is not authorized/i,
+  );
+  await assert.rejects(
+    storage.getObject({ scope: { tenantId: 'tenant-123', workspaceId: 'workspace-999' }, objectId: 'remote-1' }),
+    /scope is not authorized/i,
+  );
+  assert.equal(calls.length, 0);
+});
+
+test('S3-compatible adapter requires an explicit trusted scope guard', () => {
+  assert.throws(
+    () => createS3CompatibleObjectStorageAdapter({ client: createFakeS3Client(), bucket: 'documents' }),
+    /scopeGuard is required/i,
+  );
 });
