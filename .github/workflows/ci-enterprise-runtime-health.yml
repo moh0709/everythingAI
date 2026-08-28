@@ -3,6 +3,7 @@ name: EverythingAI Enterprise Runtime Health
 on:
   pull_request:
     paths:
+      - 'services/api/package-lock.json'
       - 'services/api/src/enterprise/**'
       - 'services/api/src/server.js'
       - 'services/api/test/enterpriseRuntimeHealth.test.js'
