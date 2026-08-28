@@ -45,7 +45,7 @@ test('enterprise authorization context accepts only an authenticated principal w
   assert.equal(context.principal.id, 'user-1');
 });
 
-test('enterprise authorization context fails closed for anonymous, unresolved, missing, or cross-tenant workspace state', () => {
+test('enterprise authorization context fails closed for anonymous, unresolved, missing, malformed, or cross-tenant workspace state', () => {
   const anonymous = createEnterpriseAuthorizationContext({
     principal: { type: 'anonymous', authenticated: false },
     workspaceContext: resolvedWorkspaceContext(),
@@ -57,6 +57,10 @@ test('enterprise authorization context fails closed for anonymous, unresolved, m
   const missingWorkspace = createEnterpriseAuthorizationContext({
     principal: { type: 'user', id: 'user-1', authenticated: true },
     workspaceContext: resolvedWorkspaceContext({ resolvedWorkspace: null }),
+  });
+  const workspaceWithoutIdentity = createEnterpriseAuthorizationContext({
+    principal: { type: 'user', id: 'user-1', authenticated: true },
+    workspaceContext: resolvedWorkspaceContext({ resolvedWorkspace: { tenant_id: 'tenant-123', slug: 'missing-id' } }),
   });
   const crossTenantWorkspace = createEnterpriseAuthorizationContext({
     principal: { type: 'user', id: 'user-1', authenticated: true },
@@ -71,6 +75,8 @@ test('enterprise authorization context fails closed for anonymous, unresolved, m
   assert.equal(unresolved.reason, 'workspace-scope-unresolved');
   assert.equal(missingWorkspace.authorized, false);
   assert.equal(missingWorkspace.reason, 'workspace-scope-missing');
+  assert.equal(workspaceWithoutIdentity.authorized, false);
+  assert.equal(workspaceWithoutIdentity.reason, 'workspace-scope-missing');
   assert.equal(crossTenantWorkspace.authorized, false);
   assert.equal(crossTenantWorkspace.reason, 'workspace-tenant-mismatch');
 });
@@ -99,9 +105,9 @@ test('resource scope guard denies cross-tenant and cross-workspace access withou
   );
 });
 
-test('OIDC identity mapping is provider-neutral and rejects incomplete claims', () => {
+test('OIDC identity mapping is provider-neutral, preserves exact issuer identity, and rejects incomplete claims', () => {
   const mapped = mapOidcIdentityClaims({
-    issuer: 'https://identity.example.test/',
+    issuer: ' https://identity.example.test/ ',
     subject: 'subject-123',
     email: 'User@Example.test',
     displayName: 'Example User',
@@ -110,11 +116,15 @@ test('OIDC identity mapping is provider-neutral and rejects incomplete claims', 
   assert.equal(mapped.status, 'mapped');
   assert.deepEqual(mapped.identity, {
     protocol: 'oidc',
-    provider: 'https://identity.example.test',
+    provider: 'https://identity.example.test/',
     subject: 'subject-123',
     email: 'user@example.test',
     displayName: 'Example User',
   });
+  assert.notEqual(
+    mapOidcIdentityClaims({ issuer: 'https://identity.example.test', subject: 'subject-123' }).identity.provider,
+    mapped.identity.provider,
+  );
   assert.equal(mapOidcIdentityClaims({ issuer: '', subject: 'subject-123' }).status, 'invalid');
   assert.equal(mapOidcIdentityClaims({ issuer: 'https://identity.example.test', subject: '' }).status, 'invalid');
 });
