@@ -1,0 +1,73 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-28",
+  "release": "Governed-Action Review Context Orientation Trust",
+  "issue": 286,
+  "status": "VALIDATION_PENDING",
+  "proposed_dispatch": "GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS",
+  "accepted_sync_baseline": {
+    "issue": 284,
+    "pr": 285,
+    "merge": "4c4ea8f0117d8bc201703c77e270c385b2a9f8b1",
+    "unchanged_head": "bc233a3fca74d9719202dcc8ad24ccc7a170f334",
+    "ci_smoke_run": 749,
+    "focused_workflow_count": 15
+  },
+  "release_scope": [
+    {
+      "issue": 278,
+      "name": "Review Context Orientation Clarity",
+      "pr": 279,
+      "merge": "b54f74a8c73c69850a2059e3e593b03a39a3ca18",
+      "final_implementation_head": "ab511573969ca8706b2110fac7e9a7540a9fa91e",
+      "ci_smoke_run": 741
+    },
+    {
+      "issue": 282,
+      "name": "Review Context Orientation Provenance & Unknown-State Clarity",
+      "pr": 283,
+      "merge": "b718146c92e8a740209ebee3ea99782b88333163",
+      "final_implementation_head": "e89ac88f071f4d303fc0c5fc5d1914d778ff931d",
+      "ci_smoke_run": 747
+    }
+  ],
+  "trust_contract": {
+    "loaded_window_distinguished_from_remembered_local_context": true,
+    "orientation_uses_loaded_local_state_only": true,
+    "orientation_provenance_uses_loaded_local_state_only": true,
+    "unknown_or_stale_facts_remain_unknown": true,
+    "loaded_window_truthfulness_preserved": true,
+    "global_audit_absence_or_completeness_inferred": false,
+    "review_completion_inferred": false,
+    "local_context_claimed_as_backend_persistence": false,
+    "replacement_execution_inferred": false,
+    "exact_target_behavior_changed": false,
+    "backend_request_to_manufacture_context": false,
+    "approval_execution_audit_undo_semantics_changed": false,
+    "backend_api_schema_persistence_expanded": false,
+    "routing_architecture_expanded": false,
+    "automatic_action_or_recovery_scope_expanded": false,
+    "filesystem_safety_changed": false
+  },
+  "fresh_release_candidate": {
+    "status": "PENDING",
+    "required_ci_smoke": true,
+    "required_focused_workflow_count": 15,
+    "historical_green_substitution_allowed": false
+  },
+  "independent_review": {
+    "status": "PENDING",
+    "required_unresolved_critical_findings": 0,
+    "required_unresolved_important_findings": 0,
+    "required_open_review_threads": 0
+  },
+  "final_decision_head_validation": {
+    "status": "PENDING",
+    "requirement": "If release-decision or handover changes after candidate validation, EverythingAI CI Smoke plus all fifteen mandatory focused workflows must pass on the changed final decision head before merge and final dispatch."
+  },
+  "rollback": "#278 and #282 remain independently reversible through their accepted merges. #284 synchronization and #286 release-gate documentation are independently reversible and change no runtime/data behavior.",
+  "enterprise_platform_scope_expanded": false,
+  "material_connector_runtime_scope_expanded": false,
+  "protected_historical_issue_69_modified": false,
+  "next_state": "Validate the unchanged #286 release candidate with EverythingAI CI Smoke plus all fifteen mandatory focused workflows, perform independent final review, then record the exact candidate/final-head evidence before merge and dispatch."
+}
