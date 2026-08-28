@@ -8,8 +8,7 @@ Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONT
 Governed-Action Trust & Evidence: **complete and dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)**  
 Governed-Action Review Context: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`)**  
 Governed-Action Review Context Summary Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)**  
-Review Context Orientation Clarity: **accepted through #278 / PR #279**  
-Review Context Orientation Provenance & Unknown-State Clarity: **accepted through #282 / PR #283**
+Governed-Action Review Context Orientation Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)**
 
 ## Completed sequence
 
@@ -87,54 +86,59 @@ Acceptance evidence:
 
 The accepted provenance behavior explains only the genuine already-loaded/local origin of orientation facts and why unavailable orientation facts remain unknown. It adds no backend request, persistence, routing architecture, mutation semantics, replacement-execution inference, or global audit completeness/absence claim.
 
+### Review Context Orientation provenance synchronization
+#284 / PR #285 merged as `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`. Unchanged documentation head `bc233a3fca74d9719202dcc8ad24ccc7a170f334` passed EverythingAI CI Smoke #749 plus all fifteen mandatory focused workflows. Final documentation review found no unresolved Critical or Important findings or review threads.
+
+### Governed-Action Review Context Orientation Trust release
+Accepted and dispatched as `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS` through #286 / PR #287 merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`.
+
+Release evidence:
+
+- fresh release candidate `b02880c12127123a74207e073362c9be14f716a1` — EverythingAI CI Smoke #751 PASS plus all fifteen mandatory focused workflows;
+- changed final decision head `41f2195052df9fb1273ab8a133727e85cbcd4184` — EverythingAI CI Smoke #753 PASS plus all fifteen mandatory focused workflows;
+- final review — no unresolved Critical or Important findings and no unresolved review threads;
+- accepted merge — `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`;
+- release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE_DECISION_2026-08-28.md`;
+- handover: `docs/HANDOVER_2026-08-28_GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE.json`.
+
 ## Current five-track position
 
 | Track | Accepted position | Next gate |
 |---|---|---|
-| Product and UX | Strong local-first client; Review Context Summary Trust dispatched; Orientation Clarity and Orientation Provenance accepted | #284 synchronization, then a bounded Orientation Trust release-gate evaluation |
-| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful loaded-window audit/evidence semantics, exact-target review behavior, provenance and unknown-state discipline | Preserve backend authority and explain only facts provable from loaded/local state |
+| Product and UX | Strong local-first client; Review Context Summary Trust and Review Context Orientation Trust dispatched | #288 synchronization, then evaluate whether another bounded Product & UX milestone adds distinct user value rather than recursively restating the same review-context facts |
+| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful loaded-window audit/evidence semantics, exact-target review behavior, provenance and unknown-state discipline | Preserve backend authority and pursue only materially useful safe-comprehension/action improvements within already approved scope |
 | Enterprise Platform | Target architecture exists; production platform not authorized | CEO-gated: authentication, tenancy, cloud, database/storage, production-platform execution |
 | Engineering Operations | Reliability history exists separately | Only if explicitly prioritized and required privileged authority is available |
-| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all fifteen focused workflows, final review, rollback, and truthful blocker discipline |
+| Governance and Autonomous Delivery | Proven issue → implementation → CI → review → merge loop with inherited gates | Preserve unchanged-head validation, all fifteen focused workflows, final review, rollback, truthful blocker discipline, and avoid recursive trust-surface expansion without distinct value |
 
 ## Active dependency sequence
 
 ```text
-Review Context Orientation Provenance accepted (#282 / #283)
-  -> #284 canonical synchronization + fifteen-workflow baseline + five-track gate
-    -> accept/reject #284 after EverythingAI CI Smoke + all fifteen focused workflows + final documentation review
-      -> if accepted, release one bounded Governed-Action Review Context Orientation Trust release-gate issue
+Governed-Action Review Context Orientation Trust dispatched (#286 / #287)
+  -> #288 canonical synchronization + five-track gate
+    -> accept/reject #288 after EverythingAI CI Smoke + all fifteen focused workflows + final documentation review
+      -> evaluate one next bounded dependency only if materially useful and already within approved scope
 ```
 
-Issue #284 does not itself authorize another product/runtime implementation milestone.
+Issue #288 does not itself authorize another product/runtime implementation milestone.
 
-## Recommended next bounded direction
+## Next five-track decision criteria
 
-**Governed-Action Review Context Orientation Trust — release-gate candidate**
+After #288 is accepted, choose the next dependency from the synchronized state using these constraints:
 
-Goal: evaluate accepted Review Context Orientation Clarity (#278/#279) and Orientation Provenance & Unknown-State Clarity (#282/#283) as one coherent trust sequence, using only already accepted behavior and evidence.
+- **Product & UX:** prefer a distinct, user-visible comprehension or workflow improvement over further recursive labels/provenance about the same review-context state; no implementation is automatically authorized by the Orientation Trust dispatch.
+- **Knowledge & Safe Action:** improvements may expose or explain only evidence actually available from authoritative backend or already-loaded/local state; missing/stale evidence remains unknown or unavailable.
+- **Enterprise Platform:** authentication, tenancy, cloud, DB/object storage, production platform, and material platform architecture remain CEO-gated.
+- **Engineering Operations:** privileged-host/systemd or production operations remain explicitly prioritized, authority-dependent work rather than an implicit continuation.
+- **Governance & Autonomous Delivery:** any next issue must be bounded, dependency-safe, reversible, independently testable, and preserve the complete inherited baseline.
 
-The separately released gate must remain documentation/release-only and must:
-
-- add no new product/runtime behavior;
-- preserve already-loaded/local-state truthfulness;
-- preserve exact-target review resumption and return;
-- distinguish current loaded-window facts from remembered local review context without implying persistence;
-- keep missing/stale context explicitly unknown or unavailable;
-- never infer a replacement execution;
-- never claim global audit absence/completeness from the loaded window;
-- trigger no backend request merely to reconstruct or enrich navigation/orientation context;
-- preserve approval, execution, audit, undo, recovery, task-resumption, and filesystem safety semantics;
-- pass the complete inherited matrix plus all fifteen mandatory focused workflows on an unchanged candidate;
-- require a clean final release-decision review before dispatch.
-
-This is a release-gate recommendation only. #284 does not authorize another product/runtime implementation.
+Do not release another product/runtime issue merely to keep the queue moving. A truthful decision that the next useful direction is CEO-gated is valid.
 
 ## Mandatory inherited release discipline
 
 Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results are supporting evidence only. Accepted focused workflows remain mandatory unless explicitly superseded by an accepted decision. Every accepted change retains milestone-scoped rollback evidence.
 
-The focused workflow baseline is now **fifteen mandatory workflows**:
+The focused workflow baseline remains **fifteen mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -162,4 +166,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It
 
 ## Rollback
 
-#284 synchronization is documentation-only and independently reversible. Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.
+#288 synchronization is documentation-only and independently reversible. Review Context Orientation Trust release merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`, Review Context Orientation provenance synchronization merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`, Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted milestone merges remain independently reversible; all earlier rollback evidence remains intact.

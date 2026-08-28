@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-08-28  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Review Context Orientation Clarity accepted through #278/#279; Review Context Orientation Provenance & Unknown-State Clarity accepted through #282/#283  
-Current gate: issue #284 canonical synchronization and next bounded release-gate decision
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Governed-Action Review Context Orientation Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)  
+Current gate: issue #288 canonical synchronization and next five-track decision gate
 
 ## Mandatory startup sequence
 
@@ -33,13 +33,20 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Review Context Orientation Clarity — #278/#279 merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18` — strict RED→GREEN; final implementation head `ab511573969ca8706b2110fac7e9a7540a9fa91e`; CI #741 plus thirteen inherited focused workflows and Orientation workflow #2.
 - Review Context Orientation synchronization — #280/#281 merge `11f85dc090318504792140fb7311e5bc234ba3da` — corrected unchanged head `ac2ce97f431faad8d8557b50f2bb34e38ad48760`; CI #744 plus fourteen focused workflows.
 - Review Context Orientation Provenance & Unknown-State Clarity — #282/#283 merge `b718146c92e8a740209ebee3ea99782b88333163` — strict RED→GREEN; final implementation head `e89ac88f071f4d303fc0c5fc5d1914d778ff931d`; CI #747 plus fourteen inherited workflows and Orientation Provenance workflow #2.
+- Review Context Orientation provenance synchronization — #284/#285 merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1` — unchanged documentation head `bc233a3fca74d9719202dcc8ad24ccc7a170f334`; CI #749 plus fifteen focused workflows.
+- Review Context Orientation Trust release — #286/#287 merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b` — fresh candidate `b02880c12127123a74207e073362c9be14f716a1` passed CI #751 plus all fifteen focused workflows; changed final decision head `41f2195052df9fb1273ab8a133727e85cbcd4184` passed CI #753 plus all fifteen focused workflows; final review clean — `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`.
 
 ## Current release authority evidence
 
-Release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`  
-Handover: `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`
+Latest release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE_DECISION_2026-08-28.md`  
+Latest handover: `docs/HANDOVER_2026-08-28_GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE.json`
 
-The release decision remains authoritative for the dispatched Review Context Summary Trust tranche. #278 and #282 are separately accepted bounded Product & UX / Knowledge & Safe Action continuations. Issue #284 synchronizes #282 acceptance and does not itself authorize another runtime feature.
+The Review Context Orientation Trust dispatch is authoritative through #286/#287. Its release candidate and changed final decision head both passed the complete fifteen-workflow focused baseline, and final release review found no unresolved Critical or Important findings or review threads. Issue #288 synchronizes that dispatch into canonical governance state and does not itself authorize another runtime feature.
+
+The prior Review Context Summary Trust release decision and handover remain valid historical release authority:
+
+- `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`;
+- `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`.
 
 ## Program tracks
 
@@ -83,7 +90,7 @@ Rules:
 
 For subsequent product/release work, preserve all applicable accepted Phase 1 + Phase 2 + Product Depth/Product & UX gates: root regression; backend tests; frontend typecheck/build; Client/Admin smoke; all accepted citation/search/navigation/lifecycle/recovery/planning/execution/audit/undo acceptance; disposable-folder RC; UI-governed planning → preview → approval → execution → audit → undo; independent final review; and milestone-scoped rollback evidence.
 
-The focused workflow baseline is now **fifteen mandatory workflows**:
+The focused workflow baseline remains **fifteen mandatory workflows**:
 
 1. `EverythingAI Source Recovery Return Context`;
 2. `EverythingAI Multi-hop Return Context`;
@@ -124,11 +131,11 @@ Historical green evidence never substitutes for validating a changed candidate. 
 
 ## Current governance gate
 
-Issue #284 is documentation-only synchronization after accepted #282/#283.
+Issue #288 is documentation-only synchronization after accepted #286/#287.
 
-It must record exact #282/#283 acceptance evidence, preserve the strict RED→GREEN record, expand the mandatory focused baseline from fourteen to fifteen workflows, preserve accepted safety/rollback semantics, and pass EverythingAI CI Smoke plus all fifteen focused workflows on one unchanged documentation head before merge.
+It must record exact #286/#287 candidate, changed-final-head, CI, review, merge, dispatch, and rollback evidence; preserve the fifteen-workflow baseline and accepted safety semantics; and pass EverythingAI CI Smoke plus all fifteen focused workflows on one unchanged documentation head before merge.
 
-The dependency-safe next direction is a **Governed-Action Review Context Orientation Trust release-gate evaluation** covering only accepted #278 and #282 behavior. It is a governance/release decision candidate, not authorization for another product/runtime implementation.
+After #288 acceptance, evaluate the next five-track direction from the synchronized state. Do not treat the Orientation Trust dispatch as automatic authorization for another product/runtime implementation. Release at most one next bounded issue only if it is dependency-safe, materially useful, reversible, and already within approved scope.
 
 ## CEO-gated directions
 
@@ -140,4 +147,4 @@ Issue #69 (`EAI-TASK-046`) is closed completed historical Phase 3/Hermes reliabi
 
 ## Rollback discipline
 
-Every accepted milestone remains independently reversible by its recorded merge. #284 is documentation-only and can be reverted independently. Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted rollback evidence remain valid.
+Every accepted milestone remains independently reversible by its recorded merge. #288 is documentation-only and can be reverted independently. Review Context Orientation Trust release merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`, Review Context Orientation provenance synchronization merge `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`, Review Context Orientation Provenance merge `b718146c92e8a740209ebee3ea99782b88333163`, Review Context Orientation synchronization merge `11f85dc090318504792140fb7311e5bc234ba3da`, Review Context Orientation merge `b54f74a8c73c69850a2059e3e593b03a39a3ca18`, post-dispatch synchronization merge `bdd65c656558e9c715c8346887a156d872dd89f3`, release merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`, synchronization merge `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9`, runtime milestone merges `7afeaedf5821422a955b1a244337fe4ca049e026` and `71f4e9051a0d2aba50108decadf5280264dde771`, and all earlier accepted rollback evidence remain valid.
