@@ -1,0 +1,46 @@
+{
+  "program": "EverythingAI",
+  "date": "2026-08-28",
+  "track": "Enterprise Platform",
+  "milestone": "Phase 3.1 Enterprise Isolation Foundation",
+  "status": "ACCEPTED",
+  "issue": 292,
+  "pr": 293,
+  "merge": "6dead7b5a62161ed80670b7c9cc28c693b709d14",
+  "authority": {
+    "ER-1": "self-hosted enterprise server first",
+    "ER-2": "OIDC-first provider-neutral identity federation",
+    "ER-3": "PostgreSQL production data platform",
+    "ER-4": "shared database with explicit tenant/workspace scoping and PostgreSQL RLS",
+    "ER-5": "S3-compatible object-storage abstraction"
+  },
+  "accepted_behavior": [
+    "provider-neutral OIDC identity boundary",
+    "fail-closed tenant/workspace authorization",
+    "PostgreSQL tenant/workspace RLS foundation",
+    "tenant-bound workspace isolation",
+    "scoped PostgreSQL transaction enforcement"
+  ],
+  "validation": {
+    "ci_smoke_run": 768,
+    "inherited_focused_workflow_count": 15,
+    "enterprise_isolation_focused_workflow_run": 10,
+    "strict_red_green": true,
+    "final_security_review": "PASS",
+    "unresolved_critical": 0,
+    "unresolved_important": 0,
+    "unresolved_review_threads": 0
+  },
+  "preserved_boundaries": {
+    "local_first_sqlite_unchanged": true,
+    "production_postgres_opt_in": true,
+    "destructive_migration": false,
+    "production_secret_provisioning": false,
+    "cloud_provider_lock_in": false,
+    "automatic_action_or_recovery_expansion": false,
+    "connector_runtime_expansion": false,
+    "historical_issue_69_modified": false
+  },
+  "rollback": "Revert merge 6dead7b5a62161ed80670b7c9cc28c693b709d14; local-first SQLite remains the fallback runtime boundary.",
+  "next_dependency": "Phase 3.2 provider-neutral S3-compatible object-storage abstraction with local filesystem compatibility and no existing-byte migration."
+}
