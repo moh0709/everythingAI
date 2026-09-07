@@ -1,0 +1,80 @@
+name: EverythingAI Pre-production Recovery Qualification
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/preproduction/**'
+      - 'services/api/src/db/production/**'
+      - 'services/api/src/storage/**'
+      - 'services/api/src/enterprise/backupRestore.js'
+      - 'services/api/test/preProductionRecoveryQualification.test.js'
+      - '.github/workflows/ci-preproduction-recovery-qualification.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  destructive-recovery-qualification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: everythingai-phase4-disposable
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: everythingai-phase4-disposable
+      PGDATABASE_MAINTENANCE: postgres
+      EAI_PHASE4_DB: eai_phase4_qualification
+      EAI_PHASE4_APP_ROLE: eai_phase4_app
+
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: services/api/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: services/api
+        run: npm ci
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Run destructive object-store recovery qualification
+        working-directory: services/api
+        run: node --test test/preProductionRecoveryQualification.test.js
+
+      - name: Run destructive PostgreSQL migration, wipe, restore and RLS qualification
+        run: bash scripts/preproduction/postgres-recovery-qualification.sh
+
+      - name: Upload qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-preproduction-recovery-evidence
+          path: ${{ runner.temp }}/everythingai-phase4
+          if-no-files-found: warn
+          retention-days: 7
