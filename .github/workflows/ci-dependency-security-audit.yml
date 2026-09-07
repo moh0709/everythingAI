@@ -29,16 +29,22 @@ jobs:
           cache-dependency-path: services/api/package-lock.json
       - name: Install exact backend dependencies
         run: npm ci
-      - name: Generate remediated lockfile candidate
-        run: npm audit fix --package-lock-only --ignore-scripts
-      - name: Upload remediated lockfile candidate
+      - name: Generate remediated dependency candidate
+        run: |
+          npm audit fix --package-lock-only --ignore-scripts || true
+          npm install express@5.2.1 --save --package-lock-only --ignore-scripts
+      - name: Audit remediation candidate
+        run: npm audit --json
+      - name: Upload remediated dependency candidate
         uses: actions/upload-artifact@v4
         with:
-          name: backend-remediated-package-lock
-          path: services/api/package-lock.json
+          name: backend-remediated-dependencies
+          path: |
+            services/api/package.json
+            services/api/package-lock.json
           if-no-files-found: error
           retention-days: 1
-      - name: Restore repository lockfile before authoritative audit
-        run: git checkout -- package-lock.json
+      - name: Restore repository dependency files before authoritative audit
+        run: git checkout -- package.json package-lock.json
       - name: Audit exact backend dependency lock
         run: npm audit --json
