@@ -29,5 +29,16 @@ jobs:
           cache-dependency-path: services/api/package-lock.json
       - name: Install exact backend dependencies
         run: npm ci
+      - name: Generate remediated lockfile candidate
+        run: npm audit fix --package-lock-only --ignore-scripts
+      - name: Upload remediated lockfile candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-remediated-package-lock
+          path: services/api/package-lock.json
+          if-no-files-found: error
+          retention-days: 1
+      - name: Restore repository lockfile before authoritative audit
+        run: git checkout -- package-lock.json
       - name: Audit exact backend dependency lock
         run: npm audit --json
