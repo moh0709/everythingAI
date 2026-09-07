@@ -9,6 +9,19 @@ PGDATABASE_MAINTENANCE="${PGDATABASE_MAINTENANCE:-postgres}"
 QUALIFICATION_DB="${EAI_PHASE4_DB:-eai_phase4_qualification}"
 APP_ROLE="${EAI_PHASE4_APP_ROLE:-eai_phase4_app}"
 ARTIFACT_DIR="${EAI_PHASE4_ARTIFACT_DIR:-${RUNNER_TEMP:-/tmp}/everythingai-phase4}"
+
+require_safe_pg_identifier() {
+  local value="$1"
+  local label="$2"
+  if [[ ! "${value}" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+    echo "FAIL: unsafe ${label} PostgreSQL identifier" >&2
+    exit 1
+  fi
+}
+
+require_safe_pg_identifier "${QUALIFICATION_DB}" "qualification database"
+require_safe_pg_identifier "${APP_ROLE}" "application role"
+
 DUMP_FILE="${ARTIFACT_DIR}/${QUALIFICATION_DB}.dump"
 CORRUPT_DUMP_FILE="${ARTIFACT_DIR}/${QUALIFICATION_DB}.corrupt.dump"
 
