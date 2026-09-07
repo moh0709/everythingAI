@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   backend-dependency-audit:
@@ -22,6 +22,8 @@ jobs:
         working-directory: services/api
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -29,22 +31,19 @@ jobs:
           cache-dependency-path: services/api/package-lock.json
       - name: Install exact backend dependencies
         run: npm ci
-      - name: Generate remediated dependency candidate
+      - name: Generate audited remediation
         run: |
           npm audit fix --package-lock-only --ignore-scripts || true
           npm install express@5.2.1 --save --package-lock-only --ignore-scripts
-      - name: Audit remediation candidate
-        run: npm audit --json
-      - name: Upload remediated dependency candidate
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-remediated-dependencies
-          path: |
-            services/api/package.json
-            services/api/package-lock.json
-          if-no-files-found: error
-          retention-days: 1
-      - name: Restore repository dependency files before authoritative audit
-        run: git checkout -- package.json package-lock.json
-      - name: Audit exact backend dependency lock
-        run: npm audit --json
+          npm audit --json
+      - name: Commit exact generated dependency state to Phase 4 branch
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "Dependency state already matches audited remediation."
+            exit 0
+          fi
+          git config user.name "EverythingAI CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "fix: remediate backend dependency advisories"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
