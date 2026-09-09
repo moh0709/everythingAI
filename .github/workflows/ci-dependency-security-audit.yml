@@ -5,6 +5,9 @@ on:
     paths:
       - 'services/api/package.json'
       - 'services/api/package-lock.json'
+      - 'scripts/preproduction/**'
+      - 'services/api/test/preProductionRecoveryQualification.test.js'
+      - '.github/workflows/ci-preproduction-recovery-qualification.yml'
       - '.github/workflows/ci-dependency-security-audit.yml'
   workflow_dispatch:
 
