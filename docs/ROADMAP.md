@@ -1,6 +1,6 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-08-29  
+Date: 2026-09-10  
 Phase 2: **complete and dispatched (`PHASE2_PASS`)**  
 Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
 Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
@@ -10,6 +10,7 @@ Governed-Action Review Context: **complete and dispatched (`GOVERNED_ACTION_REVI
 Governed-Action Review Context Summary Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)**  
 Governed-Action Review Context Orientation Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)**  
 Enterprise Readiness Foundation: **complete and dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)**
+Phase 4 Pre-production Recovery Qualification: **complete and dispatched (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`)**
 
 ## Completed sequence
 
@@ -105,13 +106,16 @@ Release evidence:
 ### Phase 3 — Enterprise Readiness Foundation
 Accepted and dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` through #304 after Phase 3.1–3.6 (#292–#303) and dependency-security remediation #305/#306. The accepted foundation covers application-level identity/tenancy isolation, PostgreSQL RLS foundations, provider-neutral object storage, durable object metadata and dry-run migration planning, runtime health, isolated backup/restore validation, bounded capacity/security validation, and exact-lock dependency security. It explicitly does not claim production deployment readiness.
 
+### Phase 4 — Pre-production Recovery Qualification
+Accepted and dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, the fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. The accepted qualification covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, corruption rejection, post-restore isolation and dependency-security requalification. It does not claim production deployment, external certification, production load qualification or commercial SLA readiness.
+
 ## Current five-track position
 
 | Track | Accepted position | Next gate |
 |---|---|---|
 | Product and UX | Phase 2/Product Depth and Review Context trust surfaces remain accepted and local-first | Choose only distinct user-value work that preserves existing trust and governed-action semantics |
 | Knowledge and Safe Action | Source-backed reading, explicit approval, truthful evidence semantics and exact-target review behavior remain accepted | Continue only bounded improvements backed by authoritative or genuinely loaded/local evidence |
-| Enterprise Platform | Application-level Enterprise Readiness Foundation dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` | CEO-gated production execution: real infrastructure/secrets, destructive cutover, external certification/load qualification, SLA commitments |
+| Enterprise Platform | Phase 4 destructive pre-production recovery qualification dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` | Complete #312 canonical synchronization, then explicitly decide Phase 5 governance baseline; real production infrastructure/secrets, external certification/load qualification and SLA commitments remain separate gates |
 | Engineering Operations | CI/release discipline now includes exact-lock dependency audit and dependency-sensitive enterprise gates | Production/privileged-host operations require explicit authority and environment access |
 | Governance and Autonomous Delivery | Phase 3.1–3.6 + dependency remediation completed through merge `d69af031bc4bfd82441ebb22b17040879cfdd93f` and #304 dispatch | Select one bounded dependency at a time; preserve unchanged-head validation, review and rollback evidence |
 

@@ -1,6 +1,6 @@
 # EverythingAI — Current Implementation Roadmap
 
-Date: 2026-09-01
+Date: 2026-09-10
 
 ## Current state
 
@@ -10,12 +10,14 @@ The later Product Depth, cross-surface context, workspace-context trust, governe
 
 Phase 3 — Enterprise Readiness Foundation is **complete and dispatched** as `ENTERPRISE_READINESS_FOUNDATION_PASS` through governance issue #304 and release PR #307. The accepted application-level foundation covers Phase 3.1–3.6 plus dependency-security remediation. It does **not** claim production deployment readiness.
 
-There is currently no automatically authorized production-execution queue. The next implementation task must be selected from the synchronized five-track roadmap. Material production-platform execution remains CEO-gated.
+Phase 4 — Pre-production Recovery Qualification is **complete and dispatched** as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix, including Dependency Security Audit #16 and Pre-production Recovery Qualification #9. The accepted scope uses disposable/non-production resources and synthetic data only.
+
+The current gate is #312: record the Phase 4 release canonically and make an explicit Phase 5 governance dispatch decision. Existing Phase 5 ADR-005-013 remains Proposed until separately accepted or revised. Material production-platform execution remains separately gated.
 
 ## Active sequence
 
-1. Preserve the accepted `ENTERPRISE_READINESS_FOUNDATION_PASS` baseline and its exact rollback evidence.
-2. Select one dependency-satisfied next task from the five-track roadmap.
+1. Preserve the accepted `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` baseline and its exact rollback evidence.
+2. Complete #312 canonical synchronization and explicit Phase 5 governance dispatch decision.
 3. Define acceptance criteria, evidence, validation and rollback before implementation.
 4. Implement the smallest coherent reversible change.
 5. Validate the changed candidate on one unchanged head using the full applicable inherited product and enterprise regression matrix.

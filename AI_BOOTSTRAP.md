@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-08-29  
-Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Governed-Action Review Context Orientation Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`); Enterprise Readiness Foundation dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)
-Current gate: #304 Enterprise Readiness Foundation dispatch complete; select next dependency from synchronized five-track roadmap
+Date: 2026-09-10  
+Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Governed-Action Review Context Orientation Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`); Enterprise Readiness Foundation dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`); Phase 4 pre-production recovery qualification dispatched (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`)
+Current gate: #312 Phase 4 release/canonical synchronization and explicit Phase 5 governance dispatch decision
 
 ## Mandatory startup sequence
 
@@ -37,6 +37,13 @@ If a lookup fails, exhaust repository/file fallbacks before declaring a blocker.
 - Review Context Orientation Trust release — #286/#287 merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b` — fresh candidate `b02880c12127123a74207e073362c9be14f716a1` passed CI #751 plus all fifteen focused workflows; changed final decision head `41f2195052df9fb1273ab8a133727e85cbcd4184` passed CI #753 plus all fifteen focused workflows; final review clean — `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`.
 
 ## Current release authority evidence
+
+### Phase 4 Pre-production Recovery Qualification
+
+Latest release decision: `docs/PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_RELEASE_DECISION_2026-09-10.md`  
+Latest handover: `docs/HANDOVER_2026-09-10_PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION.json`
+
+`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` is authoritative for the bounded destructive qualification completed through #310/#311. It covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, post-restore isolation, corruption rejection, exact-lock dependency security, and the remediated Express 5.2.1 dependency state. The CEO-authorized POC posture permits destructive testing only against disposable/non-production resources because no customers or production customer data currently exist.
 
 ### Phase 3 Enterprise Readiness Foundation
 
@@ -135,7 +142,7 @@ Historical green evidence never substitutes for validating a changed candidate. 
 
 ## Current governance gate
 
-Phase 3 Enterprise Readiness Foundation is dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` through #304. Final dependency-remediation head `5cc3ffe0f8842ea2250ddb986d9cb86444e3df2a` passed CI Smoke #836, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, and Dependency Security Audit #8. Select the next bounded dependency from the synchronized five-track roadmap.
+Phase 4 Pre-production Recovery Qualification is dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310/#311. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. Current release/canonical synchronization gate is #312; Phase 5 planning artifacts remain Proposed until an explicit Phase 5 decision accepts or revises them.
 
 
 ## CEO-gated directions
