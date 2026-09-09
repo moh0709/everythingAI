@@ -32,112 +32,59 @@ jobs:
                   raise SystemExit(f'missing expected anchor for {label}')
               return text.replace(old, new, 1)
 
-          # PROJECT_STATE.md
-          p = Path('PROJECT_STATE.md')
-          t = p.read_text()
+          p = Path('PROJECT_STATE.md'); t = p.read_text()
           t = replace_once(t, 'Date: 2026-08-29', 'Date: 2026-09-10', 'PROJECT_STATE date')
-          t = replace_once(t,
-              'Authority: accepted repository state through Phase 3.6 plus dependency-security remediation; Enterprise Readiness Foundation dispatch',
-              'Authority: accepted repository state through Phase 4 pre-production destructive migration and recovery qualification',
-              'PROJECT_STATE authority')
+          t = replace_once(t, 'Authority: accepted repository state through Phase 3.6 plus dependency-security remediation; Enterprise Readiness Foundation dispatch', 'Authority: accepted repository state through Phase 4 pre-production destructive migration and recovery qualification', 'PROJECT_STATE authority')
           t = replace_once(t, 'Current governance issue: #304', 'Current governance issue: #312', 'PROJECT_STATE gate')
           marker = '**Phase 4 — Pre-production Recovery Qualification is COMPLETE AND DISPATCHED (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`).**'
           if marker not in t:
               anchor = '## Current program stage\n\n'
-              block = (
-                  marker + '\n\n'
-                  'Accepted through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. '
-                  'Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix, including CI Smoke #858, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. '
-                  'The milestone proves destructive qualification only against disposable/non-production resources and synthetic data; it does not claim production deployment, external certification, production load qualification, or commercial SLA readiness.\n\n'
-              )
+              block = marker + '\n\nAccepted through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix, including CI Smoke #858, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. The milestone proves destructive qualification only against disposable/non-production resources and synthetic data; it does not claim production deployment, external certification, production load qualification, or commercial SLA readiness.\n\n'
               t = replace_once(t, anchor, anchor + block, 'PROJECT_STATE Phase4 block')
           p.write_text(t)
 
-          # AI_BOOTSTRAP.md
-          p = Path('AI_BOOTSTRAP.md')
-          t = p.read_text()
+          p = Path('AI_BOOTSTRAP.md'); t = p.read_text()
           t = replace_once(t, 'Date: 2026-08-29', 'Date: 2026-09-10', 'AI_BOOTSTRAP date')
           old_state = 'Current accepted state: Phase 2 dispatched (`PHASE2_PASS`); Product Depth comprehension dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`); Cross-Surface Context Continuity dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`); Workspace Context Trust & Provenance dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`); Governed-Action Trust & Evidence dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`); Governed-Action Review Context dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`); Governed-Action Review Context Summary Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`); Governed-Action Review Context Orientation Trust dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`); Enterprise Readiness Foundation dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)'
-          new_state = old_state + '; Phase 4 pre-production recovery qualification dispatched (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`)'
-          t = replace_once(t, old_state, new_state, 'AI_BOOTSTRAP accepted state')
-          t = replace_once(t,
-              'Current gate: #304 Enterprise Readiness Foundation dispatch complete; select next dependency from synchronized five-track roadmap',
-              'Current gate: #312 Phase 4 release/canonical synchronization and explicit Phase 5 governance dispatch decision',
-              'AI_BOOTSTRAP current gate')
-          phase4_heading = '### Phase 4 Pre-production Recovery Qualification'
-          if phase4_heading not in t:
+          t = replace_once(t, old_state, old_state + '; Phase 4 pre-production recovery qualification dispatched (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`)', 'AI_BOOTSTRAP accepted state')
+          t = replace_once(t, 'Current gate: #304 Enterprise Readiness Foundation dispatch complete; select next dependency from synchronized five-track roadmap', 'Current gate: #312 Phase 4 release/canonical synchronization and explicit Phase 5 governance dispatch decision', 'AI_BOOTSTRAP current gate')
+          if '### Phase 4 Pre-production Recovery Qualification' not in t:
               anchor = '## Current release authority evidence\n\n'
-              block = (
-                  phase4_heading + '\n\n'
-                  'Latest release decision: `docs/PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_RELEASE_DECISION_2026-09-10.md`  \n'
-                  'Latest handover: `docs/HANDOVER_2026-09-10_PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION.json`\n\n'
-                  '`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` is authoritative for the bounded destructive qualification completed through #310/#311. '
-                  'It covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, post-restore isolation, corruption rejection, exact-lock dependency security, and the remediated Express 5.2.1 dependency state. '
-                  'The CEO-authorized POC posture permits destructive testing only against disposable/non-production resources because no customers or production customer data currently exist.\n\n'
-              )
+              block = '### Phase 4 Pre-production Recovery Qualification\n\nLatest release decision: `docs/PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_RELEASE_DECISION_2026-09-10.md`  \nLatest handover: `docs/HANDOVER_2026-09-10_PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION.json`\n\n`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` is authoritative for the bounded destructive qualification completed through #310/#311. It covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, post-restore isolation, corruption rejection, exact-lock dependency security, and the remediated Express 5.2.1 dependency state. The CEO-authorized POC posture permits destructive testing only against disposable/non-production resources because no customers or production customer data currently exist.\n\n'
               t = replace_once(t, anchor, anchor + block, 'AI_BOOTSTRAP Phase4 authority')
           old_gate = 'Phase 3 Enterprise Readiness Foundation is dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` through #304. Final dependency-remediation head `5cc3ffe0f8842ea2250ddb986d9cb86444e3df2a` passed CI Smoke #836, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, and Dependency Security Audit #8. Select the next bounded dependency from the synchronized five-track roadmap.'
-          new_gate = ('Phase 4 Pre-production Recovery Qualification is dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310/#311. '
-                      'Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. '
-                      'Current release/canonical synchronization gate is #312; Phase 5 planning artifacts remain Proposed until an explicit Phase 5 decision accepts or revises them.')
-          t = replace_once(t, old_gate, new_gate, 'AI_BOOTSTRAP governance gate')
-          p.write_text(t)
+          new_gate = 'Phase 4 Pre-production Recovery Qualification is dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310/#311. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. Current release/canonical synchronization gate is #312; Phase 5 planning artifacts remain Proposed until an explicit Phase 5 decision accepts or revises them.'
+          t = replace_once(t, old_gate, new_gate, 'AI_BOOTSTRAP governance gate'); p.write_text(t)
 
-          # docs/ROADMAP.md
-          p = Path('docs/ROADMAP.md')
-          t = p.read_text()
+          p = Path('docs/ROADMAP.md'); t = p.read_text()
           t = replace_once(t, 'Date: 2026-08-29', 'Date: 2026-09-10', 'ROADMAP date')
           status_line = 'Phase 4 Pre-production Recovery Qualification: **complete and dispatched (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`)**'
           if status_line not in t:
               anchor = 'Enterprise Readiness Foundation: **complete and dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)**\n'
               t = replace_once(t, anchor, anchor + status_line + '\n', 'ROADMAP Phase4 status')
-          section = '### Phase 4 — Pre-production Recovery Qualification'
-          if section not in t:
+          if '### Phase 4 — Pre-production Recovery Qualification' not in t:
               anchor = '## Current five-track position\n'
-              block = (
-                  section + '\n'
-                  'Accepted and dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. '
-                  'Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, the fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. '
-                  'The accepted qualification covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, corruption rejection, post-restore isolation and dependency-security requalification. '
-                  'It does not claim production deployment, external certification, production load qualification or commercial SLA readiness.\n\n'
-              )
+              block = '### Phase 4 — Pre-production Recovery Qualification\nAccepted and dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, the fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. The accepted qualification covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, corruption rejection, post-restore isolation and dependency-security requalification. It does not claim production deployment, external certification, production load qualification or commercial SLA readiness.\n\n'
               t = replace_once(t, anchor, block + anchor, 'ROADMAP Phase4 section')
-          t = t.replace(
-              '| Enterprise Platform | Application-level Enterprise Readiness Foundation dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` | CEO-gated production execution: real infrastructure/secrets, destructive cutover, external certification/load qualification, SLA commitments |',
-              '| Enterprise Platform | Phase 4 destructive pre-production recovery qualification dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` | Complete #312 canonical synchronization, then explicitly decide Phase 5 governance baseline; real production infrastructure/secrets, external certification/load qualification and SLA commitments remain separate gates |',
-              1)
+          t = t.replace('| Enterprise Platform | Application-level Enterprise Readiness Foundation dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` | CEO-gated production execution: real infrastructure/secrets, destructive cutover, external certification/load qualification, SLA commitments |', '| Enterprise Platform | Phase 4 destructive pre-production recovery qualification dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` | Complete #312 canonical synchronization, then explicitly decide Phase 5 governance baseline; real production infrastructure/secrets, external certification/load qualification and SLA commitments remain separate gates |', 1)
           p.write_text(t)
 
-          # docs/IMPLEMENTATION_ROADMAP.md
-          p = Path('docs/IMPLEMENTATION_ROADMAP.md')
-          t = p.read_text()
+          p = Path('docs/IMPLEMENTATION_ROADMAP.md'); t = p.read_text()
           t = replace_once(t, 'Date: 2026-09-01', 'Date: 2026-09-10', 'IMPLEMENTATION_ROADMAP date')
-          phase4_para = ('Phase 4 — Pre-production Recovery Qualification is **complete and dispatched** as '
-                         '`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge '
-                         '`9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head '
-                         '`0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix, including '
-                         'Dependency Security Audit #16 and Pre-production Recovery Qualification #9. The accepted scope uses disposable/non-production resources and synthetic data only.\n\n')
+          phase4_para = 'Phase 4 — Pre-production Recovery Qualification is **complete and dispatched** as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix, including Dependency Security Audit #16 and Pre-production Recovery Qualification #9. The accepted scope uses disposable/non-production resources and synthetic data only.\n\n'
           if phase4_para not in t:
               anchor = 'Phase 3 — Enterprise Readiness Foundation is **complete and dispatched** as `ENTERPRISE_READINESS_FOUNDATION_PASS` through governance issue #304 and release PR #307. The accepted application-level foundation covers Phase 3.1–3.6 plus dependency-security remediation. It does **not** claim production deployment readiness.\n\n'
               t = replace_once(t, anchor, anchor + phase4_para, 'IMPLEMENTATION_ROADMAP Phase4 state')
-          t = replace_once(t,
-              'There is currently no automatically authorized production-execution queue. The next implementation task must be selected from the synchronized five-track roadmap. Material production-platform execution remains CEO-gated.',
-              'The current gate is #312: record the Phase 4 release canonically and make an explicit Phase 5 governance dispatch decision. Existing Phase 5 ADR-005-013 remains Proposed until separately accepted or revised. Material production-platform execution remains separately gated.',
-              'IMPLEMENTATION_ROADMAP current gate')
-          old_seq = '1. Preserve the accepted `ENTERPRISE_READINESS_FOUNDATION_PASS` baseline and its exact rollback evidence.\n2. Select one dependency-satisfied next task from the five-track roadmap.'
-          new_seq = '1. Preserve the accepted `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` baseline and its exact rollback evidence.\n2. Complete #312 canonical synchronization and explicit Phase 5 governance dispatch decision.'
-          t = replace_once(t, old_seq, new_seq, 'IMPLEMENTATION_ROADMAP active sequence')
+          t = replace_once(t, 'There is currently no automatically authorized production-execution queue. The next implementation task must be selected from the synchronized five-track roadmap. Material production-platform execution remains CEO-gated.', 'The current gate is #312: record the Phase 4 release canonically and make an explicit Phase 5 governance dispatch decision. Existing Phase 5 ADR-005-013 remains Proposed until separately accepted or revised. Material production-platform execution remains separately gated.', 'IMPLEMENTATION_ROADMAP current gate')
+          t = replace_once(t, '1. Preserve the accepted `ENTERPRISE_READINESS_FOUNDATION_PASS` baseline and its exact rollback evidence.\n2. Select one dependency-satisfied next task from the five-track roadmap.', '1. Preserve the accepted `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` baseline and its exact rollback evidence.\n2. Complete #312 canonical synchronization and explicit Phase 5 governance dispatch decision.', 'IMPLEMENTATION_ROADMAP active sequence')
           p.write_text(t)
           PY
 
-          git diff --check
           git diff -- PROJECT_STATE.md AI_BOOTSTRAP.md docs/ROADMAP.md docs/IMPLEMENTATION_ROADMAP.md
-
           if git diff --quiet -- PROJECT_STATE.md AI_BOOTSTRAP.md docs/ROADMAP.md docs/IMPLEMENTATION_ROADMAP.md; then
             echo 'Canonical files already synchronized.'
             exit 0
           fi
-
           git config user.name 'EverythingAI CI'
           git config user.email 'actions@users.noreply.github.com'
           git add PROJECT_STATE.md AI_BOOTSTRAP.md docs/ROADMAP.md docs/IMPLEMENTATION_ROADMAP.md
