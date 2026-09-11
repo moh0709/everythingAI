@@ -1,7 +1,14 @@
 # ADR-005-013 — Governance Session Handover, Continuity & Institutional Knowledge Preservation
 
-Status: Proposed  
-Phase: 5 Planning
+Status: Accepted  
+Accepted: 2026-09-10  
+Phase: 5.1 Governance Continuity Baseline
+
+## Authority Boundary
+
+This ADR establishes repository and operational governance continuity requirements. It does **not** itself activate runtime enforcement, automatic recovery, automatic governance freeze, new authorization authority, privileged infrastructure actions, or external certification status.
+
+Terms such as `governance freeze`, `recovery-boundary activation`, `enforcement activation`, and `operational certification` describe governed decision states. They require explicit authorized human/CEO/release-owner action and evidence appropriate to the affected scope. A continuity validator may report `PASS`, `BLOCKED`, or `INVALID`; it may not execute runtime or infrastructure changes.
 
 ## Context
 
@@ -59,7 +66,7 @@ All major governance work must preserve:
 - recovery context
 - enforcement maturity state
 
-Governance continuity becomes a mandatory operational discipline.
+Governance continuity becomes a mandatory repository and release discipline.
 
 ## Governance Continuity Principles
 
@@ -89,15 +96,17 @@ Major governance milestones must produce formal handover artifacts.
 
 Mandatory handover triggers include:
 
-| Trigger |
-|---|
-| phase completion |
-| governance freeze |
-| recovery-boundary activation |
-| enforcement activation |
-| operational certification |
-| major architecture restructuring |
-| governance ownership transfer |
+| Trigger | Meaning under this ADR |
+|---|---|
+| phase completion | accepted phase/milestone closes and releases a next dependency |
+| governance freeze decision | an authorized reviewer explicitly records that further governance progression is paused |
+| recovery-boundary activation decision | an authorized reviewer explicitly records that recovery/containment procedures are active |
+| enforcement activation decision | an authorized reviewer explicitly enables a previously approved enforcement stage |
+| operational qualification/certification decision | an internal qualification or external certification is recorded only when supporting evidence actually exists |
+| major architecture restructuring | a material architecture authority changes |
+| governance ownership transfer | accountable governance/release ownership changes |
+
+No trigger in this table is automatically executed by repository validation.
 
 ## Governance Handover Artifact Requirements
 
@@ -116,7 +125,11 @@ Mandatory handover artifacts must contain:
 | governance contracts |
 | critical architectural assumptions |
 | forbidden patterns |
+| exact acceptance/evidence references |
+| rollback boundary |
 | next approved governance actions |
+
+Unknown or unavailable state must be recorded truthfully as unknown, unavailable, blocked, or not applicable. Missing evidence must never be promoted to a positive claim.
 
 ## Mandatory Governance State Preservation
 
@@ -156,7 +169,7 @@ Includes:
 
 - operational readiness maturity
 - due diligence maturity
-- enforcement certification maturity
+- qualification/certification maturity where evidence exists
 - rollout progression state
 
 ## Governance Knowledge Preservation Requirements
@@ -173,17 +186,22 @@ The following governance artifacts must remain preserved:
 | due diligence reports |
 | enforcement activation approvals |
 | governance audit artifacts |
+| release decisions and milestone handovers |
 
 ## Governance Continuity Validation
 
 Governance continuity validation must verify:
 
 - architectural assumptions remain explicit
-- governance ownership remains clear
+- governance ownership remains clear or explicitly unassigned
 - rollout state remains reconstructable
-- recovery procedures remain accessible
+- recovery procedures remain accessible or explicitly unavailable
 - enforcement maturity remains traceable
 - invariants remain preserved
+- acceptance evidence and rollback boundaries are referenced
+- next actions are bounded and authorization requirements are explicit
+
+Repository validation is read-only with respect to product/runtime data. It may fail CI or mark a governance artifact invalid, but it cannot activate runtime freeze/recovery/enforcement behavior.
 
 ## Governance Drift Detection
 
@@ -201,30 +219,23 @@ Governance context drift occurs when:
 - recovery assumptions become implicit
 - enforcement assumptions become fragmented
 
-Governance context drift is prohibited.
+Governance context drift is prohibited from being silently accepted.
 
 ## Recovery Boundary Requirements
 
-Immediate recovery-boundary activation is mandatory if:
+If governance ownership becomes ambiguous, rationale becomes unrecoverable, enforcement maturity becomes unclear, invariant assumptions become inconsistent, or operational procedures become fragmented, the continuity result must be recorded as `BLOCKED` or `INVALID` and escalated to an authorized governance/release owner.
 
-- governance ownership becomes ambiguous
-- governance rationale becomes unrecoverable
-- enforcement maturity becomes unclear
-- invariant assumptions become inconsistent
-- operational procedures become fragmented
+Actual recovery-boundary activation requires a separate explicit decision; this ADR does not trigger it automatically.
 
 ## Governance Freeze Requirements
 
-Governance freeze is mandatory if:
+If continuity cannot be reconstructed sufficiently to make a safe governance decision, progression must be treated as blocked until an authorized governance/release owner either restores the missing context or explicitly accepts a bounded risk.
 
-- governance continuity becomes compromised
-- operational assumptions become inconsistent
-- recovery procedures become incomplete
-- enforcement assumptions become unverifiable
+A repository validator may block a merge. It may not freeze application runtime, infrastructure, users, or customer operations.
 
 ## Operational Review Requirements
 
-BR-4 and BR-5 governance progression require governance continuity validation.
+Any future BR-4/BR-5 or equivalent governance progression that depends on continuity must include governance continuity validation.
 
 Mandatory review areas:
 
@@ -233,6 +244,8 @@ Mandatory review areas:
 - recovery continuity
 - enforcement continuity
 - operational continuity
+
+Stage names are descriptive governance labels only unless separately defined and accepted elsewhere.
 
 ## Consequences
 
@@ -272,6 +285,10 @@ Major milestones require structured handovers.
 
 Architectural continuity reviews become mandatory.
 
+## Rollback
+
+Reverting the Phase 5.1 acceptance merge returns this ADR to its prior Proposed state. Such a rollback does not alter Phase 4 runtime/recovery qualification evidence or any earlier accepted governance/release authority.
+
 ## Final Principle
 
-Governance maturity must survive beyond individual implementation sessions.
+Governance maturity must survive beyond individual implementation sessions, and continuity controls must never silently create new runtime authority.
