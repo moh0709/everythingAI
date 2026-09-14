@@ -2,7 +2,7 @@
 
 Date: 2026-09-14  
 Current accepted state: Phase 6 Production Identity, Tenancy & Authorization Foundation dispatched (`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`)  
-Current canonical synchronization: #340
+Latest accepted canonical state evidence synchronization reflected here: Phase 6.12 (#359 / PR #360), merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`
 
 ## Mandatory startup sequence
 
@@ -29,6 +29,10 @@ Phase 6 Production Identity, Tenancy & Authorization Foundation is accepted thro
 - `docs/HANDOVER_2026-09-14_PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION.json`.
 
 Final closure evidence: 20/20 triggered workflows passed, including Phase 6 Closure Qualification #2 and CI Smoke #906. Final review had no review submissions or review threads.
+
+Post-closure canonical evidence is synchronized through Phase 6.12 (#359 / PR #360). Its unchanged documentation-only candidate `392110bb00975011c336e96b52aec90b4e64553e` passed 22/22 triggered workflows, including CI Smoke #924, with zero review submissions and zero review threads, and merged as `7fd477c2bcfea10587a3c4fd64d51681da816c5a`.
+
+Post-closure evidence corrections do not reopen Phase 6 for new runtime or product scope and do not expand production authority.
 
 ## Phase 6 capability boundary
 
@@ -110,6 +114,6 @@ Historical green evidence never substitutes for revalidating a changed candidate
 
 ## Current next-step rule
 
-Phase 6 is closed. Inspect the synchronized five-track roadmap and current open repository dependencies before releasing the next bounded milestone or numbered phase.
+Phase 6 is closed and must not be reopened for new product/runtime scope. Continue only bounded evidence-consistency corrections that preserve the accepted Phase 6 authority boundary. Post-Phase-6 product work belongs to its separately governed phase.
 
 Material production-platform execution, secrets, privileged-host changes, destructive production cutover, external certification/load commitments, commercial SLA/SLO commitments, broad authorization rollout, or material automatic authority expansion remain separately CEO-gated.
