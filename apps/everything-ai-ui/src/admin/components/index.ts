@@ -5,6 +5,7 @@ export { default as AdminShell, AdminShell as NamedAdminShell } from './AdminShe
 export { default as AdminStatusBanner, AdminStatusBanner as NamedAdminStatusBanner } from './AdminStatusBanner';
 export { default as AdminViewRouter, AdminViewRouter as NamedAdminViewRouter } from './AdminViewRouter';
 export { default as AnalyticsView, AnalyticsView as NamedAnalyticsView } from './AnalyticsView';
+export { default as ArchiveReviewWorkspace, ArchiveReviewWorkspace as NamedArchiveReviewWorkspace } from './ArchiveReviewWorkspace';
 export { default as AskAIView, AskAIView as NamedAskAIView } from './AskAIView';
 export { default as DashboardView, DashboardView as NamedDashboardView } from './DashboardView';
 export { default as ExplorerView, ExplorerView as NamedExplorerView } from './ExplorerView';
