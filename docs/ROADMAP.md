@@ -1,180 +1,80 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-09-14  
-Phase 2: **complete and dispatched (`PHASE2_PASS`)**  
-Product Depth Comprehension: **complete and dispatched (`PRODUCT_DEPTH_COMPREHENSION_PASS`)**  
-Cross-Surface Context Continuity: **complete and dispatched (`CROSS_SURFACE_CONTEXT_CONTINUITY_PASS`)**  
-Workspace Context Trust & Provenance: **complete and dispatched (`WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS`)**  
-Governed-Action Trust & Evidence: **complete and dispatched (`GOVERNED_ACTION_TRUST_EVIDENCE_PASS`)**  
-Governed-Action Review Context: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_PASS`)**  
-Governed-Action Review Context Summary Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS`)**  
-Governed-Action Review Context Orientation Trust: **complete and dispatched (`GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS`)**  
-Enterprise Readiness Foundation: **complete and dispatched (`ENTERPRISE_READINESS_FOUNDATION_PASS`)**  
-Phase 4 Pre-production Recovery Qualification: **complete and dispatched (`PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`)**  
-Phase 5 Governance Foundation: **closure candidate qualified; final dispatch is gated on the unchanged final PR #318 head (`PHASE5_GOVERNANCE_FOUNDATION_PASS` only after final green qualification and review)**
+Date: 2026-09-14
 
-## Completed sequence
+## Accepted program position
 
-### Phase 0 — Reconciliation and Release Control
-Complete. Established five-track governance, execution ownership, release-candidate baselines, and evidence discipline.
+- Phase 2 — `PHASE2_PASS` — complete.
+- Product Depth Comprehension — `PRODUCT_DEPTH_COMPREHENSION_PASS` — complete.
+- Cross-Surface Context Continuity — `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS` — complete.
+- Workspace Context Trust & Provenance — `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS` — complete.
+- Governed-Action Trust & Evidence — `GOVERNED_ACTION_TRUST_EVIDENCE_PASS` — complete.
+- Governed-Action Review Context — `GOVERNED_ACTION_REVIEW_CONTEXT_PASS` — complete.
+- Governed-Action Review Context Summary Trust — `GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS` — complete.
+- Governed-Action Review Context Orientation Trust — `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS` — complete.
+- Enterprise Readiness Foundation — `ENTERPRISE_READINESS_FOUNDATION_PASS` — complete.
+- Phase 4 Pre-production Recovery Qualification — `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` — complete.
+- Phase 5 Governance Foundation — `PHASE5_GOVERNANCE_FOUNDATION_PASS` — complete and dispatched.
 
-### Phase 1 — Local MVP Product Review and Release Hardening
-Complete. Hardened the local MVP, source-processing/recovery lifecycle, Unicode integrity, governed action/undo flow, and release evidence.
+## Phase 5 accepted release
 
-### Phase 2 — Product Intelligence & Knowledge Experience
-Complete and dispatched as `PHASE2_PASS`.
+Final unchanged candidate: `4050a2814f23e75adb6f31ebf2779dd0e4e6878d`.  
+Merge to `main`: `ddb9ed95422ca9bd4be9641a51fa16502aadd80e` through #317 / PR #318.
 
-### Product Depth — Evidence, Search, Lifecycle & Recovery Comprehension
-Accepted and dispatched as `PRODUCT_DEPTH_COMPREHENSION_PASS` through #198/#199 merge `e32f3a1db5b1c5447031842cd59bda59afadce90`, CI #624/#625.
+Final validation: 23/23 applicable workflows passed, including Phase 5 Closure Qualification #9, CI Smoke #879, all fifteen inherited focused product workflows and all six applicable enterprise workflows. Final review was clean with no unresolved Critical/Important findings or review threads.
 
-### Product Depth — Cross-Surface Context Continuity
-Accepted and dispatched as `CROSS_SURFACE_CONTEXT_CONTINUITY_PASS` through #218/#219 merge `6cbb3c15de8cb5e9624c5fb164a2781790336298`, candidate CI #652 and changed-final-head CI #654.
+Accepted Phase 5 maturity is L0 Advisory / Shadow Only. The release does not activate production enforcement or expand automatic action/recovery/infrastructure authority.
 
-### Product & UX — Workspace Context Trust & Provenance
-Accepted and dispatched as `WORKSPACE_CONTEXT_TRUST_PROVENANCE_PASS` through #230/#231 merge `dac62d9503d0b159d0997c224258e9bdb03a2473`, candidate CI #666 and changed-final-head CI #669.
+## Historical authority
 
-### Product & UX / Knowledge & Safe Action — Governed-Action Trust & Evidence
-Accepted and dispatched as `GOVERNED_ACTION_TRUST_EVIDENCE_PASS` through #246/#247 merge `9927ab9988e4b321619dd4a745af9023855c4d8b`, candidate CI #691 and changed-final-head CI #696.
+Detailed pre-closure canonical history remains preserved exactly at `main` commit `0f03beae72c323bb4ad0022dbd7fe05146d29720` and by the original canonical blob SHAs in `docs/PHASE5_CANONICAL_HISTORY_PRESERVATION_2026-09-14.md`.
 
-### Product & UX / Knowledge & Safe Action — Governed-Action Review Context
-Accepted and dispatched as `GOVERNED_ACTION_REVIEW_CONTEXT_PASS` through #262/#263 merge `39232ca75ac5e58e2de4fbdc0125de0ef78ba261`.
-
-### Product & UX — Governed-Action Review Context Summary & Safe Return Map
-#266 / PR #267 merged as `71f4e9051a0d2aba50108decadf5280264dde771` after strict RED→GREEN development, unchanged-head CI #724, inherited focused workflows, new Summary workflow #2, and clean final review.
-
-### Product & UX — Governed-Action Review Context Summary Provenance & Unknown-State Explanations
-#270 / PR #271 merged as `7afeaedf5821422a955b1a244337fe4ca049e026` after strict RED→GREEN development, unchanged-head CI #729, all twelve inherited focused workflows, new Summary Provenance workflow #2, and clean final review.
-
-### Governed-Action Review Context Summary Trust synchronization
-#272 / PR #273 merged as `549fcd7b47e435111a9c46f5bd7fa5412f3ec0e9` after unchanged-head CI #733 plus all thirteen mandatory focused workflows and clean final documentation review.
-
-### Governed-Action Review Context Summary Trust release
-Accepted and dispatched as `GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_PASS` through #274 / PR #275 merge `f996c4e2ff2ce4bbb80c35b0a08efa46f174feed`.
-
-Release evidence:
-
-- fresh release candidate `9ab4d164a5c070ab9a68d13bbfe89c8ecd04c49f` — EverythingAI CI Smoke #735 PASS plus all thirteen mandatory focused workflows;
-- changed final decision head `3abb8f2155e9ab1914db2720b276ed1b36a3d50b` — EverythingAI CI Smoke #736 PASS plus all thirteen mandatory focused workflows;
-- final review — no unresolved Critical or Important findings and no review threads;
-- release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE_DECISION_2026-08-27.md`;
-- handover: `docs/HANDOVER_2026-08-27_GOVERNED_ACTION_REVIEW_CONTEXT_SUMMARY_TRUST_RELEASE.json`.
-
-### Review Context Summary Trust post-dispatch synchronization
-#276 / PR #277 merged as `bdd65c656558e9c715c8346887a156d872dd89f3` after unchanged-head EverythingAI CI Smoke #738 plus all thirteen mandatory focused workflows and clean final documentation review.
-
-### Product & UX — Review Context Orientation Clarity
-#278 / PR #279 merged as `b54f74a8c73c69850a2059e3e593b03a39a3ca18` after strict RED→GREEN development.
-
-Acceptance evidence:
-
-- RED head `ec20ce898896d0adcbc6f2880fd8656a28460acb` — `EverythingAI Governed-Action Review Context Orientation` #1 failed because the required orientation explanation did not yet exist;
-- final unchanged implementation head `ab511573969ca8706b2110fac7e9a7540a9fa91e` — EverythingAI CI Smoke #741 PASS, all thirteen inherited mandatory focused workflows PASS, and `EverythingAI Governed-Action Review Context Orientation` #2 PASS;
-- final review — no unresolved Critical or Important findings and no review threads;
-- accepted merge — `b54f74a8c73c69850a2059e3e593b03a39a3ca18`.
-
-The accepted orientation behavior distinguishes the currently visible loaded audit window from remembered local review context using already-loaded/local state only. It adds no backend fetch, persistence, routing architecture, mutation semantics, replacement-execution inference, or global audit-absence claim.
-
-### Review Context Orientation synchronization
-#280 / PR #281 merged as `11f85dc090318504792140fb7311e5bc234ba3da`. Corrected unchanged documentation head `ac2ce97f431faad8d8557b50f2bb34e38ad48760` passed EverythingAI CI Smoke #744 plus all fourteen mandatory focused workflows. Final documentation review corrected a historical-evidence preservation issue before merge.
-
-### Product & UX / Knowledge & Safe Action — Review Context Orientation Provenance & Unknown-State Clarity
-#282 / PR #283 merged as `b718146c92e8a740209ebee3ea99782b88333163` after strict RED→GREEN development.
-
-Acceptance evidence:
-
-- RED head `12ee9062dbc41c5444e5b7c06d484d98b40ef330` — `EverythingAI Governed-Action Review Context Orientation Provenance` #1 failed because the required provenance explanation did not yet exist;
-- final unchanged implementation head `e89ac88f071f4d303fc0c5fc5d1914d778ff931d` — EverythingAI CI Smoke #747 PASS, all fourteen inherited mandatory focused workflows PASS, and `EverythingAI Governed-Action Review Context Orientation Provenance` #2 PASS;
-- final review — no unresolved Critical or Important findings and no review threads;
-- accepted merge — `b718146c92e8a740209ebee3ea99782b88333163`.
-
-The accepted provenance behavior explains only the genuine already-loaded/local origin of orientation facts and why unavailable orientation facts remain unknown. It adds no backend request, persistence, routing architecture, mutation semantics, replacement-execution inference, or global audit completeness/absence claim.
-
-### Review Context Orientation provenance synchronization
-#284 / PR #285 merged as `4c4ea8f0117d8bc201703c77e270c385b2a9f8b1`. Unchanged documentation head `bc233a3fca74d9719202dcc8ad24ccc7a170f334` passed EverythingAI CI Smoke #749 plus all fifteen mandatory focused workflows. Final documentation review found no unresolved Critical or Important findings or review threads.
-
-### Governed-Action Review Context Orientation Trust release
-Accepted and dispatched as `GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_PASS` through #286 / PR #287 merge `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`.
-
-Release evidence:
-
-- fresh release candidate `b02880c12127123a74207e073362c9be14f716a1` — EverythingAI CI Smoke #751 PASS plus all fifteen mandatory focused workflows;
-- changed final decision head `41f2195052df9fb1273ab8a133727e85cbcd4184` — EverythingAI CI Smoke #753 PASS plus all fifteen mandatory focused workflows;
-- final review — no unresolved Critical or Important findings and no unresolved review threads;
-- accepted merge — `88a5ec01fd87bedc360c7410c7c25bc4dfcce86b`;
-- release decision: `docs/GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE_DECISION_2026-08-28.md`;
-- handover: `docs/HANDOVER_2026-08-28_GOVERNED_ACTION_REVIEW_CONTEXT_ORIENTATION_TRUST_RELEASE.json`.
-
-### Phase 3 — Enterprise Readiness Foundation
-Accepted and dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS` through #304 after Phase 3.1–3.6 (#292–#303) and dependency-security remediation #305/#306. The accepted foundation covers application-level identity/tenancy isolation, PostgreSQL RLS foundations, provider-neutral object storage, durable object metadata and dry-run migration planning, runtime health, isolated backup/restore validation, bounded capacity/security validation, and exact-lock dependency security. It explicitly does not claim production deployment readiness.
-
-### Phase 4 — Pre-production Recovery Qualification
-Accepted and dispatched as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed CI Smoke #858, the fifteen inherited focused workflows, all six Phase 3 enterprise workflows, Dependency Security Audit #16, and Pre-production Recovery Qualification #9. The accepted qualification covers disposable PostgreSQL migration/wipe/restore, object-store wipe/restore, corruption rejection, post-restore isolation and dependency-security requalification. It does not claim production deployment, external certification, production load qualification or commercial SLA readiness.
-
-### Phase 5 — Governance Foundation closure
-Historical Phase 5 governance tracks 5.1–5.8 are implemented and are being consolidated through #317 / PR #318 together with accepted ADR-005-013 Governance Continuity. First comprehensive candidate `6139d018bc2fe398cd5e482f30305d110173a1c5` passed 20/20 triggered workflows, including Phase 5 Closure Qualification #1, CI Smoke #871, Enterprise Isolation #113, Object Storage #97, Object Metadata Migration Planning #92 and all fifteen inherited focused product workflows. Final dispatch remains gated on the final changed PR head passing the complete applicable matrix and independent review.
+All earlier release decisions, handovers, reports, PRs, issues, CI evidence and rollback records remain accepted historical evidence. Issue #69 remains untouched.
 
 ## Current five-track position
 
-| Track | Accepted position | Next gate |
+| Track | Accepted position | Next decision criterion |
 |---|---|---|
-| Product and UX | Phase 2/Product Depth and Review Context trust surfaces remain accepted and local-first | Choose only distinct user-value work that preserves existing trust and governed-action semantics |
-| Knowledge and Safe Action | Source-backed reading, explicit approval, truthful evidence semantics and exact-target review behavior remain accepted | Continue only bounded improvements backed by authoritative or genuinely loaded/local evidence |
-| Enterprise Platform | Phase 4 destructive pre-production recovery qualification remains accepted; Phase 5 adds governance foundations only, not production enforcement | Keep production infrastructure/secrets, destructive cutover, certification/load qualification and SLA commitments separately CEO-gated |
-| Engineering Operations | CI/release discipline includes exact-lock dependency audit, enterprise gates, Governance Continuity and Phase 5 Closure Qualification | Validate the exact final PR #318 head; production/privileged-host operations remain separately gated |
-| Governance and Autonomous Delivery | Phase 5 governance foundations are closure-qualified at L0 advisory/shadow maturity pending final changed-head release gate | Complete #317/#318; only then inspect the synchronized roadmap and dispatch one bounded dependency without inventing enforcement authority |
+| Product & UX | Mature local-first trust/context surfaces are accepted | Choose distinct user-visible value; avoid recursive restatement of existing context/trust facts |
+| Knowledge & Safe Action | Source-backed knowledge, explicit approval, truthful unknown-state handling, audit/undo and recovery safeguards are accepted | Improve useful knowledge/action capability without manufacturing facts or bypassing authority |
+| Enterprise Platform | Enterprise foundation and pre-production recovery qualification are accepted; Phase 5 adds governance foundations | Real production infrastructure/secrets, destructive cutover, external certification/load qualification and SLA commitments remain CEO-gated |
+| Engineering Operations | CI/release discipline includes product, enterprise, recovery, Governance Continuity and Phase 5 closure gates | Preserve validation wiring; privileged production operations remain separately gated |
+| Governance & Autonomous Delivery | Phase 5 foundation is accepted at L0 advisory/shadow maturity | Release one bounded dependency at a time; do not infer production enforcement authority |
 
 ## Active dependency sequence
 
 ```text
-Phase 4 accepted
-  -> Phase 5.1 Governance Continuity accepted (#314 / PR #315)
-    -> Phase 5 comprehensive closure #317 / PR #318
-      -> final unchanged-head CI + independent review
-        -> PHASE5_GOVERNANCE_FOUNDATION_PASS only if fully green
-          -> inspect synchronized five-track roadmap
-            -> release one bounded next dependency
+Phase 5 Governance Foundation accepted
+  -> canonical acceptance synchronization #319
+    -> inspect current repository + five-track priorities
+      -> select one bounded, dependency-satisfied next milestone
+        -> define acceptance + rollback
+          -> implement and validate on one unchanged head
 ```
 
-No numbered Phase 6 scope is authorized by this roadmap merely because Phase 5 closes. The next phase/issue must be derived from the synchronized five-track state and explicit CEO authority where material strategy or authority expansion is involved.
+## Next-phase rule
 
-## Next five-track decision criteria
+There is currently **no repository-authoritative Phase 6 implementation scope merely because Phase 5 is complete**. A Phase 6 label/number may be assigned only after the next strategic dependency has been selected from the current five-track position.
 
-- **Product & UX:** pursue distinct user-visible value, not recursive restatement of already trusted review-context facts.
-- **Knowledge & Safe Action:** preserve backend authority, explicit approval, truthful unknown-state handling, audit/undo and filesystem safety.
-- **Enterprise Platform:** the application-level foundation and Phase 4 recovery qualification are accepted; production secrets, privileged-host execution, destructive migration/cutover, external certification and production-load/SLA commitments remain separate gates.
-- **Engineering Operations:** keep dependency/security, enterprise, continuity and closure validation wired to changes that can affect them; privileged production operations require explicit authority.
-- **Governance & Autonomous Delivery:** release only bounded, dependency-safe, reversible work with unchanged-head validation and independent final review.
+Selection should prioritize:
+
+1. material user/customer value;
+2. dependency readiness;
+3. bounded and reversible scope;
+4. preservation of safe-action and evidence semantics;
+5. no hidden production-authority expansion;
+6. measurable acceptance criteria.
+
+If the best next dependency requires a material business/architecture/production-authority decision, escalate that decision to the CEO before execution. Otherwise the CTO may release bounded work autonomously.
 
 ## Mandatory inherited release discipline
 
-Every changed product/release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green results are supporting evidence only. Accepted focused workflows remain mandatory unless explicitly superseded by an accepted decision. Every accepted change retains milestone-scoped rollback evidence.
-
-The focused workflow baseline remains **fifteen mandatory workflows**:
-
-1. `EverythingAI Source Recovery Return Context`;
-2. `EverythingAI Multi-hop Return Context`;
-3. `EverythingAI Return Context Provenance`;
-4. `EverythingAI Workspace Context Summary`;
-5. `EverythingAI Workspace Context Provenance`;
-6. `EverythingAI Context-Aware Task Resumption`;
-7. `EverythingAI Governed-Action Comprehension`;
-8. `EverythingAI Governed-Action Evidence Navigation`;
-9. `EverythingAI Governed-Action Evidence Filtering`;
-10. `EverythingAI Governed-Action Review Resumption`;
-11. `EverythingAI Governed-Action Review Context Provenance`;
-12. `EverythingAI Governed-Action Review Context Summary`;
-13. `EverythingAI Governed-Action Review Context Summary Provenance`;
-14. `EverythingAI Governed-Action Review Context Orientation`;
-15. `EverythingAI Governed-Action Review Context Orientation Provenance`.
+Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. The fifteen accepted focused product workflows remain mandatory unless explicitly superseded. Phase 3/4/5-affecting work additionally preserves applicable enterprise, dependency-security, recovery, Governance Continuity and Phase 5 Closure Qualification gates.
 
 ## CEO-gated directions
 
-ER-1 through ER-5 are already approved and implemented at the bounded application-foundation level. Explicit CEO approval is still required before material production-platform execution beyond that foundation, including privileged-host/root/sudo/SSH/systemd work, real production secrets or identity-provider provisioning, destructive database/object migration or cutover, external penetration/compliance/certification commitments, production load/capacity qualification, provider-specific cloud lock-in decisions beyond the approved neutral architecture, automatic action/recovery scope expansion, material connector/runtime expansion, or commercial SLA/SLO commitments.
-
-## Issue #69
-
-Issue #69 is closed completed historical Phase 3/Hermes reliability evidence. It is not an open dependency and must not be rewritten without explicit CEO review of a newly discovered factual inconsistency.
+Explicit CEO authority remains required before privileged-host/root/sudo/SSH/systemd work, real production secrets or identity-provider provisioning, destructive production database/object migration or cutover, external penetration/compliance/certification commitments, production load/capacity qualification, provider-specific cloud lock-in beyond accepted neutral architecture, material automatic action/recovery authority expansion, or commercial SLA/SLO commitments.
 
 ## Rollback
 
-The Phase 5 closure/canonical synchronization is documentation/governance and qualification wiring layered on the existing historical Phase 5 implementation and remains independently reversible. Phase 4, Phase 3, Review Context Orientation Trust and all earlier accepted milestone merges retain their existing independent rollback evidence; issue #69 remains historical and unchanged.
+Phase 5 closure and canonical acceptance synchronization are independently reversible from historical Phase 5 implementation, Phase 5.1 Governance Continuity, Phase 4, Phase 3 and all earlier accepted milestones.
