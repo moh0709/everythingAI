@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-09-14  
-Authority: accepted repository state through Phase 6 Production Identity, Tenancy & Authorization Foundation closure and post-closure canonical evidence synchronization  
-Latest accepted Phase 6 evidence synchronization: #363 / PR #364, merge `5b9e10096b56db7b1546d9347474436dbd50dc46`
+Authority: accepted repository state through Phase 6 Production Identity, Tenancy & Authorization Foundation closure and accepted post-closure evidence maintenance  
+Post-closure acceptance authority: GitHub issue/PR/merge/workflow evidence; this file records the stable Phase 6 authority baseline and is not recursively rewritten merely to record later evidence-only synchronization merges.
 
 ## Current program stage
 
@@ -15,7 +15,9 @@ The final unchanged closure candidate passed 20/20 triggered workflows, includin
 
 Post-closure canonical synchronization was accepted through #340 / PR #341 on unchanged candidate `8432cf256945d74c84ff488b420f1bc16ea56d3a`, with 23/23 triggered workflows green, and merged as `16517e009d108c200e65c93781d655c29c7f4624`.
 
-Subsequent bounded evidence consistency fixes were accepted through Phase 6.14. Phase 6.12 synchronized `PROJECT_STATE.md` through #359 / PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`; Phase 6.13 synchronized `AI_BOOTSTRAP.md` through #361 / PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`; Phase 6.14 reconciled `docs/ROADMAP.md` and `docs/IMPLEMENTATION_ROADMAP.md` through #363 / PR #364. The unchanged Phase 6.14 candidate `7e7c7663a1a0e4253365e2f3513cba8639aa5b54` passed 22/22 triggered workflows, including CI Smoke #928, and merged as `5b9e10096b56db7b1546d9347474436dbd50dc46`.
+Subsequent bounded evidence consistency fixes were accepted through Phase 6.15. Phase 6.12 synchronized `PROJECT_STATE.md` through #359 / PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`; Phase 6.13 synchronized `AI_BOOTSTRAP.md` through #361 / PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`; Phase 6.14 reconciled `docs/ROADMAP.md` and `docs/IMPLEMENTATION_ROADMAP.md` through #363 / PR #364 merge `5b9e10096b56db7b1546d9347474436dbd50dc46`; Phase 6.15 reconciled the two highest-authority startup/state files through #365 / PR #366 on unchanged candidate `d3dabdeb461d6b6e79d34598deaa3d0a6eff3bcd`, which passed 22/22 triggered workflows including CI Smoke #930 and merged as `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
+
+Future evidence-only Phase 6 acceptance is determined directly from repository issue/PR/merge/workflow evidence. A later evidence-only merge does not by itself make this file stale and does not require a recursive follow-up synchronization. Update this file again only if the stable runtime/product authority, safety boundary, or another factual baseline recorded here changes.
 
 Phase 6 establishes provider-neutral production-oriented identity and authorization contracts across authenticated principals, tenant/workspace membership, normalized roles/permissions, exact resource-scope isolation, optional device identity, trusted audit attribution, representative `documents.read` enforcement, representative trusted action audit propagation, and integrated fail-closed/local-compatibility qualification.
 
@@ -41,6 +43,7 @@ Phase 5 governance remains **L0 Advisory / Shadow Only**. Phase 6 authorization 
 - Phase 6.12 `PROJECT_STATE.md` Post-closure Evidence Synchronization — PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`.
 - Phase 6.13 `AI_BOOTSTRAP.md` Post-closure Evidence Synchronization — PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
 - Phase 6.14 Roadmap Post-closure Evidence Reconciliation — PR #364 merge `5b9e10096b56db7b1546d9347474436dbd50dc46`.
+- Phase 6.15 Canonical Authority Reconciliation — PR #366 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
 
 ## Accepted predecessor baselines
 
@@ -77,8 +80,8 @@ Every changed product/release candidate must validate the complete applicable in
 
 ## Next decision rule
 
-Phase 6 is closed and must not be reopened for new product/runtime scope. Continue only bounded evidence-consistency corrections that preserve the accepted Phase 6 authority boundary. Post-Phase-6 product work belongs to its separately governed phase. Do not infer production infrastructure activation or broader enforcement authority from Phase 6 acceptance. Any material production authority expansion remains CEO-gated.
+Phase 6 is closed and must not be reopened for new product/runtime scope. Evidence-only acceptance after Phase 6.15 is read directly from GitHub issue/PR/merge/workflow evidence and does not require recursive synchronization of canonical files unless a factual baseline or authority boundary changes. Post-Phase-6 product work belongs to its separately governed phase. Do not infer production infrastructure activation or broader enforcement authority from Phase 6 acceptance. Any material production authority expansion remains CEO-gated.
 
 ## Rollback
 
-This Phase 6.15 canonical reconciliation is documentation/evidence-only and independently reversible to accepted Phase 6.14 merge `5b9e10096b56db7b1546d9347474436dbd50dc46`. Reverting this correction does not alter Phase 6 runtime contracts or any earlier accepted milestone.
+This Phase 6.16 evidence-governance correction is documentation/evidence-only and independently reversible to accepted Phase 6.15 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`. Reverting this correction does not alter Phase 6 runtime contracts or any earlier accepted milestone.
