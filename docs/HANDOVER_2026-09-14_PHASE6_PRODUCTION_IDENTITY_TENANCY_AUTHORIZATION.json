@@ -2,10 +2,21 @@
   "project": "EverythingAI",
   "date": "2026-09-14",
   "phase": "Phase 6 — Production Identity, Tenancy & Authorization Foundation",
-  "decision_state": "CLOSURE_CANDIDATE_PENDING_FINAL_UNCHANGED_HEAD_QUALIFICATION",
-  "target_decision": "PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS",
+  "decision_state": "ACCEPTED",
+  "decision": "PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS",
   "parent_issue": 323,
   "closure_issue": 338,
+  "canonical_sync_issue": 340,
+  "accepted_closure_candidate": "6eef85c405a020feb30d239b4c55b26d747f0ccb",
+  "accepted_closure_merge": "71fd3627b783284bccf37f7628b86a8a78fb3c07",
+  "validation": {
+    "triggered_workflows": 20,
+    "successful_workflows": 20,
+    "phase6_closure_qualification_run": 2,
+    "ci_smoke_run": 906,
+    "review_submissions": 0,
+    "review_threads": 0
+  },
   "accepted_implementation_chain": [
     {"phase": "6.1", "pr": 324, "merge": "cd6e428408a4155358c5de4b8f20bbc26130166f"},
     {"phase": "6.2", "pr": 326, "merge": "693c7eadfee42b8ae6dc6a7ab02117454c610b43"},
@@ -13,7 +24,8 @@
     {"phase": "6.4", "pr": 331, "merge": "dfbdd4dd6f9a0d63e2a4d347421d8150bdc23ef5"},
     {"phase": "6.5", "pr": 333, "merge": "86e46c13ebb2928f00a909e2eec92b4d28b1afba"},
     {"phase": "6.6", "pr": 335, "merge": "054c58822616cede0d5db293e2d382bfa6b7e1bb"},
-    {"phase": "6.7", "pr": 337, "merge": "15c1617b5201e0bfb98f11517e6ebdca69857da4"}
+    {"phase": "6.7", "pr": 337, "merge": "15c1617b5201e0bfb98f11517e6ebdca69857da4"},
+    {"phase": "6.8", "pr": 339, "merge": "71fd3627b783284bccf37f7628b86a8a78fb3c07"}
   ],
   "implemented_foundations": [
     "provider-neutral production authenticated-principal boundary",
@@ -36,21 +48,18 @@
     "services/api/test/productionTrustedAuditContext.test.js",
     "services/api/test/productionIntegratedAuthorizationQualification.test.js"
   ],
-  "closure_artifacts": [
-    "scripts/validate-phase6-closure.mjs",
-    ".github/workflows/ci-phase6-closure.yml",
-    "docs/PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_RELEASE_DECISION_2026-09-14.md"
-  ],
   "authority_boundary": {
     "production_secrets": false,
     "real_idp_credentials": false,
+    "real_device_credentials": false,
     "privileged_host_operations": false,
     "destructive_production_cutover": false,
     "external_certification_commitment": false,
     "production_load_or_sla_commitment": false,
+    "broad_route_authorization_rollout": false,
     "broad_automatic_action_recovery_governance_expansion": false,
     "phase5_governance_mode": "L0 Advisory / Shadow Only"
   },
-  "next_required_action": "Validate one final unchanged Phase 6 closure head with the dedicated closure workflow and the complete applicable inherited matrix; then perform final canonical acceptance synchronization only if review state is clean.",
-  "rollback": "Closure artifacts are independently reversible from the accepted Phase 6.1–6.7 implementation merges."
+  "next_required_action": "Complete documentation/evidence-only canonical synchronization #340 on one unchanged green head, then inspect repository priorities before creating any next numbered phase.",
+  "rollback": "Canonical synchronization is independently reversible from Phase 6 closure merge 71fd3627b783284bccf37f7628b86a8a78fb3c07; closure remains independently reversible from accepted Phase 6.1–6.7 implementation merges."
 }

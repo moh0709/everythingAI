@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-09-14  
-Current accepted state: Phase 5 Governance Foundation dispatched (`PHASE5_GOVERNANCE_FOUNDATION_PASS`)  
-Current canonical synchronization: #319
+Current accepted state: Phase 6 Production Identity, Tenancy & Authorization Foundation dispatched (`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`)  
+Current canonical synchronization: #340
 
 ## Mandatory startup sequence
 
@@ -20,41 +20,53 @@ Repository state, exact SHAs, issue/PR state, workflow evidence and canonical au
 
 ## Current release authority
 
-Phase 5 Governance Foundation is accepted through:
+Phase 6 Production Identity, Tenancy & Authorization Foundation is accepted through:
 
-- final unchanged candidate `4050a2814f23e75adb6f31ebf2779dd0e4e6878d`;
-- #317 / PR #318;
-- merge `ddb9ed95422ca9bd4be9641a51fa16502aadd80e`;
-- `docs/PHASE5_GOVERNANCE_FOUNDATION_RELEASE_DECISION_2026-09-14.md`;
-- `docs/HANDOVER_2026-09-14_PHASE5_GOVERNANCE_FOUNDATION.json`.
+- final unchanged closure candidate `6eef85c405a020feb30d239b4c55b26d747f0ccb`;
+- #338 / PR #339;
+- closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`;
+- `docs/PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_RELEASE_DECISION_2026-09-14.md`;
+- `docs/HANDOVER_2026-09-14_PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION.json`.
 
-Final candidate evidence: 23/23 applicable workflows passed, including Phase 5 Closure Qualification #9, CI Smoke #879, all fifteen inherited focused Product/Governed-Action workflows and all six applicable enterprise workflows. Final review had no unresolved Critical/Important findings or review threads.
+Final closure evidence: 20/20 triggered workflows passed, including Phase 6 Closure Qualification #2 and CI Smoke #906. Final review had no review submissions or review threads.
 
-## Phase 5 authority boundary
+## Phase 6 capability boundary
 
-- Enforcement Level: L0.
-- Mode: Advisory / Shadow Only.
-- No new runtime mutation authority.
-- No production runtime blocking.
-- No automatic governance freeze or recovery activation.
-- No automatic approval, execution, retry or undo.
-- No privileged infrastructure/root/sudo/SSH/systemd authority.
-- No production-secret or IdP provisioning authority.
-- No destructive production database/object-store cutover authority.
-- No provider lock-in.
-- No external certification claim.
-- No production load/SLA claim.
+Accepted foundations include:
 
-Controlled-enforcement artifacts remain governance foundations and are not production enforcement activation.
+- provider-neutral production authenticated-principal middleware boundary;
+- tenant/workspace membership authorization;
+- normalized roles and permission contracts;
+- exact tenant/workspace resource-scope isolation;
+- representative `documents.read` production permission/resource enforcement;
+- optional tenant/workspace-bound device identity;
+- trusted authorization-derived audit attribution;
+- trusted audit propagation into representative action execution and undo evidence;
+- integrated cross-tenant/cross-workspace denial, ambiguity/degraded-state, anti-spoofing and local-compatibility qualification.
+
+## Production and governance authority boundary
+
+Phase 6 does not authorize or perform:
+
+- production IdP/device credential or secret provisioning;
+- certificates/key material provisioning;
+- privileged root/sudo/SSH/systemd operations;
+- destructive production database/object-store migration or cutover;
+- broad route-by-route authorization rollout beyond accepted representative enforcement;
+- external certification/compliance commitments;
+- production load qualification or commercial SLA/SLO commitments;
+- provider lock-in;
+- material automatic action/recovery/governance authority expansion.
+
+Phase 5 remains **L0 Advisory / Shadow Only**. Phase 6 production-oriented authorization contracts do not silently activate Phase 5 governance enforcement.
 
 ## Accepted predecessor authority
 
-- Phase 5.1 Governance Continuity — merge `2f8285c140936185bbe75b943b1dcf1acf28e16b`, ADR-005-013 Accepted.
+- Phase 5 Governance Foundation — `PHASE5_GOVERNANCE_FOUNDATION_PASS`, merge `ddb9ed95422ca9bd4be9641a51fa16502aadd80e`.
+- Phase 5.1 Governance Continuity — merge `2f8285c140936185bbe75b943b1dcf1acf28e16b`.
 - Phase 4 Pre-production Recovery Qualification — `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`, merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`.
 - Phase 3 Enterprise Readiness Foundation — `ENTERPRISE_READINESS_FOUNDATION_PASS`.
-- Phase 2 and all later accepted Product Depth/Product & UX trust milestones remain accepted historical authority.
-
-The exact pre-closure canonical baseline and detailed historical authority remain pinned by `docs/PHASE5_CANONICAL_HISTORY_PRESERVATION_2026-09-14.md`; issue #69 remains untouched.
+- Phase 2 and later accepted Product Depth/Product & UX trust milestones remain accepted historical authority.
 
 ## Program tracks
 
@@ -92,14 +104,12 @@ Rules:
 - preserve explicit rollback boundaries;
 - accepted focused workflows remain inherited unless explicitly superseded.
 
-## Mandatory inherited product baseline
+## Mandatory inherited validation
 
-The fifteen accepted focused Product/Governed-Action workflows remain mandatory unless explicitly superseded. Historical green evidence never substitutes for revalidating a changed candidate.
-
-Phase 3/4/5-affecting candidates additionally preserve applicable enterprise isolation, object storage, metadata migration planning, runtime health, backup/restore, capacity/security, dependency-security, recovery, Governance Continuity and Phase 5 Closure Qualification gates.
+Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Phase 6-affecting work additionally runs `EverythingAI Phase 6 Closure Qualification` unless an accepted later decision explicitly supersedes it.
 
 ## Current next-step rule
 
-Phase 5 is closed. Inspect the synchronized five-track roadmap and current repository issues before releasing the next bounded dependency. Do not infer a Phase 6 implementation scope solely from numbering or conversation title.
+Phase 6 is closed. Inspect the synchronized five-track roadmap and current open repository dependencies before releasing the next bounded milestone or numbered phase.
 
-Material production-platform execution, authority expansion, secrets, privileged-host changes, destructive production cutover, external certification/load commitments or commercial SLA/SLO commitments remain separately CEO-gated.
+Material production-platform execution, secrets, privileged-host changes, destructive production cutover, external certification/load commitments, commercial SLA/SLO commitments, broad authorization rollout, or material automatic authority expansion remain separately CEO-gated.
