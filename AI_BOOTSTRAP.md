@@ -1,8 +1,8 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-09-14  
-Current accepted state: Phase 5 Governance Foundation dispatched (`PHASE5_GOVERNANCE_FOUNDATION_PASS`)  
-Current canonical synchronization: #319
+Current accepted state: Phase 6 Production Identity, Tenancy & Authorization Foundation dispatched (`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`)  
+Current canonical synchronization: Phase 6 finalization under #338
 
 ## Mandatory startup sequence
 
@@ -16,45 +16,44 @@ Before any project-state decision or implementation:
 6. Confirm the next work is dependency-satisfied and within approved authority.
 7. Define acceptance criteria, evidence, validation and rollback before implementation.
 
-Repository state, exact SHAs, issue/PR state, workflow evidence and canonical authority files are the source of truth. Do not trust a handover blindly.
+Repository state, exact SHAs, issue/PR state, workflow evidence and canonical authority files are source of truth.
 
 ## Current release authority
 
-Phase 5 Governance Foundation is accepted through:
+Phase 6 is accepted through:
 
-- final unchanged candidate `4050a2814f23e75adb6f31ebf2779dd0e4e6878d`;
-- #317 / PR #318;
-- merge `ddb9ed95422ca9bd4be9641a51fa16502aadd80e`;
-- `docs/PHASE5_GOVERNANCE_FOUNDATION_RELEASE_DECISION_2026-09-14.md`;
-- `docs/HANDOVER_2026-09-14_PHASE5_GOVERNANCE_FOUNDATION.json`.
+- final unchanged closure candidate `6eef85c405a020feb30d239b4c55b26d747f0ccb`;
+- closure issue #338 / PR #339;
+- closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`;
+- `docs/PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_RELEASE_DECISION_2026-09-14.md`;
+- `docs/HANDOVER_2026-09-14_PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION.json`.
 
-Final candidate evidence: 23/23 applicable workflows passed, including Phase 5 Closure Qualification #9, CI Smoke #879, all fifteen inherited focused Product/Governed-Action workflows and all six applicable enterprise workflows. Final review had no unresolved Critical/Important findings or review threads.
+Final candidate evidence: 20/20 triggered workflows passed, including Phase 6 Closure Qualification #2, CI Smoke #906, triggered focused Product/Governed-Action workflows and applicable enterprise isolation/storage/migration gates. Final review had no review submissions or review threads.
 
-## Phase 5 authority boundary
+## Accepted Phase 6 foundation
 
-- Enforcement Level: L0.
-- Mode: Advisory / Shadow Only.
-- No new runtime mutation authority.
-- No production runtime blocking.
-- No automatic governance freeze or recovery activation.
-- No automatic approval, execution, retry or undo.
-- No privileged infrastructure/root/sudo/SSH/systemd authority.
-- No production-secret or IdP provisioning authority.
-- No destructive production database/object-store cutover authority.
+The accepted production-oriented foundation includes authenticated-principal verification contracts, tenant/workspace membership authorization, roles/permissions, exact resource-scope isolation, representative `documents.read` enforcement, optional scope-bound device identity, trusted authorization-derived audit attribution and integrated fail-closed qualification.
+
+## Production authority boundary
+
+- No production secrets or real IdP/device credentials.
+- No certificate/key provisioning.
+- No privileged host/root/sudo/SSH/systemd authority.
+- No destructive production database/object-store migration or cutover.
 - No provider lock-in.
-- No external certification claim.
-- No production load/SLA claim.
-
-Controlled-enforcement artifacts remain governance foundations and are not production enforcement activation.
+- No external certification/compliance claim.
+- No production load/SLA/SLO claim.
+- No broad route-by-route authorization rollout.
+- No broad automatic action/recovery/governance authority expansion.
+- Phase 5 governance remains L0 Advisory / Shadow Only.
 
 ## Accepted predecessor authority
 
-- Phase 5.1 Governance Continuity — merge `2f8285c140936185bbe75b943b1dcf1acf28e16b`, ADR-005-013 Accepted.
-- Phase 4 Pre-production Recovery Qualification — `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`, merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`.
+- Phase 5 Governance Foundation — `PHASE5_GOVERNANCE_FOUNDATION_PASS`.
+- Phase 5.1 Governance Continuity — merge `2f8285c140936185bbe75b943b1dcf1acf28e16b`.
+- Phase 4 Pre-production Recovery Qualification — `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS`.
 - Phase 3 Enterprise Readiness Foundation — `ENTERPRISE_READINESS_FOUNDATION_PASS`.
-- Phase 2 and all later accepted Product Depth/Product & UX trust milestones remain accepted historical authority.
-
-The exact pre-closure canonical baseline and detailed historical authority remain pinned by `docs/PHASE5_CANONICAL_HISTORY_PRESERVATION_2026-09-14.md`; issue #69 remains untouched.
+- Phase 2 and accepted Product Depth/Product & UX trust milestones remain historical authority.
 
 ## Program tracks
 
@@ -72,13 +71,12 @@ Do not silently convert progress in one track into authority in another.
 
 - **CEO / Product Owner:** final authority for material business, strategic, architectural, security/legal and materially scope-changing decisions.
 - **ChatGPT:** CTO/PM/release gatekeeper and engineering executor for bounded dependency-satisfied work within approved scope.
-- **Forge:** optional executor only when explicitly released.
-- **Hermes:** explicitly assigned non-overlapping operational/infrastructure work only.
+- **Forge/Hermes:** optional bounded executors only when explicitly released.
 - **Human operator:** privileged SSH/root/sudo and secret-provisioning work that safe automation cannot perform.
 
 ## Execution lifecycle
 
-`inspect → acceptance matrix → implement narrowly → test/CI → evaluate → fix → retest → independent diff/security/governance review → accept/reject → merge/close → canonical verification → next dependency`
+`inspect → acceptance matrix → implement narrowly → test/CI → evaluate → fix → retest → independent review → accept/reject → merge/close → canonical verification → next dependency`
 
 Rules:
 
@@ -89,17 +87,14 @@ Rules:
 - every final release decision refers to one unchanged candidate head;
 - no unresolved Critical/Important findings or review threads at merge;
 - truthful BLOCKED/REJECTED outcomes are valid;
-- preserve explicit rollback boundaries;
-- accepted focused workflows remain inherited unless explicitly superseded.
+- preserve explicit rollback boundaries.
 
-## Mandatory inherited product baseline
+## Mandatory inherited validation
 
-The fifteen accepted focused Product/Governed-Action workflows remain mandatory unless explicitly superseded. Historical green evidence never substitutes for revalidating a changed candidate.
-
-Phase 3/4/5-affecting candidates additionally preserve applicable enterprise isolation, object storage, metadata migration planning, runtime health, backup/restore, capacity/security, dependency-security, recovery, Governance Continuity and Phase 5 Closure Qualification gates.
+Every changed product/release candidate must preserve the complete applicable inherited matrix. Phase 6-affecting candidates additionally run the focused Phase 6 qualification stack and dedicated Phase 6 Closure Qualification. Historical green evidence never substitutes for validating a changed candidate.
 
 ## Current next-step rule
 
-Phase 5 is closed. Inspect the synchronized five-track roadmap and current repository issues before releasing the next bounded dependency. Do not infer a Phase 6 implementation scope solely from numbering or conversation title.
+Phase 6 is closed. Inspect current open repository dependencies and the synchronized five-track roadmap before releasing the next bounded milestone. Do not infer Phase 7 authority solely from numbering or conversation title.
 
-Material production-platform execution, authority expansion, secrets, privileged-host changes, destructive production cutover, external certification/load commitments or commercial SLA/SLO commitments remain separately CEO-gated.
+Material production-platform execution, secrets, privileged-host changes, destructive production cutover, external certification/load commitments, commercial SLA/SLO commitments or material authority expansion remain separately CEO-gated.
