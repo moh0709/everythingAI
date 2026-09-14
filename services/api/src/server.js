@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { openDatabase } from './db/client.js';
 import { createProductionWorkspaceContextMiddleware } from './db/production/index.js';
 import { resolveEnterpriseRuntimeConfig, createEnterpriseHealthReporter } from './enterprise/runtimeHealth.js';
-import { requireApiToken } from './middleware/auth.js';
+import { resolveAuthenticationMiddleware } from './middleware/auth.js';
 import { attachRequestContext } from './middleware/requestContext.js';
 import { attachWorkspaceContext } from './middleware/workspaceContext.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -54,6 +54,7 @@ export function resolveWorkspaceContextMiddleware(options = {}, dependencies = {
 export function createApiApp(options = {}, dependencies = {}) {
   const app = express();
   const workspaceContextMiddleware = resolveWorkspaceContextMiddleware(options, dependencies);
+  const authenticationMiddleware = resolveAuthenticationMiddleware(options, dependencies);
   const runtimeConfig = resolveEnterpriseRuntimeConfig(options.runtimeEnv ?? process.env);
   const healthReporter = createEnterpriseHealthReporter({
     config: runtimeConfig,
@@ -102,7 +103,7 @@ export function createApiApp(options = {}, dependencies = {}) {
     }
   });
 
-  app.use('/api', attachRequestContext, workspaceContextMiddleware, requireApiToken);
+  app.use('/api', attachRequestContext, workspaceContextMiddleware, authenticationMiddleware);
 
   app.use('/api', createFilesRouter());
   app.use('/api', createSourcePathsRouter());
