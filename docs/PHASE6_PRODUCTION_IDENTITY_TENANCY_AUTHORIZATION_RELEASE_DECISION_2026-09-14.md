@@ -1,17 +1,20 @@
 # EverythingAI — Phase 6 Production Identity, Tenancy & Authorization Release Decision
 
 Date: 2026-09-14  
-Status: CLOSURE CANDIDATE — FINAL PASS PENDING UNCHANGED-HEAD QUALIFICATION  
+Status: ACCEPTED AND DISPATCHED  
+Decision: `PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`  
 Parent: #323  
 Closure issue: #338
 
-## Candidate decision
+## Accepted release evidence
 
-Target decision after final qualification: `PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`.
+Final unchanged closure candidate: `6eef85c405a020feb30d239b4c55b26d747f0ccb`.  
+Closure PR: #339.  
+Closure merge to `main`: `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
 
-This document does not itself grant acceptance. Phase 6 remains a closure candidate until the final changed head passes the complete applicable inherited validation matrix, the dedicated Phase 6 Closure Qualification workflow, and final review remains free of unresolved Critical/Important findings or review threads.
+The unchanged candidate passed 20/20 triggered workflows, including EverythingAI Phase 6 Closure Qualification #2, CI Smoke #906, all triggered inherited focused Product/Governed-Action workflows, Enterprise Isolation, Object Storage and Object Metadata Migration Planning. Final review had zero review submissions and zero review threads.
 
-## Accepted implementation chain under qualification
+## Accepted implementation chain
 
 1. Phase 6.1 production authentication principal boundary — PR #324, merge `cd6e428408a4155358c5de4b8f20bbc26130166f`.
 2. Phase 6.2 tenant/workspace membership boundary — PR #326, merge `693c7eadfee42b8ae6dc6a7ab02117454c610b43`.
@@ -21,38 +24,16 @@ This document does not itself grant acceptance. Phase 6 remains a closure candid
 6. Phase 6.6 trusted audit evidence integration for representative action execution/undo — PR #335, merge `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
 7. Phase 6.7 integrated identity/tenancy authorization qualification — PR #337, merge `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
 
-## Qualified capability boundary
+## Accepted capability boundary
 
-Phase 6 establishes a provider-neutral production authorization foundation consisting of:
-
-- authenticated principal boundary with explicit production enablement and fail-closed behavior;
-- tenant/workspace membership authorization;
-- normalized effective roles and permissions;
-- exact tenant/workspace resource-scope enforcement;
-- one representative production resource path requiring `documents.read`;
-- optional device identity bound to the authorized tenant/workspace;
-- trusted authorization-derived audit attribution;
-- representative trusted audit propagation into action execution and undo evidence;
-- integrated cross-tenant, cross-workspace, ambiguity, degraded-state, spoofing-resistance and local-compatibility qualification.
+Phase 6 establishes a provider-neutral production identity, tenancy and authorization foundation with fail-closed authenticated principal handling, tenant/workspace membership authorization, normalized roles and permissions, exact resource-scope isolation, one representative `documents.read` enforcement path, optional scope-bound device identity, trusted authorization-derived audit attribution, trusted audit propagation into representative action execution/undo evidence, and integrated isolation/spoofing/local-compatibility qualification.
 
 ## Explicit non-authority
 
-This release does not provision production secrets, production IdP credentials, production device credentials, certificates or key material. It does not perform privileged host/root/sudo/SSH/systemd work, destructive production database/object-store migration or cutover, provider-specific lock-in, external certification/compliance commitments, production load qualification, commercial SLA/SLO commitments, or broad automatic action/recovery/governance enforcement expansion.
+This release does not provision production secrets, real production IdP credentials, production device credentials, certificates or key material. It does not perform privileged host/root/sudo/SSH/systemd work, destructive production database/object-store migration or cutover, provider-specific lock-in, external certification/compliance commitments, production load qualification, commercial SLA/SLO commitments, broad route-by-route authorization rollout, or broad automatic action/recovery/governance enforcement expansion.
 
-Phase 5 governance remains L0 Advisory / Shadow Only. Phase 6 authorization boundaries are production-oriented contracts and representative enforcement foundations; they do not silently activate broad platform-wide enforcement or production infrastructure.
+Phase 5 governance remains L0 Advisory / Shadow Only. Phase 6 production-oriented authorization contracts do not silently activate platform-wide production enforcement or production infrastructure.
 
 ## Rollback
 
-The Phase 6 closure layer is independently reversible from the already accepted Phase 6.1–6.7 implementation merges. Reverting the closure merge must not require reverting those bounded implementation milestones.
-
-Each Phase 6 implementation merge remains independently traceable and reversible through its PR/commit history.
-
-## Final acceptance gate
-
-PASS may be recorded only when:
-
-1. one final unchanged closure head is identified;
-2. `EverythingAI Phase 6 Closure Qualification` succeeds on that exact head;
-3. the complete applicable inherited workflow matrix succeeds on the same exact head;
-4. no unresolved Critical/Important finding or review thread remains;
-5. canonical project-state files are synchronized to the accepted result without overstating production authority.
+Closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07` is independently reversible from accepted Phase 6.1–6.7 implementation merges. Each bounded implementation milestone remains independently traceable and reversible through its PR and merge history.
