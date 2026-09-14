@@ -35,8 +35,12 @@ Phase 6 accepts a provider-neutral production identity/tenancy/authorization fou
 11. Phase 6.11 release-decision/handover evidence consistency — issue #356 / PR #357 merge `620e20279321f0881df99a168c09a7395873fed5`.
 12. Phase 6.12 `PROJECT_STATE.md` post-closure evidence synchronization — issue #359 / PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`.
 13. Phase 6.13 `AI_BOOTSTRAP.md` post-closure evidence synchronization — issue #361 / PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
+14. Phase 6.14 roadmap post-closure evidence reconciliation — issue #363 / PR #364 merge `5b9e10096b56db7b1546d9347474436dbd50dc46`.
+15. Phase 6.15 canonical authority reconciliation — issue #365 / PR #366 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
 
-Phase 6.9–6.13 are accepted documentation/evidence consistency corrections and do not reopen Phase 6 runtime scope.
+Phase 6.9–6.15 are accepted documentation/evidence consistency corrections and do not reopen Phase 6 runtime scope.
+
+Future evidence-only Phase 6 acceptance after Phase 6.15 is determined directly from current GitHub issue/PR/merge/workflow evidence. Evidence-only merges do not recursively require this implementation roadmap to add another synchronization item. Update this file only when a stable implementation dependency, runtime/product authority, safety boundary, validation contract, or other factual baseline changes.
 
 Key focused qualification files include:
 
@@ -63,11 +67,13 @@ Key focused qualification files include:
 ## Current execution sequence
 
 1. Phase 6 runtime implementation and closure are complete.
-2. Preserve canonical Phase 6 evidence consistency after closure.
-3. When a factual post-closure inconsistency is discovered, correct only the affected documentation/evidence path.
-4. Validate every changed Phase 6 evidence candidate with the complete applicable inherited matrix on one unchanged head and clean review state.
-5. Do not use evidence maintenance to reopen Phase 6 runtime scope or expand production authority.
-6. Separately scoped later-phase work must derive its own authority from current repository priorities and accepted dependency readiness.
+2. Preserve the stable Phase 6 authority and safety boundary.
+3. Read evidence-only acceptance after Phase 6.15 directly from GitHub issue/PR/merge/workflow evidence.
+4. Do not recursively modify canonical documents merely because a documentation/evidence-only synchronization merged.
+5. Update canonical documents only when their stable factual baseline, runtime/product authority, dependency state, safety boundary, or validation contract changes.
+6. Validate every changed Phase 6 candidate with the complete applicable inherited matrix on one unchanged head and clean review state.
+7. Do not use evidence maintenance to reopen Phase 6 runtime scope or expand production authority.
+8. Separately scoped later-phase work must derive its own authority from current repository priorities and accepted dependency readiness.
 
 ## Five-track implementation boundary
 
@@ -104,4 +110,4 @@ Issue #69 remains closed historical evidence and must not be rewritten without a
 
 ## Rollback
 
-Phase 6 post-closure evidence corrections are independently reversible. Phase 6 closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6.1–6.7 implementation merge, Phase 5 and all earlier accepted milestones retain independent rollback evidence. The accepted pre-Phase-6.14 evidence baseline is Phase 6.13 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
+Phase 6 post-closure evidence corrections are independently reversible. Phase 6 closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6.1–6.7 implementation merge, Phase 5 and all earlier accepted milestones retain independent rollback evidence. The accepted pre-Phase-6.16 evidence baseline is Phase 6.15 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
