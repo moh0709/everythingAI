@@ -135,7 +135,7 @@ export function createApiApp(options = {}, dependencies = {}) {
   app.use('/api', createWikiRouter());
   app.use('/api', createIntelligenceRouter());
   app.use('/api', createWatchRouter());
-  app.use('/api', createActionsRouter());
+  app.use('/api', createActionsRouter(options));
   app.use('/api', createRecoveryRouter());
   app.use('/api', createIntegrationsRouter());
   app.use('/api', createSystemRouter());
