@@ -89,6 +89,10 @@ export function createProductionResourceScopeAuthorizationMiddleware({
       }
 
       const resourceScope = outcome?.resourceScope ?? outcome?.scope ?? null;
+      if (!resourceScope || typeof resourceScope !== 'object' || Array.isArray(resourceScope)) {
+        return sendForbidden(res);
+      }
+
       const scopeDecision = assertEnterpriseResourceScope(
         {
           authorized: true,
