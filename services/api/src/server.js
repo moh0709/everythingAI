@@ -11,6 +11,10 @@ import { resolveEnterpriseRuntimeConfig, createEnterpriseHealthReporter } from '
 import { resolveAuthenticationMiddleware } from './middleware/auth.js';
 import { resolveMembershipAuthorizationMiddleware } from './middleware/membershipAuthorization.js';
 import { resolvePermissionAuthorizationMiddleware } from './middleware/permissionAuthorization.js';
+import {
+  resolveAuditAttributionMiddleware,
+  resolveDeviceIdentityMiddleware,
+} from './middleware/deviceAuditAttribution.js';
 import { attachRequestContext } from './middleware/requestContext.js';
 import { attachWorkspaceContext } from './middleware/workspaceContext.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -59,6 +63,8 @@ export function createApiApp(options = {}, dependencies = {}) {
   const authenticationMiddleware = resolveAuthenticationMiddleware(options, dependencies);
   const membershipAuthorizationMiddleware = resolveMembershipAuthorizationMiddleware(options, dependencies);
   const permissionAuthorizationMiddleware = resolvePermissionAuthorizationMiddleware(options, dependencies);
+  const deviceIdentityMiddleware = resolveDeviceIdentityMiddleware(options, dependencies);
+  const auditAttributionMiddleware = resolveAuditAttributionMiddleware(options, dependencies);
   const runtimeConfig = resolveEnterpriseRuntimeConfig(options.runtimeEnv ?? process.env);
   const healthReporter = createEnterpriseHealthReporter({
     config: runtimeConfig,
@@ -114,6 +120,8 @@ export function createApiApp(options = {}, dependencies = {}) {
     workspaceContextMiddleware,
     membershipAuthorizationMiddleware,
     permissionAuthorizationMiddleware,
+    deviceIdentityMiddleware,
+    auditAttributionMiddleware,
   );
 
   app.use('/api', createFilesRouter(options, dependencies));
