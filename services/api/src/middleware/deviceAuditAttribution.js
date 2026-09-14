@@ -1,3 +1,5 @@
+const AUDIT_ACTOR_TYPES = new Set(['user', 'service_principal', 'system', 'anonymous']);
+
 function normalizeValue(value) {
   if (typeof value !== 'string') {
     return null;
@@ -5,6 +7,11 @@ function normalizeValue(value) {
 
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizeAuditActorType(value) {
+  const normalized = normalizeValue(value);
+  return normalized && AUDIT_ACTOR_TYPES.has(normalized) ? normalized : null;
 }
 
 function sendForbidden(res) {
@@ -112,7 +119,7 @@ export function createProductionAuditAttributionMiddleware() {
   return (req, res, next) => {
     const authorizationContext = req.authorizationContext;
     const principalId = normalizeValue(authorizationContext?.principalId);
-    const principalType = normalizeValue(authorizationContext?.principalType);
+    const principalType = normalizeAuditActorType(authorizationContext?.principalType);
     const tenantId = normalizeValue(authorizationContext?.tenantId);
     const workspaceId = normalizeValue(authorizationContext?.workspaceId);
 
