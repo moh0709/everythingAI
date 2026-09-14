@@ -7,12 +7,12 @@ EverythingAI is the project foundation for **EverythingApp**: a local-first, sou
 As of 2026-09-14, the accepted program baseline is:
 
 ```text
-Phase 5 Governance Foundation: COMPLETE AND DISPATCHED
-Decision: PHASE5_GOVERNANCE_FOUNDATION_PASS
-Accepted release candidate: 4050a2814f23e75adb6f31ebf2779dd0e4e6878d
-Phase 5 release merge: ddb9ed95422ca9bd4be9641a51fa16502aadd80e
-Canonical post-release synchronization merge: b64ed338fa6a513074fdcef2e4b126f629262f6a
-Governance maturity: L0 — Advisory / Shadow Only
+Phase 6 Production Identity, Tenancy & Authorization Foundation: COMPLETE AND DISPATCHED
+Decision: PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS
+Accepted closure candidate: 6eef85c405a020feb30d239b4c55b26d747f0ccb
+Phase 6 closure merge: 71fd3627b783284bccf37f7628b86a8a78fb3c07
+Canonical acceptance synchronization merge: 16517e009d108c200e65c93781d655c29c7f4624
+Phase 5 governance maturity: L0 — Advisory / Shadow Only
 ```
 
 Current source-of-truth documents, in authority order:
@@ -22,8 +22,8 @@ PROJECT_STATE.md
 AI_BOOTSTRAP.md
 docs/ROADMAP.md
 docs/IMPLEMENTATION_ROADMAP.md
-docs/PHASE5_GOVERNANCE_FOUNDATION_RELEASE_DECISION_2026-09-14.md
-docs/HANDOVER_2026-09-14_PHASE5_GOVERNANCE_FOUNDATION.json
+docs/PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_RELEASE_DECISION_2026-09-14.md
+docs/HANDOVER_2026-09-14_PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION.json
 ```
 
 The repository contains older local-MVP documents that use an earlier Phase 1–8 numbering scheme. Those files are preserved as historical evidence and must not be interpreted as the current program roadmap when they conflict with the canonical authority above.
@@ -34,9 +34,9 @@ The repository contains older local-MVP documents that use an earlier Phase 1–
 
 ## Current focus
 
-Phase 5 is closed. The next roadmap milestone has **not** been assigned a repository-authoritative numbered scope yet. The next dependency must be selected from the synchronized five-track roadmap using product value, dependency readiness, bounded/reversible scope, safe-action/evidence preservation, and measurable acceptance criteria.
+Phase 6 is closed and dispatched. The next roadmap milestone must be selected from the synchronized five-track roadmap using product value, dependency readiness, bounded/reversible scope, safe-action/evidence preservation, and measurable acceptance criteria.
 
-No production-enforcement authority is implied by Phase 5 completion. The accepted governance foundation remains L0 Advisory / Shadow Only.
+Phase 6 acceptance does not authorize real production identity/device credentials, production secrets, privileged infrastructure, destructive production migration/cutover, broad route-by-route authorization rollout, external certification/load/SLA commitments, or material automatic action/recovery/governance authority expansion. Phase 5 governance remains L0 Advisory / Shadow Only.
 
 ## Historical local MVP baseline
 
@@ -237,7 +237,6 @@ Run backend tests:
 cd C:\temp\EverythingAI\services\api
 npm test
 ```
-
 Run frontend validation:
 
 ```powershell
@@ -332,9 +331,8 @@ See the `/docs` folder.
 - [`AI_BOOTSTRAP.md`](AI_BOOTSTRAP.md)
 - [`ROADMAP.md`](docs/ROADMAP.md)
 - [`IMPLEMENTATION_ROADMAP.md`](docs/IMPLEMENTATION_ROADMAP.md)
-- [`PHASE5_GOVERNANCE_FOUNDATION_RELEASE_DECISION_2026-09-14.md`](docs/PHASE5_GOVERNANCE_FOUNDATION_RELEASE_DECISION_2026-09-14.md)
-- [`HANDOVER_2026-09-14_PHASE5_GOVERNANCE_FOUNDATION.json`](docs/HANDOVER_2026-09-14_PHASE5_GOVERNANCE_FOUNDATION.json)
-- [`PHASE5_CANONICAL_HISTORY_PRESERVATION_2026-09-14.md`](docs/PHASE5_CANONICAL_HISTORY_PRESERVATION_2026-09-14.md)
+- [`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_RELEASE_DECISION_2026-09-14.md`](docs/PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_RELEASE_DECISION_2026-09-14.md)
+- [`HANDOVER_2026-09-14_PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION.json`](docs/HANDOVER_2026-09-14_PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION.json)
 
 ### Historical local-MVP checkpoint documentation
 
@@ -378,7 +376,7 @@ Any such track must be explicitly selected through the current canonical roadmap
 
 ### Enterprise workspace documentation
 
-The production target remains a governed enterprise cognitive workspace. Current production-authority boundaries are controlled by `PROJECT_STATE.md`, `AI_BOOTSTRAP.md`, and the accepted Phase 5 release decision; older enterprise documents do not independently grant production authority.
+The production target remains a governed enterprise cognitive workspace. Current production-authority boundaries are controlled by `PROJECT_STATE.md`, `AI_BOOTSTRAP.md`, and the accepted Phase 6 release decision; older enterprise documents do not independently grant production authority.
 
 - [`ENTERPRISE_WORKSPACE_PRD.md`](docs/ENTERPRISE_WORKSPACE_PRD.md)
 - [`ENTERPRISE_TECHNICAL_ARCHITECTURE.md`](docs/ENTERPRISE_TECHNICAL_ARCHITECTURE.md)
