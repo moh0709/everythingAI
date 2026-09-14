@@ -1,6 +1,6 @@
 # EverythingAI — Current Implementation Roadmap
 
-Date: 2026-09-10
+Date: 2026-09-14
 
 ## Current state
 
@@ -10,21 +10,25 @@ The later Product Depth, cross-surface context, workspace-context trust, governe
 
 Phase 3 — Enterprise Readiness Foundation is **complete and dispatched** as `ENTERPRISE_READINESS_FOUNDATION_PASS` through governance issue #304 and release PR #307. The accepted application-level foundation covers Phase 3.1–3.6 plus dependency-security remediation. It does **not** claim production deployment readiness.
 
-Phase 4 — Pre-production Recovery Qualification is **complete and dispatched** as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix, including Dependency Security Audit #16 and Pre-production Recovery Qualification #9. The accepted scope uses disposable/non-production resources and synthetic data only.
+Phase 4 — Pre-production Recovery Qualification is **complete and dispatched** as `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Final unchanged head `0d8d4a949fe84b756c867bec7fbd8d78512c765f` passed the complete applicable 24-workflow matrix. Destructive qualification remains limited to disposable/non-production resources and synthetic data.
 
-The current gate is #312: record the Phase 4 release canonically and make an explicit Phase 5 governance dispatch decision. Existing Phase 5 ADR-005-013 remains Proposed until separately accepted or revised. Material production-platform execution remains separately gated.
+Phase 5.1 Governance Continuity is accepted through #314 / PR #315 merge `2f8285c140936185bbe75b943b1dcf1acf28e16b`. ADR-005-013 is Accepted and establishes repository/release continuity requirements without activating runtime enforcement.
+
+Phase 5 comprehensive Governance Foundation closure is active through #317 / PR #318. Historical governance tracks 5.1–5.8 are being requalified and consolidated rather than rebuilt. First comprehensive candidate `6139d018bc2fe398cd5e482f30305d110173a1c5` passed 20/20 triggered workflows, including Phase 5 Closure Qualification #1 and CI Smoke #871. Final dispatch as `PHASE5_GOVERNANCE_FOUNDATION_PASS` is permitted only after the exact final changed PR head is fully green and independently review-clean.
 
 ## Active sequence
 
-1. Preserve the accepted `PHASE4_PREPRODUCTION_RECOVERY_QUALIFICATION_PASS` baseline and its exact rollback evidence.
-2. Complete #312 canonical synchronization and explicit Phase 5 governance dispatch decision.
-3. Define acceptance criteria, evidence, validation and rollback before implementation.
-4. Implement the smallest coherent reversible change.
-5. Validate the changed candidate on one unchanged head using the full applicable inherited product and enterprise regression matrix.
-6. Independently review the final diff/security implications and resolve all Critical/Important findings and review threads.
-7. Merge/close only on verified green evidence, then release at most one next dependency.
+1. Preserve the accepted Phase 4 and Phase 5.1 baselines and their rollback evidence.
+2. Complete #317 / PR #318 canonical synchronization and Phase 5 closure evidence.
+3. Re-run the complete applicable CI matrix on the exact changed final head.
+4. Inspect Phase 5 Closure Qualification and important enterprise/security evidence.
+5. Perform final diff/security/governance review with zero unresolved Critical or Important findings and zero unresolved review threads.
+6. Merge PR #318 only if that unchanged final head remains fully green.
+7. Close #317; close #316 only when its synchronization scope is demonstrably absorbed by #317.
+8. Verify `main` after merge.
+9. Inspect the synchronized five-track roadmap before defining the next numbered phase or issue. Do not infer a Phase 6 scope merely from Phase 5 completion.
 
-Production secrets, privileged-host/root/sudo/SSH/systemd execution, destructive PostgreSQL/object-storage migration or cutover, external penetration/compliance/certification commitments, production-load qualification and commercial SLA/SLO commitments require explicit CEO authority before execution.
+Production secrets, privileged-host/root/sudo/SSH/systemd execution, destructive production PostgreSQL/object-storage migration or cutover, external penetration/compliance/certification commitments, production-load qualification and commercial SLA/SLO commitments remain separately CEO-gated.
 
 ## Phase 2 accepted chain
 
@@ -49,42 +53,45 @@ Architecture authority remains:
 
 Accepted milestones:
 
-- Phase 3.1 — identity, tenancy and PostgreSQL isolation — #292 / PR #293 — merge `6dead7b5a62161ed80670b7c9cc28c693b709d14` — CI Smoke #768 plus inherited and Enterprise Isolation acceptance.
-- Phase 3.2 — provider-neutral object storage — #294 / PR #295 — merge `d0b6b1e7d201eb8f90686f9833ea7fa17a307752` — CI Smoke #778 plus inherited, Enterprise Isolation and Object Storage acceptance.
-- Phase 3.3 — durable object metadata and migration planning — #296 / PR #297 — merge `6fecf25048628857f489791682018ed3b226e9ba` — CI Smoke #790 plus enterprise metadata-planning acceptance; destructive cutover remained excluded.
-- Phase 3.4 — enterprise runtime configuration and health — #298 / PR #299 — merge `81831a8ae6239a170b8645e8ec0bfbc0f3cbd571` — CI Smoke #795; application-level health only.
-- Phase 3.5 — backup/restore and DR validation foundation — #300 / PR #301 — merge `2d392f8743339fe52b9f6478bbfcf113e02d1fdd` — CI Smoke #806; isolated/disposable validation only.
-- Phase 3.6 — capacity, security and release validation — #302 / PR #303 — merge `eb3acd0aa956f41e70e3225ddecaef04cd58481e`; final head `ee03896a5f663683e8c1bf22f9334b8f79b5ea94` passed CI Smoke #827 plus the inherited and Phase 3 enterprise validation matrix.
-- Dependency-security remediation — #305 / PR #306 — merge `d69af031bc4bfd82441ebb22b17040879cfdd93f`; final head `5cc3ffe0f8842ea2250ddb986d9cb86444e3df2a` passed CI Smoke #836, all fifteen inherited focused workflows, all six Phase 3 enterprise workflows and Dependency Security Audit #8 with a clean exact-lock audit.
-- Enterprise Readiness Foundation release — #304 / PR #307 — accepted and dispatched as `ENTERPRISE_READINESS_FOUNDATION_PASS`; authoritative release evidence is `docs/ENTERPRISE_READINESS_FOUNDATION_RELEASE_DECISION_2026-08-29.md` and `docs/HANDOVER_2026-08-29_ENTERPRISE_READINESS_FOUNDATION_RELEASE.json`.
+- Phase 3.1 — #292 / PR #293 — merge `6dead7b5a62161ed80670b7c9cc28c693b709d14`.
+- Phase 3.2 — #294 / PR #295 — merge `d0b6b1e7d201eb8f90686f9833ea7fa17a307752`.
+- Phase 3.3 — #296 / PR #297 — merge `6fecf25048628857f489791682018ed3b226e9ba`.
+- Phase 3.4 — #298 / PR #299 — merge `81831a8ae6239a170b8645e8ec0bfbc0f3cbd571`.
+- Phase 3.5 — #300 / PR #301 — merge `2d392f8743339fe52b9f6478bbfcf113e02d1fdd`.
+- Phase 3.6 — #302 / PR #303 — merge `eb3acd0aa956f41e70e3225ddecaef04cd58481e`.
+- Dependency-security remediation — #305 / PR #306 — merge `d69af031bc4bfd82441ebb22b17040879cfdd93f`.
+- Enterprise Readiness Foundation release — #304 / PR #307 — `ENTERPRISE_READINESS_FOUNDATION_PASS`.
+
+Authoritative detailed evidence remains in `docs/ENTERPRISE_READINESS_FOUNDATION_RELEASE_DECISION_2026-08-29.md`, `docs/HANDOVER_2026-08-29_ENTERPRISE_READINESS_FOUNDATION_RELEASE.json`, GitHub issues/PRs and workflow history.
 
 Local-first SQLite remains a supported product/runtime mode unless a separately accepted migration/cutover gate authorizes otherwise.
 
+## Phase 4 accepted chain
+
+Phase 4 pre-production recovery qualification is accepted through #310 / PR #311 merge `9f67ef1a58f9c3886d594bcd426d67fc6b4ebda1`. Its destructive-test authority is strictly limited to disposable/non-production resources and synthetic data. It does not authorize destructive production cutover.
+
+## Phase 5 governance foundation chain
+
+Historical implemented tracks and due-diligence evidence remain preserved in issues #6–#13 and:
+
+- `REPORTS/ISSUE-6-PHASE5-IDENTITY-FOUNDATION.md`;
+- `REPORTS/ISSUE-7-PHASE5-PERMISSION-FOUNDATION.md`;
+- `REPORTS/ISSUE-8-PHASE5-POLICY-ENGINE-SHADOW-GOVERNANCE.md`;
+- `REPORTS/ISSUE-9-PHASE5-RISK-CLASSIFICATION-FOUNDATION.md`;
+- `REPORTS/ISSUE-10-PHASE5-APPROVAL-WORKFLOW-FOUNDATION.md`;
+- `REPORTS/ISSUE-11-PHASE5-ESCALATION-GOVERNANCE-FOUNDATION.md`;
+- `REPORTS/ISSUE-12-PHASE5-AUTHORIZATION-DECISION-LAYER.md`;
+- `REPORTS/ISSUE-13-PHASE5-CONTROLLED-ENFORCEMENT-ACTIVATION.md`.
+
+Closure qualification is enforced by `scripts/validate-phase5-closure.mjs` and `.github/workflows/ci-phase5-closure.yml`, with accepted Governance Continuity inherited through ADR-005-013 and `scripts/validate-governance-continuity.mjs`.
+
+Phase 5 maturity remains L0 Advisory / Shadow Only. Controlled-enforcement implementation artifacts are governance foundations and do not themselves activate production runtime blocking or mutation authority.
+
 ## Inherited release gates
 
-Every future changed product/release candidate must preserve the complete applicable accepted Phase 1 + Phase 2 + Product Depth/Product & UX baseline, including:
+Every future changed product/release candidate must preserve the complete applicable accepted Phase 1 + Phase 2 + Product Depth/Product & UX baseline, including root regression, backend tests, frontend typecheck/build, Client/Admin smoke, accepted citation/search/navigation/lifecycle/recovery/planning/execution/audit/undo acceptance, disposable-folder release-candidate acceptance, UI-governed planning → preview → approval → execution → audit → undo acceptance, all fifteen accepted focused product workflows, independent final review, and milestone-scoped rollback evidence.
 
-1. root regression;
-2. backend tests;
-3. frontend typecheck;
-4. frontend production build;
-5. Client/Admin Playwright smoke;
-6. accepted citation/search/navigation/lifecycle/recovery/planning/execution/audit/undo acceptance;
-7. disposable-folder release-candidate acceptance;
-8. UI-governed planning → preview → approval → execution → audit → undo acceptance;
-9. all fifteen accepted focused product workflows;
-10. independent final diff review;
-11. exact milestone-scoped rollback evidence.
-
-Phase 3-affecting candidates additionally preserve the applicable enterprise gates:
-
-- Enterprise Isolation;
-- Object Storage;
-- Object Metadata Migration Planning;
-- Enterprise Runtime Health;
-- Enterprise Backup Restore Validation;
-- Enterprise Capacity & Security;
-- read-only exact-lock Dependency Security Audit when dependency-lock changes can affect the backend/enterprise runtime.
+Phase 3/4/5-affecting candidates additionally preserve applicable enterprise, dependency-security, recovery, Governance Continuity and Phase 5 Closure Qualification gates.
 
 Historical green evidence is supporting evidence only and never substitutes for validating a changed candidate.
 
@@ -97,30 +104,17 @@ Choose only distinct user-visible value. Do not recursively restate already trus
 Preserve backend authority, explicit approval, truthful unknown-state handling, audit/undo, recovery and filesystem safety.
 
 ### Enterprise Platform
-The application-level Enterprise Readiness Foundation is accepted. Real infrastructure/secrets, privileged-host execution, destructive migration/cutover, external certification, production-load qualification and SLA/SLO commitments remain separate CEO-gated work.
+Phase 4 pre-production recovery qualification is accepted. Phase 5 closure adds governance foundations only. Real infrastructure/secrets, privileged-host execution, destructive production migration/cutover, external certification, production-load qualification and SLA/SLO commitments remain separate CEO-gated work.
 
 ### Engineering Operations
-Keep dependency/security and enterprise validation wired to changes that can affect them. Privileged production operations require explicit authority and environment access.
+Keep dependency/security, enterprise, recovery, continuity and governance-closure validation wired to changes that can affect them. Privileged production operations require explicit authority and environment access.
 
 ### Governance and Autonomous Delivery
-Release exactly one bounded dependency at a time using inspect → acceptance matrix → narrow implementation → test/CI → evaluate → improve → retest → independent review → accept/reject → merge/close → next dependency.
+Complete #317/#318 with unchanged-head validation and clean independent review. After merge, inspect the synchronized roadmap and release one bounded dependency at a time.
 
 ## Scope boundaries
 
-Do not silently begin or claim completion of:
-
-- production identity-provider or credential provisioning;
-- privileged-host/server provisioning;
-- destructive production database/object migration or cutover;
-- provider-specific cloud lock-in beyond the approved neutral architecture;
-- external penetration testing, compliance assessment or certification;
-- production load/capacity qualification against representative infrastructure and traffic;
-- commercial support or SLA/SLO commitments;
-- automatic action/recovery/rebuild expansion;
-- materially expanded connector/runtime behavior;
-- other material architecture changes not covered by accepted ER-1 through ER-5.
-
-These require explicit authority at the relevant gate.
+Do not silently begin or claim completion of production identity-provider or credential provisioning, privileged-host/server provisioning, destructive production database/object migration or cutover, provider-specific cloud lock-in beyond approved neutral architecture, external penetration testing/compliance/certification, production load/capacity qualification, commercial support/SLA/SLO commitments, automatic action/recovery/rebuild expansion, materially expanded connector/runtime behavior, or other material architecture changes not covered by accepted authority.
 
 ## Issue #69
 
@@ -128,4 +122,4 @@ Issue #69 is closed completed historical Phase 3/Hermes reliability evidence and
 
 ## Rollback
 
-This #308 reconciliation is documentation-only and can be reverted independently without reverting any accepted runtime/product/enterprise milestone. Phase 3.1–3.6, dependency-security remediation, Enterprise Readiness release synchronization, Phase 2, Product Depth and all later trust milestones retain their own accepted merge-level rollback evidence.
+Phase 5 closure/canonical synchronization is independently reversible from historical Phase 5 implementation, Phase 5.1 Governance Continuity, Phase 4 qualification and earlier accepted runtime/product/enterprise milestones. All earlier accepted merge-level rollback evidence remains valid and preserved.
