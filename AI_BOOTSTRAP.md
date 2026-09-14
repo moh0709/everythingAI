@@ -2,7 +2,7 @@
 
 Date: 2026-09-14  
 Current accepted state: Phase 6 Production Identity, Tenancy & Authorization Foundation dispatched (`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`)  
-Latest accepted canonical state evidence synchronization reflected here: Phase 6.14 (#363 / PR #364), merge `5b9e10096b56db7b1546d9347474436dbd50dc46`
+Post-closure evidence authority: GitHub issue/PR/merge/workflow evidence. This file records the stable operating authority and is not recursively rewritten merely to record later evidence-only synchronization merges.
 
 ## Mandatory startup sequence
 
@@ -30,7 +30,9 @@ Phase 6 Production Identity, Tenancy & Authorization Foundation is accepted thro
 
 Final closure evidence: 20/20 triggered workflows passed, including Phase 6 Closure Qualification #2 and CI Smoke #906. Final review had no review submissions or review threads.
 
-Post-closure canonical evidence is synchronized through Phase 6.14 (#363 / PR #364). Its unchanged documentation-only candidate `7e7c7663a1a0e4253365e2f3513cba8639aa5b54` passed 22/22 triggered workflows, including CI Smoke #928, with zero review submissions and zero inline review comments, and merged as `5b9e10096b56db7b1546d9347474436dbd50dc46`.
+Accepted post-closure evidence maintenance is recorded through Phase 6.15. Phase 6.14 issue #363 / PR #364 used unchanged candidate `7e7c7663a1a0e4253365e2f3513cba8639aa5b54`, passed 22/22 triggered workflows including CI Smoke #928, and merged as `5b9e10096b56db7b1546d9347474436dbd50dc46`. Phase 6.15 issue #365 / PR #366 used unchanged candidate `d3dabdeb461d6b6e79d34598deaa3d0a6eff3bcd`, passed 22/22 triggered workflows including CI Smoke #930, and merged as `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
+
+Later evidence-only Phase 6 acceptance is determined from current GitHub issue/PR/merge/workflow evidence. A later evidence-only merge does not itself require this file to be synchronized again. Update this file only when a stable factual baseline, authority boundary, startup rule, or runtime/product status recorded here materially changes.
 
 Post-closure evidence corrections do not reopen Phase 6 for new runtime or product scope and do not expand production authority.
 
@@ -114,6 +116,6 @@ Historical green evidence never substitutes for revalidating a changed candidate
 
 ## Current next-step rule
 
-Phase 6 is closed and must not be reopened for new product/runtime scope. Continue only bounded evidence-consistency corrections that preserve the accepted Phase 6 authority boundary. Post-Phase-6 product work belongs to its separately governed phase.
+Phase 6 is closed and must not be reopened for new product/runtime scope. Evidence-only acceptance after Phase 6.15 is read directly from GitHub issue/PR/merge/workflow evidence and does not create a recursive requirement to update this file. Post-Phase-6 product work belongs to its separately governed phase.
 
 Material production-platform execution, secrets, privileged-host changes, destructive production cutover, external certification/load commitments, commercial SLA/SLO commitments, broad authorization rollout, or material automatic authority expansion remain separately CEO-gated.
