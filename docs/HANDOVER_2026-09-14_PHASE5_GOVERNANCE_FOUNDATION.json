@@ -5,8 +5,29 @@
   "phase": "Phase 5 Governance Foundation closure",
   "governance_issue": 317,
   "release_pr": 318,
-  "decision_target": "PHASE5_GOVERNANCE_FOUNDATION_PASS",
-  "decision_state": "PENDING_FINAL_CHANGED_HEAD_QUALIFICATION",
+  "decision": "PHASE5_GOVERNANCE_FOUNDATION_PASS",
+  "decision_state": "ACCEPTED_AND_MERGED",
+  "final_release_candidate": "4050a2814f23e75adb6f31ebf2779dd0e4e6878d",
+  "accepted_merge": "ddb9ed95422ca9bd4be9641a51fa16502aadd80e",
+  "final_validation": {
+    "workflow_runs": 23,
+    "failures": 0,
+    "phase5_closure_qualification": {
+      "run_number": 9,
+      "run_id": 34812965835,
+      "conclusion": "success"
+    },
+    "ci_smoke": {
+      "run_number": 879,
+      "run_id": 34812965690,
+      "conclusion": "success"
+    },
+    "inherited_focused_product_workflows": "15/15 successful",
+    "applicable_enterprise_workflows": "6/6 successful",
+    "reviews": 0,
+    "unresolved_review_threads": 0,
+    "critical_or_important_findings": 0
+  },
   "governance_state": {
     "maturity": "Advisory / Shadow governance with controlled governance foundations",
     "enforcement_level": "L0",
@@ -14,6 +35,7 @@
     "production_runtime_blocking": false,
     "automatic_governance_freeze": false,
     "automatic_recovery_activation": false,
+    "automatic_approval_execution_retry_or_undo": false,
     "privileged_infrastructure_authority": false,
     "production_secret_authority": false,
     "external_certification_claim": false,
@@ -30,69 +52,28 @@
     "Controlled Enforcement Activation Governance",
     "Governance Session Handover & Continuity"
   ],
-  "first_comprehensive_candidate": {
-    "sha": "6139d018bc2fe398cd5e482f30305d110173a1c5",
-    "workflow_runs": 20,
-    "failures": 0,
-    "phase5_closure_qualification": {
-      "run_number": 1,
-      "run_id": 34772033801,
-      "conclusion": "success"
-    },
-    "ci_smoke": {
-      "run_number": 871,
-      "run_id": 34772033813,
-      "conclusion": "success"
-    },
-    "enterprise_isolation": {
-      "run_number": 113,
-      "run_id": 34772033679,
-      "conclusion": "success"
-    },
-    "object_storage": {
-      "run_number": 97,
-      "run_id": 34772033811,
-      "conclusion": "success"
-    },
-    "object_metadata_migration_planning": {
-      "run_number": 92,
-      "run_id": 34772033857,
-      "conclusion": "success"
-    },
-    "inherited_focused_product_workflows": "15/15 successful"
+  "canonical_authority": {
+    "project_state": "PROJECT_STATE.md",
+    "bootstrap": "AI_BOOTSTRAP.md",
+    "roadmap": "docs/ROADMAP.md",
+    "implementation_roadmap": "docs/IMPLEMENTATION_ROADMAP.md",
+    "phase5_status": "services/api/docs/phase5-implementation-status.md",
+    "history_preservation": "docs/PHASE5_CANONICAL_HISTORY_PRESERVATION_2026-09-14.md"
   },
-  "required_final_gate": {
-    "final_pr_head": "resolve from PR #318 after all canonical and release changes are committed",
-    "unchanged_head_required": true,
-    "complete_applicable_ci_required": true,
-    "phase5_closure_qualification_required": true,
-    "governance_continuity_required": true,
-    "critical_or_important_findings_allowed": 0,
-    "unresolved_review_threads_allowed": 0
+  "historical_preservation": {
+    "pre_closure_main": "0f03beae72c323bb4ad0022dbd7fe05146d29720",
+    "issue_69_modified": false,
+    "historical_release_evidence_preserved": true
   },
-  "canonical_files": [
-    "PROJECT_STATE.md",
-    "AI_BOOTSTRAP.md",
-    "docs/ROADMAP.md",
-    "docs/IMPLEMENTATION_ROADMAP.md",
-    "services/api/docs/phase5-implementation-status.md"
-  ],
-  "preservation_requirements": [
-    "Preserve historical issue #69 unchanged",
-    "Preserve all earlier accepted release and rollback evidence",
-    "Preserve local-first SQLite support unless separately cut over",
-    "Preserve tenant/workspace isolation and Phase 3/4 safeguards",
-    "Preserve Phase 4 destructive-test scope as disposable/non-production resources and synthetic data only"
-  ],
   "forbidden_inferences": [
     "No production enforcement activation",
     "No automatic approval/execution/retry/recovery/undo authority",
-    "No privileged infrastructure or secret authority",
+    "No privileged infrastructure or production-secret authority",
     "No destructive production cutover",
     "No external certification claim",
     "No production SLA/load claim",
     "No provider lock-in"
   ],
-  "rollback": "Revert the Phase 5 closure/canonical synchronization independently from the historical Phase 5 implementation, Phase 4 qualification, and Phase 5.1 Governance Continuity acceptance.",
-  "next_action": "Synchronize canonical authority, requalify the exact changed PR #318 head, perform final review, merge only if fully green, then inspect the synchronized roadmap before dispatching the next phase."
+  "rollback": "Revert the Phase 5 closure/canonical synchronization independently from historical Phase 5 implementation, Phase 5.1 Governance Continuity, Phase 4 qualification and earlier accepted milestones.",
+  "next_action": "Use the synchronized five-track roadmap to select one bounded next dependency. Do not infer production-enforcement authority or a Phase 6 scope that is not explicitly supported by accepted roadmap evidence."
 }
