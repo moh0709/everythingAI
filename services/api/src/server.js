@@ -10,6 +10,7 @@ import { createProductionWorkspaceContextMiddleware } from './db/production/inde
 import { resolveEnterpriseRuntimeConfig, createEnterpriseHealthReporter } from './enterprise/runtimeHealth.js';
 import { resolveAuthenticationMiddleware } from './middleware/auth.js';
 import { resolveMembershipAuthorizationMiddleware } from './middleware/membershipAuthorization.js';
+import { resolvePermissionAuthorizationMiddleware } from './middleware/permissionAuthorization.js';
 import { attachRequestContext } from './middleware/requestContext.js';
 import { attachWorkspaceContext } from './middleware/workspaceContext.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -57,6 +58,7 @@ export function createApiApp(options = {}, dependencies = {}) {
   const workspaceContextMiddleware = resolveWorkspaceContextMiddleware(options, dependencies);
   const authenticationMiddleware = resolveAuthenticationMiddleware(options, dependencies);
   const membershipAuthorizationMiddleware = resolveMembershipAuthorizationMiddleware(options, dependencies);
+  const permissionAuthorizationMiddleware = resolvePermissionAuthorizationMiddleware(options, dependencies);
   const runtimeConfig = resolveEnterpriseRuntimeConfig(options.runtimeEnv ?? process.env);
   const healthReporter = createEnterpriseHealthReporter({
     config: runtimeConfig,
@@ -111,6 +113,7 @@ export function createApiApp(options = {}, dependencies = {}) {
     authenticationMiddleware,
     workspaceContextMiddleware,
     membershipAuthorizationMiddleware,
+    permissionAuthorizationMiddleware,
   );
 
   app.use('/api', createFilesRouter());
