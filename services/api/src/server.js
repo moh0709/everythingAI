@@ -116,7 +116,7 @@ export function createApiApp(options = {}, dependencies = {}) {
     permissionAuthorizationMiddleware,
   );
 
-  app.use('/api', createFilesRouter());
+  app.use('/api', createFilesRouter(options, dependencies));
   app.use('/api', createSourcePathsRouter());
   app.use('/api', createProviderSettingsRouter());
   app.use('/api', createAgentBridgeRouter());

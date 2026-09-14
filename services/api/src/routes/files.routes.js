@@ -19,6 +19,7 @@ import { requireBodyString, parseLimit } from '../utils/request.js';
 import { selectFolder } from '../utils/folderPicker.js';
 import { filterActiveFiles } from '../recovery/trashVisibility.js';
 import { createDocumentContext } from '../documents/documentContextService.js';
+import { resolveResourceScopeAuthorizationMiddleware } from '../middleware/resourceScopeAuthorization.js';
 
 function includeTrashed(queryValue) {
   return queryValue?.toString().toLowerCase() === 'true';
@@ -84,8 +85,19 @@ function revealFile(filePath) {
   spawn('xdg-open', [folder], { detached: true, stdio: 'ignore' }).unref();
 }
 
-export function createFilesRouter() {
+export function createFilesRouter(options = {}, dependencies = {}) {
   const router = Router();
+  const documentContextScopeAuthorization = resolveResourceScopeAuthorizationMiddleware({
+    productionResourceScopeAuthorization: options.productionResourceScopeAuthorization === true,
+    requiredPermissions: ['documents.read'],
+    resourceIdFromRequest: (req) => req.params?.fileId ?? null,
+  }, {
+    resolveResourceScope: dependencies.resolveDocumentResourceScope,
+    createProductionResourceScopeAuthorizationMiddleware:
+      dependencies.createProductionResourceScopeAuthorizationMiddleware,
+    passthroughResourceScopeAuthorizationMiddleware:
+      dependencies.passthroughResourceScopeAuthorizationMiddleware,
+  });
 
   router.get('/files', (req, res) => {
     const db = openDatabase();
@@ -103,7 +115,7 @@ export function createFilesRouter() {
 
   router.get('/files/:fileId/preview', sendDocumentContext);
 
-  router.get('/documents/:fileId/context', sendDocumentContext);
+  router.get('/documents/:fileId/context', documentContextScopeAuthorization, sendDocumentContext);
 
   router.post('/files/:fileId/reveal', (req, res, next) => {
     try {
