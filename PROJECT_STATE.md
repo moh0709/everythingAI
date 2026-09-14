@@ -1,8 +1,8 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-09-14  
-Authority: accepted repository state through Phase 6 Production Identity, Tenancy & Authorization Foundation closure  
-Current canonical synchronization issue: #340
+Authority: accepted repository state through Phase 6 Production Identity, Tenancy & Authorization Foundation closure and post-closure canonical evidence synchronization  
+Latest accepted Phase 6 evidence synchronization: #356 / PR #357
 
 ## Current program stage
 
@@ -12,6 +12,10 @@ Accepted final closure candidate: `6eef85c405a020feb30d239b4c55b26d747f0ccb`.
 Accepted closure merge to `main`: `71fd3627b783284bccf37f7628b86a8a78fb3c07` through #338 / PR #339.
 
 The final unchanged closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 6 Closure Qualification #2 and CI Smoke #906. Final review had zero review submissions and zero review threads.
+
+Post-closure canonical synchronization was accepted through #340 / PR #341 on unchanged candidate `8432cf256945d74c84ff488b420f1bc16ea56d3a`, with 23/23 triggered workflows green, and merged as `16517e009d108c200e65c93781d655c29c7f4624`.
+
+Subsequent bounded evidence consistency fixes were accepted through Phase 6.10 (#342 / PR #346) and Phase 6.11 (#356 / PR #357). Phase 6.11 validated 20/20 triggered workflows on unchanged candidate `8f2635481407b00e51f9f55912b1eae3d96c3dfd` and merged as `620e20279321f0881df99a168c09a7395873fed5`.
 
 Phase 6 establishes provider-neutral production-oriented identity and authorization contracts across authenticated principals, tenant/workspace membership, normalized roles/permissions, exact resource-scope isolation, optional device identity, trusted audit attribution, representative `documents.read` enforcement, representative trusted action audit propagation, and integrated fail-closed/local-compatibility qualification.
 
@@ -31,6 +35,9 @@ Phase 5 governance remains **L0 Advisory / Shadow Only**. Phase 6 authorization 
 - Phase 6.6 Trusted Audit Evidence Integration — PR #335 merge `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
 - Phase 6.7 Integrated Authorization Qualification — PR #337 merge `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
 - Phase 6.8 Closure Qualification — PR #339 merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
+- Phase 6.9 Canonical Acceptance Synchronization — PR #341 merge `16517e009d108c200e65c93781d655c29c7f4624`.
+- Phase 6.10 README Post-closure Consistency — PR #346 merge `98b149c43b8d42cd17045e8dfe00823dd2817e35`.
+- Phase 6.11 Accepted Evidence Consistency — PR #357 merge `620e20279321f0881df99a168c09a7395873fed5`.
 
 ## Accepted predecessor baselines
 
@@ -67,8 +74,8 @@ Every changed product/release candidate must validate the complete applicable in
 
 ## Next decision rule
 
-Inspect current repository dependencies and the synchronized five-track roadmap before creating the next numbered phase. Do not infer production infrastructure activation or broader enforcement authority from Phase 6 acceptance. Any material production authority expansion remains CEO-gated.
+Phase 6 is closed and must not be reopened for new product/runtime scope. Continue only bounded evidence-consistency corrections that preserve the accepted Phase 6 authority boundary. Post-Phase-6 product work belongs to its separately governed phase. Do not infer production infrastructure activation or broader enforcement authority from Phase 6 acceptance. Any material production authority expansion remains CEO-gated.
 
 ## Rollback
 
-This Phase 6 canonical synchronization is independently reversible from Phase 6 closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6.1–6.7 implementation merge, Phase 5 and all earlier accepted milestones.
+This Phase 6 canonical-state evidence correction is independently reversible to accepted Phase 6.11 merge `620e20279321f0881df99a168c09a7395873fed5`. Reverting this documentation-only correction does not alter Phase 6 runtime contracts or any earlier accepted milestone.
