@@ -7,15 +7,28 @@
   "parent_issue": 323,
   "closure_issue": 338,
   "canonical_sync_issue": 340,
+  "canonical_sync_pr": 341,
   "accepted_closure_candidate": "6eef85c405a020feb30d239b4c55b26d747f0ccb",
   "accepted_closure_merge": "71fd3627b783284bccf37f7628b86a8a78fb3c07",
+  "accepted_canonical_sync_candidate": "8432cf256945d74c84ff488b420f1bc16ea56d3a",
+  "accepted_canonical_sync_merge": "16517e009d108c200e65c93781d655c29c7f4624",
   "validation": {
-    "triggered_workflows": 20,
-    "successful_workflows": 20,
-    "phase6_closure_qualification_run": 2,
-    "ci_smoke_run": 906,
-    "review_submissions": 0,
-    "review_threads": 0
+    "closure": {
+      "triggered_workflows": 20,
+      "successful_workflows": 20,
+      "phase6_closure_qualification_run": 2,
+      "ci_smoke_run": 906,
+      "review_submissions": 0,
+      "review_threads": 0
+    },
+    "canonical_sync": {
+      "triggered_workflows": 23,
+      "successful_workflows": 23,
+      "phase6_closure_qualification_run": 3,
+      "ci_smoke_run": 908,
+      "review_submissions": 0,
+      "review_threads": 0
+    }
   },
   "accepted_implementation_chain": [
     {"phase": "6.1", "pr": 324, "merge": "cd6e428408a4155358c5de4b8f20bbc26130166f"},
@@ -25,7 +38,8 @@
     {"phase": "6.5", "pr": 333, "merge": "86e46c13ebb2928f00a909e2eec92b4d28b1afba"},
     {"phase": "6.6", "pr": 335, "merge": "054c58822616cede0d5db293e2d382bfa6b7e1bb"},
     {"phase": "6.7", "pr": 337, "merge": "15c1617b5201e0bfb98f11517e6ebdca69857da4"},
-    {"phase": "6.8", "pr": 339, "merge": "71fd3627b783284bccf37f7628b86a8a78fb3c07"}
+    {"phase": "6.8", "pr": 339, "merge": "71fd3627b783284bccf37f7628b86a8a78fb3c07"},
+    {"phase": "6.9", "pr": 341, "merge": "16517e009d108c200e65c93781d655c29c7f4624"}
   ],
   "implemented_foundations": [
     "provider-neutral production authenticated-principal boundary",
@@ -60,6 +74,6 @@
     "broad_automatic_action_recovery_governance_expansion": false,
     "phase5_governance_mode": "L0 Advisory / Shadow Only"
   },
-  "next_required_action": "Complete documentation/evidence-only canonical synchronization #340 on one unchanged green head, then inspect repository priorities before creating any next numbered phase.",
-  "rollback": "Canonical synchronization is independently reversible from Phase 6 closure merge 71fd3627b783284bccf37f7628b86a8a78fb3c07; closure remains independently reversible from accepted Phase 6.1–6.7 implementation merges."
+  "next_required_action": "Phase 6 closure and canonical synchronization are complete. Preserve the accepted Phase 6 authority boundary and inspect current repository authority before any later-phase work.",
+  "rollback": "Canonical synchronization merge 16517e009d108c200e65c93781d655c29c7f4624 is independently reversible from Phase 6 closure merge 71fd3627b783284bccf37f7628b86a8a78fb3c07; closure remains independently reversible from accepted Phase 6.1–6.7 implementation merges."
 }

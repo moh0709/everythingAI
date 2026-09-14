@@ -4,7 +4,7 @@ Date: 2026-09-14
 Status: ACCEPTED — `PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`  
 Parent: #323  
 Closure issue: #338  
-Canonical synchronization: #340
+Canonical synchronization: #340 / PR #341 — ACCEPTED
 
 ## Accepted decision
 
@@ -13,7 +13,7 @@ Phase 6 — Production Identity, Tenancy & Authorization Foundation is accepted 
 Accepted final unchanged closure candidate: `6eef85c405a020feb30d239b4c55b26d747f0ccb`.  
 Accepted closure merge: `71fd3627b783284bccf37f7628b86a8a78fb3c07` through PR #339.
 
-The accepted candidate passed 20/20 triggered workflows, including `EverythingAI Phase 6 Closure Qualification` #2 and CI Smoke #906. Final review state contained zero review submissions and zero review threads.
+The accepted closure candidate passed 20/20 triggered workflows, including `EverythingAI Phase 6 Closure Qualification` #2 and CI Smoke #906. Final review state contained zero review submissions and zero review threads.
 
 ## Accepted implementation chain
 
@@ -25,6 +25,7 @@ The accepted candidate passed 20/20 triggered workflows, including `EverythingAI
 6. Phase 6.6 trusted audit evidence integration for representative action execution/undo — PR #335, merge `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
 7. Phase 6.7 integrated identity/tenancy authorization qualification — PR #337, merge `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
 8. Phase 6.8 closure qualification and release evidence — PR #339, merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
+9. Phase 6.9 canonical acceptance synchronization — PR #341, unchanged candidate `8432cf256945d74c84ff488b420f1bc16ea56d3a`, merge `16517e009d108c200e65c93781d655c29c7f4624`.
 
 ## Accepted capability boundary
 
@@ -46,10 +47,14 @@ This release does not provision production secrets, production IdP credentials, 
 
 Phase 5 governance remains L0 Advisory / Shadow Only. Phase 6 authorization boundaries are production-oriented contracts and representative enforcement foundations; they do not silently activate broad platform-wide enforcement or production infrastructure.
 
-## Canonical synchronization
+## Accepted canonical synchronization
 
-Issue #340 synchronizes `PROJECT_STATE.md`, `AI_BOOTSTRAP.md`, `docs/ROADMAP.md`, `docs/IMPLEMENTATION_ROADMAP.md`, this decision artifact and the machine-readable handover to this accepted state. That synchronization is documentation/evidence only and must itself pass the applicable inherited matrix on one unchanged head before merge.
+Issue #340 / PR #341 completed the documentation/evidence-only synchronization of `PROJECT_STATE.md`, `AI_BOOTSTRAP.md`, `docs/ROADMAP.md`, `docs/IMPLEMENTATION_ROADMAP.md`, this decision artifact and the machine-readable handover to the accepted Phase 6 state.
+
+The unchanged canonical-synchronization candidate `8432cf256945d74c84ff488b420f1bc16ea56d3a` passed 23/23 triggered workflows, including `EverythingAI Phase 6 Closure Qualification` #3 and CI Smoke #908, and merged as `16517e009d108c200e65c93781d655c29c7f4624`. Review state was clean with zero review submissions and zero review threads.
+
+Canonical synchronization acceptance does not expand runtime or production authority beyond the explicit Phase 6 boundary above.
 
 ## Rollback
 
-The canonical synchronization is independently reversible from closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`. The closure merge is independently reversible from the accepted Phase 6.1–6.7 implementation merges. Each bounded Phase 6 implementation remains independently traceable and reversible through its PR/commit history.
+The canonical synchronization merge `16517e009d108c200e65c93781d655c29c7f4624` is independently reversible from closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`. The closure merge is independently reversible from the accepted Phase 6.1–6.7 implementation merges. Each bounded Phase 6 implementation remains independently traceable and reversible through its PR/commit history.
