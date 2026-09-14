@@ -26,7 +26,7 @@ Final validation: 20/20 triggered workflows passed, including Phase 6 Closure Qu
 
 Phase 6 accepts provider-neutral production-oriented identity/authorization contracts and representative enforcement evidence. It does not provision production secrets/credentials, activate privileged infrastructure, perform destructive production cutover, broaden automatic governance/action authority, or make certification/load/SLA commitments.
 
-## Phase 6 implementation chain
+## Phase 6 implementation and accepted post-closure evidence chain
 
 1. Authentication principal boundary — PR #324.
 2. Tenant/workspace membership authorization — PR #326.
@@ -36,7 +36,13 @@ Phase 6 accepts provider-neutral production-oriented identity/authorization cont
 6. Trusted audit evidence integration for representative action paths — PR #335.
 7. Integrated identity/tenancy authorization qualification — PR #337.
 8. Closure qualification and release evidence — PR #339.
-9. Canonical acceptance synchronization — #340 (documentation/evidence only; independently reversible).
+9. Phase 6.9 canonical acceptance synchronization — issue #340 / PR #341, merge `16517e009d108c200e65c93781d655c29c7f4624`.
+10. Phase 6.10 README canonical-baseline consistency — issue #342 / PR #346, merge `98b149c43b8d42cd17045e8dfe00823dd2817e35`.
+11. Phase 6.11 release-decision/handover evidence consistency — issue #356 / PR #357, merge `620e20279321f0881df99a168c09a7395873fed5`.
+12. Phase 6.12 `PROJECT_STATE.md` post-closure evidence synchronization — issue #359 / PR #360, merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`.
+13. Phase 6.13 `AI_BOOTSTRAP.md` post-closure evidence synchronization — issue #361 / PR #362, merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
+
+Items 9–13 are documentation/evidence consistency work only. They do not reopen Phase 6 runtime scope or grant additional production authority.
 
 ## Current five-track position
 
@@ -45,27 +51,28 @@ Phase 6 accepts provider-neutral production-oriented identity/authorization cont
 | Product & UX | Mature local-first trust/context surfaces are accepted | Choose distinct user-visible value; avoid recursive restatement of existing context/trust facts |
 | Knowledge & Safe Action | Source-backed knowledge, explicit approval, truthful unknown-state handling, audit/undo and recovery safeguards are accepted | Improve useful knowledge/action capability without manufacturing facts or bypassing authority |
 | Enterprise Platform | Phase 6 adds accepted provider-neutral identity, tenancy and authorization foundations | Real production IdP/secrets, privileged infrastructure, destructive cutover, external certification/load qualification and SLA commitments remain CEO-gated |
-| Engineering Operations | CI/release discipline now includes Phase 6 Closure Qualification alongside inherited gates | Preserve validation wiring; privileged production operations remain separately gated |
+| Engineering Operations | CI/release discipline includes Phase 6 Closure Qualification alongside inherited gates | Preserve validation wiring; privileged production operations remain separately gated |
 | Governance & Autonomous Delivery | Phase 6 is accepted; Phase 5 governance remains L0 advisory/shadow | Release one bounded dependency at a time; do not infer broader runtime enforcement authority |
 
-## Active dependency sequence
+## Active dependency rule
 
 ```text
-Phase 6 accepted
-  -> canonical acceptance synchronization #340
-    -> inspect current repository + five-track priorities
-      -> select one bounded, dependency-satisfied next milestone
-        -> define acceptance + rollback
-          -> implement and validate on one unchanged head
+Phase 6 accepted and dispatched
+  -> preserve canonical evidence consistency
+    -> correct only factual post-closure inconsistencies when discovered
+      -> validate every changed candidate on one unchanged head
+        -> keep runtime/product authority unchanged
 ```
+
+Phase 6 has no open runtime implementation dependency. New product/runtime scope belongs to a separately authorized milestone or phase and must not be inferred from Phase 6 acceptance.
 
 ## Next-phase rule
 
-No Phase 7 scope is created merely by closing Phase 6. The next numbered phase must be derived from synchronized repository priorities and dependency readiness.
+Post-Phase-6 milestones must be derived from synchronized repository priorities and dependency readiness. Any separately tracked later-phase work does not expand Phase 6 authority and must preserve the accepted Phase 6 safety boundary.
 
 Selection should prioritize material user/customer value, dependency readiness, bounded reversible scope, preservation of safe-action/evidence semantics, no hidden production-authority expansion, and measurable acceptance criteria.
 
-If the best next dependency requires a material business, architecture, production-infrastructure or authority decision, escalate that exact decision to the CEO. Otherwise bounded work may proceed autonomously.
+If the best next dependency requires a material business, architecture, production-infrastructure or authority decision, escalate that exact decision to the CEO. Otherwise bounded work may proceed under its own repository-authoritative scope.
 
 ## Mandatory inherited release discipline
 
@@ -77,4 +84,4 @@ Explicit CEO authority remains required before privileged-host/root/sudo/SSH/sys
 
 ## Rollback
 
-Phase 6 canonical synchronization is independently reversible from closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6 implementation merge, Phase 5 and all earlier accepted milestones.
+Phase 6 post-closure evidence corrections remain independently reversible from closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6 implementation merge, Phase 5 and all earlier accepted milestones. The current pre-Phase-6.14 accepted evidence baseline is Phase 6.13 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
