@@ -9,9 +9,10 @@ import {
 import { generateConfiguredPreviewSuggestions } from '../suggestions/suggestionService.js';
 import { createActionPreview } from '../previews/actionPreviewService.js';
 import { executeActionPreview, undoActionExecution } from '../actions/actionExecutor.js';
+import { resolveActionAuditContext } from '../middleware/auditContextBridge.js';
 import { requireBodyString, parseLimit } from '../utils/request.js';
 
-export function createActionsRouter() {
+export function createActionsRouter(options = {}) {
   const router = Router();
 
   router.post('/suggestions', async (req, res, next) => {
@@ -66,13 +67,14 @@ export function createActionsRouter() {
       const previewId = requireBodyString(req, res, 'previewId');
       if (!previewId) return;
 
+      const auditContext = resolveActionAuditContext(req, options);
       const db = openDatabase();
       let execution;
       try {
         execution = await executeActionPreview(db, {
           previewId,
           approve: req.body?.approve === true,
-          auditContext: req.requestContext,
+          auditContext,
         });
       } catch (execError) {
         db.close();
@@ -91,11 +93,12 @@ export function createActionsRouter() {
 
   router.post('/action-executions/:executionId/undo', async (req, res, next) => {
     try {
+      const auditContext = resolveActionAuditContext(req, options);
       const db = openDatabase();
       const execution = await undoActionExecution(db, {
         executionId: req.params.executionId,
         approve: req.body?.approve === true,
-        auditContext: req.requestContext,
+        auditContext,
       });
       db.close();
 
