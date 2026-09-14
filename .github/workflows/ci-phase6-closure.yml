@@ -1,0 +1,50 @@
+name: EverythingAI Phase 6 Closure Qualification
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/src/middleware/auth.js'
+      - 'services/api/src/middleware/membershipAuthorization.js'
+      - 'services/api/src/middleware/permissionAuthorization.js'
+      - 'services/api/src/middleware/resourceScopeAuthorization.js'
+      - 'services/api/src/middleware/deviceAuditAttribution.js'
+      - 'services/api/src/middleware/auditContextBridge.js'
+      - 'services/api/src/routes/files.routes.js'
+      - 'services/api/src/routes/actions.routes.js'
+      - 'services/api/src/server.js'
+      - 'services/api/test/production*.test.js'
+      - 'docs/PHASE6_*.md'
+      - 'docs/HANDOVER_*PHASE6*.json'
+      - 'scripts/validate-phase6-closure.mjs'
+      - '.github/workflows/ci-phase6-closure.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase6-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install API dependencies exactly
+        working-directory: services/api
+        run: npm ci
+      - name: Validate Phase 6 closure artifact baseline
+        run: node scripts/validate-phase6-closure.mjs
+      - name: Run complete Phase 6 focused qualification stack
+        working-directory: services/api
+        run: >-
+          node --test
+          test/productionAuthenticationMiddleware.test.js
+          test/productionMembershipAuthorization.test.js
+          test/productionPermissionAuthorization.test.js
+          test/productionResourceScopeAuthorization.test.js
+          test/productionDeviceAuditAttribution.test.js
+          test/productionAuditActorType.test.js
+          test/productionTrustedAuditContext.test.js
+          test/productionIntegratedAuthorizationQualification.test.js
