@@ -30,6 +30,13 @@ Phase 6 accepts a provider-neutral production identity/tenancy/authorization fou
 6. Phase 6.6 trusted audit evidence integration — PR #335 merge `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
 7. Phase 6.7 integrated authorization qualification — PR #337 merge `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
 8. Phase 6.8 closure qualification — PR #339 merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
+9. Phase 6.9 canonical acceptance synchronization — issue #340 / PR #341 merge `16517e009d108c200e65c93781d655c29c7f4624`.
+10. Phase 6.10 README canonical-baseline consistency — issue #342 / PR #346 merge `98b149c43b8d42cd17045e8dfe00823dd2817e35`.
+11. Phase 6.11 release-decision/handover evidence consistency — issue #356 / PR #357 merge `620e20279321f0881df99a168c09a7395873fed5`.
+12. Phase 6.12 `PROJECT_STATE.md` post-closure evidence synchronization — issue #359 / PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`.
+13. Phase 6.13 `AI_BOOTSTRAP.md` post-closure evidence synchronization — issue #361 / PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
+
+Phase 6.9–6.13 are accepted documentation/evidence consistency corrections and do not reopen Phase 6 runtime scope.
 
 Key focused qualification files include:
 
@@ -55,12 +62,12 @@ Key focused qualification files include:
 
 ## Current execution sequence
 
-1. Complete documentation/evidence-only canonical acceptance synchronization #340.
-2. Validate the final #340 head with the complete applicable inherited matrix, including Phase 6 Closure Qualification.
-3. Merge #340 only on unchanged green evidence and clean review state.
-4. Close #323/#338/#340 only after canonical authority on `main` matches accepted Phase 6 evidence.
-5. Inspect current repository priorities and five-track roadmap.
-6. Select one bounded dependency-satisfied next milestone; do not infer Phase 7 scope from numbering alone.
+1. Phase 6 runtime implementation and closure are complete.
+2. Preserve canonical Phase 6 evidence consistency after closure.
+3. When a factual post-closure inconsistency is discovered, correct only the affected documentation/evidence path.
+4. Validate every changed Phase 6 evidence candidate with the complete applicable inherited matrix on one unchanged head and clean review state.
+5. Do not use evidence maintenance to reopen Phase 6 runtime scope or expand production authority.
+6. Separately scoped later-phase work must derive its own authority from current repository priorities and accepted dependency readiness.
 
 ## Five-track implementation boundary
 
@@ -79,9 +86,9 @@ Preserve the complete applicable product, enterprise, security, recovery, govern
 ### Governance & Autonomous Delivery
 Release one bounded dependency at a time with unchanged-head validation, clean review, explicit rollback and truthful PASS/BLOCKED/REJECTED decisions. Phase 5 remains L0 Advisory / Shadow Only.
 
-## Next numbered phase
+## Post-Phase-6 work
 
-No Phase 7 implementation scope is authoritative yet. Derive the next phase or milestone from synchronized five-track priorities and current repository dependencies after #340 is accepted.
+Phase 6 itself has no open runtime implementation dependency. Later-phase or milestone work is separately scoped and must not be interpreted as an extension of Phase 6 authority.
 
 ## Inherited release gates
 
@@ -97,4 +104,4 @@ Issue #69 remains closed historical evidence and must not be rewritten without a
 
 ## Rollback
 
-#340 is documentation/evidence-only and independently reversible. Phase 6 closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6.1–6.7 implementation merge, Phase 5 and all earlier accepted milestones retain independent rollback evidence.
+Phase 6 post-closure evidence corrections are independently reversible. Phase 6 closure merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`, each Phase 6.1–6.7 implementation merge, Phase 5 and all earlier accepted milestones retain independent rollback evidence. The accepted pre-Phase-6.14 evidence baseline is Phase 6.13 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
