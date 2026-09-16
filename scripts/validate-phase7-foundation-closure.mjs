@@ -33,7 +33,7 @@ tests.forEach(requireFile);
 requireText('services/api/src/archive/archivePlanner.js', "action: 'copy'");
 requireText('services/api/src/archive/archivePlanner.js', 'filesystem_mutation_allowed: false');
 requireText('services/api/src/archive/archiveExecutor.js', 'COPYFILE_EXCL');
-requireText('services/api/src/archive/metadataSidecar.js', "flag: 'wx'");
+requireText('services/api/src/archive/metadataSidecar.js', "fs.open(sidecarPath, 'wx')");
 requireText('apps/everything-ai-ui/src/admin/components/ArchiveReviewWorkspace.tsx', 'Approval here records intent only');
 requireText('apps/everything-ai-ui/src/admin/components/ArchiveReviewWorkspace.tsx', 'No execute/run action exists');
 requireText('docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md', '| 7 | Watcher integration |');
