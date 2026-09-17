@@ -19,6 +19,37 @@ function resolveWatcherDatabasePath(db) {
   return db?.name || process.env.EVERYTHINGAI_DB_PATH;
 }
 
+async function runArchiveWatchHook({
+  onArchiveWatchCycle,
+  id,
+  absoluteRoot,
+  scan,
+  knowledge,
+}) {
+  if (typeof onArchiveWatchCycle !== 'function') return null;
+
+  const evidence = Object.freeze({
+    source: 'watcher',
+    watch_root_id: id,
+    root_path: absoluteRoot,
+    scan,
+    knowledge,
+  });
+
+  try {
+    const result = await onArchiveWatchCycle(evidence);
+    return Object.freeze({
+      status: 'ready',
+      result,
+    });
+  } catch (error) {
+    return Object.freeze({
+      status: 'failed',
+      error: error?.message || String(error),
+    });
+  }
+}
+
 async function runWatchCycle({
   id,
   absoluteRoot,
@@ -26,6 +57,7 @@ async function runWatchCycle({
   extract,
   auto,
   logger,
+  onArchiveWatchCycle,
 }) {
   const cycleDb = openDatabase(databasePath);
   const insert = cycleDb.transaction((record) => upsertIndexedFile(cycleDb, record));
@@ -65,9 +97,18 @@ async function runWatchCycle({
         created_at: new Date().toISOString(),
       });
 
+      const archiveReview = await runArchiveWatchHook({
+        onArchiveWatchCycle,
+        id,
+        absoluteRoot,
+        scan,
+        knowledge,
+      });
+
       return {
         scan,
         knowledge,
+        archive_review: archiveReview,
       };
     });
   } finally {
@@ -102,6 +143,7 @@ function snapshotRuntimeState(id, state) {
     debounceMs: state.debounceMs,
     lastJob: state.lastJob,
     lastCycleAt: state.lastCycleAt,
+    lastArchiveReview: state.lastArchiveReview,
   };
 }
 
@@ -124,6 +166,7 @@ export async function startFolderWatcher(db, {
   auto = true,
   debounceMs = DEFAULT_DEBOUNCE_MS,
   logger = console,
+  onArchiveWatchCycle,
 } = {}) {
   if (!rootPath) throw new Error('rootPath is required');
 
@@ -149,6 +192,7 @@ export async function startFolderWatcher(db, {
     pending: false,
     lastJob: null,
     lastCycleAt: null,
+    lastArchiveReview: null,
     close: null,
   };
 
@@ -162,8 +206,17 @@ export async function startFolderWatcher(db, {
     try {
       do {
         state.pending = false;
-        const jobResult = await runWatchCycle({ id, absoluteRoot, databasePath, extract, auto, logger });
+        const jobResult = await runWatchCycle({
+          id,
+          absoluteRoot,
+          databasePath,
+          extract,
+          auto,
+          logger,
+          onArchiveWatchCycle,
+        });
         state.lastJob = jobResult.job;
+        state.lastArchiveReview = jobResult.output?.archive_review ?? null;
         state.lastCycleAt = new Date().toISOString();
       } while (state.pending);
     } catch (error) {
@@ -238,6 +291,7 @@ export function stopFolderWatcher(db, { rootPath }) {
 export async function resumePersistedWatchers(db, {
   logger = console,
   startWatcher = startFolderWatcher,
+  onArchiveWatchCycle,
 } = {}) {
   const activeRoots = listPersistedActiveWatchRoots(db);
   const results = [];
@@ -249,6 +303,7 @@ export async function resumePersistedWatchers(db, {
         extract: true,
         auto: true,
         logger,
+        onArchiveWatchCycle,
       });
       results.push({ rootPath: root.root_path, status: 'active', result });
     } catch (error) {
