@@ -1,0 +1,63 @@
+{
+  "project": "EverythingAI",
+  "phase": "Phase 8 — Watcher Integration & Stale Archive Preview Foundation",
+  "date": "2026-09-17",
+  "decision_state": "CLOSURE_CANDIDATE",
+  "decision": "PHASE8_WATCHER_STALE_PREVIEW_PASS",
+  "parent_issue": 375,
+  "closure_issue": 385,
+  "predecessor": {
+    "phase": "Phase 7 — AI Organization Workspace Foundation",
+    "decision": "PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS"
+  },
+  "accepted_chain": [
+    {"slice": "8.1", "pr": 376, "merge": "d33574b25642c6cc6236c3d46464e4da1d82c3d5", "capability": "Archive stale-state evaluator"},
+    {"slice": "8.2", "issue": 377, "pr": 378, "merge": "97cbe9671b14c597bc4a647e3bbe79e3b660d748", "capability": "Watcher review adapter and semantic dedupe"},
+    {"slice": "8.3", "issue": 379, "pr": 380, "merge": "612f8af22663b98725ac421a6da0f7f556cb00d0", "capability": "Safe watcher archive integration hook"},
+    {"slice": "8.4", "issue": 381, "pr": 382, "merge": "0d1960bce368c597e0e2e173bbde08eabfdaae33", "capability": "Preview-only watcher update and rebuild bridge"},
+    {"slice": "8.5", "issue": 383, "pr": 384, "merge": "ae2204c0ae3ba75d3eac5860a200be083d7af744", "capability": "Admin stale rebuild and conflict review visibility"}
+  ],
+  "accepted_capability_boundary": [
+    "deterministic archive stale-state classification",
+    "semantic watcher candidate deduplication",
+    "optional watcher review-evidence hook after successful scan/knowledge cycles",
+    "preview-only update and rebuild proposals bound to current source fingerprints",
+    "sidecar-missing preview metadata without direct writer authority",
+    "manual-review-only archive-changed and conflict states",
+    "Admin stale-state filtering, counts and approval blocking"
+  ],
+  "safety_invariants": [
+    "watcher is an evidence producer and does not directly execute archive writes",
+    "watcher runtime does not import or call archiveExecutor.js",
+    "watcher runtime does not import or call metadataSidecar.js",
+    "watcher candidates deny execution, automatic approval and filesystem mutation",
+    "source-changed and archive-missing flows remain preview-only and approval-required",
+    "archive-changed and conflict states remain manual-review-only",
+    "current source fingerprint is rebound into generated previews to preserve stale-approval protection",
+    "existing Phase 7 copy-first, no-overwrite and source-preservation protections remain inherited",
+    "Admin workspace records approval intent only and has no execute/run action"
+  ],
+  "deferred": [
+    "Stage 8 AI enrichment improvements",
+    "Stage 9 advanced document intelligence",
+    "watcher-driven archive execution",
+    "automatic approval or execution",
+    "archive overwrite authority",
+    "source delete/move/rename authority",
+    "broad full-drive watcher enablement by default",
+    "production secrets or privileged production infrastructure",
+    "destructive production migration/cutover",
+    "external certification/load commitments",
+    "commercial SLA/SLO commitments",
+    "material automatic governance/action/recovery expansion"
+  ],
+  "closure_requirements": {
+    "dedicated_phase8_closure_gate": "required",
+    "complete_applicable_inherited_matrix": "required",
+    "unchanged_candidate_head": true,
+    "clean_review_state": true
+  },
+  "canonical_sync_after_acceptance": true,
+  "rollback": "Phase 8 closure evidence and each Phase 8.1-8.5 implementation slice remain separately identifiable and reversible; the accepted Phase 7 baseline remains the predecessor boundary.",
+  "next_after_acceptance": "Synchronize canonical project-state and roadmap authority to the accepted Phase 8 watcher stale-preview baseline, then scope Stage 8 AI enrichment improvements separately."
+}
