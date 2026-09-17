@@ -1,0 +1,47 @@
+{
+  "project": "EverythingAI",
+  "phase": "Phase 7 — AI Organization Workspace Foundation",
+  "date": "2026-09-16",
+  "decision_state": "CLOSURE_CANDIDATE",
+  "decision": "PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS",
+  "accepted_stage_range": "2-6",
+  "stages_7_to_9_deferred": true,
+  "parent_issue": 343,
+  "closure_issue": 369,
+  "accepted_chain": [
+    {"slice": "7.1", "issue": 344, "pr": 345, "capability": "Archive Profile Model"},
+    {"slice": "7.2", "issue": 348, "pr": 349, "capability": "Preview-only Archive Planner"},
+    {"slice": "7.3", "issue": 350, "pr": 351, "capability": "Explicit-approval copy-only Archive Executor"},
+    {"slice": "7.4", "issue": 352, "pr": 353, "capability": "Metadata Sidecar Writer"},
+    {"slice": "7.5", "issue": 354, "pr": 358, "capability": "Admin/operator Archive Review Workspace Foundation"}
+  ],
+  "safety_invariants": [
+    "copy-first archive behavior",
+    "no source delete/move/rename authority from the archive foundation",
+    "no archive overwrite without separately accepted exact conflict resolution",
+    "explicit approval required before copy execution",
+    "preview planner performs no filesystem mutation",
+    "sidecars identify AI-generated provenance and reject secret-bearing metadata",
+    "review workspace records approval intent only and has no direct execution action"
+  ],
+  "deferred": [
+    "Stage 7 watcher integration",
+    "Stage 8 AI enrichment improvements",
+    "Stage 9 advanced document intelligence",
+    "watcher-driven archive writes",
+    "automatic approval or execution",
+    "production secrets or privileged production infrastructure",
+    "destructive production migration/cutover",
+    "external certification/load commitments",
+    "commercial SLA/SLO commitments",
+    "material automatic governance/action/recovery expansion"
+  ],
+  "closure_requirements": {
+    "dedicated_phase7_closure_gate": "required",
+    "complete_applicable_inherited_matrix": "required",
+    "unchanged_candidate_head": true,
+    "clean_review_state": true
+  },
+  "rollback": "Closure evidence and every Phase 7.1-7.5 slice remain independently reversible.",
+  "next_after_acceptance": "Synchronize canonical roadmap/state files to the accepted Phase 7 foundation baseline. Stage 7-9 work requires separately governed follow-up scope."
+}
