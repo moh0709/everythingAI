@@ -1,49 +1,81 @@
 # EverythingAI — Canonical Project State
 
-Date: 2026-09-14  
-Authority: accepted repository state through Phase 6 Production Identity, Tenancy & Authorization Foundation closure and accepted post-closure evidence maintenance  
-Post-closure acceptance authority: GitHub issue/PR/merge/workflow evidence; this file records the stable Phase 6 authority baseline and is not recursively rewritten merely to record later evidence-only synchronization merges.
+Date: 2026-09-17  
+Authority: accepted repository state through Phase 7 AI Organization Workspace Foundation closure, while preserving all accepted Phase 6 production identity/tenancy/authorization authority and boundaries.
 
 ## Current program stage
 
-**Phase 6 — Production Identity, Tenancy & Authorization Foundation is COMPLETE AND DISPATCHED (`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`).**
+**Phase 7 — AI Organization Workspace Foundation is COMPLETE AND DISPATCHED (`PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS`).**
 
-Accepted final closure candidate: `6eef85c405a020feb30d239b4c55b26d747f0ccb`.  
-Accepted closure merge to `main`: `71fd3627b783284bccf37f7628b86a8a78fb3c07` through #338 / PR #339.
+Accepted final Phase 7 closure candidate: `e613143b58a9d2048b5c1291baa68828881c0512`.  
+Accepted Phase 7 closure merge to `main`: `60a16f58321f599ed5f13b0319fbd712ba3e986a` through issue #369 / PR #372.
 
-The final unchanged closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 6 Closure Qualification #2 and CI Smoke #906. Final review had zero review submissions and zero review threads.
+The final unchanged Phase 7 closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 7 Foundation Closure Qualification #2 and CI Smoke #936. Final review had zero review submissions and zero review threads.
 
-Post-closure canonical synchronization was accepted through #340 / PR #341 on unchanged candidate `8432cf256945d74c84ff488b420f1bc16ea56d3a`, with 23/23 triggered workflows green, and merged as `16517e009d108c200e65c93781d655c29c7f4624`.
+Phase 7 accepts the AI Organization Workspace foundation through design Stages 2–6 only:
 
-Subsequent bounded evidence consistency fixes were accepted through Phase 6.15. Phase 6.12 synchronized `PROJECT_STATE.md` through #359 / PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`; Phase 6.13 synchronized `AI_BOOTSTRAP.md` through #361 / PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`; Phase 6.14 reconciled `docs/ROADMAP.md` and `docs/IMPLEMENTATION_ROADMAP.md` through #363 / PR #364 merge `5b9e10096b56db7b1546d9347474436dbd50dc46`; Phase 6.15 reconciled the two highest-authority startup/state files through #365 / PR #366 on unchanged candidate `d3dabdeb461d6b6e79d34598deaa3d0a6eff3bcd`, which passed 22/22 triggered workflows including CI Smoke #930 and merged as `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
+- validated Archive Profile Model and local persistence;
+- deterministic preview-only archive planning;
+- exact-approval copy-only archive execution with source fingerprint verification and no-overwrite semantics;
+- provenance-rich metadata sidecars with secret exclusion and exclusive-create safety;
+- Admin/operator archive review workspace foundation with conflict visibility and approval intent only.
 
-Future evidence-only Phase 6 acceptance is determined directly from repository issue/PR/merge/workflow evidence. A later evidence-only merge does not by itself make this file stale and does not require a recursive follow-up synchronization. Update this file again only if the stable runtime/product authority, safety boundary, or another factual baseline recorded here changes.
+Stages 7–9 remain deferred: watcher integration, AI enrichment improvements, and advanced document intelligence. Phase 7 closure does **not** authorize watcher-driven archive writes, automatic approval/execution, source delete/move/rename authority, archive overwrite authority, privileged production infrastructure, real production secrets, destructive production migration/cutover, external certification/load commitments, commercial SLA/SLO commitments, or material automatic governance/action/recovery authority expansion.
+
+Canonical release evidence:
+
+- `docs/PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_RELEASE_DECISION_2026-09-16.md`
+- `docs/HANDOVER_2026-09-16_PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION.json`
+- `scripts/validate-phase7-foundation-closure.mjs`
+- `.github/workflows/ci-phase7-foundation-closure.yml`
+
+## Accepted Phase 7 implementation chain
+
+- Phase 7.1 Archive Profile Model — PR #345 merge `c9b654be42b72a5f44b3972c37733802614791bc`.
+- Phase 7.2 Preview-only Archive Planner — PR #349 merge `c53f2cde8692e11bbc9c00542767a8188f5efd10`.
+- Phase 7.3 Copy-only Archive Executor — PR #351 merge `40fc5ac13c6311f78146d0b9e9ab812fd62757ef`.
+- Phase 7.4 Metadata Sidecar Writer — PR #353 merge `3662d8eb48f77bf071b625cf380a378b482cf8c2`.
+- Phase 7.5 Admin Archive Review Workspace Foundation — PR #358 merge `01c2901882c36885979e077e584701f28e381ff2`.
+- Phase 7.6 Foundation Closure Qualification — PR #372 merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`.
+
+## Accepted Phase 6 baseline
+
+Phase 6 — Production Identity, Tenancy & Authorization Foundation remains COMPLETE AND DISPATCHED (`PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS`).
+
+Accepted final Phase 6 closure candidate: `6eef85c405a020feb30d239b4c55b26d747f0ccb`.  
+Accepted closure merge: `71fd3627b783284bccf37f7628b86a8a78fb3c07` through #338 / PR #339.
 
 Phase 6 establishes provider-neutral production-oriented identity and authorization contracts across authenticated principals, tenant/workspace membership, normalized roles/permissions, exact resource-scope isolation, optional device identity, trusted audit attribution, representative `documents.read` enforcement, representative trusted action audit propagation, and integrated fail-closed/local-compatibility qualification.
 
+Phase 6 accepted chain remains:
+
+- PR #324 authentication principal boundary — `cd6e428408a4155358c5de4b8f20bbc26130166f`.
+- PR #326 tenant/workspace membership boundary — `693c7eadfee42b8ae6dc6a7ab02117454c610b43`.
+- PR #328 roles/permission boundary — `b3db1317f5c92c360754375bf8ee7ac6251c94dc`.
+- PR #331 resource-scope isolation — `dfbdd4dd6f9a0d63e2a4d347421d8150bdc23ef5`.
+- PR #333 device identity/audit attribution — `86e46c13ebb2928f00a909e2eec92b4d28b1afba`.
+- PR #335 trusted audit evidence — `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
+- PR #337 integrated qualification — `15c1617f5c92c360754375bf8ee7ac6251c94dc` is not authoritative for Phase 6.7; authoritative Phase 6.7 merge remains `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
+- PR #339 closure — `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
+- Post-closure evidence maintenance through Phase 6.15 remains accepted, ending with PR #366 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
+
 ## Authority boundary
 
-Phase 6 does **not** provision real production IdP/device credentials, secrets, certificates or key material. It does not authorize privileged host/root/sudo/SSH/systemd operations, destructive production database/object-store migration or cutover, external certification/compliance commitments, production load qualification, commercial SLA/SLO commitments, provider lock-in, broad route-by-route authorization rollout, or material automatic action/recovery/governance authority expansion.
+Phase 5 governance remains **L0 Advisory / Shadow Only**. Neither Phase 6 nor Phase 7 silently activates broader automatic enforcement.
 
-Phase 5 governance remains **L0 Advisory / Shadow Only**. Phase 6 authorization foundations do not silently convert Phase 5 governance into runtime enforcement.
+The following remain separately CEO-gated:
 
-## Accepted Phase 6 chain
-
-- Phase 6.1 Authentication Principal Boundary — PR #324 merge `cd6e428408a4155358c5de4b8f20bbc26130166f`.
-- Phase 6.2 Tenant/Workspace Membership Boundary — PR #326 merge `693c7eadfee42b8ae6dc6a7ab02117454c610b43`.
-- Phase 6.3 Roles/Permission Authorization Boundary — PR #328 merge `b3db1317f5c92c360754375bf8ee7ac6251c94dc`.
-- Phase 6.4 Resource-Scope Isolation & Representative Permission Enforcement — PR #331 merge `dfbdd4dd6f9a0d63e2a4d347421d8150bdc23ef5`.
-- Phase 6.5 Device Identity & Audit Attribution — PR #333 merge `86e46c13ebb2928f00a909e2eec92b4d28b1afba`.
-- Phase 6.6 Trusted Audit Evidence Integration — PR #335 merge `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
-- Phase 6.7 Integrated Authorization Qualification — PR #337 merge `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
-- Phase 6.8 Closure Qualification — PR #339 merge `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
-- Phase 6.9 Canonical Acceptance Synchronization — PR #341 merge `16517e009d108c200e65c93781d655c29c7f4624`.
-- Phase 6.10 README Post-closure Consistency — PR #346 merge `98b149c43b8d42cd17045e8dfe00823dd2817e35`.
-- Phase 6.11 Accepted Evidence Consistency — PR #357 merge `620e20279321f0881df99a168c09a7395873fed5`.
-- Phase 6.12 `PROJECT_STATE.md` Post-closure Evidence Synchronization — PR #360 merge `7fd477c2bcfea10587a3c4fd64d51681da816c5a`.
-- Phase 6.13 `AI_BOOTSTRAP.md` Post-closure Evidence Synchronization — PR #362 merge `8d41c95cf34e5ece761d31820b41f927812a5686`.
-- Phase 6.14 Roadmap Post-closure Evidence Reconciliation — PR #364 merge `5b9e10096b56db7b1546d9347474436dbd50dc46`.
-- Phase 6.15 Canonical Authority Reconciliation — PR #366 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
+- production IdP/device credential, secret, certificate or key provisioning;
+- privileged root/sudo/SSH/systemd operations;
+- destructive production database/object-store migration or cutover;
+- broad route-by-route authorization rollout beyond accepted representative enforcement;
+- watcher-driven archive mutation or automatic approval/execution;
+- source delete/move/rename or archive overwrite authority;
+- provider lock-in beyond accepted neutral architecture;
+- external certification/compliance commitments;
+- production load/capacity qualification;
+- commercial SLA/SLO commitments;
+- material automatic action/recovery/governance authority expansion.
 
 ## Accepted predecessor baselines
 
@@ -68,20 +100,20 @@ Implementation completion alone is never acceptance.
 
 ## Mandatory inherited regression baseline
 
-Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Phase 6-affecting candidates additionally preserve the dedicated Phase 6 Closure Qualification gate together with applicable product, enterprise, security, recovery, Governance Continuity and Phase 5 closure gates.
+Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 7 foundation contracts must preserve `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting candidates additionally preserve the dedicated Phase 6 Closure Qualification gate unless an accepted later decision explicitly supersedes it.
 
 ## Current five-track position
 
-- **Product & UX:** trusted local-first product surfaces remain accepted; future work should add distinct user-visible value.
-- **Knowledge & Safe Action:** preserve backend authority, explicit approval, truthful unknown-state handling, audit/undo, recovery and filesystem safety.
-- **Enterprise Platform:** production identity/tenancy/authorization foundations are accepted as provider-neutral contracts; real production provisioning/cutover remains CEO-gated.
-- **Engineering Operations:** preserve inherited validation plus Phase 6 Closure Qualification; privileged production operations remain separately gated.
-- **Governance & Autonomous Delivery:** Phase 6 is closed. Release only bounded dependency-satisfied work with unchanged-head validation, clean review and explicit rollback.
+- **Product & UX:** Phase 7 adds a bounded Admin/operator archive review workspace foundation while preserving Client Workspace/Admin separation.
+- **Knowledge & Safe Action:** archive planning/execution remains copy-first, explicit-approval, source-preserving and no-overwrite by default.
+- **Enterprise Platform:** Phase 6 production identity/tenancy/authorization foundations remain accepted; production provisioning/cutover remains CEO-gated.
+- **Engineering Operations:** inherited CI plus Phase 6 and Phase 7 closure qualification gates are preserved where applicable.
+- **Governance & Autonomous Delivery:** Phase 7 foundation is closed. Release later stages only as separately bounded dependencies with unchanged-head validation, clean review and explicit rollback.
 
 ## Next decision rule
 
-Phase 6 is closed and must not be reopened for new product/runtime scope. Evidence-only acceptance after Phase 6.15 is read directly from GitHub issue/PR/merge/workflow evidence and does not require recursive synchronization of canonical files unless a factual baseline or authority boundary changes. Post-Phase-6 product work belongs to its separately governed phase. Do not infer production infrastructure activation or broader enforcement authority from Phase 6 acceptance. Any material production authority expansion remains CEO-gated.
+Phase 7 Foundation is closed through Stage 6. Stages 7–9 in `docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md` remain separately governed future work and must not be inferred as authorized by this closure. The next product phase must be selected from current repository priorities and dependency readiness while preserving Phase 7 copy-first/no-overwrite/manual-approval boundaries and all Phase 6 production authority restrictions.
 
 ## Rollback
 
-This Phase 6.16 evidence-governance correction is documentation/evidence-only and independently reversible to accepted Phase 6.15 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`. Reverting this correction does not alter Phase 6 runtime contracts or any earlier accepted milestone.
+Phase 7 canonical synchronization is documentation/evidence-only and independently reversible to closure merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`. Each Phase 7.1–7.5 implementation merge remains independently reversible, and reverting this synchronization does not alter Phase 7 runtime contracts, Phase 6 runtime contracts, or earlier accepted milestones.
