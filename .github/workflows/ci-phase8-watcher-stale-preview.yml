@@ -1,0 +1,62 @@
+name: EverythingAI Phase 8 Watcher Stale Preview Qualification
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/src/archive/**'
+      - 'services/api/src/watcher/watchService.js'
+      - 'services/api/test/archive*.test.js'
+      - 'services/api/test/watcherArchiveIntegration.test.js'
+      - 'apps/everything-ai-ui/src/admin/archiveReviewModel.ts'
+      - 'apps/everything-ai-ui/src/admin/components/ArchiveReviewWorkspace.tsx'
+      - 'tests/archive-review-stale-model.test.mjs'
+      - 'PROJECT_STATE.md'
+      - 'AI_BOOTSTRAP.md'
+      - 'docs/ROADMAP.md'
+      - 'docs/IMPLEMENTATION_ROADMAP.md'
+      - 'docs/PHASE8_*.md'
+      - 'docs/HANDOVER_*PHASE8*.json'
+      - 'scripts/validate-phase8-watcher-integration.mjs'
+      - '.github/workflows/ci-phase8-watcher-stale-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase8-watcher-stale-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Phase 8 watcher stale-preview artifacts
+        run: node scripts/validate-phase8-watcher-integration.mjs
+      - name: Run Phase 8 Admin stale-review model qualification
+        run: node --test tests/archive-review-stale-model.test.mjs
+      - name: Install API dependencies exactly
+        working-directory: services/api
+        run: npm ci
+      - name: Run Phase 7 and Phase 8 focused archive qualification stack
+        working-directory: services/api
+        run: >-
+          node --test
+          test/archiveProfileModel.test.js
+          test/archivePlanner.test.js
+          test/archiveExecutor.test.js
+          test/metadataSidecar.test.js
+          test/archiveStaleState.test.js
+          test/archiveWatchAdapter.test.js
+          test/watcherArchiveIntegration.test.js
+          test/archiveUpdatePreview.test.js
+      - name: Install frontend dependencies exactly
+        working-directory: apps/everything-ai-ui
+        run: npm ci
+      - name: Typecheck Admin review workspace
+        working-directory: apps/everything-ai-ui
+        run: npm run typecheck
+      - name: Build frontend
+        working-directory: apps/everything-ai-ui
+        run: npm run build
