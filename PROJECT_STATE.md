@@ -55,7 +55,7 @@ Phase 6 accepted chain remains:
 - PR #331 resource-scope isolation — `dfbdd4dd6f9a0d63e2a4d347421d8150bdc23ef5`.
 - PR #333 device identity/audit attribution — `86e46c13ebb2928f00a909e2eec92b4d28b1afba`.
 - PR #335 trusted audit evidence — `054c58822616cede0d5db293e2d382bfa6b7e1bb`.
-- PR #337 integrated qualification — `15c1617f5c92c360754375bf8ee7ac6251c94dc` is not authoritative for Phase 6.7; authoritative Phase 6.7 merge remains `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
+- PR #337 integrated qualification — `15c1617b5201e0bfb98f11517e6ebdca69857da4`.
 - PR #339 closure — `71fd3627b783284bccf37f7628b86a8a78fb3c07`.
 - Post-closure evidence maintenance through Phase 6.15 remains accepted, ending with PR #366 merge `92d56c501e82050e6de83aa6d70fccc8e62e3f1c`.
 
