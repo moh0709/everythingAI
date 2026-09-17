@@ -4,9 +4,11 @@ import {
   applyArchiveApprovalIntent,
   deriveArchiveBulkReviewSummary,
   filterArchiveReviewItems,
+  getArchiveStaleState,
   isArchiveReviewItemBlocked,
   type ArchiveReviewFilter,
   type ArchiveReviewItem,
+  type ArchiveStaleState,
 } from '../archiveReviewModel';
 
 type ArchiveReviewWorkspaceProps = {
@@ -16,6 +18,28 @@ type ArchiveReviewWorkspaceProps = {
   policyWarnings?: string[];
   onIntentChange?: (items: ArchiveReviewItem[]) => void;
 };
+
+const STALE_LABELS: Record<ArchiveStaleState, string> = {
+  current: 'Current',
+  source_changed: 'Source changed',
+  archive_missing: 'Archive missing',
+  archive_changed: 'Archive changed',
+  sidecar_missing: 'Sidecar missing',
+  conflict: 'Conflict',
+};
+
+const FILTERS: Array<{ value: ArchiveReviewFilter; label: string }> = [
+  { value: 'all', label: 'All' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'rejected', label: 'Rejected' },
+  { value: 'stale', label: 'Stale' },
+  { value: 'source_changed', label: 'Source changed' },
+  { value: 'archive_missing', label: 'Archive missing' },
+  { value: 'archive_changed', label: 'Archive changed' },
+  { value: 'sidecar_missing', label: 'Sidecar missing' },
+  { value: 'conflict', label: 'Conflict' },
+];
 
 export function ArchiveReviewWorkspace({
   planId,
@@ -67,14 +91,14 @@ export function ArchiveReviewWorkspace({
     </div>}
 
     <div className="button-row" aria-label="Archive review filters">
-      {(['all', 'pending', 'approved', 'rejected', 'conflict'] as ArchiveReviewFilter[]).map((value) => (
+      {FILTERS.map(({ value, label }) => (
         <button
           key={value}
           className={filter === value ? 'purple' : 'outline'}
           onClick={() => setFilter(value)}
           type="button"
         >
-          {value}
+          {label}
         </button>
       ))}
     </div>
@@ -82,8 +106,11 @@ export function ArchiveReviewWorkspace({
     <div className="panel">
       <strong>Bulk review</strong>
       <p>
-        Selected: <b>{summary.selected_count}</b> · Conflicts/blocked: <b>{summary.conflict_count}</b> · Reviewable: <b>{summary.reviewable_count}</b>
+        Selected: <b>{summary.selected_count}</b> · Stale: <b>{summary.stale_count}</b> · Conflicts/blocked: <b>{summary.conflict_count}</b> · Reviewable: <b>{summary.reviewable_count}</b>
       </p>
+      {summary.selected_count > 0 && <p className="muted">
+        Source changed: {summary.stale_state_counts.source_changed} · Archive missing: {summary.stale_state_counts.archive_missing} · Archive changed: {summary.stale_state_counts.archive_changed} · Sidecar missing: {summary.stale_state_counts.sidecar_missing} · Conflict: {summary.stale_state_counts.conflict}
+      </p>}
       <div className="button-row">
         <button
           type="button"
@@ -107,6 +134,8 @@ export function ArchiveReviewWorkspace({
     <div className="planning-grid advanced">
       {visibleItems.map((item) => {
         const blocked = isArchiveReviewItemBlocked(item);
+        const staleState = getArchiveStaleState(item);
+        const manualReview = staleState === 'archive_changed' || staleState === 'conflict';
         return <article key={item.plan_item_id} className="panel">
           <label>
             <input
@@ -118,9 +147,12 @@ export function ArchiveReviewWorkspace({
           </label>
           <h3><FileText size={16} /> {item.source_path}</h3>
           <p><strong>Proposed archive path:</strong> {item.suggested_archive_path}</p>
+          <p><strong>Archive state:</strong> {STALE_LABELS[staleState]}</p>
+          {item.review_mode && <p><strong>Review mode:</strong> {item.review_mode}</p>}
           <p><strong>Approval intent:</strong> {item.approval_status}</p>
           <p><strong>Conflict state:</strong> {item.conflict_status}</p>
-          {blocked && <p role="status"><AlertTriangle size={14} /> Approval is blocked until conflict/stale state is resolved.</p>}
+          {manualReview && <p role="status"><AlertTriangle size={14} /> Manual review is required for this archive state. Approval intent remains blocked until the state is resolved.</p>}
+          {!manualReview && blocked && <p role="status"><AlertTriangle size={14} /> Approval is blocked until conflict/stale state is resolved.</p>}
 
           <div>
             <strong>AI-generated metadata fields</strong>
