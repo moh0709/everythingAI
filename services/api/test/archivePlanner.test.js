@@ -135,3 +135,156 @@ test('preview planner requires complete source fingerprint evidence', () => {
     /INVALID_SOURCE_SNAPSHOT/,
   );
 });
+
+
+test('preview planner normalizes AI enrichment into immutable deterministic plan evidence', () => {
+  const generatedMetadata = {
+    tags: {
+      value: ['invoice', 'finance', 'invoice'],
+      generated_by: 'provider-neutral-model',
+      evidence_refs: [{
+        type: 'document_text',
+        source_path: path.resolve('fixtures/source/invoice.pdf'),
+        locator: 'page=2',
+      }],
+    },
+    summary: {
+      value: 'Invoice summary',
+      generated_by: 'provider-neutral-model',
+      evidence_refs: [{
+        type: 'document_text',
+        source_path: path.resolve('fixtures/source/invoice.pdf'),
+        locator: 'page=1',
+      }],
+    },
+  };
+
+  const first = createPreviewArchivePlan({
+    profile: createProfile(),
+    source_snapshots: [createSnapshot({ generated_metadata: generatedMetadata })],
+  });
+  const second = createPreviewArchivePlan({
+    profile: createProfile(),
+    source_snapshots: [createSnapshot({ generated_metadata: generatedMetadata })],
+  });
+
+  assert.equal(first.plan_id, second.plan_id);
+  assert.equal(first.filesystem_mutation_allowed, false);
+  assert.equal(first.execution_allowed, false);
+  assert.equal(first.automatic_approval_allowed, false);
+
+  const item = first.items[0];
+  assert.equal(item.enrichment.enabled, true);
+  assert.equal(item.enrichment.status, 'ready');
+  assert.equal(item.enrichment.provider_neutral, true);
+  assert.equal(item.enrichment.filesystem_mutation_allowed, false);
+  assert.equal(item.enrichment.execution_allowed, false);
+  assert.equal(item.enrichment.automatic_approval_allowed, false);
+  assert.deepEqual(item.enrichment.metadata.tags.value, ['finance', 'invoice']);
+  assert.equal(item.enrichment.metadata.summary.ai_generated, true);
+  assert.deepEqual(item.ai_generated_fields, ['classification', 'summary', 'tags']);
+  assert.equal(item.evidence_refs.some((entry) => entry.locator === 'page=2'), true);
+  assert.equal(Object.isFrozen(item.enrichment), true);
+});
+
+test('preview planner makes normalized enrichment part of deterministic item identity', () => {
+  const baseMetadata = {
+    summary: {
+      value: 'First summary',
+      generated_by: 'provider-neutral-model',
+      evidence_refs: [{
+        type: 'document_text',
+        source_path: path.resolve('fixtures/source/invoice.pdf'),
+        locator: 'page=1',
+      }],
+    },
+  };
+  const changedMetadata = {
+    summary: {
+      ...baseMetadata.summary,
+      value: 'Changed summary',
+    },
+  };
+
+  const first = createPreviewArchivePlan({
+    profile: createProfile(),
+    source_snapshots: [createSnapshot({ generated_metadata: baseMetadata })],
+  });
+  const changed = createPreviewArchivePlan({
+    profile: createProfile(),
+    source_snapshots: [createSnapshot({ generated_metadata: changedMetadata })],
+  });
+
+  assert.notEqual(first.items[0].plan_item_id, changed.items[0].plan_item_id);
+  assert.notEqual(first.plan_id, changed.plan_id);
+});
+
+test('preview planner honors profile enrichment disable switch and fails closed on generated input', () => {
+  const disabledProfile = createProfile({ metadata_enrichment_enabled: false });
+
+  const withoutGeneratedMetadata = createPreviewArchivePlan({
+    profile: disabledProfile,
+    source_snapshots: [createSnapshot({ generated_metadata: {} })],
+  });
+  assert.equal(withoutGeneratedMetadata.items[0].enrichment.enabled, false);
+  assert.equal(withoutGeneratedMetadata.items[0].enrichment.status, 'disabled');
+  assert.deepEqual(withoutGeneratedMetadata.items[0].enrichment.metadata, {});
+
+  assert.throws(
+    () => createPreviewArchivePlan({
+      profile: disabledProfile,
+      source_snapshots: [createSnapshot({
+        generated_metadata: {
+          summary: {
+            value: 'Must be rejected',
+            generated_by: 'provider-neutral-model',
+            evidence_refs: [{
+              type: 'document_text',
+              source_path: path.resolve('fixtures/source/invoice.pdf'),
+              locator: 'page=1',
+            }],
+          },
+        },
+      })],
+    }),
+    /AI_ENRICHMENT_DISABLED/,
+  );
+});
+
+test('preview planner rejects malformed or unsupported generated enrichment through policy boundary', () => {
+  assert.throws(
+    () => createPreviewArchivePlan({
+      profile: createProfile(),
+      source_snapshots: [createSnapshot({
+        generated_metadata: {
+          arbitrary: {
+            value: 'not allowed',
+            generated_by: 'provider-neutral-model',
+            evidence_refs: [{
+              type: 'document_text',
+              source_path: path.resolve('fixtures/source/invoice.pdf'),
+              locator: 'page=1',
+            }],
+          },
+        },
+      })],
+    }),
+    /ENRICHMENT_FIELD_NOT_ALLOWED:arbitrary/,
+  );
+
+  assert.throws(
+    () => createPreviewArchivePlan({
+      profile: createProfile(),
+      source_snapshots: [createSnapshot({
+        generated_metadata: {
+          summary: {
+            value: 'Missing evidence',
+            generated_by: 'provider-neutral-model',
+            evidence_refs: [],
+          },
+        },
+      })],
+    }),
+    /AI_EVIDENCE_REQUIRED:summary/,
+  );
+});
