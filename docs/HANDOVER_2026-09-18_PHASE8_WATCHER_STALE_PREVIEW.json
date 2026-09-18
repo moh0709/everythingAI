@@ -1,0 +1,52 @@
+{
+  "project": "EverythingAI",
+  "phase": "Phase 8 — Watcher Integration & Stale Archive Preview Foundation",
+  "date": "2026-09-18",
+  "decision_state": "CLOSURE_CANDIDATE",
+  "decision": "PHASE8_WATCHER_STALE_PREVIEW_PASS",
+  "parent_issue": 375,
+  "closure_issue": 385,
+  "accepted_chain": [
+    {"slice": "8.1", "pr": 376, "merge": "d33574b25642c6cc6236c3d46464e4da1d82c3d5", "capability": "Archive stale-state evaluator"},
+    {"slice": "8.2", "pr": 378, "merge": "97cbe9671b14c597bc4a647e3bbe79e3b660d748", "capability": "Watcher review adapter and semantic dedupe"},
+    {"slice": "8.3", "pr": 380, "merge": "612f8af22663b98725ac421a6da0f7f556cb00d0", "capability": "Error-bounded watcher review hook"},
+    {"slice": "8.4", "pr": 382, "merge": "0d1960bce368c597e0e2e173bbde08eabfdaae33", "capability": "Preview-only update/rebuild bridge"},
+    {"slice": "8.5", "pr": 384, "merge": "ae2204c0ae3ba75d3eac5860a200be083d7af744", "capability": "Admin stale/rebuild/conflict visibility"}
+  ],
+  "accepted_capabilities": [
+    "deterministic stale-state evaluation",
+    "deterministic watcher review candidate identifiers",
+    "duplicate-event semantic dedupe",
+    "error-bounded watcher review hook",
+    "source-fingerprint-bound update and rebuild previews",
+    "Admin stale/manual-review visibility with approval blocking"
+  ],
+  "authority": {
+    "watcher_driven_execution": false,
+    "automatic_approval": false,
+    "archive_overwrite_authority": false,
+    "source_delete_move_rename": false,
+    "direct_archive_executor_call_from_watcher": false,
+    "direct_metadata_sidecar_write_from_watcher": false,
+    "broad_full_drive_watch_default": false
+  },
+  "deferred": [
+    "Stage 8 AI enrichment improvements",
+    "Stage 9 advanced document intelligence",
+    "automatic archive execution",
+    "watcher-driven overwrite",
+    "production secrets or privileged production infrastructure",
+    "destructive production migration/cutover",
+    "external certification/load commitments",
+    "commercial SLA/SLO commitments",
+    "material automatic governance/action/recovery expansion"
+  ],
+  "closure_requirements": {
+    "dedicated_phase8_closure_gate": "required",
+    "complete_applicable_inherited_matrix": "required",
+    "unchanged_candidate_head": true,
+    "clean_review_state": true
+  },
+  "rollback": "Closure evidence and every Phase 8.1-8.5 slice remain independently reversible. Phase 7 and earlier accepted milestones remain intact.",
+  "next_after_acceptance": "Synchronize canonical roadmap/state files to the accepted Phase 8 watcher stale-preview baseline. Stage 8 AI enrichment remains separately governed."
+}
