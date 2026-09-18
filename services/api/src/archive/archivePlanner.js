@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import path from 'node:path';
+import { normalizeArchiveEnrichment } from './archiveEnrichmentPolicy.js';
 import { validateArchiveProfile } from './archiveProfileModel.js';
 
 function normalizeString(value) {
@@ -44,6 +45,9 @@ function validateSourceSnapshot(snapshot, profile) {
     throw new Error('SOURCE_OUTSIDE_PROFILE_ROOTS');
   }
 
+  const hasGeneratedMetadata = Object.prototype.hasOwnProperty.call(snapshot ?? {}, 'generated_metadata');
+  const generatedMetadata = hasGeneratedMetadata ? snapshot.generated_metadata : {};
+
   return {
     source_path: path.resolve(sourcePath),
     source_fingerprint: {
@@ -54,6 +58,7 @@ function validateSourceSnapshot(snapshot, profile) {
     suggested_relative_path: normalizeString(snapshot?.suggested_relative_path),
     ai_generated_fields: normalizeAiFields(snapshot?.ai_generated_fields),
     evidence_refs: normalizeEvidenceRefs(snapshot?.evidence_refs),
+    generated_metadata: generatedMetadata,
   };
 }
 
@@ -67,6 +72,24 @@ function buildDestination(profile, snapshot) {
   }
 
   return destination;
+}
+
+function flattenEnrichmentEvidence(metadata) {
+  const deduped = new Map();
+
+  for (const entry of Object.values(metadata)) {
+    for (const evidence of entry.evidence_refs) {
+      const key = JSON.stringify([evidence.type, evidence.source_path, evidence.locator]);
+      deduped.set(key, evidence);
+    }
+  }
+
+  return [...deduped.values()]
+    .sort((a, b) => (
+      a.source_path.localeCompare(b.source_path)
+      || a.type.localeCompare(b.type)
+      || a.locator.localeCompare(b.locator)
+    ));
 }
 
 export function createPreviewArchivePlan({ profile: inputProfile, source_snapshots: sourceSnapshots } = {}) {
@@ -98,13 +121,47 @@ export function createPreviewArchivePlan({ profile: inputProfile, source_snapsho
     }
     destinationKeys.add(destinationKey);
 
+    const enrichment = normalizeArchiveEnrichment({
+      profile,
+      generated_metadata: snapshot.generated_metadata,
+    });
+    const enrichmentMetadata = enrichment.metadata;
+    const enrichmentFields = Object.keys(enrichmentMetadata);
+    const enrichmentEvidence = flattenEnrichmentEvidence(enrichmentMetadata);
+
+    const aiGeneratedFields = [...new Set([
+      ...snapshot.ai_generated_fields,
+      ...enrichmentFields,
+    ])].sort();
+
+    const evidenceRefs = [
+      ...snapshot.evidence_refs,
+      ...enrichmentEvidence,
+    ];
+    const dedupedEvidence = new Map();
+    for (const evidence of evidenceRefs) {
+      const key = JSON.stringify([evidence.type, evidence.source_path, evidence.locator]);
+      dedupedEvidence.set(key, evidence);
+    }
+    const normalizedEvidenceRefs = [...dedupedEvidence.values()]
+      .sort((a, b) => (
+        a.source_path.localeCompare(b.source_path)
+        || a.type.localeCompare(b.type)
+        || a.locator.localeCompare(b.locator)
+      ));
+
     const stableContract = {
       profile_id: profile.id,
       source_path: snapshot.source_path,
       source_fingerprint: snapshot.source_fingerprint,
       suggested_archive_path: suggestedArchivePath,
-      ai_generated_fields: snapshot.ai_generated_fields,
-      evidence_refs: snapshot.evidence_refs,
+      ai_generated_fields: aiGeneratedFields,
+      evidence_refs: normalizedEvidenceRefs,
+      enrichment: {
+        enabled: enrichment.enabled,
+        status: enrichment.status,
+        metadata: enrichmentMetadata,
+      },
     };
 
     return Object.freeze({
@@ -117,8 +174,17 @@ export function createPreviewArchivePlan({ profile: inputProfile, source_snapsho
       requires_approval: true,
       approval_status: 'pending',
       conflict_status: 'none',
-      ai_generated_fields: Object.freeze([...snapshot.ai_generated_fields]),
-      evidence_refs: Object.freeze(snapshot.evidence_refs.map((entry) => Object.freeze({ ...entry }))),
+      ai_generated_fields: Object.freeze(aiGeneratedFields),
+      evidence_refs: Object.freeze(normalizedEvidenceRefs.map((entry) => Object.freeze({ ...entry }))),
+      enrichment: Object.freeze({
+        enabled: enrichment.enabled,
+        status: enrichment.status,
+        provider_neutral: enrichment.provider_neutral,
+        metadata: enrichmentMetadata,
+        filesystem_mutation_allowed: false,
+        execution_allowed: false,
+        automatic_approval_allowed: false,
+      }),
     });
   });
 
@@ -135,6 +201,7 @@ export function createPreviewArchivePlan({ profile: inputProfile, source_snapsho
       action: item.action,
       ai_generated_fields: item.ai_generated_fields,
       evidence_refs: item.evidence_refs,
+      enrichment: item.enrichment,
     })),
   };
 
@@ -144,6 +211,8 @@ export function createPreviewArchivePlan({ profile: inputProfile, source_snapsho
     archive_destination: profile.archive_destination,
     mode: 'preview_only',
     filesystem_mutation_allowed: false,
+    execution_allowed: false,
+    automatic_approval_allowed: false,
     items: Object.freeze(planItems),
   });
 }
