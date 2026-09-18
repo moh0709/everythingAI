@@ -78,7 +78,7 @@ requireText('docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md', '| 7 | Watcher integrati
 const releaseDecision = 'docs/PHASE8_WATCHER_STALE_PREVIEW_RELEASE_DECISION_2026-09-18.md';
 const handover = 'docs/HANDOVER_2026-09-18_PHASE8_WATCHER_STALE_PREVIEW.json';
 requireText(releaseDecision, 'PHASE8_WATCHER_STALE_PREVIEW_PASS');
-requireText(releaseDecision, 'watcher-driven archive execution remains prohibited');
+requireText(releaseDecision, 'Watcher-driven archive execution remains prohibited');
 requireText(handover, '"decision": "PHASE8_WATCHER_STALE_PREVIEW_PASS"');
 requireText(handover, '"watcher_driven_execution": false');
 requireText(handover, '"automatic_approval": false');
