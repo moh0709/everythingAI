@@ -14,6 +14,32 @@ export type ArchiveReviewEvidenceRef = {
   locator?: string;
 };
 
+export type ArchiveMetadataUserProvenance = {
+  edited_by: string;
+  edited_at: string;
+  replaced_ai_generated: boolean;
+  prior_generated_by?: string | null;
+  prior_evidence_refs?: ArchiveReviewEvidenceRef[];
+};
+
+export type ArchiveReviewMetadataEntry = {
+  value: unknown;
+  generated_by?: string | null;
+  ai_generated: boolean;
+  evidence_refs: ArchiveReviewEvidenceRef[];
+  user_provenance?: ArchiveMetadataUserProvenance | null;
+};
+
+export type ArchiveReviewEnrichment = {
+  enabled: boolean;
+  status: 'ready' | 'disabled' | string;
+  provider_neutral?: boolean;
+  metadata: Record<string, ArchiveReviewMetadataEntry>;
+  filesystem_mutation_allowed?: boolean;
+  execution_allowed?: boolean;
+  automatic_approval_allowed?: boolean;
+};
+
 export type ArchiveReviewItem = {
   plan_item_id: string;
   source_path: string;
@@ -24,6 +50,7 @@ export type ArchiveReviewItem = {
   review_mode?: string;
   ai_generated_fields: string[];
   evidence_refs: ArchiveReviewEvidenceRef[];
+  enrichment?: ArchiveReviewEnrichment;
 };
 
 export type ArchiveReviewFilter =
@@ -31,6 +58,18 @@ export type ArchiveReviewFilter =
   | ArchiveReviewStatus
   | 'stale'
   | ArchiveStaleState;
+
+export type ArchiveMetadataProvenanceView = {
+  field: string;
+  origin: 'ai_generated' | 'user_edited' | 'user_authored';
+  generated_by: string | null;
+  evidence_count: number;
+  edited_by: string | null;
+  edited_at: string | null;
+  replaced_ai_generated: boolean;
+  prior_generated_by: string | null;
+  prior_evidence_count: number;
+};
 
 const STALE_STATES: ArchiveStaleState[] = [
   'current',
@@ -45,6 +84,36 @@ const MANUAL_REVIEW_STATES = new Set<ArchiveStaleState>(['archive_changed', 'con
 
 export function getArchiveStaleState(item: ArchiveReviewItem): ArchiveStaleState {
   return item.stale_state ?? 'current';
+}
+
+export function getArchiveEnrichmentState(item: ArchiveReviewItem) {
+  if (!item.enrichment) return 'not_supplied' as const;
+  return item.enrichment.enabled ? 'enabled' as const : 'disabled' as const;
+}
+
+export function deriveArchiveMetadataProvenance(item: ArchiveReviewItem): ArchiveMetadataProvenanceView[] {
+  const metadata = item.enrichment?.metadata ?? {};
+
+  return Object.entries(metadata)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([field, entry]) => {
+      const user = entry.user_provenance ?? null;
+      const origin = user
+        ? (user.replaced_ai_generated ? 'user_edited' : 'user_authored')
+        : (entry.ai_generated ? 'ai_generated' : 'user_authored');
+
+      return Object.freeze({
+        field,
+        origin,
+        generated_by: entry.generated_by ?? null,
+        evidence_count: Array.isArray(entry.evidence_refs) ? entry.evidence_refs.length : 0,
+        edited_by: user?.edited_by ?? null,
+        edited_at: user?.edited_at ?? null,
+        replaced_ai_generated: user?.replaced_ai_generated === true,
+        prior_generated_by: user?.prior_generated_by ?? null,
+        prior_evidence_count: Array.isArray(user?.prior_evidence_refs) ? user.prior_evidence_refs.length : 0,
+      });
+    });
 }
 
 export function isArchiveReviewItemBlocked(item: ArchiveReviewItem) {
