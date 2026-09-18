@@ -1,7 +1,7 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-09-18  
-Current accepted state: Phase 8 Watcher Integration & Stale Archive Preview Foundation dispatched (`PHASE8_WATCHER_STALE_PREVIEW_PASS`).
+Current accepted state: Phase 9 AI Metadata Enrichment Controls Foundation dispatched (`PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS`).
 
 ## Mandatory startup sequence
 
@@ -19,34 +19,40 @@ Repository state, exact SHAs, issue/PR state, workflow evidence and canonical au
 
 ## Current release authority
 
-Phase 8 Watcher Integration & Stale Archive Preview Foundation is accepted through:
+Phase 9 AI Metadata Enrichment Controls Foundation is accepted through:
 
-- parent issue #375;
-- closure issue #385 / PR #386;
-- unchanged closure candidate `dbd5765d9d9a8df640ab9654889b9ac6cbed8c9f`;
-- closure merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58`;
-- `docs/PHASE8_WATCHER_STALE_PREVIEW_RELEASE_DECISION_2026-09-18.md`;
-- `docs/HANDOVER_2026-09-18_PHASE8_WATCHER_STALE_PREVIEW.json`.
+- parent issue #389;
+- closure issue #398 / PR #399;
+- unchanged closure candidate `14e32cbbb5cd154301a52f4bc86dcdd4e71ce331`;
+- closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48`;
+- `docs/PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_RELEASE_DECISION_2026-09-18.md`;
+- `docs/HANDOVER_2026-09-18_PHASE9_AI_METADATA_ENRICHMENT_CONTROLS.json`.
 
-Final closure evidence: 20/20 triggered workflows passed, including EverythingAI Phase 8 Watcher Stale Preview Closure Qualification #2 and CI Smoke #957. Final review had no review submissions or review threads.
+Final closure evidence: 20/20 triggered workflows passed, including EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification #1 and CI Smoke #970. Final review had no review submissions or review threads.
 
-## Phase 8 capability boundary
+## Phase 9 capability boundary
 
-Accepted Stage 7 watcher capability includes:
+Accepted design Stage 8 capability includes:
 
-- deterministic stale-state evaluation;
-- semantic watcher review-candidate dedupe;
-- error-bounded integration with the existing watcher;
-- update/rebuild preview generation bound to current source fingerprints;
-- Admin/operator stale, rebuild, conflict and manual-review visibility.
+- provider-neutral metadata enrichment policy and normalization;
+- explicit profile-level enrichment enable/disable;
+- bounded `summary`, `classification`, and `tags` fields;
+- required field-level generator/evidence provenance;
+- deterministic preview-plan enrichment identity;
+- sidecar AI provenance and user-edit replacement provenance;
+- Admin enrichment preference and provenance visibility.
 
-The watcher boundary remains review/preview-only. It does not directly execute archive writes, approve archive actions, overwrite archive outputs, or mutate source files.
+The accepted Phase 9 foundation does not directly invoke an AI provider/model and adds no filesystem mutation, automatic approval/execution, overwrite, source mutation, or watcher-execution authority.
 
-Stage 8 AI enrichment improvements and Stage 9 advanced document intelligence remain separately governed.
+Design Stage 9 advanced document intelligence remains separately governed.
+
+## Accepted Phase 8 authority
+
+Phase 8 Watcher Integration & Stale Archive Preview Foundation remains accepted as `PHASE8_WATCHER_STALE_PREVIEW_PASS` through closure merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58` and canonical synchronization merge `01f56476d76d8002793347d6868fe9f1e5ae0854`. Its watcher review/preview-only and no-execution boundaries remain inherited by Phase 9.
 
 ## Accepted Phase 7 authority
 
-Phase 7 AI Organization Workspace Foundation remains accepted as `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` through closure merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`. Its copy-first, no-overwrite, source-preserving and explicit-approval boundaries remain inherited by Phase 8.
+Phase 7 AI Organization Workspace Foundation remains accepted as `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` through closure merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`. Its copy-first, no-overwrite, source-preserving and explicit-approval boundaries remain inherited by Phase 9.
 
 ## Accepted Phase 7 chain
 
@@ -128,8 +134,8 @@ Rules:
 
 ## Mandatory inherited validation
 
-Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Work affecting accepted Phase 8 watcher contracts must run `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`. Phase 7 foundation-affecting work additionally preserves `EverythingAI Phase 7 Foundation Closure Qualification`, and Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded.
+Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Work affecting accepted Phase 9 enrichment contracts must run `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`. Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; and Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded.
 
 ## Current next-step rule
 
-Phase 8 is closed through Stage 7. Stage 8 AI enrichment improvements and Stage 9 advanced document intelligence remain separately governed dependencies. Select subsequent work from synchronized repository priorities while preserving watcher review/preview-only semantics, explicit approval, copy-first/no-overwrite behavior, Client Workspace/Admin separation, and all production/governance safety boundaries above.
+Phase 9 is closed through design Stage 8. Design Stage 9 advanced document intelligence remains a separately governed dependency. Select subsequent work from synchronized repository priorities while preserving provider-neutral enrichment provenance/disable semantics, watcher review/preview-only behavior, explicit approval, copy-first/no-overwrite behavior, Client Workspace/Admin separation, and all production/governance safety boundaries above.
