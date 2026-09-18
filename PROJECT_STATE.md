@@ -1,33 +1,48 @@
 # EverythingAI — Canonical Project State
 
-Date: 2026-09-17  
-Authority: accepted repository state through Phase 7 AI Organization Workspace Foundation closure, while preserving all accepted Phase 6 production identity/tenancy/authorization authority and boundaries.
+Date: 2026-09-18  
+Authority: accepted repository state through Phase 8 Watcher Integration & Stale Archive Preview Foundation closure, while preserving the accepted Phase 7 organization foundation and all Phase 6 production identity/tenancy/authorization authority and boundaries.
 
 ## Current program stage
 
-**Phase 7 — AI Organization Workspace Foundation is COMPLETE AND DISPATCHED (`PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS`).**
+**Phase 8 — Watcher Integration & Stale Archive Preview Foundation is COMPLETE AND DISPATCHED (`PHASE8_WATCHER_STALE_PREVIEW_PASS`).**
 
-Accepted final Phase 7 closure candidate: `e613143b58a9d2048b5c1291baa68828881c0512`.  
-Accepted Phase 7 closure merge to `main`: `60a16f58321f599ed5f13b0319fbd712ba3e986a` through issue #369 / PR #372.
+Accepted final Phase 8 closure candidate: `dbd5765d9d9a8df640ab9654889b9ac6cbed8c9f`.  
+Accepted Phase 8 closure merge to `main`: `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58` through issue #385 / PR #386.
 
-The final unchanged Phase 7 closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 7 Foundation Closure Qualification #2 and CI Smoke #936. Final review had zero review submissions and zero review threads.
+The final unchanged Phase 8 closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 8 Watcher Stale Preview Closure Qualification #2 and CI Smoke #957. Final review had zero review submissions and zero review threads.
 
-Phase 7 accepts the AI Organization Workspace foundation through design Stages 2–6 only:
+Phase 8 accepts the bounded Stage 7 watcher integration:
 
-- validated Archive Profile Model and local persistence;
-- deterministic preview-only archive planning;
-- exact-approval copy-only archive execution with source fingerprint verification and no-overwrite semantics;
-- provenance-rich metadata sidecars with secret exclusion and exclusive-create safety;
-- Admin/operator archive review workspace foundation with conflict visibility and approval intent only.
+- deterministic stale-state evaluation for current/source-changed/archive-missing/archive-changed/sidecar-missing/conflict;
+- semantic watcher review-candidate dedupe;
+- error-bounded integration into the existing watcher;
+- source-fingerprint-bound update/rebuild preview generation;
+- Admin/operator stale/rebuild/conflict/manual-review visibility and approval blocking.
 
-Stages 7–9 remain deferred: watcher integration, AI enrichment improvements, and advanced document intelligence. Phase 7 closure does **not** authorize watcher-driven archive writes, automatic approval/execution, source delete/move/rename authority, archive overwrite authority, privileged production infrastructure, real production secrets, destructive production migration/cutover, external certification/load commitments, commercial SLA/SLO commitments, or material automatic governance/action/recovery authority expansion.
+Watcher integration remains review/preview-only. It does not authorize watcher-driven archive execution, automatic approval, archive overwrite, source delete/move/rename, direct watcher calls into the archive executor or metadata sidecar writer, or broad full-drive watch by default.
 
-Canonical release evidence:
+Stage 8 AI enrichment improvements and Stage 9 advanced document intelligence remain separately governed future work.
 
-- `docs/PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_RELEASE_DECISION_2026-09-16.md`
-- `docs/HANDOVER_2026-09-16_PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION.json`
-- `scripts/validate-phase7-foundation-closure.mjs`
-- `.github/workflows/ci-phase7-foundation-closure.yml`
+Canonical Phase 8 release evidence:
+
+- `docs/PHASE8_WATCHER_STALE_PREVIEW_RELEASE_DECISION_2026-09-18.md`
+- `docs/HANDOVER_2026-09-18_PHASE8_WATCHER_STALE_PREVIEW.json`
+- `scripts/validate-phase8-watcher-closure.mjs`
+- `.github/workflows/ci-phase8-watcher-closure.yml`
+
+## Accepted Phase 8 implementation chain
+
+- Phase 8.1 Archive Stale-State Evaluator — PR #376 merge `d33574b25642c6cc6236c3d46464e4da1d82c3d5`.
+- Phase 8.2 Watcher Review Adapter / Semantic Dedupe — PR #378 merge `97cbe9671b14c597bc4a647e3bbe79e3b660d748`.
+- Phase 8.3 Safe Watcher Integration Hook — PR #380 merge `612f8af22663b98725ac421a6da0f7f556cb00d0`.
+- Phase 8.4 Preview-only Update/Rebuild Bridge — PR #382 merge `0d1960bce368c597e0e2e173bbde08eabfdaae33`.
+- Phase 8.5 Admin Stale/Rebuild/Conflict Visibility — PR #384 merge `ae2204c0ae3ba75d3eac5860a200be083d7af744`.
+- Phase 8.6 Watcher Stale Preview Closure Qualification — PR #386 merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58`.
+
+## Accepted Phase 7 baseline
+
+Phase 7 — AI Organization Workspace Foundation remains COMPLETE AND DISPATCHED (`PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS`) through design Stage 6.
 
 ## Accepted Phase 7 implementation chain
 
@@ -61,7 +76,7 @@ Phase 6 accepted chain remains:
 
 ## Authority boundary
 
-Phase 5 governance remains **L0 Advisory / Shadow Only**. Neither Phase 6 nor Phase 7 silently activates broader automatic enforcement.
+Phase 5 governance remains **L0 Advisory / Shadow Only**. Phases 6–8 do not silently activate broader automatic enforcement.
 
 The following remain separately CEO-gated:
 
@@ -69,7 +84,7 @@ The following remain separately CEO-gated:
 - privileged root/sudo/SSH/systemd operations;
 - destructive production database/object-store migration or cutover;
 - broad route-by-route authorization rollout beyond accepted representative enforcement;
-- watcher-driven archive mutation or automatic approval/execution;
+- watcher-driven archive execution or automatic approval;
 - source delete/move/rename or archive overwrite authority;
 - provider lock-in beyond accepted neutral architecture;
 - external certification/compliance commitments;
@@ -100,7 +115,7 @@ Implementation completion alone is never acceptance.
 
 ## Mandatory inherited regression baseline
 
-Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 7 foundation contracts must preserve `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting candidates additionally preserve the dedicated Phase 6 Closure Qualification gate unless an accepted later decision explicitly supersedes it.
+Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 8 watcher contracts must preserve `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting candidates additionally preserve the dedicated Phase 6 Closure Qualification gate unless explicitly superseded.
 
 ## Current five-track position
 
@@ -112,7 +127,7 @@ Every changed product/release candidate must validate the complete applicable in
 
 ## Next decision rule
 
-Phase 7 Foundation is closed through Stage 6. Stages 7–9 in `docs/AI_ORGANIZATION_WORKSPACE_DESIGN.md` remain separately governed future work and must not be inferred as authorized by this closure. The next product phase must be selected from current repository priorities and dependency readiness while preserving Phase 7 copy-first/no-overwrite/manual-approval boundaries and all Phase 6 production authority restrictions.
+Phase 8 is closed through design Stage 7. Stage 8 AI enrichment improvements and Stage 9 advanced document intelligence remain separately governed future work. The next product phase must preserve Phase 8 review/preview-only watcher semantics, Phase 7 copy-first/no-overwrite/manual-approval boundaries, and all Phase 6 production authority restrictions.
 
 ## Rollback
 
