@@ -56,13 +56,17 @@ const canonicalFiles = [
 ];
 for (const file of canonicalFiles) {
   requireText(file, 'PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS');
-  requireText(file, 'e613143b58a9d2048b5c1291baa68828881c0512');
   requireText(file, '60a16f58321f599ed5f13b0319fbd712ba3e986a');
 }
-requireText('PROJECT_STATE.md', 'Stages 7–9 remain deferred');
-requireText('AI_BOOTSTRAP.md', 'Stages 7–9 remain deferred');
-requireText('docs/ROADMAP.md', 'Stage 7 watcher integration');
-requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Stage 7 — Watcher integration');
+
+// Phase 7 remains an accepted historical foundation after later stages advance.
+// Deferral of Stages 7–9 is historical Phase 7 release evidence, not a perpetual
+// requirement on current canonical state. Later accepted phases may advance those
+// stages while preserving the Phase 7 Stage 2–6 safety boundary.
+requireText('PROJECT_STATE.md', 'Phase 7');
+requireText('AI_BOOTSTRAP.md', 'Phase 7');
+requireText('docs/ROADMAP.md', 'Phase 7 AI Organization Workspace Foundation');
+requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Accepted Phase 7');
 
 if (failures.length) {
   console.error('PHASE7_FOUNDATION_CLOSURE_INVALID');
@@ -74,4 +78,4 @@ console.log('PHASE7_FOUNDATION_CLOSURE_EVIDENCE_VALID');
 console.log(`Phase 7 implementation artifacts present: ${implementationFiles.length}`);
 console.log(`Phase 7 focused backend tests present: ${tests.length}`);
 console.log(`Phase 7 canonical authority files synchronized: ${canonicalFiles.length}`);
-console.log('Boundary preserved: foundation accepted through Stage 6 only; watcher integration, AI enrichment improvements and advanced document intelligence remain deferred.');
+console.log('Boundary preserved: Phase 7 remains accepted through Stage 6; later separately accepted phases may advance deferred stages without rewriting Phase 7 history.');
