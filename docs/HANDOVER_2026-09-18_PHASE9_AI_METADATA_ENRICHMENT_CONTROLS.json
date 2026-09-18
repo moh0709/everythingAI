@@ -1,0 +1,58 @@
+{
+  "project": "EverythingAI",
+  "phase": "Phase 9 — AI Metadata Enrichment Controls Foundation",
+  "design_stage": 8,
+  "date": "2026-09-18",
+  "decision_state": "CLOSURE_CANDIDATE",
+  "decision": "PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS",
+  "parent_issue": 389,
+  "closure_issue": 398,
+  "accepted_chain": [
+    {"slice": "9.1", "pr": 391, "merge": "36d2c6544da99e0cdca03d1cebabbfcea2dc6035", "capability": "Provider-neutral enrichment policy and normalization"},
+    {"slice": "9.2", "pr": 393, "merge": "e961cb3e754fbad2313c7ee949daea22fa568ef3", "capability": "Preview planner enrichment integration"},
+    {"slice": "9.3", "pr": 395, "merge": "68d391d058383f97ced1227a4d8d9a00501422f6", "capability": "Sidecar enrichment and user-edit provenance"},
+    {"slice": "9.4", "pr": 397, "merge": "da0d5278f1f49451befd60ba3f7226c113d31b77", "capability": "Admin enrichment control and provenance visibility"}
+  ],
+  "accepted_capabilities": [
+    "profile-level enrichment enable/disable",
+    "bounded summary/classification/tags enrichment fields",
+    "field-level AI generator and evidence provenance",
+    "deterministic immutable preview integration",
+    "sidecar AI provenance",
+    "explicit user-edit provenance",
+    "Admin enrichment state and provenance visibility"
+  ],
+  "authority": {
+    "provider_neutral": true,
+    "direct_model_or_provider_invocation_in_foundation": false,
+    "filesystem_mutation_authority_added": false,
+    "automatic_approval_or_execution_added": false,
+    "archive_overwrite_authority_added": false,
+    "source_delete_move_rename_added": false,
+    "watcher_execution_authority_added": false,
+    "broad_full_drive_watch_default_added": false,
+    "advanced_document_intelligence_included": false
+  },
+  "deferred": [
+    "design Stage 9 advanced document intelligence",
+    "OCR/layout/table/image/chart extraction improvements",
+    "automatic model invocation orchestration",
+    "provider-specific lock-in",
+    "automatic approval or archive execution",
+    "watcher-driven execution",
+    "archive overwrite or source mutation",
+    "production secrets or privileged production infrastructure",
+    "destructive production migration/cutover",
+    "external certification/load commitments",
+    "commercial SLA/SLO commitments",
+    "material automatic governance/action/recovery expansion"
+  ],
+  "closure_requirements": {
+    "dedicated_phase9_closure_gate": "required",
+    "complete_applicable_inherited_matrix": "required",
+    "unchanged_candidate_head": true,
+    "clean_review_state": true
+  },
+  "rollback": "Closure evidence and every Phase 9.1-9.4 implementation slice remain independently reversible. Phase 8 and all earlier accepted milestones remain intact.",
+  "next_after_acceptance": "Synchronize canonical roadmap/state files to the accepted Phase 9 enrichment-controls baseline. Design Stage 9 advanced document intelligence remains separately governed."
+}
