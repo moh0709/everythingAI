@@ -84,6 +84,22 @@ requireText(handover, '"watcher_driven_execution": false');
 requireText(handover, '"automatic_approval": false');
 requireText(handover, '"archive_overwrite_authority": false');
 
+const canonicalFiles = [
+  'PROJECT_STATE.md',
+  'AI_BOOTSTRAP.md',
+  'docs/ROADMAP.md',
+  'docs/IMPLEMENTATION_ROADMAP.md',
+];
+for (const file of canonicalFiles) {
+  requireText(file, 'PHASE8_WATCHER_STALE_PREVIEW_PASS');
+  requireText(file, 'dbd5765d9d9a8df640ab9654889b9ac6cbed8c9f');
+  requireText(file, 'c2398c9c5e4007fd7fbdc2f31561365cf93e5d58');
+}
+requireText('PROJECT_STATE.md', 'Stage 8 AI enrichment improvements');
+requireText('AI_BOOTSTRAP.md', 'Stage 8 AI enrichment improvements');
+requireText('docs/ROADMAP.md', 'Stage 8 AI enrichment improvements');
+requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Stage 8 — AI enrichment improvements');
+
 if (failures.length) {
   console.error('PHASE8_WATCHER_STALE_PREVIEW_CLOSURE_INVALID');
   failures.forEach((failure) => console.error(`- ${failure}`));
@@ -93,4 +109,5 @@ if (failures.length) {
 console.log('PHASE8_WATCHER_STALE_PREVIEW_CLOSURE_EVIDENCE_VALID');
 console.log(`Phase 8 implementation artifacts present: ${implementationFiles.length}`);
 console.log(`Phase 8 focused tests present: ${tests.length}`);
+console.log(`Phase 8 canonical authority files synchronized: ${canonicalFiles.length}`);
 console.log('Boundary preserved: watcher integration creates stale/review evidence and previews only; no automatic approval, execution, overwrite, or source mutation authority.');

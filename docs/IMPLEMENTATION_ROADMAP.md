@@ -1,24 +1,54 @@
 # EverythingAI — Current Implementation Roadmap
 
-Date: 2026-09-17
+Date: 2026-09-18
 
 ## Current accepted state
 
-Phase 7 AI Organization Workspace Foundation is **complete and dispatched** as `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` through design Stage 6.
+Phase 8 Watcher Integration & Stale Archive Preview Foundation is **complete and dispatched** as `PHASE8_WATCHER_STALE_PREVIEW_PASS` through design Stage 7.
 
-Accepted Phase 7 release evidence:
+Accepted Phase 8 release evidence:
 
-- parent issue #343;
-- closure issue #369;
-- closure PR #372;
-- final unchanged closure candidate `e613143b58a9d2048b5c1291baa68828881c0512`;
-- closure merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`;
+- parent issue #375;
+- closure issue #385;
+- closure PR #386;
+- final unchanged closure candidate `dbd5765d9d9a8df640ab9654889b9ac6cbed8c9f`;
+- closure merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58`;
 - 20/20 triggered workflows successful;
-- Phase 7 Foundation Closure Qualification #2 successful;
-- CI Smoke #936 successful;
+- Phase 8 Watcher Stale Preview Closure Qualification #2 successful;
+- CI Smoke #957 successful;
 - zero review submissions and zero review threads at closure merge.
 
-Phase 7 accepts the AI Organization Workspace foundation through Stages 2–6 only. Stages 7–9 remain deferred and separately governed.
+## Accepted Phase 8 implementation evidence
+
+1. Phase 8.1 deterministic stale-state evaluator — PR #376 merge `d33574b25642c6cc6236c3d46464e4da1d82c3d5`.
+2. Phase 8.2 watcher review adapter / semantic dedupe — PR #378 merge `97cbe9671b14c597bc4a647e3bbe79e3b660d748`.
+3. Phase 8.3 safe watcher integration hook — PR #380 merge `612f8af22663b98725ac421a6da0f7f556cb00d0`.
+4. Phase 8.4 preview-only update/rebuild bridge — PR #382 merge `0d1960bce368c597e0e2e173bbde08eabfdaae33`.
+5. Phase 8.5 Admin stale/rebuild/conflict visibility — PR #384 merge `ae2204c0ae3ba75d3eac5860a200be083d7af744`.
+6. Phase 8.6 watcher stale-preview closure qualification — PR #386 merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58`.
+7. Phase 8.7 canonical acceptance synchronization — issue #387; evidence-only and does not expand runtime authority.
+
+Key Phase 8 implementation and qualification paths:
+
+- `services/api/src/archive/archiveStaleState.js`
+- `services/api/src/archive/archiveWatchAdapter.js`
+- `services/api/src/watcher/watchService.js`
+- `services/api/src/archive/archiveUpdatePreview.js`
+- `apps/everything-ai-ui/src/admin/archiveReviewModel.ts`
+- `apps/everything-ai-ui/src/admin/components/ArchiveReviewWorkspace.tsx`
+- `services/api/test/archiveStaleState.test.js`
+- `services/api/test/archiveWatchAdapter.test.js`
+- `services/api/test/watcherArchiveIntegration.test.js`
+- `services/api/test/archiveUpdatePreview.test.js`
+- `tests/archive-review-stale-model.test.mjs`
+- `scripts/validate-phase8-watcher-closure.mjs`
+- `.github/workflows/ci-phase8-watcher-closure.yml`
+
+Phase 8 preserves review/preview-only watcher semantics: no automatic approval, watcher-driven execution, overwrite, source mutation, direct watcher execution/sidecar mutation, or broad full-drive default.
+
+## Accepted Phase 7 baseline
+
+Phase 7 AI Organization Workspace Foundation remains complete and dispatched as `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` through design Stage 6. Its copy-first, no-overwrite, source-preserving and explicit-approval boundaries remain inherited by Phase 8.
 
 ## Accepted Phase 7 implementation evidence
 
@@ -63,13 +93,12 @@ Phase 7 Foundation preserves these implementation rules:
 
 ## Deferred implementation sequence
 
-The following design stages are **not** included in `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` and require separately scoped acceptance before implementation/release:
+The following design stages are **not** included in `PHASE8_WATCHER_STALE_PREVIEW_PASS` and require separately scoped acceptance before implementation/release:
 
-1. **Stage 7 — Watcher integration:** stale detection and update-preview flow, with no archive overwrite by watcher.
-2. **Stage 8 — AI enrichment improvements:** enrichment controls, user-disable switch and provenance labeling, with no new filesystem mutation authority.
-3. **Stage 9 — Advanced document intelligence:** OCR/layout/table extraction improvements, with no broad-drive watch by default and separate risk review.
+1. **Stage 8 — AI enrichment improvements:** enrichment controls, user-disable switch and provenance labeling, with no new filesystem mutation authority.
+2. **Stage 9 — Advanced document intelligence:** OCR/layout/table extraction improvements, with no broad-drive watch by default and separate risk review.
 
-Do not infer authority to implement or activate these stages solely from the design document or Phase 7 Foundation closure.
+Stage 7 watcher integration is accepted only within the Phase 8 review/preview boundary. Do not infer watcher-driven execution, automatic approval, archive overwrite or source mutation authority.
 
 ## Accepted Phase 6 baseline
 
@@ -95,10 +124,10 @@ Phase 7 does not expand Phase 6 production credentials, infrastructure, broad au
 
 ## Current execution sequence
 
-1. Phase 7 Foundation implementation and closure are complete through Stage 6.
-2. Preserve the accepted copy-first/no-overwrite/manual-approval/source-preservation boundary.
-3. Preserve Admin/operator review as non-executing approval intent unless a later stage explicitly adds a governed persistence/execution path.
-4. Keep Stages 7–9 separately gated.
+1. Phase 8 implementation and closure are complete through Stage 7.
+2. Preserve watcher review/preview-only behavior, semantic dedupe, source-fingerprint binding and error-bounded watcher integration.
+3. Preserve Phase 7 copy-first/no-overwrite/manual-approval/source-preservation boundaries.
+4. Keep Stage 8 AI enrichment and Stage 9 advanced document intelligence separately gated.
 5. Preserve all accepted Phase 6 production-authority restrictions.
 6. Select the next milestone from current repository priorities and dependency readiness.
 7. Validate every changed candidate with the complete applicable inherited matrix on one unchanged head and clean review state.
@@ -116,14 +145,14 @@ Preserve explicit approval, source/evidence provenance, copy-first behavior, no-
 Provider-neutral production identity, tenancy and authorization foundations remain accepted. Real IdP/device credentials, production secrets, privileged-host work, destructive production migration/cutover, external certification, production load qualification and SLA commitments remain separately CEO-gated.
 
 ### Engineering Operations
-Preserve the complete applicable product, enterprise, security, recovery and governance validation matrix. Phase 7 foundation-affecting changes additionally preserve `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting changes preserve the Phase 6 closure gate as applicable.
+Preserve the complete applicable product, enterprise, security, recovery and governance validation matrix. Phase 8 watcher-affecting changes preserve `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting changes preserve `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting changes preserve the Phase 6 closure gate as applicable.
 
 ### Governance & Autonomous Delivery
 Release one bounded dependency at a time with unchanged-head validation, clean review, explicit rollback and truthful PASS/BLOCKED/REJECTED decisions. Phase 5 remains L0 Advisory / Shadow Only.
 
 ## Production and authority safety boundaries
 
-Do not silently begin or claim completion of production identity/device credential provisioning, privileged-host/server changes, destructive production database/object migration or cutover, provider-specific cloud lock-in beyond accepted neutral architecture, external penetration/compliance/certification, production load/capacity qualification, commercial support/SLA/SLO commitments, broad route authorization rollout, watcher-driven archive writes, automatic archive approval/execution, source delete/move/rename, archive overwrite, or material automatic action/recovery/governance authority expansion.
+Do not silently begin or claim completion of production identity/device credential provisioning, privileged-host/server changes, destructive production database/object migration or cutover, provider-specific cloud lock-in beyond accepted neutral architecture, external penetration/compliance/certification, production load/capacity qualification, commercial support/SLA/SLO commitments, broad route authorization rollout, watcher-driven archive execution, automatic archive approval, source delete/move/rename, archive overwrite, or material automatic action/recovery/governance authority expansion.
 
 ## Issue #69
 
@@ -131,4 +160,4 @@ Issue #69 remains closed historical evidence and must not be rewritten without a
 
 ## Rollback
 
-Phase 7 canonical synchronization is independently reversible from Phase 7 closure merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`. Each Phase 7.1–7.5 implementation merge remains independently reversible. Phase 6 closure and all earlier accepted milestones retain independent rollback evidence.
+Phase 8 canonical synchronization is independently reversible from Phase 8 closure merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58`. Each Phase 8.1–8.5 implementation merge remains independently reversible. Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback evidence.
