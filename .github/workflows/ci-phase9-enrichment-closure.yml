@@ -1,0 +1,55 @@
+name: EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/src/archive/archiveEnrichmentPolicy.js'
+      - 'services/api/src/archive/archivePlanner.js'
+      - 'services/api/src/archive/metadataSidecar.js'
+      - 'services/api/test/archiveEnrichmentPolicy.test.js'
+      - 'services/api/test/archivePlanner.test.js'
+      - 'services/api/test/metadataSidecar.test.js'
+      - 'apps/everything-ai-ui/src/admin/archiveReviewModel.ts'
+      - 'apps/everything-ai-ui/src/admin/components/ArchiveReviewWorkspace.tsx'
+      - 'tests/archive-review-enrichment-model.test.mjs'
+      - 'docs/PHASE9_*.md'
+      - 'docs/HANDOVER_*PHASE9*.json'
+      - 'scripts/validate-phase9-enrichment-closure.mjs'
+      - '.github/workflows/ci-phase9-enrichment-closure.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase9-ai-metadata-enrichment-controls-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install API dependencies exactly
+        working-directory: services/api
+        run: npm ci
+      - name: Validate Phase 9 closure artifacts and authority boundary
+        run: node scripts/validate-phase9-enrichment-closure.mjs
+      - name: Run Phase 9 focused backend qualification
+        working-directory: services/api
+        run: >-
+          node --test
+          test/archiveEnrichmentPolicy.test.js
+          test/archivePlanner.test.js
+          test/metadataSidecar.test.js
+      - name: Run Admin enrichment model qualification
+        run: node --test tests/archive-review-enrichment-model.test.mjs
+      - name: Install frontend dependencies exactly
+        working-directory: apps/everything-ai-ui
+        run: npm ci
+      - name: Typecheck Admin enrichment surface
+        working-directory: apps/everything-ai-ui
+        run: npm run typecheck
+      - name: Build frontend
+        working-directory: apps/everything-ai-ui
+        run: npm run build
