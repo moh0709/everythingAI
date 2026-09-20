@@ -1,0 +1,67 @@
+{
+  "title": "EverythingAI Phase 10 Advanced Document Intelligence Research Handover",
+  "date": "2026-09-20",
+  "parent_issue": 402,
+  "closure_issue": 409,
+  "decision": "PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS",
+  "authority": "research_and_architecture_only",
+  "accepted_chain": [
+    {
+      "phase": "10.1",
+      "pr": 404,
+      "merge": "f8cff3fe31c37a768222f4f5aafc00ef698c6195"
+    },
+    {
+      "phase": "10.2",
+      "pr": 406,
+      "merge": "459abab4900595abb585d12b0f7fa61e6aef7b87"
+    },
+    {
+      "phase": "10.3",
+      "pr": 408,
+      "merge": "8de98bf0e10d28705a9b6d72c89015f2c26d1ea6"
+    }
+  ],
+  "accepted_reports": [
+    "REPORTS/EAI-PHASE10-1-DOCUMENT-INTELLIGENCE-CAPABILITY-INVENTORY.md",
+    "REPORTS/EAI-PHASE10-2-STRUCTURED-DOCUMENT-EVIDENCE-CONTRACT.md",
+    "REPORTS/EAI-PHASE10-3-DOCUMENT-INTELLIGENCE-OPTIONS-RISK-MATRIX.md"
+  ],
+  "current_runtime_truth": {
+    "advanced_document_intelligence_implemented": false,
+    "ocr_runtime_activated": false,
+    "python_sidecar_deployed": false,
+    "external_provider_activated": false,
+    "filesystem_mutation_authority_added": false,
+    "automatic_approval_or_execution_added": false,
+    "schema_migration_performed": false
+  },
+  "recommended_next_implementation": {
+    "name": "Structured Document Intelligence 1.0 — model-free fixture validator and local adapter protocol",
+    "model_dependency_required": false,
+    "provider_dependency_required": false,
+    "runtime_authority": "read_only_protocol_foundation",
+    "prerequisites": [
+      "explicit bounded implementation issue",
+      "Phase 10.2 contract fixtures",
+      "unchanged-head inherited CI qualification"
+    ]
+  },
+  "advisory_candidates": {
+    "first_structured_prototype": "Docling",
+    "ocr_baseline": "Tesseract",
+    "specialist_comparator": "PaddleOCR / PP-StructureV3",
+    "license_gated_option": "PyMuPDF"
+  },
+  "production_and_governance_boundaries": [
+    "no privileged production infrastructure or secrets",
+    "no destructive production migration/cutover",
+    "no remote document processing by default",
+    "no provider lock-in",
+    "no filesystem mutation or archive execution authority expansion",
+    "no external certification/load commitments",
+    "no commercial SLA/SLO commitments",
+    "Phase 5 remains L0 Advisory / Shadow Only"
+  ],
+  "rollback": "Research artifacts are evidence-only and independently reversible; Phase 9 runtime contracts remain intact."
+}
