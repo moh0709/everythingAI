@@ -1,0 +1,153 @@
+{
+  "schema_version": "1.0",
+  "file_id": "file-table-1",
+  "source_path": "/fixtures/table.pdf",
+  "source_fingerprint": {
+    "hash": "sha256:table-001",
+    "size_bytes": 4096,
+    "mtime_ms": 3000
+  },
+  "mime_type": "application/pdf",
+  "extractor": {
+    "id": "fixture-structured-native",
+    "version": "1.0.0",
+    "provider": null,
+    "model": null,
+    "configuration_hash": "cfg:table",
+    "local": true
+  },
+  "extraction_mode": "structured_native",
+  "extracted_at": "2026-09-20T14:00:00.000Z",
+  "status": "complete",
+  "pages": [
+    {
+      "page_id": "page-1",
+      "page_number": 1,
+      "width": 1,
+      "height": 1,
+      "unit": "normalized_0_1",
+      "rotation": 0,
+      "native_text_available": true,
+      "ocr_used": false,
+      "block_ids": [
+        "block-table-1"
+      ],
+      "evidence_mode": "native"
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "block-table-1",
+      "page_id": "page-1",
+      "block_type": "table",
+      "reading_order": 1,
+      "bbox": {
+        "x": 0.1,
+        "y": 0.2,
+        "width": 0.8,
+        "height": 0.5,
+        "coordinate_space": "normalized_0_1"
+      },
+      "text": "Name | Amount\nA | 10",
+      "evidence_mode": "native",
+      "confidence": null,
+      "native_object_ref": "pdf:table:1",
+      "parent_block_id": null,
+      "child_block_ids": []
+    }
+  ],
+  "tables": [
+    {
+      "table_id": "table-1",
+      "page_id": "page-1",
+      "bbox": {
+        "x": 0.1,
+        "y": 0.2,
+        "width": 0.8,
+        "height": 0.5,
+        "coordinate_space": "normalized_0_1"
+      },
+      "title": "Amounts",
+      "row_count": 2,
+      "column_count": 2,
+      "cells": [
+        {
+          "cell_id": "cell-1",
+          "row_index": 0,
+          "column_index": 0,
+          "row_span": 1,
+          "column_span": 1,
+          "text": "Name",
+          "bbox": {
+            "x": 0.1,
+            "y": 0.2,
+            "width": 0.4,
+            "height": 0.2,
+            "coordinate_space": "normalized_0_1"
+          },
+          "evidence_mode": "native",
+          "confidence": null
+        },
+        {
+          "cell_id": "cell-2",
+          "row_index": 0,
+          "column_index": 1,
+          "row_span": 1,
+          "column_span": 1,
+          "text": "Amount",
+          "bbox": {
+            "x": 0.5,
+            "y": 0.2,
+            "width": 0.4,
+            "height": 0.2,
+            "coordinate_space": "normalized_0_1"
+          },
+          "evidence_mode": "native",
+          "confidence": null
+        },
+        {
+          "cell_id": "cell-3",
+          "row_index": 1,
+          "column_index": 0,
+          "row_span": 1,
+          "column_span": 1,
+          "text": "A",
+          "bbox": {
+            "x": 0.1,
+            "y": 0.4,
+            "width": 0.4,
+            "height": 0.2,
+            "coordinate_space": "normalized_0_1"
+          },
+          "evidence_mode": "native",
+          "confidence": null
+        },
+        {
+          "cell_id": "cell-4",
+          "row_index": 1,
+          "column_index": 1,
+          "row_span": 1,
+          "column_span": 1,
+          "text": "10",
+          "bbox": {
+            "x": 0.5,
+            "y": 0.4,
+            "width": 0.4,
+            "height": 0.2,
+            "coordinate_space": "normalized_0_1"
+          },
+          "evidence_mode": "native",
+          "confidence": null
+        }
+      ],
+      "evidence_mode": "native",
+      "confidence": null
+    }
+  ],
+  "figures": [],
+  "warnings": [],
+  "plain_text": "[TABLE table-1]\nName | Amount\nA | 10\n[/TABLE]",
+  "filesystem_mutation_allowed": false,
+  "execution_allowed": false,
+  "automatic_approval_allowed": false
+}
