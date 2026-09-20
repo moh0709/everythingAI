@@ -1,7 +1,7 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-09-18  
-Current accepted state: Phase 9 AI Metadata Enrichment Controls Foundation dispatched (`PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS`).
+Date: 2026-09-20  
+Current accepted state: Phase 10 Advanced Document Intelligence Research Foundation dispatched (`PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS`) as research/architecture authority only.
 
 ## Mandatory startup sequence
 
@@ -19,32 +19,34 @@ Repository state, exact SHAs, issue/PR state, workflow evidence and canonical au
 
 ## Current release authority
 
-Phase 9 AI Metadata Enrichment Controls Foundation is accepted through:
+Phase 10 Advanced Document Intelligence Research is accepted through:
 
-- parent issue #389;
-- closure issue #398 / PR #399;
-- unchanged closure candidate `14e32cbbb5cd154301a52f4bc86dcdd4e71ce331`;
-- closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48`;
-- `docs/PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_RELEASE_DECISION_2026-09-18.md`;
-- `docs/HANDOVER_2026-09-18_PHASE9_AI_METADATA_ENRICHMENT_CONTROLS.json`.
+- parent issue #402;
+- closure issue #409 / PR #410;
+- unchanged research closure candidate `5e22e4aa7d45abe4001f88637d6437f927301886`;
+- research closure merge `33999b1c9cb6777a1f7e1cfc6cf21391759d91a2`;
+- `docs/PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_DECISION_2026-09-20.md`;
+- `docs/HANDOVER_2026-09-20_PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH.json`.
 
-Final closure evidence: 20/20 triggered workflows passed, including EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification #1 and CI Smoke #970. Final review had no review submissions or review threads.
+Final research closure evidence: 20/20 triggered workflows passed on one unchanged candidate head with no review submissions or review threads.
 
-## Phase 9 capability boundary
+## Phase 10 research authority boundary
 
-Accepted design Stage 8 capability includes:
+Accepted Phase 10 authority covers research and architecture evidence only:
 
-- provider-neutral metadata enrichment policy and normalization;
-- explicit profile-level enrichment enable/disable;
-- bounded `summary`, `classification`, and `tags` fields;
-- required field-level generator/evidence provenance;
-- deterministic preview-plan enrichment identity;
-- sidecar AI provenance and user-edit replacement provenance;
-- Admin enrichment preference and provenance visibility.
+- current extraction capability/gap inventory;
+- structured evidence/provenance contract;
+- source-fingerprint and OCR/native-text arbitration requirements;
+- implementation options, dependency and licensing risk analysis;
+- advisory recommendation for an isolated local adapter with the Node API authoritative.
 
-The accepted Phase 9 foundation does not directly invoke an AI provider/model and adds no filesystem mutation, automatic approval/execution, overwrite, source mutation, or watcher-execution authority.
+Advanced document-intelligence runtime remains **unimplemented**. No OCR/model runtime, Python sidecar, Docling/PaddleOCR/Tesseract/PyMuPDF dependency activation, remote processing, schema migration, filesystem mutation, automatic approval/execution, archive overwrite, source mutation, privileged production infrastructure, certification or SLA/SLO authority is granted.
 
-Design Stage 9 advanced document intelligence remains separately governed.
+Recommended next bounded implementation: **Structured Document Intelligence 1.0 — model-free fixture validator and local adapter protocol**. It requires no model/provider dependency and has read-only protocol authority.
+
+## Accepted Phase 9 authority
+
+Phase 9 AI Metadata Enrichment Controls Foundation remains accepted as `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` through closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48` and canonical synchronization merge `f19e4acead1f6eb6a4e2989e6c2984a99b323127`. Its provider-neutral enrichment, user-disable and provenance boundaries remain inherited.
 
 ## Accepted Phase 8 authority
 
