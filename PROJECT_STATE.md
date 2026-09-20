@@ -1,35 +1,48 @@
 # EverythingAI — Canonical Project State
 
 Date: 2026-09-18  
-Authority: accepted repository state through Phase 8 Watcher Integration & Stale Archive Preview Foundation closure, while preserving the accepted Phase 7 organization foundation and all Phase 6 production identity/tenancy/authorization authority and boundaries.
+Authority: accepted repository state through Phase 9 AI Metadata Enrichment Controls Foundation closure, while preserving the accepted Phase 8 watcher foundation, Phase 7 organization foundation, and all Phase 6 production identity/tenancy/authorization authority and boundaries.
 
 ## Current program stage
 
-**Phase 8 — Watcher Integration & Stale Archive Preview Foundation is COMPLETE AND DISPATCHED (`PHASE8_WATCHER_STALE_PREVIEW_PASS`).**
+**Phase 9 — AI Metadata Enrichment Controls Foundation is COMPLETE AND DISPATCHED (`PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS`).**
 
-Accepted final Phase 8 closure candidate: `dbd5765d9d9a8df640ab9654889b9ac6cbed8c9f`.  
-Accepted Phase 8 closure merge to `main`: `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58` through issue #385 / PR #386.
+Accepted final Phase 9 closure candidate: `14e32cbbb5cd154301a52f4bc86dcdd4e71ce331`.  
+Accepted Phase 9 closure merge to `main`: `d8cf36b3959d97efdd2b7689923cb94239a38e48` through issue #398 / PR #399.
 
-The final unchanged Phase 8 closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 8 Watcher Stale Preview Closure Qualification #2 and CI Smoke #957. Final review had zero review submissions and zero review threads.
+The final unchanged Phase 9 closure candidate passed 20/20 triggered workflows, including EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification #1 and CI Smoke #970. Final review had zero review submissions and zero review threads.
 
-Phase 8 accepts the bounded Stage 7 watcher integration:
+Phase 9 accepts design Stage 8 as a bounded provider-neutral metadata-enrichment controls foundation:
 
-- deterministic stale-state evaluation for current/source-changed/archive-missing/archive-changed/sidecar-missing/conflict;
-- semantic watcher review-candidate dedupe;
-- error-bounded integration into the existing watcher;
-- source-fingerprint-bound update/rebuild preview generation;
-- Admin/operator stale/rebuild/conflict/manual-review visibility and approval blocking.
+- profile-level AI enrichment enable/disable with fail-closed generated-input behavior;
+- bounded `summary`, `classification`, and `tags` enrichment fields;
+- field-level generator and evidence provenance;
+- deterministic immutable preview-planner integration;
+- metadata sidecar AI provenance plus explicit user-edit provenance;
+- Admin enrichment preference and provenance visibility.
 
-Watcher integration remains review/preview-only. It does not authorize watcher-driven archive execution, automatic approval, archive overwrite, source delete/move/rename, direct watcher calls into the archive executor or metadata sidecar writer, or broad full-drive watch by default.
+The accepted foundation does not directly invoke an AI provider/model and adds no filesystem mutation, execution, automatic approval, archive overwrite, source mutation, or watcher-execution authority.
 
-Stage 8 AI enrichment improvements and Stage 9 advanced document intelligence remain separately governed future work.
+Design Stage 9 advanced document intelligence remains separately governed future work.
 
-Canonical Phase 8 release evidence:
+Canonical Phase 9 release evidence:
 
-- `docs/PHASE8_WATCHER_STALE_PREVIEW_RELEASE_DECISION_2026-09-18.md`
-- `docs/HANDOVER_2026-09-18_PHASE8_WATCHER_STALE_PREVIEW.json`
-- `scripts/validate-phase8-watcher-closure.mjs`
-- `.github/workflows/ci-phase8-watcher-closure.yml`
+- `docs/PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_RELEASE_DECISION_2026-09-18.md`
+- `docs/HANDOVER_2026-09-18_PHASE9_AI_METADATA_ENRICHMENT_CONTROLS.json`
+- `scripts/validate-phase9-enrichment-closure.mjs`
+- `.github/workflows/ci-phase9-enrichment-closure.yml`
+
+## Accepted Phase 9 implementation chain
+
+- Phase 9.1 Provider-neutral Enrichment Policy — PR #391 merge `36d2c6544da99e0cdca03d1cebabbfcea2dc6035`.
+- Phase 9.2 Preview Planner Enrichment Integration — PR #393 merge `e961cb3e754fbad2313c7ee949daea22fa568ef3`.
+- Phase 9.3 Metadata Sidecar Enrichment / User-edit Provenance — PR #395 merge `68d391d058383f97ced1227a4d8d9a00501422f6`.
+- Phase 9.4 Admin Enrichment Controls / Provenance Visibility — PR #397 merge `da0d5278f1f49451befd60ba3f7226c113d31b77`.
+- Phase 9.5 Enrichment Controls Closure Qualification — PR #399 merge `d8cf36b3959d97efdd2b7689923cb94239a38e48`.
+
+## Accepted Phase 8 baseline
+
+Phase 8 — Watcher Integration & Stale Archive Preview Foundation remains COMPLETE AND DISPATCHED (`PHASE8_WATCHER_STALE_PREVIEW_PASS`) through design Stage 7.
 
 ## Accepted Phase 8 implementation chain
 
@@ -76,7 +89,7 @@ Phase 6 accepted chain remains:
 
 ## Authority boundary
 
-Phase 5 governance remains **L0 Advisory / Shadow Only**. Phases 6–8 do not silently activate broader automatic enforcement.
+Phase 5 governance remains **L0 Advisory / Shadow Only**. Phases 6–9 do not silently activate broader automatic enforcement.
 
 The following remain separately CEO-gated:
 
@@ -115,7 +128,7 @@ Implementation completion alone is never acceptance.
 
 ## Mandatory inherited regression baseline
 
-Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 8 watcher contracts must preserve `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting candidates additionally preserve the dedicated Phase 6 Closure Qualification gate unless explicitly superseded.
+Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 9 enrichment contracts must preserve `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting candidates additionally preserve the dedicated Phase 6 Closure Qualification gate unless explicitly superseded.
 
 ## Current five-track position
 
@@ -127,8 +140,8 @@ Every changed product/release candidate must validate the complete applicable in
 
 ## Next decision rule
 
-Phase 8 is closed through design Stage 7. Stage 8 AI enrichment improvements and Stage 9 advanced document intelligence remain separately governed future work. The next product phase must preserve Phase 8 review/preview-only watcher semantics, Phase 7 copy-first/no-overwrite/manual-approval boundaries, and all Phase 6 production authority restrictions.
+Phase 9 is closed through design Stage 8. Design Stage 9 advanced document intelligence remains separately governed future work and requires its own bounded risk/acceptance scope. The next product phase must preserve Phase 9 provider-neutral enrichment provenance/disable semantics, Phase 8 review/preview-only watcher semantics, Phase 7 copy-first/no-overwrite/manual-approval boundaries, and all Phase 6 production authority restrictions.
 
 ## Rollback
 
-Phase 7 canonical synchronization is documentation/evidence-only and independently reversible to closure merge `60a16f58321f599ed5f13b0319fbd712ba3e986a`. Each Phase 7.1–7.5 implementation merge remains independently reversible, and reverting this synchronization does not alter Phase 7 runtime contracts, Phase 6 runtime contracts, or earlier accepted milestones.
+Phase 9 canonical synchronization is documentation/evidence-only and independently reversible to closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48`. Each Phase 9.1–9.4 implementation merge remains independently reversible. Phase 8, Phase 7, Phase 6 and all earlier accepted milestones retain their independent rollback boundaries.

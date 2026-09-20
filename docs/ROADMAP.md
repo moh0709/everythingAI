@@ -18,6 +18,26 @@ Date: 2026-09-18
 - Phase 6 Production Identity, Tenancy & Authorization Foundation — `PHASE6_PRODUCTION_IDENTITY_TENANCY_AUTHORIZATION_PASS` — complete and dispatched.
 - Phase 7 AI Organization Workspace Foundation — `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` — complete and dispatched through design Stage 6.
 - Phase 8 Watcher Integration & Stale Archive Preview Foundation — `PHASE8_WATCHER_STALE_PREVIEW_PASS` — complete and dispatched through design Stage 7.
+- Phase 9 AI Metadata Enrichment Controls Foundation — `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` — complete and dispatched through design Stage 8.
+
+## Phase 9 accepted release
+
+Final unchanged closure candidate: `14e32cbbb5cd154301a52f4bc86dcdd4e71ce331`.  
+Closure merge to `main`: `d8cf36b3959d97efdd2b7689923cb94239a38e48` through issue #398 / PR #399.
+
+Final validation: 20/20 triggered workflows passed, including Phase 9 AI Metadata Enrichment Controls Closure Qualification #1 and CI Smoke #970. Final review was clean with no review submissions or review threads.
+
+Accepted Phase 9 capabilities:
+
+1. Provider-neutral enrichment policy with profile-level enable/disable and bounded fields — PR #391.
+2. Deterministic preview-planner enrichment integration — PR #393.
+3. Sidecar AI provenance and explicit user-edit replacement provenance — PR #395.
+4. Admin enrichment preference and AI-vs-user provenance visibility — PR #397.
+5. Dedicated Phase 9 closure qualification and release evidence — PR #399.
+
+Phase 9 accepts design Stage 8 only as a provider-neutral enrichment-controls foundation. It does not directly invoke an AI provider/model or add new filesystem mutation, automatic approval/execution, overwrite, source mutation, or watcher-execution authority.
+
+Design Stage 9 advanced document intelligence remains separately governed future work.
 
 ## Phase 8 accepted release
 
@@ -79,25 +99,25 @@ Phase 6 remains the accepted provider-neutral production identity/tenancy/author
 ## Active dependency rule
 
 ```text
-Phase 8 accepted through Stage 7
-  -> preserve watcher review/preview-only + semantic dedupe + source-fingerprint binding
-    -> preserve Phase 7 copy-first + no-overwrite + explicit-approval boundaries
-      -> keep Stage 8 AI enrichment improvements separately gated
-        -> keep Stage 9 advanced document intelligence separately gated
+Phase 9 accepted through design Stage 8
+  -> preserve provider-neutral enrichment + user-disable + provenance semantics
+    -> preserve Phase 8 watcher review/preview-only boundaries
+      -> preserve Phase 7 copy-first + no-overwrite + explicit-approval boundaries
+        -> keep design Stage 9 advanced document intelligence separately gated
           -> preserve all Phase 6 production authority restrictions
 ```
 
 ## Next-phase rule
 
-Post-Phase-8 work must be derived from synchronized repository priorities and dependency readiness. Stage 8 AI enrichment may add enrichment controls, a user-disable switch and provenance labeling, but must not add new filesystem mutation authority. Stage 9 advanced document intelligence remains separately gated and requires OCR/layout/table extraction risk review; broad-drive watch remains off by default.
+Post-Phase-9 work must be derived from synchronized repository priorities and dependency readiness. Design Stage 9 advanced document intelligence requires its own bounded research/risk and acceptance scope for OCR/layout/table/image/chart extraction. Broad-drive watch remains off by default, and advanced extraction must not silently expand filesystem mutation or automatic execution authority.
 
-Selection should prioritize material user/customer value, bounded reversible scope, explicit approval, source/evidence provenance, no hidden filesystem mutation, and measurable acceptance criteria.
+Selection should prioritize material user/customer value, bounded reversible scope, evidence provenance, provider neutrality where applicable, explicit approval, and measurable acceptance criteria.
 
 If the best next dependency requires a material business, architecture, production-infrastructure or authority decision, escalate that exact decision to the CEO. Otherwise bounded work may proceed under its repository-authoritative scope.
 
 ## Mandatory inherited release discipline
 
-Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 8 watcher contracts preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded by an accepted later decision.
+Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 9 enrichment contracts preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded by an accepted later decision.
 
 ## CEO-gated directions
 
@@ -105,4 +125,4 @@ Explicit CEO authority remains required before privileged-host/root/sudo/SSH/sys
 
 ## Rollback
 
-Phase 8 closure merge `c2398c9c5e4007fd7fbdc2f31561365cf93e5d58` and each Phase 8 implementation merge remain independently reversible. Phase 8 canonical synchronization is evidence/documentation-only and can be reverted without changing accepted runtime contracts. Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback evidence.
+Phase 9 closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48` and each Phase 9 implementation merge remain independently reversible. Canonical synchronization is evidence/documentation-only and can be reverted without changing accepted runtime contracts. Phase 8, Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback evidence.
