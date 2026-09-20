@@ -1,6 +1,6 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-09-18
+Date: 2026-09-20
 
 ## Accepted program position
 
@@ -19,6 +19,25 @@ Date: 2026-09-18
 - Phase 7 AI Organization Workspace Foundation — `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` — complete and dispatched through design Stage 6.
 - Phase 8 Watcher Integration & Stale Archive Preview Foundation — `PHASE8_WATCHER_STALE_PREVIEW_PASS` — complete and dispatched through design Stage 7.
 - Phase 9 AI Metadata Enrichment Controls Foundation — `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` — complete and dispatched through design Stage 8.
+- Phase 10 Advanced Document Intelligence Research Foundation — `PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS` — complete and dispatched as research/architecture authority only; advanced runtime remains unimplemented.
+
+## Phase 10 accepted research release
+
+Final unchanged research closure candidate: `5e22e4aa7d45abe4001f88637d6437f927301886`.  
+Research closure merge to `main`: `33999b1c9cb6777a1f7e1cfc6cf21391759d91a2` through issue #409 / PR #410.
+
+Final validation: 20/20 triggered workflows passed on one unchanged head with clean review state.
+
+Accepted Phase 10 research outputs:
+
+1. Current extraction capability inventory and advanced-intelligence gap map — PR #404.
+2. Provider-neutral structured document evidence/provenance contract — PR #406.
+3. Implementation options, dependency and licensing risk matrix — PR #408.
+4. Dedicated research closure qualification and release evidence — PR #410.
+
+This is a **research/architecture PASS only**. Advanced OCR/layout/table/image/chart runtime is not implemented. No OCR/model runtime, Python sidecar deployment, Docling/PaddleOCR/Tesseract/PyMuPDF activation, remote processing, schema migration, filesystem mutation, archive execution, or production authority expansion is accepted.
+
+Recommended next implementation: **Structured Document Intelligence 1.0 — model-free fixture validator and local adapter protocol**, read-only and provider/model-free.
 
 ## Phase 9 accepted release
 
@@ -99,25 +118,24 @@ Phase 6 remains the accepted provider-neutral production identity/tenancy/author
 ## Active dependency rule
 
 ```text
-Phase 9 accepted through design Stage 8
-  -> preserve provider-neutral enrichment + user-disable + provenance semantics
-    -> preserve Phase 8 watcher review/preview-only boundaries
-      -> preserve Phase 7 copy-first + no-overwrite + explicit-approval boundaries
-        -> keep design Stage 9 advanced document intelligence separately gated
-          -> preserve all Phase 6 production authority restrictions
+Phase 10 research accepted
+  -> preserve research/runtime truth separation
+    -> implement model-free fixture validator + local adapter protocol first
+      -> preserve Phase 9 provider-neutral enrichment provenance
+        -> preserve Phase 8 watcher review/preview-only boundaries
+          -> preserve Phase 7 copy-first + no-overwrite + explicit approval
+            -> preserve all Phase 6 production authority restrictions
 ```
 
 ## Next-phase rule
 
-Post-Phase-9 work must be derived from synchronized repository priorities and dependency readiness. Design Stage 9 advanced document intelligence requires its own bounded research/risk and acceptance scope for OCR/layout/table/image/chart extraction. Broad-drive watch remains off by default, and advanced extraction must not silently expand filesystem mutation or automatic execution authority.
+The next dependency is **Structured Document Intelligence 1.0 — model-free fixture validator and local adapter protocol**. It should validate the accepted structured-evidence contract using deterministic fixtures and define a read-only local adapter protocol while keeping the Node API authoritative.
 
-Selection should prioritize material user/customer value, bounded reversible scope, evidence provenance, provider neutrality where applicable, explicit approval, and measurable acceptance criteria.
-
-If the best next dependency requires a material business, architecture, production-infrastructure or authority decision, escalate that exact decision to the CEO. Otherwise bounded work may proceed under its repository-authoritative scope.
+Do not install or activate Docling, Tesseract, PaddleOCR/PP-StructureV3, PyMuPDF or remote processing as part of that foundation. Any extractor activation requires a later bounded implementation decision, fixture evidence, dependency/license review and unchanged-head qualification.
 
 ## Mandatory inherited release discipline
 
-Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 9 enrichment contracts preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded by an accepted later decision.
+Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 10 research contracts/canonical authority preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded by an accepted later decision.
 
 ## CEO-gated directions
 
@@ -125,4 +143,4 @@ Explicit CEO authority remains required before privileged-host/root/sudo/SSH/sys
 
 ## Rollback
 
-Phase 9 closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48` and each Phase 9 implementation merge remain independently reversible. Canonical synchronization is evidence/documentation-only and can be reverted without changing accepted runtime contracts. Phase 8, Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback evidence.
+Phase 10 research closure merge `33999b1c9cb6777a1f7e1cfc6cf21391759d91a2` and each Phase 10 research merge remain independently reversible. Canonical synchronization is evidence/documentation-only and can be reverted without changing accepted Phase 9 runtime contracts. Phase 9, Phase 8, Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback evidence.
