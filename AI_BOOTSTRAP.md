@@ -46,7 +46,7 @@ Recommended next bounded implementation: **Structured Document Intelligence 1.0 
 
 ## Accepted Phase 9 authority
 
-Phase 9 AI Metadata Enrichment Controls Foundation remains accepted as `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` through closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48` and canonical synchronization merge `f19e4acead1f6eb6a4e2989e6c2984a99b323127`. Its provider-neutral enrichment, user-disable and provenance boundaries remain inherited.
+Phase 9 AI Metadata Enrichment Controls Foundation remains accepted as `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` through unchanged closure candidate `14e32cbbb5cd154301a52f4bc86dcdd4e71ce331`, closure merge `d8cf36b3959d97efdd2b7689923cb94239a38e48`, and canonical synchronization merge `f19e4acead1f6eb6a4e2989e6c2984a99b323127`. Its provider-neutral enrichment, user-disable and provenance boundaries remain inherited.
 
 ## Accepted Phase 8 authority
 
