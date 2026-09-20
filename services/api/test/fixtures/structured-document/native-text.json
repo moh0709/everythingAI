@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0",
+  "file_id": "file-native-1",
+  "source_path": "/fixtures/native.pdf",
+  "source_fingerprint": {
+    "hash": "sha256:native-001",
+    "size_bytes": 1024,
+    "mtime_ms": 1000
+  },
+  "mime_type": "application/pdf",
+  "extractor": {
+    "id": "fixture-native",
+    "version": "1.0.0",
+    "provider": null,
+    "model": null,
+    "configuration_hash": "cfg:native",
+    "local": true
+  },
+  "extraction_mode": "native_text",
+  "extracted_at": "2026-09-20T14:00:00.000Z",
+  "status": "complete",
+  "pages": [
+    {
+      "page_id": "page-1",
+      "page_number": 1,
+      "width": 1,
+      "height": 1,
+      "unit": "normalized_0_1",
+      "rotation": 0,
+      "native_text_available": true,
+      "ocr_used": false,
+      "block_ids": [
+        "block-1"
+      ],
+      "evidence_mode": "native"
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "block-1",
+      "page_id": "page-1",
+      "block_type": "paragraph",
+      "reading_order": 1,
+      "bbox": {
+        "x": 0.1,
+        "y": 0.1,
+        "width": 0.8,
+        "height": 0.2,
+        "coordinate_space": "normalized_0_1"
+      },
+      "text": "Native document text.",
+      "evidence_mode": "native",
+      "confidence": null,
+      "native_object_ref": "pdf:text:1",
+      "parent_block_id": null,
+      "child_block_ids": []
+    }
+  ],
+  "tables": [],
+  "figures": [],
+  "warnings": [],
+  "plain_text": "Native document text.",
+  "filesystem_mutation_allowed": false,
+  "execution_allowed": false,
+  "automatic_approval_allowed": false
+}

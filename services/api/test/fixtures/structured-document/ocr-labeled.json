@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "file_id": "file-ocr-1",
+  "source_path": "/fixtures/scanned.pdf",
+  "source_fingerprint": {
+    "hash": "sha256:ocr-001",
+    "size_bytes": 2048,
+    "mtime_ms": 2000
+  },
+  "mime_type": "application/pdf",
+  "extractor": {
+    "id": "fixture-ocr-label",
+    "version": "1.0.0",
+    "provider": null,
+    "model": null,
+    "configuration_hash": "cfg:ocr-label",
+    "local": true
+  },
+  "extraction_mode": "ocr",
+  "extracted_at": "2026-09-20T14:00:00.000Z",
+  "status": "complete",
+  "pages": [
+    {
+      "page_id": "page-1",
+      "page_number": 1,
+      "width": 1,
+      "height": 1,
+      "unit": "normalized_0_1",
+      "rotation": 0,
+      "native_text_available": false,
+      "native_text_character_count": 0,
+      "ocr_used": true,
+      "ocr_reason": "no_native_text",
+      "block_ids": [
+        "block-ocr-1"
+      ],
+      "evidence_mode": "ocr"
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "block-ocr-1",
+      "page_id": "page-1",
+      "block_type": "paragraph",
+      "reading_order": 1,
+      "bbox": {
+        "x": 0.05,
+        "y": 0.1,
+        "width": 0.9,
+        "height": 0.3,
+        "coordinate_space": "normalized_0_1"
+      },
+      "text": "Fixture text labeled as OCR evidence; no OCR engine ran.",
+      "evidence_mode": "ocr",
+      "confidence": {
+        "value": 0.82,
+        "scale": "0_1",
+        "source": "fixture"
+      },
+      "native_object_ref": null,
+      "parent_block_id": null,
+      "child_block_ids": []
+    }
+  ],
+  "tables": [],
+  "figures": [],
+  "warnings": [
+    {
+      "code": "OCR_LOW_CONFIDENCE",
+      "severity": "warning",
+      "page_id": "page-1",
+      "evidence_id": null,
+      "message": "Model-free fixture warning."
+    }
+  ],
+  "plain_text": "Fixture text labeled as OCR evidence; no OCR engine ran.",
+  "filesystem_mutation_allowed": false,
+  "execution_allowed": false,
+  "automatic_approval_allowed": false
+}
