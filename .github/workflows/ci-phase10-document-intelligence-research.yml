@@ -3,6 +3,10 @@ name: EverythingAI Phase 10 Advanced Document Intelligence Research Qualificatio
 on:
   pull_request:
     paths:
+      - 'PROJECT_STATE.md'
+      - 'AI_BOOTSTRAP.md'
+      - 'docs/ROADMAP.md'
+      - 'docs/IMPLEMENTATION_ROADMAP.md'
       - 'REPORTS/EAI-PHASE10-*.md'
       - 'docs/PHASE10_*.md'
       - 'docs/HANDOVER_*PHASE10*.json'
