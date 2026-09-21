@@ -1,7 +1,7 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-09-20  
-Current accepted state: Phase 10 Advanced Document Intelligence Research Foundation dispatched (`PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS`) as research/architecture authority only.
+Date: 2026-09-21  
+Current accepted state: Phase 11 Structured Document Intelligence 1.0 Foundation dispatched (`PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`) as a model/provider-free, local-first, read-only runtime foundation.
 
 ## Mandatory startup sequence
 
@@ -19,16 +19,36 @@ Repository state, exact SHAs, issue/PR state, workflow evidence and canonical au
 
 ## Current release authority
 
-Phase 10 Advanced Document Intelligence Research is accepted through:
+Phase 11 Structured Document Intelligence 1.0 Foundation is accepted through:
 
-- parent issue #402;
-- closure issue #409 / PR #410;
-- unchanged research closure candidate `5e22e4aa7d45abe4001f88637d6437f927301886`;
-- research closure merge `33999b1c9cb6777a1f7e1cfc6cf21391759d91a2`;
-- `docs/PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_DECISION_2026-09-20.md`;
-- `docs/HANDOVER_2026-09-20_PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH.json`.
+- parent issue #413;
+- closure issue #425 / PR #427;
+- unchanged closure candidate `1949e36360b2923ee8b8512dad332638a5a098e4`;
+- closure merge `f137941e0ac9416d9a19688c324a87ebf14409a3`;
+- `docs/PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_RELEASE_DECISION_2026-09-21.md`;
+- `docs/HANDOVER_2026-09-21_PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION.json`.
 
-Final research closure evidence: 20/20 triggered workflows passed on one unchanged candidate head with no review submissions or review threads.
+Final closure evidence: **20/20 triggered workflows passed**, including Phase 11 Structured Document Intelligence Foundation Qualification #1 and CI Smoke #996, with no review submissions or review threads.
+
+## Phase 11 runtime authority boundary
+
+Accepted capability includes:
+
+- provider-neutral structured extraction contract and deterministic evidence IDs;
+- source-fingerprint-bound static native/OCR-labeled/table fixtures without actual OCR/model execution;
+- local-only/read-only adapter protocol with no hidden fallback;
+- compatibility projection to legacy plain text;
+- opt-in shadow comparison beside the current extraction path;
+- deterministic fixture qualification and operator diagnostics.
+
+Node remains authoritative. Legacy `extracted_text`, search and Wiki extraction remain persistence/search authority.
+
+Phase 11 does **not** activate real OCR/model extraction, Python sidecars, child-process document intelligence, Docling/PaddleOCR/Tesseract/PyMuPDF dependencies, remote processing, structured-result persistence/schema migration, filesystem mutation, archive execution/approval, overwrite or source mutation.
+
+## Accepted Phase 10 research authority
+
+Phase 10 remains accepted as `PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS`. Its research reports remain historical architecture/risk authority. Phase 11 advances only the model/provider-free protocol/fixture/shadow foundation recommended by that research.
+## Phase 10 research authority boundary
 
 ## Phase 10 research authority boundary
 
@@ -136,8 +156,9 @@ Rules:
 
 ## Mandatory inherited validation
 
-Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Work affecting accepted Phase 9 enrichment contracts must run `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`. Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; and Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded.
-
+Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Work affecting accepted Phase 11 structured-document contracts or canonical authority must run `EverythingAI Phase 11 Structured Document Intelligence Foundation Qualification`; Phase 10 research/canonical work preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded.
 ## Current next-step rule
 
-Phase 9 is closed through design Stage 8. Design Stage 9 advanced document intelligence remains a separately governed dependency. Select subsequent work from synchronized repository priorities while preserving provider-neutral enrichment provenance/disable semantics, watcher review/preview-only behavior, explicit approval, copy-first/no-overwrite behavior, Client Workspace/Admin separation, and all production/governance safety boundaries above.
+Phase 11 Foundation is closed. Select the next bounded dependency from current repository priorities and dependency readiness.
+
+Any real OCR/layout/table/image/chart extractor activation, Python/child-process sidecar, Docling/Tesseract/PaddleOCR/PyMuPDF dependency, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority requires separately scoped acceptance. PyMuPDF remains license-gated. Provider neutrality, local-first behavior, read-only foundation semantics and all earlier filesystem/action/governance boundaries remain inherited.
