@@ -83,6 +83,23 @@ requireText(handover, '"structured_persistence_activated": false');
 requireText(handover, '"legacy_extracted_text_authority_replaced": false');
 requireText(handover, '"filesystem_mutation_authority_added": false');
 
+const canonicalFiles = [
+  'PROJECT_STATE.md',
+  'AI_BOOTSTRAP.md',
+  'docs/ROADMAP.md',
+  'docs/IMPLEMENTATION_ROADMAP.md',
+];
+for (const file of canonicalFiles) {
+  requireText(file, 'PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS');
+  requireText(file, '1949e36360b2923ee8b8512dad332638a5a098e4');
+  requireText(file, 'f137941e0ac9416d9a19688c324a87ebf14409a3');
+  requireText(file, 'PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS');
+}
+requireText('PROJECT_STATE.md', 'legacy `extracted_text` remains persistence/search authority');
+requireText('AI_BOOTSTRAP.md', 'Legacy `extracted_text`, search and Wiki extraction remain persistence/search authority');
+requireText('docs/ROADMAP.md', 'Real extractor activation remains a separately governed future dependency');
+requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Real OCR/model extraction and structured-result persistence remain unimplemented and separately gated');
+
 if (failures.length) {
   console.error('PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_INVALID');
   failures.forEach((failure) => console.error(`- ${failure}`));
@@ -93,4 +110,5 @@ console.log('PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_EVIDENCE_VALID'
 console.log(`Phase 11 runtime boundary files present: ${runtimeFiles.length}`);
 console.log(`Phase 11 focused tests present: ${focusedTests.length}`);
 console.log(`Phase 11 deterministic fixtures present: ${fixtures.length}`);
+console.log(`Phase 11 canonical authority files synchronized: ${canonicalFiles.length}`);
 console.log('Boundary preserved: model/provider-free read-only structured-document foundation; legacy extraction remains persistence/search authority; no OCR/model/runtime dependency activation.');
