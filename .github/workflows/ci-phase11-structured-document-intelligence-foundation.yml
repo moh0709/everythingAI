@@ -1,0 +1,49 @@
+name: EverythingAI Phase 11 Structured Document Intelligence Foundation Qualification
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/src/extractors/structuredDocumentContract.js'
+      - 'services/api/src/extractors/structuredDocumentAdapterProtocol.js'
+      - 'services/api/src/extractors/structuredExtractionShadowBridge.js'
+      - 'services/api/src/extractors/structuredDocumentFixtureQualification.js'
+      - 'services/api/src/extractors/extractionRunner.js'
+      - 'services/api/test/structuredDocumentContract.test.js'
+      - 'services/api/test/structuredDocumentAdapterProtocol.test.js'
+      - 'services/api/test/structuredExtractionShadowBridge.test.js'
+      - 'services/api/test/structuredDocumentFixtureQualification.test.js'
+      - 'services/api/test/fixtures/structured-document/**'
+      - 'scripts/diagnose-structured-document-fixtures.mjs'
+      - 'docs/PHASE11_*.md'
+      - 'docs/HANDOVER_*PHASE11*.json'
+      - 'scripts/validate-phase11-structured-document-intelligence-foundation.mjs'
+      - '.github/workflows/ci-phase11-structured-document-intelligence-foundation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase11-structured-document-intelligence-foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install API dependencies exactly
+        working-directory: services/api
+        run: npm ci
+      - name: Validate Phase 11 closure evidence and authority boundary
+        run: node scripts/validate-phase11-structured-document-intelligence-foundation.mjs
+      - name: Run Phase 11 focused qualification stack
+        working-directory: services/api
+        run: >-
+          node --test
+          test/structuredDocumentContract.test.js
+          test/structuredDocumentAdapterProtocol.test.js
+          test/structuredExtractionShadowBridge.test.js
+          test/structuredDocumentFixtureQualification.test.js
+      - name: Run operator fixture diagnostics
+        run: node scripts/diagnose-structured-document-fixtures.mjs

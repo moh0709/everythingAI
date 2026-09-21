@@ -1,0 +1,81 @@
+{
+  "title": "EverythingAI Phase 11 Structured Document Intelligence 1.0 Foundation Handover",
+  "date": "2026-09-21",
+  "parent_issue": 413,
+  "closure_issue": 425,
+  "decision_state": "CLOSURE_CANDIDATE",
+  "decision": "PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS",
+  "accepted_chain": [
+    {
+      "phase": "11.1",
+      "pr": 415,
+      "merge": "b5f44a38db080e597142e01f568c11c13c6d9caa",
+      "capability": "structured extraction contract validator and deterministic fixtures"
+    },
+    {
+      "phase": "11.2",
+      "pr": 417,
+      "merge": "e2ef0f29bb40d352a6be05d537cc88535e927055",
+      "capability": "read-only local structured adapter protocol"
+    },
+    {
+      "phase": "11.3",
+      "pr": 421,
+      "merge": "8e752c7959facc6bf515d4b6a6182a14f85a9795",
+      "capability": "compatibility projection and opt-in shadow extraction bridge"
+    },
+    {
+      "phase": "11.4",
+      "pr": 424,
+      "merge": "327bb805b666f11de366602f76044d89c43fd5ee",
+      "capability": "static fixture qualification and operator diagnostics"
+    }
+  ],
+  "accepted_capabilities": [
+    "provider-neutral structured extraction contract",
+    "deterministic source-fingerprint-bound evidence identities",
+    "model-free native/OCR-labeled/table fixture validation",
+    "local-only read-only adapter request/response protocol",
+    "timeout and transport error isolation",
+    "structured-to-legacy compatibility projection",
+    "opt-in shadow comparison with legacy extraction remaining authoritative",
+    "static fixture qualification digest and operator diagnostics"
+  ],
+  "runtime_truth": {
+    "ocr_or_model_execution_activated": false,
+    "python_sidecar_deployed": false,
+    "child_process_adapter_activated": false,
+    "external_provider_activated": false,
+    "structured_persistence_activated": false,
+    "legacy_extracted_text_authority_replaced": false,
+    "filesystem_mutation_authority_added": false,
+    "automatic_approval_or_execution_added": false,
+    "schema_migration_performed": false
+  },
+  "authority": {
+    "node_api_remains_authoritative": true,
+    "provider_neutral": true,
+    "local_first": true,
+    "read_only_foundation": true,
+    "legacy_extraction_persistence_authoritative": true
+  },
+  "deferred": [
+    "real OCR/model extractor execution",
+    "Python sidecar deployment",
+    "Docling adapter",
+    "Tesseract adapter",
+    "PaddleOCR adapter",
+    "PyMuPDF adoption pending license review",
+    "structured extraction persistence/schema migration",
+    "search/wiki replacement with structured regions",
+    "remote processing",
+    "filesystem mutation or archive/action authority expansion"
+  ],
+  "closure_requirements": {
+    "dedicated_phase11_gate": "required",
+    "complete_applicable_inherited_matrix": "required",
+    "unchanged_candidate_head": true,
+    "clean_review_state": true
+  },
+  "rollback": "Phase 11 closure evidence and each Phase 11.1-11.4 implementation slice remain independently reversible. Phase 10 research and Phase 9/8/7/6 accepted baselines remain intact."
+}
