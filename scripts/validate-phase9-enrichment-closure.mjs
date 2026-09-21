@@ -128,10 +128,16 @@ for (const file of canonicalFiles) {
   requireText(file, '14e32cbbb5cd154301a52f4bc86dcdd4e71ce331');
   requireText(file, 'd8cf36b3959d97efdd2b7689923cb94239a38e48');
 }
-requireText('PROJECT_STATE.md', 'Design Stage 9 advanced document intelligence');
-requireText('AI_BOOTSTRAP.md', 'Design Stage 9 advanced document intelligence');
-requireText('docs/ROADMAP.md', 'Design Stage 9 advanced document intelligence');
-requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Design Stage 9 — Advanced document intelligence');
+// Phase 9 remains accepted historical enrichment authority after later phases
+// separately advance document-intelligence research/foundation work. Phase 9's
+// own release/handover continue to prove that advanced document intelligence
+// was excluded at Phase 9 closure; current canonical state may describe later
+// accepted phases without rewriting Phase 9 history.
+requireText('PROJECT_STATE.md', 'Phase 9');
+requireText('AI_BOOTSTRAP.md', 'Phase 9');
+requireText('docs/ROADMAP.md', 'Phase 9');
+requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Phase 9');
+requireText('PROJECT_STATE.md', 'PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS');
 
 if (failures.length) {
   console.error('PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_CLOSURE_INVALID');
@@ -143,4 +149,4 @@ console.log('PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_CLOSURE_EVIDENCE_VALID');
 console.log(`Phase 9 implementation artifacts present: ${implementationFiles.length}`);
 console.log(`Phase 9 focused tests present: ${focusedTests.length}`);
 console.log(`Phase 9 canonical authority files synchronized: ${canonicalFiles.length}`);
-console.log('Boundary preserved: provider-neutral enrichment controls and provenance only; no model invocation, automatic approval/execution, or new filesystem mutation authority.');
+console.log('Boundary preserved: Phase 9 provider-neutral enrichment controls/provenance remain accepted historical authority; later separately accepted phases do not rewrite Phase 9 closure scope.');

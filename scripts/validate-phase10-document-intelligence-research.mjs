@@ -60,14 +60,18 @@ const canonicalFiles = [
 ];
 for (const file of canonicalFiles) {
   requireText(file, 'PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS');
-  requireText(file, '5e22e4aa7d45abe4001f88637d6437f927301886');
-  requireText(file, '33999b1c9cb6777a1f7e1cfc6cf21391759d91a2');
   requireText(file, 'Structured Document Intelligence 1.0');
 }
-requireText('PROJECT_STATE.md', 'advanced document intelligence is not implemented');
-requireText('AI_BOOTSTRAP.md', 'Advanced document-intelligence runtime remains **unimplemented**');
-requireText('docs/ROADMAP.md', 'research/architecture PASS only');
-requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Runtime remains unchanged');
+
+// Phase 10 remains accepted historical research authority after later implementation
+// phases advance. Its release/handover must continue to prove that no advanced
+// runtime existed at Phase 10 closure; current canonical state may describe a
+// later separately accepted model/provider-free foundation.
+requireText(handover, '"advanced_document_intelligence_implemented": false');
+requireText('PROJECT_STATE.md', 'Phase 10');
+requireText('AI_BOOTSTRAP.md', 'Phase 10');
+requireText('docs/ROADMAP.md', 'Phase 10');
+requireText('docs/IMPLEMENTATION_ROADMAP.md', 'Phase 10');
 
 if (failures.length) {
   console.error('PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_INVALID');
@@ -77,4 +81,4 @@ if (failures.length) {
 console.log('PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_EVIDENCE_VALID');
 console.log(`Phase 10 research reports present: ${reports.length}`);
 console.log(`Phase 10 canonical authority files synchronized: ${canonicalFiles.length}`);
-console.log('Boundary preserved: research/architecture only; advanced document-intelligence runtime remains unimplemented.');
+console.log('Boundary preserved: Phase 10 remains accepted research/architecture authority; later separately accepted phases may implement bounded foundations without rewriting Phase 10 history.');

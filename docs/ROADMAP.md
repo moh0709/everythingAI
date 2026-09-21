@@ -1,6 +1,6 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-09-20
+Date: 2026-09-21
 
 ## Accepted program position
 
@@ -19,7 +19,27 @@ Date: 2026-09-20
 - Phase 7 AI Organization Workspace Foundation — `PHASE7_AI_ORGANIZATION_WORKSPACE_FOUNDATION_PASS` — complete and dispatched through design Stage 6.
 - Phase 8 Watcher Integration & Stale Archive Preview Foundation — `PHASE8_WATCHER_STALE_PREVIEW_PASS` — complete and dispatched through design Stage 7.
 - Phase 9 AI Metadata Enrichment Controls Foundation — `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` — complete and dispatched through design Stage 8.
-- Phase 10 Advanced Document Intelligence Research Foundation — `PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS` — complete and dispatched as research/architecture authority only; advanced runtime remains unimplemented.
+- Phase 10 Advanced Document Intelligence Research Foundation — `PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS` — complete and dispatched as research/architecture authority.
+- Phase 11 Structured Document Intelligence 1.0 Foundation — `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS` — complete and dispatched as a model/provider-free, local-first, read-only protocol/fixture/shadow foundation.
+
+## Phase 11 accepted foundation release
+
+Final unchanged closure candidate: `1949e36360b2923ee8b8512dad332638a5a098e4`.  
+Closure merge to `main`: `f137941e0ac9416d9a19688c324a87ebf14409a3` through issue #425 / PR #427.
+
+Final validation: **20/20 triggered workflows passed**, including Phase 11 Structured Document Intelligence Foundation Qualification #1 and CI Smoke #996. Final review was clean with no review submissions or review threads.
+
+Accepted Phase 11 capabilities:
+
+1. Provider-neutral structured extraction contract and deterministic evidence identities — PR #415.
+2. Local-only/read-only structured adapter protocol with strict request/response correlation and no hidden fallback — PR #417.
+3. Structured-to-legacy compatibility projection plus opt-in shadow extraction diagnostics while legacy extraction remains authoritative — PR #421.
+4. Static fixture qualification metrics/digest and read-only operator diagnostics — PR #424.
+5. Dedicated Phase 11 foundation closure qualification and release evidence — PR #427.
+
+Phase 11 does **not** activate real OCR/model extraction, Python/child-process document intelligence, Docling/PaddleOCR/Tesseract/PyMuPDF runtime dependencies, remote processing, structured-result persistence/schema migration, replacement of legacy `extracted_text`/search/Wiki authority, filesystem mutation or archive/action authority.
+
+Real extractor activation remains a separately governed future dependency and requires fixture evidence, dependency/license review and unchanged-head qualification.
 
 ## Phase 10 accepted research release
 
@@ -109,33 +129,33 @@ Phase 6 remains the accepted provider-neutral production identity/tenancy/author
 
 | Track | Accepted position | Next decision criterion |
 |---|---|---|
-| Product & UX | Phase 7 adds the bounded Admin/operator archive review foundation while preserving Client Workspace/Admin separation | Choose the next distinct user-visible value without bypassing review/approval boundaries |
-| Knowledge & Safe Action | Copy-first archive planning/execution, evidence provenance, no-overwrite and source preservation are accepted | Advance only through explicit reviewable stages; no hidden mutation authority |
+| Product & UX | Phase 11 adds a structured-document foundation without adding a new execution surface | Add later user-visible document intelligence only after separately gated extractor evidence exists |
+| Knowledge & Safe Action | Structured evidence/fixtures/projections are accepted; legacy extraction/search/Wiki remain authoritative | Preserve provenance/fingerprint binding and no hidden replacement of legacy authority |
 | Enterprise Platform | Phase 6 provider-neutral identity, tenancy and authorization foundations remain accepted | Real production IdP/secrets, privileged infrastructure, destructive cutover, certification/load qualification and SLA commitments remain CEO-gated |
-| Engineering Operations | CI/release discipline now includes Phase 7 Foundation Closure Qualification alongside inherited gates | Preserve applicable closure gates and unchanged-head evidence |
-| Governance & Autonomous Delivery | Phase 7 Foundation is accepted; Phase 5 governance remains L0 advisory/shadow | Release later stages one bounded dependency at a time; do not infer automatic authority |
-
+| Engineering Operations | Phase 11 closure qualification joins inherited Phase 10/9/8/7/6 gates | Preserve applicable qualification gates and unchanged-head evidence |
+| Governance & Autonomous Delivery | Phase 11 foundation is accepted; Phase 5 governance remains L0 advisory/shadow | Release real extractor/runtime activation as a separate bounded dependency; do not infer model/provider authority |
 ## Active dependency rule
 
 ```text
-Phase 10 research accepted
-  -> preserve research/runtime truth separation
-    -> implement model-free fixture validator + local adapter protocol first
-      -> preserve Phase 9 provider-neutral enrichment provenance
-        -> preserve Phase 8 watcher review/preview-only boundaries
-          -> preserve Phase 7 copy-first + no-overwrite + explicit approval
+Phase 11 structured-document foundation accepted
+  -> preserve model/provider-free + local-only/read-only protocol authority
+    -> preserve legacy extracted_text/search/Wiki authority
+      -> require separate fixture-backed decision before real extractor activation
+        -> preserve Phase 10 research/licensing constraints
+          -> preserve Phase 9/8/7 filesystem/action boundaries
             -> preserve all Phase 6 production authority restrictions
 ```
-
 ## Next-phase rule
 
-The next dependency is **Structured Document Intelligence 1.0 — model-free fixture validator and local adapter protocol**. It should validate the accepted structured-evidence contract using deterministic fixtures and define a read-only local adapter protocol while keeping the Node API authoritative.
+Phase 11 Foundation is closed. The next bounded dependency must be selected from synchronized repository priorities and dependency readiness.
 
-Do not install or activate Docling, Tesseract, PaddleOCR/PP-StructureV3, PyMuPDF or remote processing as part of that foundation. Any extractor activation requires a later bounded implementation decision, fixture evidence, dependency/license review and unchanged-head qualification.
+A later real extractor prototype may use the accepted Phase 11 protocol, but activation of Docling, Tesseract, PaddleOCR/PP-StructureV3, PyMuPDF, any Python/child-process sidecar, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority requires a separate implementation decision and acceptance evidence.
 
+PyMuPDF remains license-gated pending explicit compatibility review. Remote processing remains off by default. Provider neutrality and local-first behavior remain inherited.
 ## Mandatory inherited release discipline
 
-Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 10 research contracts/canonical authority preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded by an accepted later decision.
+Every changed release candidate must pass the full applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 11 structured-document contracts/canonical authority preserves `EverythingAI Phase 11 Structured Document Intelligence Foundation Qualification`; Phase 10 research/canonical work preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded by a later accepted decision.
+## CEO-gated directions
 
 ## CEO-gated directions
 
@@ -143,4 +163,4 @@ Explicit CEO authority remains required before privileged-host/root/sudo/SSH/sys
 
 ## Rollback
 
-Phase 10 research closure merge `33999b1c9cb6777a1f7e1cfc6cf21391759d91a2` and each Phase 10 research merge remain independently reversible. Canonical synchronization is evidence/documentation-only and can be reverted without changing accepted Phase 9 runtime contracts. Phase 9, Phase 8, Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback evidence.
+Phase 11 closure merge `f137941e0ac9416d9a19688c324a87ebf14409a3` and each Phase 11 implementation merge remain independently reversible. Phase 11 canonical synchronization is evidence/documentation-only and can be reverted without changing accepted runtime contracts. Phase 10 research, Phase 9, Phase 8, Phase 7, Phase 6 and all earlier accepted milestones retain independent rollback boundaries.
