@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import { listFilesForExtraction, markIndexedFileFailed, upsertFileExtraction } from '../db/client.js';
 import { extractDocument } from './documentExtractor.js';
+import { runStructuredExtractionShadow } from './structuredExtractionShadowBridge.js';
 
 const MAX_DIAGNOSTIC_ITEMS = 100;
 
@@ -41,6 +42,7 @@ export async function extractIndexedFiles(db, {
   limit = 1000,
   force = false,
   logger = console,
+  structuredShadow = null,
 } = {}) {
   const files = listFilesForExtraction(db, { fileId, limit });
   const counters = {
@@ -50,11 +52,16 @@ export async function extractIndexedFiles(db, {
     stale_missing: 0,
     unsupported: 0,
     skipped_unchanged: 0,
+    structured_shadow_checked: 0,
+    structured_shadow_matches: 0,
+    structured_shadow_differences: 0,
+    structured_shadow_failed: 0,
   };
   const failedItems = [];
   const staleMissingItems = [];
   const unsupportedItems = [];
   const skippedItems = [];
+  const structuredShadowItems = [];
 
   for (const file of files) {
     if (!(await fileExists(file.absolute_path))) {
@@ -100,6 +107,40 @@ export async function extractIndexedFiles(db, {
         extractorName: result.extractor_name,
       }));
     }
+
+    if (structuredShadow && result.extraction_status === 'extracted') {
+      counters.structured_shadow_checked += 1;
+      try {
+        const shadow = await runStructuredExtractionShadow({
+          file,
+          legacy_result: result,
+          adapter: structuredShadow.adapter,
+          invoke: structuredShadow.invoke,
+          timeout_ms: structuredShadow.timeout_ms,
+        });
+
+        if (shadow.status === 'match') counters.structured_shadow_matches += 1;
+        if (shadow.status === 'different') counters.structured_shadow_differences += 1;
+
+        pushDiagnostic(structuredShadowItems, createDiagnosticItem(file, {
+          shadowStatus: shadow.status,
+          requestId: shadow.request_id,
+          legacyExtractorName: shadow.legacy_extractor_name,
+          structuredExtractorName: shadow.structured_extractor_name,
+          legacyCharacterCount: shadow.legacy_character_count,
+          structuredCharacterCount: shadow.structured_character_count,
+          extractionMode: shadow.extraction_mode,
+          warningCount: shadow.warning_count,
+        }));
+      } catch (error) {
+        counters.structured_shadow_failed += 1;
+        pushDiagnostic(structuredShadowItems, createDiagnosticItem(file, {
+          shadowStatus: 'failed',
+          message: error?.message || 'Structured shadow extraction failed.',
+        }));
+        logger.error(`Structured shadow extraction failed for ${file.absolute_path}: ${error?.message || error}`);
+      }
+    }
   }
 
   return {
@@ -108,11 +149,13 @@ export async function extractIndexedFiles(db, {
     staleMissingItems,
     unsupportedItems,
     skippedItems,
+    structuredShadowItems,
     diagnostics: {
       failedItems,
       staleMissingItems,
       unsupportedItems,
       skippedItems,
+      structuredShadowItems,
     },
   };
 }
