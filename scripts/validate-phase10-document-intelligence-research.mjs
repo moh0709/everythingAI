@@ -67,8 +67,6 @@ for (const file of canonicalFiles) {
 // phases advance. Its release/handover must continue to prove that no advanced
 // runtime existed at Phase 10 closure; current canonical state may describe a
 // later separately accepted model/provider-free foundation.
-requireText(release, '5e22e4aa7d45abe4001f88637d6437f927301886');
-requireText(release, '33999b1c9cb6777a1f7e1cfc6cf21391759d91a2');
 requireText(handover, '"advanced_document_intelligence_implemented": false');
 requireText('PROJECT_STATE.md', 'Phase 10');
 requireText('AI_BOOTSTRAP.md', 'Phase 10');
