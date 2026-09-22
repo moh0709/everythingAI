@@ -21,7 +21,7 @@ Date: 2026-09-22
 - Phase 9 AI Metadata Enrichment Controls Foundation — `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` — complete and dispatched through design Stage 8.
 - Phase 10 Advanced Document Intelligence Research Foundation — `PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS` — complete and dispatched as research/architecture authority.
 - Phase 11 Structured Document Intelligence 1.0 Foundation — `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS` — complete and dispatched as a model/provider-free, local-first, read-only protocol/fixture/shadow foundation.
-- Phase 12 Structured Extractor Candidate Qualification — active through Phase 12.2; real extractor execution remains blocked at CEO decision gate #435.
+- Phase 12 Structured Extractor Candidate Qualification — active through Phase 12.4; bounded local Docling/Tesseract benchmark execution is authorized and runner-qualified, while production adoption remains separately gated.
 
 ## Active Phase 12 — Structured Extractor Candidate Qualification
 
@@ -29,9 +29,11 @@ Accepted evidence:
 
 1. Phase 12.1 benchmark corpus/manifest and deterministic scoring harness — PR #432 merge `37196a5659cec23ffca05fbae5789ce41ca96d77`.
 2. Phase 12.2 provider-neutral candidate result import and diagnostics — PR #434 merge `0084d851b32e9fde5a9f2c1ce41d0fc9fd86cc2d`.
-3. Both changed candidate heads completed all 19 triggered workflows successfully with zero review submissions and zero review threads.
+3. Phase 12.3 CEO decision gate — issue #435 closed with Option A approved for bounded local Docling + Tesseract execution.
+4. Phase 12.4 bounded local benchmark runner — issue #438 / PR #439; final unchanged head `be599e7f620599f560beca75c434a24bd9255ac1`; merge `a158c33845e88d4d5e143af0915877a35efa2a5b`.
+5. Phase 12.4 validation: 20/20 triggered workflows passed with zero review submissions and zero review threads.
 
-Current gate: issue #435. The CEO must explicitly authorize or defer real local extractor benchmark execution. Until that decision, Phase 12 adds no Docling/Tesseract/PaddleOCR/PyMuPDF runtime, no Python sidecar/child process, no model download, no OCR execution, no remote processing, no persistence/schema migration, no filesystem/archive/action mutation, and no replacement of legacy extraction/search/Wiki authority.
+Current dependency: Phase 12.5 real local benchmark evidence collection (#441). Phase 12.4 permits explicit, offline, fixed-corpus benchmark execution only for locked Docling 2.129.0 and Tesseract 5.5.3 runtimes. It does not authorize production extraction, automatic indexing, persistence/schema migration, remote processing, filesystem/archive/action mutation, provider adoption, automatic ranking/winner selection, PaddleOCR or PyMuPDF. CI qualified the runner but did not produce real candidate benchmark numbers.
 
 ## Phase 11 accepted foundation release
 
@@ -140,30 +142,31 @@ Phase 6 remains the accepted provider-neutral production identity/tenancy/author
 
 | Track | Accepted position | Next decision criterion |
 |---|---|---|
-| Product & UX | Phase 12.1/12.2 add benchmark and diagnostics evidence only; there is still no new extractor execution surface | Any real extractor prototype remains behind CEO gate #435 |
+| Product & UX | Phase 12.4 adds an explicit benchmark-only local Docling/Tesseract execution surface; no production extraction or automatic indexing surface exists | Collect real Phase 12.5 benchmark evidence before any adoption discussion |
 | Knowledge & Safe Action | Provider-neutral benchmark evidence can now be scored/imported; legacy extraction/search/Wiki remain authoritative | Preserve provenance/fingerprint binding and no hidden replacement of legacy authority |
 | Enterprise Platform | Phase 6 provider-neutral identity, tenancy and authorization foundations remain accepted | Real production IdP/secrets, privileged infrastructure, destructive cutover, certification/load qualification and SLA commitments remain CEO-gated |
-| Engineering Operations | Phase 12.1/12.2 each completed all 19 triggered workflows; inherited Phase 11/10/9/8/7/6 gates remain applicable | Preserve applicable qualification gates and unchanged-head evidence |
-| Governance & Autonomous Delivery | Phase 12 is active through 12.2; Phase 5 governance remains L0 advisory/shadow | Resolve CEO gate #435 before any real extractor/runtime activation |
+| Engineering Operations | Phase 12.4 final head passed 20/20 triggered workflows; inherited Phase 11/10/9/8/7/6 gates remain applicable | Preserve applicable qualification gates and unchanged-head evidence |
+| Governance & Autonomous Delivery | Phase 12 is active through 12.4; Phase 5 governance remains L0 advisory/shadow | Benchmark authority is bounded; production adoption/provider selection remains separately governed |
 ## Active dependency rule
 
 ```text
 Phase 11 structured-document foundation accepted
   -> Phase 12.1 benchmark/scoring foundation accepted
     -> Phase 12.2 candidate diagnostics accepted
-      -> Phase 12.3 CEO decision gate #435
-        -> no real extractor runtime until explicitly authorized
-          -> preserve model/provider-neutral + local/read-only boundaries
-            -> preserve legacy extracted_text/search/Wiki authority
-              -> preserve Phase 10 licensing constraints
-                -> preserve Phase 9/8/7 filesystem/action boundaries
-                  -> preserve all Phase 6 production authority restrictions
+      -> Phase 12.3 CEO Option A approved
+        -> Phase 12.4 bounded local Docling/Tesseract runner accepted
+          -> Phase 12.5 collect real locked benchmark evidence
+            -> no production adoption without separate acceptance
+              -> preserve legacy extracted_text/search/Wiki authority
+                -> preserve Phase 10 licensing constraints
+                  -> preserve Phase 9/8/7 filesystem/action boundaries
+                    -> preserve all Phase 6 production authority restrictions
 ```
 ## Next-phase rule
 
-Phase 12 is active through Phase 12.2. The next bounded dependency is CEO decision gate #435.
+Phase 12 is active through Phase 12.4. The next bounded dependency is Phase 12.5 real local benchmark evidence collection using the accepted locked runner.
 
-A later real extractor prototype may use the accepted Phase 11 protocol only after #435 explicitly authorizes the bounded benchmark scope. Activation of Docling, Tesseract, PaddleOCR/PP-StructureV3, PyMuPDF, any Python/child-process sidecar, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority remains separately governed and requires acceptance evidence.
+Docling/Tesseract execution is authorized only inside the Phase 12.4 benchmark boundary. Production route activation, automatic indexing, structured persistence/schema migration, replacement of legacy extraction/search/Wiki authority, PaddleOCR, PyMuPDF and provider adoption remain separately governed and require new acceptance evidence.
 
 PyMuPDF remains license-gated pending explicit compatibility review. Remote processing remains off by default. Provider neutrality and local-first behavior remain inherited.
 ## Mandatory inherited release discipline
