@@ -4,14 +4,16 @@ Date: 2026-09-22
 
 ## Current accepted state
 
-Phase 12 Structured Extractor Candidate Qualification is **active through Phase 12.2**.
+Phase 12 Structured Extractor Candidate Qualification is **active through Phase 12.4**.
 
 Accepted Phase 12 evidence:
 
 - Phase 12.1 benchmark corpus/manifest and deterministic scoring harness — PR #432 merge `37196a5659cec23ffca05fbae5789ce41ca96d77`.
 - Phase 12.2 provider-neutral candidate result import and diagnostics — PR #434 merge `0084d851b32e9fde5a9f2c1ce41d0fc9fd86cc2d`.
-- Each changed Phase 12.1/12.2 head completed all 19 triggered workflows successfully with zero review submissions and zero review threads.
-- Phase 12.3 is CEO decision gate #435; no real extractor runtime is authorized yet.
+- Phase 12.3 CEO decision gate — #435 closed with Option A approved for bounded local Docling + Tesseract benchmarking.
+- Phase 12.4 bounded local benchmark runner — #438 / PR #439; final unchanged head `be599e7f620599f560beca75c434a24bd9255ac1`; merge `a158c33845e88d4d5e143af0915877a35efa2a5b`.
+- Phase 12.4 final validation: 20/20 triggered workflows successful, zero review submissions, zero review threads.
+- Real candidate benchmark numbers have not yet been accepted; CI qualified the runner and boundaries only.
 
 Phase 11 Structured Document Intelligence 1.0 Foundation remains **complete and dispatched** as `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`.
 
@@ -80,9 +82,9 @@ Runtime remains unchanged: OCR/model execution, Python sidecar deployment, struc
 
 ## Current bounded dependency
 
-Phase 12.1 and 12.2 are complete. The next dependency is the explicit CEO decision in issue #435. Phase 12.4+ must not install or execute a real extractor until that gate is resolved.
+Phase 12.1–12.4 are complete. The CEO resolved #435 with Option A, and the benchmark-only local runner is accepted. The next dependency is Phase 12.5: execute the locked Docling/Tesseract benchmark locally and capture real accuracy/runtime/RAM/cold-start/determinism evidence for neutral comparison.
 
-If a real structured-document extractor prototype is chosen later, it must:
+The accepted benchmark runner must:
 
 1. remain local-first and provider-neutral by default;
 2. use the accepted Phase 11 request/response and structured evidence contracts;
@@ -94,7 +96,7 @@ If a real structured-document extractor prototype is chosen later, it must:
 8. keep PyMuPDF license-gated until explicitly resolved;
 9. pass the complete inherited matrix on one unchanged head.
 
-No real OCR/model/provider or Python sidecar is implicitly authorized by Phase 11 closure.
+Phase 12.4 explicitly authorizes only the locked benchmark runner. It does not authorize production OCR/model/provider adoption, persistence, automatic indexing or broader Python sidecar/runtime integration.
 ## Accepted Phase 9 baseline
 
 ## Accepted Phase 9 baseline
