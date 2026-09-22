@@ -113,6 +113,8 @@ requireText(runnerFile, "execution_evidence_kind: 'explicit_local_runtime_benchm
 
 requireText(diagnosticsFile, 'version: value.version == null');
 requireText(diagnosticsFile, 'revision: value.revision == null');
+requireText(diagnosticsFile, 'RUNTIME_EXECUTED_SOFTWARE_VERSION_REQUIRED');
+requireText(diagnosticsFile, 'RUNTIME_EXECUTED_MODEL_REVISION_REQUIRED');
 requireText(
   'services/api/test/structuredExtractorCandidateDiagnostics.test.js',
   "assert.equal(normalized.software.version, '0.0.0-fixture')",
