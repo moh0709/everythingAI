@@ -31,6 +31,12 @@ function normalizeLicenseRecord(value, prefix) {
 
   return Object.freeze({
     name: requireString(value.name, `${prefix}_LICENSE_NAME_REQUIRED`),
+    version: value.version == null
+      ? null
+      : requireString(value.version, `${prefix}_LICENSE_VERSION_INVALID`),
+    revision: value.revision == null
+      ? null
+      : requireString(value.revision, `${prefix}_LICENSE_REVISION_INVALID`),
     license: requireString(value.license, `${prefix}_LICENSE_REQUIRED`),
     review_status: requireEnum(
       value.review_status,
