@@ -1,6 +1,6 @@
 # EverythingAI — Current Roadmap
 
-Date: 2026-09-21
+Date: 2026-09-22
 
 ## Accepted program position
 
@@ -21,6 +21,17 @@ Date: 2026-09-21
 - Phase 9 AI Metadata Enrichment Controls Foundation — `PHASE9_AI_METADATA_ENRICHMENT_CONTROLS_PASS` — complete and dispatched through design Stage 8.
 - Phase 10 Advanced Document Intelligence Research Foundation — `PHASE10_ADVANCED_DOCUMENT_INTELLIGENCE_RESEARCH_PASS` — complete and dispatched as research/architecture authority.
 - Phase 11 Structured Document Intelligence 1.0 Foundation — `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS` — complete and dispatched as a model/provider-free, local-first, read-only protocol/fixture/shadow foundation.
+- Phase 12 Structured Extractor Candidate Qualification — active through Phase 12.2; real extractor execution remains blocked at CEO decision gate #435.
+
+## Active Phase 12 — Structured Extractor Candidate Qualification
+
+Accepted evidence:
+
+1. Phase 12.1 benchmark corpus/manifest and deterministic scoring harness — PR #432 merge `37196a5659cec23ffca05fbae5789ce41ca96d77`.
+2. Phase 12.2 provider-neutral candidate result import and diagnostics — PR #434 merge `0084d851b32e9fde5a9f2c1ce41d0fc9fd86cc2d`.
+3. Both changed candidate heads completed all 19 triggered workflows successfully with zero review submissions and zero review threads.
+
+Current gate: issue #435. The CEO must explicitly authorize or defer real local extractor benchmark execution. Until that decision, Phase 12 adds no Docling/Tesseract/PaddleOCR/PyMuPDF runtime, no Python sidecar/child process, no model download, no OCR execution, no remote processing, no persistence/schema migration, no filesystem/archive/action mutation, and no replacement of legacy extraction/search/Wiki authority.
 
 ## Phase 11 accepted foundation release
 
@@ -129,11 +140,11 @@ Phase 6 remains the accepted provider-neutral production identity/tenancy/author
 
 | Track | Accepted position | Next decision criterion |
 |---|---|---|
-| Product & UX | Phase 11 adds a structured-document foundation without adding a new execution surface | Add later user-visible document intelligence only after separately gated extractor evidence exists |
-| Knowledge & Safe Action | Structured evidence/fixtures/projections are accepted; legacy extraction/search/Wiki remain authoritative | Preserve provenance/fingerprint binding and no hidden replacement of legacy authority |
+| Product & UX | Phase 12.1/12.2 add benchmark and diagnostics evidence only; there is still no new extractor execution surface | Any real extractor prototype remains behind CEO gate #435 |
+| Knowledge & Safe Action | Provider-neutral benchmark evidence can now be scored/imported; legacy extraction/search/Wiki remain authoritative | Preserve provenance/fingerprint binding and no hidden replacement of legacy authority |
 | Enterprise Platform | Phase 6 provider-neutral identity, tenancy and authorization foundations remain accepted | Real production IdP/secrets, privileged infrastructure, destructive cutover, certification/load qualification and SLA commitments remain CEO-gated |
-| Engineering Operations | Phase 11 closure qualification joins inherited Phase 10/9/8/7/6 gates | Preserve applicable qualification gates and unchanged-head evidence |
-| Governance & Autonomous Delivery | Phase 11 foundation is accepted; Phase 5 governance remains L0 advisory/shadow | Release real extractor/runtime activation as a separate bounded dependency; do not infer model/provider authority |
+| Engineering Operations | Phase 12.1/12.2 each completed all 19 triggered workflows; inherited Phase 11/10/9/8/7/6 gates remain applicable | Preserve applicable qualification gates and unchanged-head evidence |
+| Governance & Autonomous Delivery | Phase 12 is active through 12.2; Phase 5 governance remains L0 advisory/shadow | Resolve CEO gate #435 before any real extractor/runtime activation |
 ## Active dependency rule
 
 ```text
