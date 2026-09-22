@@ -336,11 +336,30 @@ def run_docling(
     )
     from docling.datamodel.base_models import InputFormat
     from docling.datamodel.pipeline_options import (
+        LayoutObjectDetectionOptions,
         OcrMode,
         PdfPipelineOptions,
         TesseractCliOcrOptions,
     )
     from docling.document_converter import DocumentConverter, ImageFormatOption
+
+    heron = next(
+        item for item in candidate["models"]
+        if item["name"] == "docling-layout-heron"
+    )
+    layout_options = LayoutObjectDetectionOptions.from_preset(
+        "layout_heron_default"
+    )
+    layout_options.model_spec = layout_options.model_spec.model_copy(
+        update={"revision": heron["revision"]}
+    )
+    if layout_options.model_spec.repo_id != "docling-project/docling-layout-heron":
+        fail(
+            "LAYOUT_MODEL_IDENTITY_MISMATCH",
+            layout_options.model_spec.repo_id,
+        )
+    if layout_options.model_spec.revision != heron["revision"]:
+        fail("LAYOUT_MODEL_REVISION_MISMATCH", layout_options.model_spec.revision)
 
     options = PdfPipelineOptions(
         artifacts_path=Path(os.environ["DOCLING_ARTIFACTS_PATH"]),
@@ -352,6 +371,7 @@ def run_docling(
             device=AcceleratorDevice.CPU,
             num_threads=max(1, min(4, os.cpu_count() or 1)),
         ),
+        layout_options=layout_options,
     )
     options.ocr_options = TesseractCliOcrOptions(
         lang=["eng"],
