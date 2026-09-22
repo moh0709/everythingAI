@@ -47,6 +47,8 @@ function candidate(candidateId, overrides = {}) {
     execution_evidence_kind: 'static_fixture_placeholder',
     software: {
       name: 'Placeholder software metadata',
+      version: '0.0.0-fixture',
+      revision: null,
       license: 'NOT-A-RUNTIME-DEPENDENCY',
       review_status: 'documented',
       source: 'repository-fixture-only',
@@ -72,9 +74,51 @@ test('imports a candidate benchmark bundle with explicit dependency/license meta
   assert.equal(normalized.candidate_id, 'candidate-a');
   assert.equal(normalized.runtime_executed, false);
   assert.equal(normalized.execution_evidence_kind, 'static_fixture_placeholder');
+  assert.equal(normalized.software.version, '0.0.0-fixture');
+  assert.equal(normalized.software.revision, null);
   assert.equal(normalized.software.review_status, 'documented');
   assert.equal(normalized.packaging.offline_supported, true);
   assert.equal(normalized.benchmark.aggregate.score_percent, 100);
+});
+
+test('real runtime evidence requires exact software and model identity metadata', () => {
+  const real = candidate('candidate-runtime', {
+    runtime_executed: true,
+    execution_evidence_kind: 'explicit_local_runtime_benchmark',
+    software: {
+      name: 'Runtime candidate',
+      version: '1.2.3',
+      license: 'example-license',
+      review_status: 'documented',
+      source: 'published-release',
+    },
+    models: [{
+      name: 'runtime-model',
+      revision: 'abc123',
+      license: 'example-model-license',
+      review_status: 'documented',
+      source: 'published-model-revision',
+    }],
+  });
+
+  const normalized = normalizeStructuredExtractorCandidateBundle(real);
+  assert.equal(normalized.runtime_executed, true);
+  assert.equal(normalized.software.version, '1.2.3');
+  assert.equal(normalized.models[0].revision, 'abc123');
+
+  const missingVersion = structuredClone(real);
+  delete missingVersion.software.version;
+  assert.throws(
+    () => normalizeStructuredExtractorCandidateBundle(missingVersion),
+    /RUNTIME_EXECUTED_SOFTWARE_VERSION_REQUIRED/,
+  );
+
+  const missingRevision = structuredClone(real);
+  delete missingRevision.models[0].revision;
+  assert.throws(
+    () => normalizeStructuredExtractorCandidateBundle(missingRevision),
+    /RUNTIME_EXECUTED_MODEL_REVISION_REQUIRED/,
+  );
 });
 
 test('produces deterministic neutral side-by-side diagnostics without ranking', () => {

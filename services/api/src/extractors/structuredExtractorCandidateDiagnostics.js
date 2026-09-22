@@ -31,6 +31,12 @@ function normalizeLicenseRecord(value, prefix) {
 
   return Object.freeze({
     name: requireString(value.name, `${prefix}_LICENSE_NAME_REQUIRED`),
+    version: value.version == null
+      ? null
+      : requireString(value.version, `${prefix}_LICENSE_VERSION_INVALID`),
+    revision: value.revision == null
+      ? null
+      : requireString(value.revision, `${prefix}_LICENSE_REVISION_INVALID`),
     license: requireString(value.license, `${prefix}_LICENSE_REQUIRED`),
     review_status: requireEnum(
       value.review_status,
@@ -147,6 +153,13 @@ export function normalizeStructuredExtractorCandidateBundle(input = {}) {
 
   const runtimeExecuted = input.runtime_executed === true;
   const evidenceKind = requireString(input.execution_evidence_kind, 'CANDIDATE_EXECUTION_EVIDENCE_KIND_REQUIRED');
+
+  if (runtimeExecuted && !software.version) {
+    throw new Error('RUNTIME_EXECUTED_SOFTWARE_VERSION_REQUIRED');
+  }
+  if (runtimeExecuted && models.some((model) => !model.revision)) {
+    throw new Error('RUNTIME_EXECUTED_MODEL_REVISION_REQUIRED');
+  }
 
   return Object.freeze({
     candidate_id: candidateId,
