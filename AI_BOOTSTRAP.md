@@ -27,6 +27,8 @@ Phase 12 is accepted only through its evidence/diagnostic foundation:
 
 No real OCR/model/provider runtime, dependency installation, model download, Python sidecar, child process, remote processing, schema migration, filesystem/archive mutation, production route activation or provider selection is authorized by the accepted Phase 12 evidence.
 
+Inherited Phase 11 acceptance marker remains `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`.
+
 ## Accepted Phase 11 release authority
 
 Phase 11 Structured Document Intelligence 1.0 Foundation is accepted through:
