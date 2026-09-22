@@ -1,7 +1,7 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
 Date: 2026-09-22  
-Current accepted state: Phase 12 Structured Extractor Candidate Qualification is active through Phase 12.2. The accepted Phase 11 model/provider-free, local-first, read-only foundation remains authoritative, and no real extractor runtime is authorized yet.
+Current accepted state: Phase 12 Structured Extractor Candidate Qualification is active through Phase 12.4. The accepted Phase 11 foundation remains authoritative, while a tightly bounded benchmark-only local Docling/Tesseract runtime is now authorized and qualified. No production extractor/provider adoption is authorized.
 
 ## Mandatory startup sequence
 
@@ -19,13 +19,14 @@ Repository state, exact SHAs, issue/PR state, workflow evidence and canonical au
 
 ## Active Phase 12 authority
 
-Phase 12 is accepted only through its evidence/diagnostic foundation:
+Phase 12 is accepted through the bounded benchmark-runner foundation:
 
 - Phase 12.1 Benchmark Corpus / Scoring Foundation — PR #432 merge `37196a5659cec23ffca05fbae5789ce41ca96d77`.
 - Phase 12.2 Candidate Result Import / Neutral Diagnostics — PR #434 merge `0084d851b32e9fde5a9f2c1ce41d0fc9fd86cc2d`.
-- Phase 12.3 is issue #435, an explicit CEO decision gate for real local extractor benchmarking.
+- Phase 12.3 CEO Decision Gate — issue #435 closed with Option A approved for bounded local Docling + Tesseract benchmarking.
+- Phase 12.4 Bounded Local Benchmark Runner — issue #438 / PR #439; final head `be599e7f620599f560beca75c434a24bd9255ac1`; merge `a158c33845e88d4d5e143af0915877a35efa2a5b`; 20/20 triggered workflows passed with no review submissions or review threads.
 
-No real OCR/model/provider runtime, dependency installation, model download, Python sidecar, child process, remote processing, schema migration, filesystem/archive mutation, production route activation or provider selection is authorized by the accepted Phase 12 evidence.
+Accepted Phase 12.4 authority is explicit benchmark-only local execution for exactly Docling 2.129.0 and Tesseract 5.5.3 under fixed-corpus, exact-version/model-lock, offline, source-fingerprint, timeout/output and determinism constraints. It does not authorize production routes, automatic indexing, persistence/schema migration, remote document processing, filesystem/archive/action mutation, provider adoption, automatic ranking/winner selection, PaddleOCR or PyMuPDF. Real candidate benchmark numbers have not yet been accepted.
 
 Inherited Phase 11 acceptance marker remains `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`.
 
@@ -171,6 +172,6 @@ Rules:
 Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Work affecting accepted Phase 11 structured-document contracts or canonical authority must run `EverythingAI Phase 11 Structured Document Intelligence Foundation Qualification`; Phase 10 research/canonical work preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded.
 ## Current next-step rule
 
-Phase 12 is active through Phase 12.2. Do not begin Phase 12.4+ real extractor execution until the CEO explicitly resolves issue #435.
+Phase 12 is active through Phase 12.4. The CEO resolved #435 with Option A. The next dependency is Phase 12.5 real local benchmark evidence collection using the locked runner; do not infer production adoption or broader extractor authority from that benchmark.
 
 Any real OCR/layout/table/image/chart extractor activation, Python/child-process sidecar, Docling/Tesseract/PaddleOCR/PyMuPDF dependency, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority requires separately scoped acceptance. PyMuPDF remains license-gated. Provider neutrality, local-first behavior, read-only foundation semantics and all earlier filesystem/action/governance boundaries remain inherited.
