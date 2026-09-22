@@ -149,18 +149,21 @@ Phase 6 remains the accepted provider-neutral production identity/tenancy/author
 
 ```text
 Phase 11 structured-document foundation accepted
-  -> preserve model/provider-free + local-only/read-only protocol authority
-    -> preserve legacy extracted_text/search/Wiki authority
-      -> require separate fixture-backed decision before real extractor activation
-        -> preserve Phase 10 research/licensing constraints
-          -> preserve Phase 9/8/7 filesystem/action boundaries
-            -> preserve all Phase 6 production authority restrictions
+  -> Phase 12.1 benchmark/scoring foundation accepted
+    -> Phase 12.2 candidate diagnostics accepted
+      -> Phase 12.3 CEO decision gate #435
+        -> no real extractor runtime until explicitly authorized
+          -> preserve model/provider-neutral + local/read-only boundaries
+            -> preserve legacy extracted_text/search/Wiki authority
+              -> preserve Phase 10 licensing constraints
+                -> preserve Phase 9/8/7 filesystem/action boundaries
+                  -> preserve all Phase 6 production authority restrictions
 ```
 ## Next-phase rule
 
-Phase 11 Foundation is closed. The next bounded dependency must be selected from synchronized repository priorities and dependency readiness.
+Phase 12 is active through Phase 12.2. The next bounded dependency is CEO decision gate #435.
 
-A later real extractor prototype may use the accepted Phase 11 protocol, but activation of Docling, Tesseract, PaddleOCR/PP-StructureV3, PyMuPDF, any Python/child-process sidecar, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority requires a separate implementation decision and acceptance evidence.
+A later real extractor prototype may use the accepted Phase 11 protocol only after #435 explicitly authorizes the bounded benchmark scope. Activation of Docling, Tesseract, PaddleOCR/PP-StructureV3, PyMuPDF, any Python/child-process sidecar, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority remains separately governed and requires acceptance evidence.
 
 PyMuPDF remains license-gated pending explicit compatibility review. Remote processing remains off by default. Provider neutrality and local-first behavior remain inherited.
 ## Mandatory inherited release discipline
