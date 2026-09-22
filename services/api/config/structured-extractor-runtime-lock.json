@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0",
+  "benchmark_id": "everythingai-phase12-local-scan-v1",
+  "authority": {
+    "benchmark_only": true,
+    "local_only": true,
+    "remote_processing_allowed": false,
+    "automatic_indexing_allowed": false,
+    "persistence_allowed": false,
+    "production_route_allowed": false,
+    "filesystem_mutation_allowed": false,
+    "automatic_winner_selection_allowed": false
+  },
+  "candidates": {
+    "docling": {
+      "candidate_id": "docling-2.129.0-local",
+      "display_name": "Docling 2.129.0 + local Tesseract OCR",
+      "adapter": {
+        "id": "docling-local-benchmark",
+        "version": "1.0.0"
+      },
+      "software": {
+        "name": "docling",
+        "version": "2.129.0",
+        "license": "MIT",
+        "review_status": "documented",
+        "source": "https://pypi.org/project/docling/2.129.0/"
+      },
+      "models": [
+        {
+          "name": "docling-layout-heron",
+          "revision": "8f39ad3",
+          "license": "Apache-2.0",
+          "review_status": "documented",
+          "source": "https://huggingface.co/docling-project/docling-layout-heron/commits/main"
+        },
+        {
+          "name": "tessdata_best-eng",
+          "revision": "e12c65a915945e4c28e237a9b52bc4a8f39a0cec",
+          "license": "Apache-2.0",
+          "review_status": "documented",
+          "source": "https://github.com/tesseract-ocr/tessdata_best"
+        }
+      ],
+      "allowed_case_ids": [
+        "ocr-scan"
+      ],
+      "runtime": {
+        "command": "python3",
+        "script": "tools/structured-extractors/local_adapter.py",
+        "required_environment": [
+          "DOCLING_ARTIFACTS_PATH",
+          "TESSDATA_PREFIX"
+        ],
+        "forced_environment": {
+          "HF_HUB_OFFLINE": "1",
+          "TRANSFORMERS_OFFLINE": "1",
+          "HF_DATASETS_OFFLINE": "1",
+          "DOCLING_ENABLE_REMOTE_SERVICES": "0"
+        }
+      }
+    },
+    "tesseract": {
+      "candidate_id": "tesseract-5.5.3-local",
+      "display_name": "Tesseract 5.5.3 OCR baseline",
+      "adapter": {
+        "id": "tesseract-local-benchmark",
+        "version": "1.0.0"
+      },
+      "software": {
+        "name": "tesseract",
+        "version": "5.5.3",
+        "license": "Apache-2.0",
+        "review_status": "documented",
+        "source": "https://github.com/tesseract-ocr/tesseract/releases/tag/5.5.3"
+      },
+      "models": [
+        {
+          "name": "tessdata_best-eng",
+          "revision": "e12c65a915945e4c28e237a9b52bc4a8f39a0cec",
+          "license": "Apache-2.0",
+          "review_status": "documented",
+          "source": "https://github.com/tesseract-ocr/tessdata_best"
+        }
+      ],
+      "allowed_case_ids": [
+        "ocr-scan"
+      ],
+      "runtime": {
+        "command": "python3",
+        "script": "tools/structured-extractors/local_adapter.py",
+        "required_environment": [
+          "TESSDATA_PREFIX"
+        ],
+        "forced_environment": {}
+      }
+    }
+  }
+}
