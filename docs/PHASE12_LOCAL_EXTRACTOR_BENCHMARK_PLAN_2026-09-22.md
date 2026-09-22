@@ -19,7 +19,7 @@ It does not activate production extraction, automatic indexing, persistence, sch
 | Component | Version / revision | License | Role |
 |---|---|---|---|
 | Docling | 2.129.0 | MIT | Structured local candidate |
-| docling-layout-heron | 8f39ad3 | Apache-2.0 | Docling layout model |
+| docling-layout-heron | 8f39ad3c0b4c58e9c2d2c84a38465abf757272d8 | Apache-2.0 | Docling layout model |
 | Tesseract | 5.5.3 | Apache-2.0 | Standalone OCR baseline and Docling OCR engine |
 | tessdata_best English | e12c65a915945e4c28e237a9b52bc4a8f39a0cec | Apache-2.0 | English OCR data |
 
@@ -74,7 +74,7 @@ After verifying the downloaded revisions, place `.everythingai-phase12-model-loc
 
     {
       "model_revisions": [
-        "docling-layout-heron@8f39ad3",
+        "docling-layout-heron@8f39ad3c0b4c58e9c2d2c84a38465abf757272d8",
         "tessdata_best-eng@e12c65a915945e4c28e237a9b52bc4a8f39a0cec"
       ]
     }
