@@ -189,11 +189,11 @@ Implementation completion alone is never acceptance.
 Every changed product/release candidate must validate the complete applicable inherited matrix on one unchanged head. Historical green evidence is supporting evidence only. Work affecting accepted Phase 11 structured-document foundation contracts/canonical authority must preserve `EverythingAI Phase 11 Structured Document Intelligence Foundation Qualification`; Phase 10 research/canonical work preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting candidates preserve the dedicated Phase 6 Closure Qualification gate unless explicitly superseded.
 ## Current five-track position
 
-- **Product & UX:** Phase 11 adds no new end-user execution surface; structured-document capability remains contract/shadow/diagnostics foundation only.
-- **Knowledge & Safe Action:** structured evidence can be validated and compared in shadow mode, while legacy `extracted_text`, search and Wiki extraction remain authoritative.
+- **Product & UX:** Phase 12.1/12.2 add benchmark and neutral diagnostics evidence only; there is still no new extractor execution surface.
+- **Knowledge & Safe Action:** provider-neutral benchmark evidence can be scored/imported while legacy `extracted_text`, search and Wiki extraction remain authoritative.
 - **Enterprise Platform:** Phase 6 production identity/tenancy/authorization foundations remain accepted; production provisioning/cutover remains CEO-gated.
-- **Engineering Operations:** inherited CI plus Phase 11/10/9/8/7/6 qualification gates are preserved where applicable.
-- **Governance & Autonomous Delivery:** Phase 11 foundation is closed. Any real OCR/model/provider/runtime extractor activation is a new separately bounded dependency with explicit evidence, licensing/dependency review and rollback.
+- **Engineering Operations:** Phase 12.1/12.2 each completed all 19 triggered workflows; inherited Phase 11/10/9/8/7/6 qualification gates remain applicable.
+- **Governance & Autonomous Delivery:** Phase 12 is active through 12.2. Real extractor/runtime activation remains blocked at CEO decision gate #435 and requires explicit evidence, licensing/dependency review and rollback.
 ## Next decision rule
 
 Phase 12 is active through Phase 12.2. The current dependency is issue #435: the CEO must explicitly choose whether to authorize bounded real local extractor benchmarking before Phase 12.4+ can activate any extractor runtime.
