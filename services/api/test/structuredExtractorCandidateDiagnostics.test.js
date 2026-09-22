@@ -47,6 +47,8 @@ function candidate(candidateId, overrides = {}) {
     execution_evidence_kind: 'static_fixture_placeholder',
     software: {
       name: 'Placeholder software metadata',
+      version: '0.0.0-fixture',
+      revision: null,
       license: 'NOT-A-RUNTIME-DEPENDENCY',
       review_status: 'documented',
       source: 'repository-fixture-only',
@@ -72,6 +74,8 @@ test('imports a candidate benchmark bundle with explicit dependency/license meta
   assert.equal(normalized.candidate_id, 'candidate-a');
   assert.equal(normalized.runtime_executed, false);
   assert.equal(normalized.execution_evidence_kind, 'static_fixture_placeholder');
+  assert.equal(normalized.software.version, '0.0.0-fixture');
+  assert.equal(normalized.software.revision, null);
   assert.equal(normalized.software.review_status, 'documented');
   assert.equal(normalized.packaging.offline_supported, true);
   assert.equal(normalized.benchmark.aggregate.score_percent, 100);
