@@ -154,6 +154,13 @@ export function normalizeStructuredExtractorCandidateBundle(input = {}) {
   const runtimeExecuted = input.runtime_executed === true;
   const evidenceKind = requireString(input.execution_evidence_kind, 'CANDIDATE_EXECUTION_EVIDENCE_KIND_REQUIRED');
 
+  if (runtimeExecuted && !software.version) {
+    throw new Error('RUNTIME_EXECUTED_SOFTWARE_VERSION_REQUIRED');
+  }
+  if (runtimeExecuted && models.some((model) => !model.revision)) {
+    throw new Error('RUNTIME_EXECUTED_MODEL_REVISION_REQUIRED');
+  }
+
   return Object.freeze({
     candidate_id: candidateId,
     display_name: requireString(input.display_name, 'CANDIDATE_DISPLAY_NAME_REQUIRED'),
