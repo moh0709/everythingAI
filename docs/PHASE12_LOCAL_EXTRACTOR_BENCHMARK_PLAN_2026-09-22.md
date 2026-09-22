@@ -56,8 +56,8 @@ CI deliberately does not install or download Docling, Tesseract, or model data. 
 
 Example preparation:
 
-    python3 -m venv .phase12-venv
-    source .phase12-venv/bin/activate
+    python3 -m venv "$HOME/.cache/everythingai-phase12/venv"
+    source "$HOME/.cache/everythingai-phase12/venv/bin/activate"
     pip install "docling==2.129.0"
     tesseract --version
 
@@ -65,8 +65,8 @@ Example preparation:
 
 Set local artifact roots:
 
-    export DOCLING_ARTIFACTS_PATH="$PWD/.phase12-models/docling"
-    export TESSDATA_PREFIX="$PWD/.phase12-models/tessdata"
+    export DOCLING_ARTIFACTS_PATH="$HOME/.cache/everythingai-phase12/models/docling"
+    export TESSDATA_PREFIX="$HOME/.cache/everythingai-phase12/models/tessdata"
 
 Pre-fetch the pinned Heron model and `tessdata_best` English data at the revisions in `services/api/config/structured-extractor-runtime-lock.json`. No accepted benchmark run may download a model during extraction.
 
