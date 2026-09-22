@@ -147,9 +147,9 @@ if (docling?.software?.license !== 'MIT') {
 }
 if (
   docling?.models?.find((entry) => entry.name === 'docling-layout-heron')
-    ?.revision !== '8f39ad3'
+    ?.revision !== '8f39ad3c0b4c58e9c2d2c84a38465abf757272d8'
 ) {
-  failures.push('Heron model revision must remain pinned to 8f39ad3');
+  failures.push('Heron model revision must remain pinned to 8f39ad3c0b4c58e9c2d2c84a38465abf757272d8');
 }
 if (
   docling?.models?.find((entry) => entry.name === 'docling-layout-heron')
