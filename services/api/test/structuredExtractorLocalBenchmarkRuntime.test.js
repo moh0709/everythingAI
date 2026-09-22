@@ -43,7 +43,7 @@ function runtimeLock() {
         models: [
           {
             name: 'docling-layout-heron',
-            revision: '8f39ad3',
+            revision: '8f39ad3c0b4c58e9c2d2c84a38465abf757272d8',
             license: 'Apache-2.0',
             review_status: 'documented',
             source: 'published-model-card',
