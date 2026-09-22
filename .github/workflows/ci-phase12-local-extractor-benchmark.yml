@@ -1,0 +1,57 @@
+name: EverythingAI Phase 12 Local Extractor Benchmark Qualification
+
+on:
+  pull_request:
+    paths:
+      - 'services/api/src/extractors/structuredExtractorLocalBenchmarkRuntime.js'
+      - 'services/api/src/extractors/structuredExtractorCandidateDiagnostics.js'
+      - 'services/api/config/structured-extractor-runtime-lock.json'
+      - 'services/api/test/structuredExtractorLocalBenchmarkRuntime.test.js'
+      - 'services/api/test/structuredExtractorCandidateDiagnostics.test.js'
+      - 'services/api/test/fixtures/structured-benchmark-real/**'
+      - 'tools/structured-extractors/local_adapter.py'
+      - 'scripts/run-phase12-local-extractor-benchmark.mjs'
+      - 'scripts/validate-phase12-local-extractor-benchmark.mjs'
+      - 'docs/PHASE12_LOCAL_EXTRACTOR_BENCHMARK_PLAN_2026-09-22.md'
+      - '.github/workflows/ci-phase12-local-extractor-benchmark.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase12-local-extractor-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install API dependencies exactly
+        working-directory: services/api
+        run: npm ci
+
+      - name: Validate Phase 12.4 benchmark authority and runtime locks
+        run: node scripts/validate-phase12-local-extractor-benchmark.mjs
+
+      - name: Run Phase 12.4 focused Node qualification
+        working-directory: services/api
+        run: >-
+          node --test
+          test/structuredDocumentContract.test.js
+          test/structuredDocumentAdapterProtocol.test.js
+          test/structuredExtractorBenchmark.test.js
+          test/structuredExtractorCandidateDiagnostics.test.js
+          test/structuredExtractorLocalBenchmarkRuntime.test.js
+
+      - name: Validate Python adapter syntax only
+        run: python3 -m py_compile tools/structured-extractors/local_adapter.py
+
+      - name: Assert CI does not execute real extractors
+        run: |
+          test -z "${DOCLING_ARTIFACTS_PATH:-}"
+          test -z "${TESSDATA_PREFIX:-}"
+          echo "Phase 12.4 CI is contract-only; no Docling/Tesseract/model runtime executed."
