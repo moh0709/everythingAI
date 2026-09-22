@@ -1,7 +1,7 @@
 # EverythingAI — AI Bootstrap and Operating Governance
 
-Date: 2026-09-21  
-Current accepted state: Phase 11 Structured Document Intelligence 1.0 Foundation dispatched (`PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`) as a model/provider-free, local-first, read-only runtime foundation.
+Date: 2026-09-22  
+Current accepted state: Phase 12 Structured Extractor Candidate Qualification is active through Phase 12.2. The accepted Phase 11 model/provider-free, local-first, read-only foundation remains authoritative, and no real extractor runtime is authorized yet.
 
 ## Mandatory startup sequence
 
@@ -17,7 +17,19 @@ Before any project-state decision or implementation:
 
 Repository state, exact SHAs, issue/PR state, workflow evidence and canonical authority files are the source of truth. Do not trust a handover blindly.
 
-## Current release authority
+## Active Phase 12 authority
+
+Phase 12 is accepted only through its evidence/diagnostic foundation:
+
+- Phase 12.1 Benchmark Corpus / Scoring Foundation — PR #432 merge `37196a5659cec23ffca05fbae5789ce41ca96d77`.
+- Phase 12.2 Candidate Result Import / Neutral Diagnostics — PR #434 merge `0084d851b32e9fde5a9f2c1ce41d0fc9fd86cc2d`.
+- Phase 12.3 is issue #435, an explicit CEO decision gate for real local extractor benchmarking.
+
+No real OCR/model/provider runtime, dependency installation, model download, Python sidecar, child process, remote processing, schema migration, filesystem/archive mutation, production route activation or provider selection is authorized by the accepted Phase 12 evidence.
+
+Inherited Phase 11 acceptance marker remains `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`.
+
+## Accepted Phase 11 release authority
 
 Phase 11 Structured Document Intelligence 1.0 Foundation is accepted through:
 
@@ -159,6 +171,6 @@ Rules:
 Historical green evidence never substitutes for revalidating a changed candidate. Preserve the complete applicable inherited matrix. Work affecting accepted Phase 11 structured-document contracts or canonical authority must run `EverythingAI Phase 11 Structured Document Intelligence Foundation Qualification`; Phase 10 research/canonical work preserves `EverythingAI Phase 10 Advanced Document Intelligence Research Qualification`; Phase 9 enrichment-affecting work preserves `EverythingAI Phase 9 AI Metadata Enrichment Controls Closure Qualification`; Phase 8 watcher-affecting work preserves `EverythingAI Phase 8 Watcher Stale Preview Closure Qualification`; Phase 7 foundation-affecting work preserves `EverythingAI Phase 7 Foundation Closure Qualification`; Phase 6-affecting work preserves `EverythingAI Phase 6 Closure Qualification` unless explicitly superseded.
 ## Current next-step rule
 
-Phase 11 Foundation is closed. Select the next bounded dependency from current repository priorities and dependency readiness.
+Phase 12 is active through Phase 12.2. Do not begin Phase 12.4+ real extractor execution until the CEO explicitly resolves issue #435.
 
 Any real OCR/layout/table/image/chart extractor activation, Python/child-process sidecar, Docling/Tesseract/PaddleOCR/PyMuPDF dependency, remote processing, structured persistence/schema migration, or replacement of legacy extraction/search/Wiki authority requires separately scoped acceptance. PyMuPDF remains license-gated. Provider neutrality, local-first behavior, read-only foundation semantics and all earlier filesystem/action/governance boundaries remain inherited.

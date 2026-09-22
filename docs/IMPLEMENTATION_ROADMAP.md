@@ -1,10 +1,19 @@
 # EverythingAI — Current Implementation Roadmap
 
-Date: 2026-09-21
+Date: 2026-09-22
 
 ## Current accepted state
 
-Phase 11 Structured Document Intelligence 1.0 Foundation is **complete and dispatched** as `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`.
+Phase 12 Structured Extractor Candidate Qualification is **active through Phase 12.2**.
+
+Accepted Phase 12 evidence:
+
+- Phase 12.1 benchmark corpus/manifest and deterministic scoring harness — PR #432 merge `37196a5659cec23ffca05fbae5789ce41ca96d77`.
+- Phase 12.2 provider-neutral candidate result import and diagnostics — PR #434 merge `0084d851b32e9fde5a9f2c1ce41d0fc9fd86cc2d`.
+- Each changed Phase 12.1/12.2 head completed all 19 triggered workflows successfully with zero review submissions and zero review threads.
+- Phase 12.3 is CEO decision gate #435; no real extractor runtime is authorized yet.
+
+Phase 11 Structured Document Intelligence 1.0 Foundation remains **complete and dispatched** as `PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`.
 
 Accepted Phase 11 release evidence:
 
@@ -69,9 +78,9 @@ Key Phase 10 research/qualification paths:
 
 Runtime remains unchanged: OCR/model execution, Python sidecar deployment, structured extractor dependencies, remote processing, schema migration and new filesystem mutation/execution authority are not implemented or activated.
 
-## Recommended next bounded implementation
+## Current bounded dependency
 
-Phase 11 Foundation is closed. Select the next dependency from current repository priorities and dependency readiness.
+Phase 12.1 and 12.2 are complete. The next dependency is the explicit CEO decision in issue #435. Phase 12.4+ must not install or execute a real extractor until that gate is resolved.
 
 If a real structured-document extractor prototype is chosen later, it must:
 
