@@ -82,7 +82,7 @@ Runtime remains unchanged: OCR/model execution, Python sidecar deployment, struc
 
 ## Current bounded dependency
 
-Phase 12.1–12.4 are complete. The CEO resolved #435 with Option A, and the benchmark-only local runner is accepted. The next dependency is Phase 12.5: execute the locked Docling/Tesseract benchmark locally and capture real accuracy/runtime/RAM/cold-start/determinism evidence for neutral comparison.
+Phase 12.1–12.4 are complete. The CEO resolved #435 with Option A, and the benchmark-only local runner is accepted. The next dependency is Phase 12.5 (#441): execute the locked Docling/Tesseract benchmark locally and capture real accuracy/runtime/RAM/cold-start/determinism evidence for neutral comparison.
 
 The accepted benchmark runner must:
 
