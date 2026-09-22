@@ -33,7 +33,7 @@ Accepted evidence:
 4. Phase 12.4 bounded local benchmark runner — issue #438 / PR #439; final unchanged head `be599e7f620599f560beca75c434a24bd9255ac1`; merge `a158c33845e88d4d5e143af0915877a35efa2a5b`.
 5. Phase 12.4 validation: 20/20 triggered workflows passed with zero review submissions and zero review threads.
 
-Current dependency: Phase 12.5 real local benchmark evidence collection. Phase 12.4 permits explicit, offline, fixed-corpus benchmark execution only for locked Docling 2.129.0 and Tesseract 5.5.3 runtimes. It does not authorize production extraction, automatic indexing, persistence/schema migration, remote processing, filesystem/archive/action mutation, provider adoption, automatic ranking/winner selection, PaddleOCR or PyMuPDF. CI qualified the runner but did not produce real candidate benchmark numbers.
+Current dependency: Phase 12.5 real local benchmark evidence collection (#441). Phase 12.4 permits explicit, offline, fixed-corpus benchmark execution only for locked Docling 2.129.0 and Tesseract 5.5.3 runtimes. It does not authorize production extraction, automatic indexing, persistence/schema migration, remote processing, filesystem/archive/action mutation, provider adoption, automatic ranking/winner selection, PaddleOCR or PyMuPDF. CI qualified the runner but did not produce real candidate benchmark numbers.
 
 ## Phase 11 accepted foundation release
 
