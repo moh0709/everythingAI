@@ -15,7 +15,7 @@ Accepted Phase 12 evidence so far:
 - Phase 12.4 Bounded Local Benchmark Runner — issue #438 / PR #439; final unchanged head `be599e7f620599f560beca75c434a24bd9255ac1`; merge `a158c33845e88d4d5e143af0915877a35efa2a5b`.
 - The Phase 12.4 final head passed **20/20 triggered workflows** with zero review submissions and zero review threads.
 
-**Current dependency:** Phase 12.5 real local benchmark evidence collection. The repository now accepts benchmark-only local child-process authority for exactly Docling 2.129.0 and Tesseract 5.5.3 under the locked corpus/version/model restrictions from Phase 12.4. No real candidate benchmark numbers are accepted yet. Production extraction, automatic indexing, persistence/schema migration, remote document processing, filesystem/archive/action mutation, provider adoption, automatic ranking/winner selection, PaddleOCR and PyMuPDF remain unauthorized.
+**Current dependency:** Phase 12.5 real local benchmark evidence collection (#441). The repository now accepts benchmark-only local child-process authority for exactly Docling 2.129.0 and Tesseract 5.5.3 under the locked corpus/version/model restrictions from Phase 12.4. No real candidate benchmark numbers are accepted yet. Production extraction, automatic indexing, persistence/schema migration, remote document processing, filesystem/archive/action mutation, provider adoption, automatic ranking/winner selection, PaddleOCR and PyMuPDF remain unauthorized.
 
 Phase 11 — Structured Document Intelligence 1.0 Foundation remains COMPLETE AND DISPATCHED (`PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS`).
 
