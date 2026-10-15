@@ -232,7 +232,8 @@ for (const file of [
   forbidText(file, 'run-phase12-local-extractor-benchmark');
 }
 
-requireText('PROJECT_STATE.md', 'Phase 12 — Structured Extractor Candidate Qualification is ACTIVE through Phase 12.2');
+requireText('PROJECT_STATE.md', 'Phase 12.4 Bounded Local Benchmark Runner');
+requireText('PROJECT_STATE.md', 'a158c33845e88d4d5e143af0915877a35efa2a5b');
 requireText('PROJECT_STATE.md', 'PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS');
 requireText('AI_BOOTSTRAP.md', 'PHASE11_STRUCTURED_DOCUMENT_INTELLIGENCE_FOUNDATION_PASS');
 

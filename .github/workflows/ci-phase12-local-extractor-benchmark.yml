@@ -12,6 +12,10 @@ on:
       - 'tools/structured-extractors/local_adapter.py'
       - 'scripts/run-phase12-local-extractor-benchmark.mjs'
       - 'scripts/validate-phase12-local-extractor-benchmark.mjs'
+      - 'PROJECT_STATE.md'
+      - 'AI_BOOTSTRAP.md'
+      - 'docs/ROADMAP.md'
+      - 'docs/IMPLEMENTATION_ROADMAP.md'
       - 'docs/PHASE12_LOCAL_EXTRACTOR_BENCHMARK_PLAN_2026-09-22.md'
       - '.github/workflows/ci-phase12-local-extractor-benchmark.yml'
   workflow_dispatch:
