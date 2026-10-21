@@ -222,3 +222,73 @@
   border-color: #fca5a5;
   color: #991b1b;
 }
+
+.wiki-diagnostics-list {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.wiki-diagnostics-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  color: inherit;
+  font: inherit;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.wiki-diagnostics-row-button {
+  cursor: pointer;
+}
+
+.wiki-diagnostics-row-button:hover {
+  border-color: rgba(79, 70, 229, 0.45);
+  background: rgba(238, 242, 255, 0.85);
+}
+
+.wiki-diagnostics-row > span,
+.wiki-diagnostics-row > strong,
+.wiki-diagnostics-row strong,
+.wiki-diagnostics-row span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.wiki-quality-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  max-width: 100%;
+  font-weight: 700;
+}
+
+.wiki-quality-grade {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  background: #e2e8f0;
+  border-color: #cbd5f5;
+  color: #334155;
+}
