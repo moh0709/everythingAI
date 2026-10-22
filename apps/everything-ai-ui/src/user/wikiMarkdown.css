@@ -775,3 +775,8 @@
     text-align: left;
   }
 }
+
+
+.wiki-reading-list { display: grid; gap: 0.85rem; margin: 1rem 0; }
+.wiki-reading-paragraph { padding: 0.85rem 1rem; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; line-height: 1.6; }
+.wiki-source-preview-focus { border: 2px solid #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18); }

@@ -278,6 +278,112 @@
   font-weight: 700;
 }
 
+
+.wiki-quality-good { background: #dcfce7; border-color: #86efac; color: #166534; }
+.wiki-quality-warning { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+.wiki-quality-danger { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+.wiki-diagnostics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.wiki-diagnostics-card {
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  border-radius: 14px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.72);
+  min-width: 0;
+}
+
+.wiki-diagnostics-card-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.6rem;
+}
+
+.wiki-diagnostics-card-title strong { color: #0f172a; font-size: 0.95rem; }
+.wiki-diagnostics-card-title span { color: #64748b; font-size: 0.8rem; }
+
+.wiki-diagnostics-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.wiki-diagnostics-mini-grid > div { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.85rem; }
+.wiki-diagnostics-mini-grid span { color: #64748b; font-weight: 700; }
+.wiki-diagnostics-mini-grid strong { color: #0f172a; }
+
+.wiki-diagnostics-detail { margin-top: 0.5rem; font-size: 0.85rem; color: #334155; }
+.wiki-diagnostics-detail-static { }
+.wiki-diagnostics-detail dl { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.4rem; margin: 0.5rem 0; }
+.wiki-diagnostics-detail dt { color: #64748b; font-size: 0.72rem; font-weight: 900; text-transform: uppercase; }
+.wiki-diagnostics-detail dd { margin: 0; color: #0f172a; font-weight: 700; }
+
+.wiki-diagnostics-reasons { margin: 0.5rem 0 0; padding-left: 1.1rem; color: #475569; font-size: 0.85rem; }
+.wiki-diagnostics-empty { color: #64748b; font-style: italic; padding: 0.5rem 0; }
+.wiki-diagnostics-guidance { border: 1px solid #c7d2fe; background: #eef2ff; border-radius: 12px; padding: 0.85rem 1rem; margin-bottom: 1rem; color: #3730a3; }
+.wiki-diagnostics-guidance strong { display: block; margin-bottom: 0.25rem; }
+
+.wiki-rebuild-loading { color: #64748b; font-style: italic; padding: 0.5rem 0; }
+.wiki-rebuild-empty { color: #64748b; font-style: italic; padding: 1rem 0; text-align: center; }
+
+.wiki-rebuild-job-list { display: grid; gap: 0.85rem; margin-top: 1rem; }
+
+.wiki-rebuild-job {
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.wiki-rebuild-job-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; }
+.wiki-rebuild-job-id { color: #64748b; font-size: 0.78rem; word-break: break-all; }
+
+.wiki-job-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid #cbd5e1;
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.wiki-job-status-queued { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+.wiki-job-status-running { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+.wiki-job-status-completed { background: #dcfce7; border-color: #86efac; color: #166534; }
+.wiki-job-status-failed { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+.wiki-job-queued { border-left: 4px solid #fcd34d; }
+.wiki-job-running { border-left: 4px solid #93c5fd; }
+.wiki-job-completed { border-left: 4px solid #86efac; }
+.wiki-job-failed { border-left: 4px solid #fca5a5; }
+
+.wiki-rebuild-progress-track { height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; margin: 0.5rem 0; }
+.wiki-rebuild-progress-bar { height: 100%; background: linear-gradient(90deg, #4f46e5, #a855f7); transition: width 0.2s ease; }
+.wiki-rebuild-progress-text { color: #64748b; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.6rem; }
+
+.wiki-rebuild-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  font-size: 0.82rem;
+}
+
+.wiki-rebuild-meta-grid span { color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 0.72rem; }
+.wiki-rebuild-meta-grid strong { color: #0f172a; }
+
+
 .wiki-quality-grade {
   display: inline-flex;
   align-items: center;
